@@ -1,2 +1,4 @@
 # VIM swapfiles
 *.sw[po]
+
+venv/
