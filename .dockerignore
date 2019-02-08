@@ -1,4 +1,9 @@
 # VIM swapfiles
 *.sw[po]
 
+# venv files
 venv/
+
+# Python cache files
+*.pyc
+__pycache__

@@ -1,33 +1,49 @@
 #!/usr/bin/env python3
 
+"""
+Setup.py
+
+This module is used for installation of this code directly on the machine
+"""
+
+import os.path
+
 from setuptools import setup, find_packages
 
+PACKAGE_NAME = "conjur_api_python3"
+CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
+VERSION_FILE = os.path.join(CURRENT_DIR, PACKAGE_NAME, "__version__.py")
+
+VERSION_DATA = {}
+with open(VERSION_FILE, 'r') as version_fp:
+    exec(version_fp.read(), VERSION_DATA)
+
 setup(
-    name = "conjur-api-python3",
-    version = "0.0.1",
-    packages = find_packages(),
-    zip_safe = True,
+    name="conjur-api-python",
+    version=VERSION_DATA['__version__'],
+    packages=find_packages(),
+    zip_safe=True,
 
-    install_requires = open('requirements.txt').readlines(),
+    install_requires=open('requirements.txt').readlines(),
 
-    package_data = {
+    package_data={
         '': ['*.md'],
     },
 
-    author = "CyberArk Software, Inc",
-    author_email = "CyberArk Maintainers <conj_maintainers@cyberark.com>",
-    description = "APIs for interacting with the Conjur v5 appliance",
-    license = "MIT",
-    url = "https://github.com/conjurinc/conjur-api-python3",
-    keywords = [
+    author="CyberArk Software, Inc",
+    author_email="CyberArk Maintainers <conj_maintainers@cyberark.com>",
+    description="APIs for interacting with the Conjur v5 appliance",
+    license="MIT",
+    url="https://github.com/conjurinc/conjur-api-python3",
+    keywords=[
         "conjur",
         "cyberark",
         "security",
         "vault",
         "privileged access",
         "microservices"
-    ],
-    classifiers = [
+        ],
+    classifiers=[
         "Programming Language :: Python :: 3 :: Only",
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
