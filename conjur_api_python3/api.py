@@ -57,16 +57,10 @@ class Api(object):
 
     @property
     def api_token(self):
-        if not self._api_token:
-            print("API token missing. Fething new one...")
+        if not self._api_token or datetime.now() > self._api_token_expires_on:
+            print("API token missing or expired. Fething new one...")
             self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
-            self._api_token = self.authenticate(self.login_id, self.api_key)
-            return self._api_token
-
-        if datetime.now() > self._api_token_expires_on:
-            print("API token expired. Fetching new token...")
-            self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
-            self._api_token = self.authenticate(self.login_id, self.api_key)
+            self._api_token = self.authenticate()
             return self._api_token
 
         print("Using cached API token...")
@@ -104,18 +98,18 @@ class Api(object):
 
         return self.api_key
 
-    def authenticate(self, login_id=None, api_key=None):
+    def authenticate(self):
         """
         TODO
         """
 
-        if not self._url or not login_id or not api_key:
+        if not self._url or not self.login_id or not self.api_key:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
         print("Authenticating to {}...".format(self._url))
         return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
-                { 'login': quote(login_id) }, api_key).text
+                { 'login': quote(self.login_id) }, self.api_key).text
 
     def set_variable(self, variable_id, value):
         params = {
