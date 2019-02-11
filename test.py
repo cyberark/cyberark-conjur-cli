@@ -14,6 +14,7 @@ def run():
                            account="myorg",
                            login_id='admin',
                            password='supersecret',
+                           debug=False,
                            ssl_verify=False)
 
     expected_value = str(time.time()).encode('utf-8')

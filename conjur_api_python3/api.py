@@ -4,23 +4,10 @@ from urllib.parse import quote
 import requests
 from requests.auth import HTTPBasicAuth
 
-# Debug logging
-if False:
-    import logging
-    from http.client import HTTPConnection
-
-    HTTPConnection.debuglevel = 1
-
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
-    requests_log = logging.getLogger("urllib3")
-    requests_log.setLevel(logging.DEBUG)
-    requests_log.propagate = True
-
 class Api(object):
     KIND_VARIABLE='variable'
 
-    def __init__(self, url=None, server_cert=None, account='default', ssl_verify=True):
+    def __init__(self, url=None, server_cert=None, account='default', ssl_verify=True, debug=False):
         if not url or not account:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in Api creation!")
@@ -33,6 +20,18 @@ class Api(object):
         if not ssl_verify:
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        if debug:
+            import logging
+            from http.client import HTTPConnection
+
+            HTTPConnection.debuglevel = 1
+
+            logging.basicConfig()
+            logging.getLogger().setLevel(logging.DEBUG)
+            requests_log = logging.getLogger("urllib3")
+            requests_log.setLevel(logging.DEBUG)
+            requests_log.propagate = True
 
     def login(self, login_id=None, password=None):
         """

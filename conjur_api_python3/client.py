@@ -25,10 +25,13 @@ class Client(object):
     _api = None
     _login_id = None
     _api_key = None
+    _debug = False
 
     def __init__(self, url=None, server_cert=None, account='default', login_id=None,
-            password=None, ssl_verify=True):
+            password=None, ssl_verify=True, debug=False):
         print("Initializing configuration...")
+
+        self._debug = debug
 
         if url is None:
             raise ConfigException("Appliance URL not found!")
@@ -43,7 +46,7 @@ class Client(object):
         print("Verifying the URL...")
         # TODO: Implement me!
 
-        self._api = Api(url, server_cert, account, ssl_verify=ssl_verify)
+        self._api = Api(url, server_cert, account, ssl_verify=ssl_verify, debug=debug)
 
         self._login_id = login_id
         self._api_key = self._api.login(login_id, password)
