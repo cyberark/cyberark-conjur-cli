@@ -1,4 +1,6 @@
 import base64
+
+from datetime import datetime, timedelta
 from enum import auto, Enum
 from urllib.parse import quote
 
@@ -14,7 +16,13 @@ class ConjurEndpoint(Enum):
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
 
 class Api(object):
+    # Tokens should only be reused for 5 minutes
+    API_TOKEN_DURATION = 5
+
     KIND_VARIABLE='variable'
+
+    _api_token = None
+    _api_token_expires_on = None
 
     def __init__(self, url=None, server_cert=None, account='default', ssl_verify=True, debug=False):
         if not url or not account:
@@ -47,6 +55,39 @@ class Api(object):
             requests_log.setLevel(logging.DEBUG)
             requests_log.propagate = True
 
+    @property
+    def api_token(self):
+        if not self._api_token:
+            print("API token missing. Fething new one...")
+            self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
+            self._api_token = self.authenticate(self.login_id, self.api_key)
+            return self._api_token
+
+        if datetime.now() > self._api_token_expires_on:
+            print("API token expired. Fetching new token...")
+            self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
+            self._api_token = self.authenticate(self.login_id, self.api_key)
+            return self._api_token
+
+        print("Using cached API token...")
+        return self._api_token
+
+    @property
+    def api_key(self):
+        return self._api_key
+
+    @api_key.setter
+    def api_key(self, value):
+        self._api_key = value
+
+    @property
+    def login_id(self):
+        return self._login_id
+
+    @login_id.setter
+    def login_id(self, value):
+        self._login_id = value
+
     def login(self, login_id=None, password=None):
         """
         TODO
@@ -57,8 +98,11 @@ class Api(object):
             raise RuntimeError("Missing parameters in login invocation!")
 
         print("Logging in to {}...".format(self._url))
-        return self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
+        self.api_key = self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
                 None, auth=(login_id, password)).text
+        self.login_id = login_id
+
+        return self.api_key
 
     def authenticate(self, login_id=None, api_key=None):
         """
@@ -73,27 +117,23 @@ class Api(object):
         return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
                 { 'login': quote(login_id) }, api_key).text
 
-    def set_variable(self, variable_id, value, login_id, api_key):
-        token = self.authenticate(login_id, api_key)
-
+    def set_variable(self, variable_id, value):
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
         }
 
         return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
-                                     value, api_token=token).text
+                                     value, api_token=self.api_token).text
 
-    def get_variable(self, variable_id, login_id, api_key):
-        token = self.authenticate(login_id, api_key)
-
+    def get_variable(self, variable_id):
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
         }
 
         return self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
-                                     api_token=token).content
+                                     api_token=self.api_token).content
 
     def _base64encode(self, source_str):
         return base64.b64encode(source_str.encode())

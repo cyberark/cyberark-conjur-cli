@@ -46,15 +46,15 @@ class Client(object):
         print("Verifying the URL...")
         # TODO: Implement me!
 
-        self._api = Api(url, server_cert, account, ssl_verify=ssl_verify, debug=debug)
-
         self._login_id = login_id
+
+        self._api = Api(url, server_cert, account, ssl_verify=ssl_verify, debug=debug)
         self._api_key = self._api.login(login_id, password)
 
         print("Client initialized")
 
     def get(self, variable_id):
-        return self._api.get_variable(variable_id, self._login_id, self._api_key)
+        return self._api.get_variable(variable_id)
 
     def set(self, variable_id, value):
-        self._api.set_variable(variable_id, value, self._login_id, self._api_key)
+        self._api.set_variable(variable_id, value)
