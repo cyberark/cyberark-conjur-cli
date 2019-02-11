@@ -129,9 +129,6 @@ class Api(object):
         return self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                      api_token=self.api_token).content
 
-    def _base64encode(self, source_str):
-        return base64.b64encode(source_str.encode())
-
     def _invoke_endpoint(self, verb_id, endpoint_id, params, *args,
             check_errors=True, auth=None, api_token=None):
 
@@ -142,7 +139,7 @@ class Api(object):
 
         headers={}
         if api_token and len(api_token) > 0:
-            encoded_token = self._base64encode(api_token).decode('utf-8')
+            encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
             headers['Authorization'] = 'Token token="{}"'.format(encoded_token)
 
         verb = HttpVerb(verb_id).name.lower()
