@@ -13,3 +13,8 @@ Finally, enable your terminal to use those files with this command:
 ```
 $ source venv/bin/activate
 ```
+
+# Testing
+
+1. Change the login credentials in `test.sh` file
+1. Run `./test.sh`
