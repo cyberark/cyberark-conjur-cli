@@ -9,6 +9,9 @@ class HttpVerb(Enum):
     GET = auto()
     POST = auto()
 
+class ConjurEndpoint(Enum):
+    SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
+
 class Api(object):
     KIND_VARIABLE='variable'
 
@@ -21,6 +24,11 @@ class Api(object):
         self._server_cert = server_cert
         self._account = account
         self._ssl_verify = ssl_verify
+
+        self._default_params = {
+            'url': url,
+            'account': quote(account)
+        }
 
         if not ssl_verify:
             import urllib3
@@ -69,18 +77,24 @@ class Api(object):
 
     def set_variable(self, variable_id, value, login_id, api_key):
         token = self.authenticate(login_id, api_key)
-        url = "{url}/secrets/{account}/{kind}/{identifier}".format(url=self._url,
-                                                                   account=quote(self._account),
-                                                                   kind=self.KIND_VARIABLE,
-                                                                   identifier=quote(variable_id))
+
+        params = {
+            'kind': self.KIND_VARIABLE,
+            'identifier': quote(variable_id)
+        }
+        url = ConjurEndpoint.SECRETS.value.format(**self._default_params, **params)
+
         return self._invoke_endpoint(HttpVerb.POST, url, value, api_token=token).text
 
     def get_variable(self, variable_id, login_id, api_key):
         token = self.authenticate(login_id, api_key)
-        url = "{url}/secrets/{account}/{kind}/{identifier}".format(url=self._url,
-                                                                   account=quote(self._account),
-                                                                   kind=self.KIND_VARIABLE,
-                                                                   identifier=quote(variable_id))
+
+        params = {
+            'kind': self.KIND_VARIABLE,
+            'identifier': quote(variable_id)
+        }
+        url = ConjurEndpoint.SECRETS.value.format(**self._default_params, **params)
+
         return self._invoke_endpoint(HttpVerb.GET, url, api_token=token).content
 
     def _base64encode(self, source_str):
