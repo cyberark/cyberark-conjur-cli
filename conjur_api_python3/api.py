@@ -3,7 +3,6 @@ from enum import auto, Enum
 from urllib.parse import quote
 
 import requests
-from requests.auth import HTTPBasicAuth
 
 class HttpVerb(Enum):
     GET = auto()
@@ -59,7 +58,7 @@ class Api(object):
 
         print("Logging in to {}...".format(self._url))
         return self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
-                None, auth=HTTPBasicAuth(login_id, password)).text
+                None, auth=(login_id, password)).text
 
     def authenticate(self, login_id=None, api_key=None):
         """
