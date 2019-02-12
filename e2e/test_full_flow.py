@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+# Ensure that we can import the toplevel dir
+import sys
+sys.path.append(".")
+sys.path.append("..")
+
+# Regular imports
 import os
 import time
 
