@@ -5,15 +5,28 @@ import time
 
 import conjur_api_python3 as conjur
 
-VARIABLE_PATH='a/ b/c'
+VARIABLE_PATH = 'a/ b/c'
+USE_CONJURRC = True
+
+CONJUR_INFO = {
+    'url': "https://conjur.myorg.com",
+    'account': "default",
+}
+
+ACCOUNT_INFO = {
+    'ca_bundle': os.path.expanduser(os.path.join("~", "conjur-conjur.pem")),
+    'login_id': 'admin',
+    'password': 'supersecret',
+}
 
 def run():
-    ca_bundle = os.path.expanduser(os.path.join("~", "conjur-conjur.pem"))
-    client = conjur.Client(url="https://conjur.myorg.com",
-                           ca_bundle=ca_bundle,
-                           account="myorg",
-                           login_id='admin',
-                           password='supersecret')
+    client = None
+    if USE_CONJURRC is True:
+        print("Using conjurrc to log in...")
+        client = conjur.Client(**CONJUR_INFO)
+    else:
+        print("Using username/password combo to log in...")
+        client = conjur.Client(**CONJUR_INFO, **ACCOUNT_INFO)
 
     expected_value = str(time.time()).encode('utf-8')
     print("Setting var '{}' to '{}'...".format(VARIABLE_PATH, expected_value))

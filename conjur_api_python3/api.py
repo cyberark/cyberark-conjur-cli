@@ -24,7 +24,9 @@ class Api(object):
     _api_token = None
     _api_token_expires_on = None
 
-    def __init__(self, url, ca_bundle=None, account='default', ssl_verify=True, debug=False):
+    def __init__(self, url=None, ca_bundle=None, plugins=[],
+            account='default', api_key=None, login_id=None, ssl_verify=True, debug=False):
+
         if not url or not account:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in Api creation!")
@@ -36,6 +38,9 @@ class Api(object):
         self._ssl_verify = ssl_verify
         if ca_bundle:
             self._ssl_verify=ca_bundle
+
+        self.api_key = api_key
+        self.login_id = login_id
 
         self._default_params = {
             'url': url,
@@ -148,9 +153,7 @@ class Api(object):
         request_method = getattr(requests, verb)
 
         response = request_method(url, *args, verify=self._ssl_verify, auth=auth, headers=headers)
-        if check_errors and response.status_code >= 300:
-            # TODO: Use custom errors
-            raise RuntimeError("Request failed: {}: {}".format(response.status_code,
-                                                               response.text))
+        if check_errors:
+            response.raise_for_status()
 
         return response

@@ -6,6 +6,8 @@ the Conjur server
 """
 
 from .api import Api
+from .config import Config as ApiConfig
+
 
 class ConfigException(Exception):
     """
@@ -14,6 +16,7 @@ class ConfigException(Exception):
     This class is used to wrap a regular exception with a more-descriptive class name
     """
     pass
+
 
 class Client(object):
     """
@@ -45,8 +48,23 @@ class Client(object):
 
         self._login_id = login_id
 
-        self._api = Api(url, account=account, ca_bundle=ca_bundle, ssl_verify=ssl_verify, debug=debug)
-        self._api_key = self._api.login(login_id, password)
+        config = {
+            'url': url,
+            'account': account,
+            'ca_bundle': ca_bundle,
+        }
+
+        if not login_id or not password:
+            print("Login id or password not provided. Using conjurrc as credential store...")
+            config = dict(ApiConfig())
+
+        self._api = Api(**config, ssl_verify=ssl_verify, debug=debug)
+
+        if password:
+            print("Creating API key with password...")
+            self._api_key = self._api.login(login_id, password)
+        else:
+            print("Using API key with netrc credentials...")
 
         print("Client initialized")
 
