@@ -8,7 +8,7 @@ import conjur_api_python3 as conjur
 VARIABLE_PATH='a/ b/c'
 
 def run():
-    server_cert = os.path.expanduser(os.path.join("~", "conjur-conjur.pem"))
+    ca_bundle = os.path.expanduser(os.path.join("~", "conjur-conjur.pem"))
     client = conjur.Client(url="https://conjur.myorg.com",
                            ca_bundle=ca_bundle,
                            account="myorg",
