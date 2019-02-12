@@ -1,3 +1,4 @@
+import logging
 import netrc
 import os.path
 
@@ -23,7 +24,7 @@ class Config(object):
     _config = {}
 
     def __init__(self, config_file=DEFAULT_CONFIG_FILE):
-        print("Trying to get configuration from filesystem ({})...".format(config_file))
+        logging.info("Trying to get configuration from filesystem ({})...".format(config_file))
 
         config = None
         with open(config_file, 'r') as config_fp:
@@ -33,7 +34,7 @@ class Config(object):
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
 
-        print("Trying to get API key from netrc...")
+        logging.info("Trying to get API key from netrc...")
         netrc_obj = netrc.netrc()
         netrc_auth = netrc_obj.authenticators(NETRC_HOST_URL.format(**self._config))
         if netrc_auth is None:

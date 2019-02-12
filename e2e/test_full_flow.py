@@ -17,6 +17,8 @@ USE_CONJURRC = True
 CONJUR_INFO = {
     'url': "https://conjur.myorg.com",
     'account': "default",
+#    'debug': True,
+#    'http_debug': False,
 }
 
 ACCOUNT_INFO = {

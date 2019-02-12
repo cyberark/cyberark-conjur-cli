@@ -1,4 +1,5 @@
 import base64
+import logging
 
 from datetime import datetime, timedelta
 from enum import auto, Enum
@@ -25,7 +26,7 @@ class Api(object):
     _api_token_expires_on = None
 
     def __init__(self, url=None, ca_bundle=None, plugins=[],
-            account='default', api_key=None, login_id=None, ssl_verify=True, debug=False):
+            account='default', api_key=None, login_id=None, ssl_verify=True, http_debug=False):
 
         if not url or not account:
             # TODO: Use custom error
@@ -51,7 +52,7 @@ class Api(object):
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        if debug:
+        if http_debug:
             import logging
             from http.client import HTTPConnection
 
@@ -66,12 +67,12 @@ class Api(object):
     @property
     def api_token(self):
         if not self._api_token or datetime.now() > self._api_token_expires_on:
-            print("API token missing or expired. Fetching new one...")
+            logging.info("API token missing or expired. Fetching new one...")
             self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
             self._api_token = self.authenticate()
             return self._api_token
 
-        print("Using cached API token...")
+        logging.info("Using cached API token...")
         return self._api_token
 
     @property
@@ -99,7 +100,7 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
 
-        print("Logging in to {}...".format(self._url))
+        logging.info("Logging in to {}...".format(self._url))
         self.api_key = self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
                 None, auth=(login_id, password)).text
         self.login_id = login_id
@@ -115,7 +116,7 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
-        print("Authenticating to {}...".format(self._url))
+        logging.info("Authenticating to {}...".format(self._url))
         return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
                 { 'login': quote(self.login_id) }, self.api_key).text
 
