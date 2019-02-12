@@ -16,7 +16,7 @@ class ConjurEndpoint(Enum):
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
 
 class Api(object):
-    # Tokens should only be reused for 5 minutes
+    # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
     API_TOKEN_DURATION = 5
 
     KIND_VARIABLE='variable'
@@ -61,7 +61,7 @@ class Api(object):
     @property
     def api_token(self):
         if not self._api_token or datetime.now() > self._api_token_expires_on:
-            print("API token missing or expired. Fething new one...")
+            print("API token missing or expired. Fetching new one...")
             self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
             self._api_token = self.authenticate()
             return self._api_token

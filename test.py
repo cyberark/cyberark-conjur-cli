@@ -13,9 +13,7 @@ def run():
                            ca_bundle=ca_bundle,
                            account="myorg",
                            login_id='admin',
-                           password='supersecret',
-                           debug=False,
-                           ssl_verify=True)
+                           password='supersecret')
 
     expected_value = str(time.time()).encode('utf-8')
     print("Setting var '{}' to '{}'...".format(VARIABLE_PATH, expected_value))
