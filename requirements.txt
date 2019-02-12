@@ -1,2 +1,3 @@
+nose2>=0.8.0
 requests>=2.21.0
 PyYAML>=3.13
