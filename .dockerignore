@@ -7,3 +7,6 @@ venv/
 # Python cache files
 *.pyc
 __pycache__
+
+# Test outputs
+output/*.xml
