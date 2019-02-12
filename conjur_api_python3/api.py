@@ -24,15 +24,18 @@ class Api(object):
     _api_token = None
     _api_token_expires_on = None
 
-    def __init__(self, url=None, server_cert=None, account='default', ssl_verify=True, debug=False):
+    def __init__(self, url, ca_bundle=None, account='default', ssl_verify=True, debug=False):
         if not url or not account:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in Api creation!")
 
         self._url = url
-        self._server_cert = server_cert
+        self._ca_bundle = ca_bundle
         self._account = account
+
         self._ssl_verify = ssl_verify
+        if ca_bundle:
+            self._ssl_verify=ca_bundle
 
         self._default_params = {
             'url': url,
@@ -132,8 +135,7 @@ class Api(object):
     def _invoke_endpoint(self, verb_id, endpoint_id, params, *args,
             check_errors=True, auth=None, api_token=None):
 
-        if params is None:
-            params = {}
+        params = params or {}
 
         url = ConjurEndpoint(endpoint_id).value.format(**self._default_params, **params)
 

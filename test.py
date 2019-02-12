@@ -10,12 +10,12 @@ VARIABLE_PATH='a/ b/c'
 def run():
     server_cert = os.path.expanduser(os.path.join("~", "conjur-conjur.pem"))
     client = conjur.Client(url="https://conjur.myorg.com",
-                           server_cert=server_cert,
+                           ca_bundle=ca_bundle,
                            account="myorg",
                            login_id='admin',
                            password='supersecret',
                            debug=False,
-                           ssl_verify=False)
+                           ssl_verify=True)
 
     expected_value = str(time.time()).encode('utf-8')
     print("Setting var '{}' to '{}'...".format(VARIABLE_PATH, expected_value))

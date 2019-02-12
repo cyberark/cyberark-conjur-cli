@@ -27,7 +27,7 @@ class Client(object):
     _api_key = None
     _debug = False
 
-    def __init__(self, url=None, server_cert=None, account='default', login_id=None,
+    def __init__(self, url=None, ca_bundle=None, account='default', login_id=None,
             password=None, ssl_verify=True, debug=False):
         print("Initializing configuration...")
 
@@ -35,9 +35,6 @@ class Client(object):
 
         if url is None:
             raise ConfigException("Appliance URL not found!")
-
-        if server_cert is None:
-            raise ConfigException("Server certificate not found!")
 
         # TODO: This probably should be optional
         print("Verifying the certificate...")
@@ -48,7 +45,7 @@ class Client(object):
 
         self._login_id = login_id
 
-        self._api = Api(url, server_cert, account, ssl_verify=ssl_verify, debug=debug)
+        self._api = Api(url, account=account, ca_bundle=ca_bundle, ssl_verify=ssl_verify, debug=debug)
         self._api_key = self._api.login(login_id, password)
 
         print("Client initialized")
