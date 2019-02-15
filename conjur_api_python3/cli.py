@@ -33,7 +33,7 @@ class Cli(object):
         parser.add_argument('-v', '--version', action='version',
             version='%(prog)s v' + __version__)
 
-        parser.add_argument('--debug',
+        parser.add_argument('-d', '--debug',
             help='Enable debugging output',
             action='store_true')
 
@@ -43,7 +43,15 @@ class Cli(object):
 
 
         resource, args = self._parse_args(parser)
-        client = Client()
+
+        # We don't have a good "debug" vs "verbose" separation right now
+        if args.verbose is True:
+            args.debug = True
+
+        self._run_client_action(resource, args)
+
+    def _run_client_action(self, resource, args):
+        client = Client(debug=args.debug)
 
         if resource == 'variable':
             variable_id = args.variable_id

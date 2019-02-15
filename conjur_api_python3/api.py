@@ -48,7 +48,10 @@ class Api(object):
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        if http_debug:
+        # We don't want to record data on the line under any conditions other
+        # than development
+        # if http_debug:
+        if False:
             import logging
             from http.client import HTTPConnection
 
