@@ -1,5 +1,4 @@
 #!/bin/bash -e
 
-docker build -f Dockerfile.test \
-             -t conjur-api-python3-test \
-             .
+rm -rf dist/
+/usr/bin/env python3 setup.py sdist bdist

@@ -24,7 +24,22 @@ setup(
     packages=find_packages(),
     zip_safe=True,
 
-    install_requires=open('requirements.txt').readlines(),
+    scripts=['bin/conjur-py3-cli'],
+
+    entry_points = {
+        'console_scripts': ['conjur-py3-cli=conjur_api_python3:Cli.launch'],
+
+        'setuptools.installation': [
+            'eggsecutable = conjur_api_python3:yCli.launch',
+        ]
+    },
+
+    # Keep this in sync with requirements.txt
+    install_requires=[
+        "nose2>=0.8.0",
+        "requests>=2.21.0",
+        "PyYAML>=3.13",
+    ],
 
     package_data={
         '': ['*.md'],

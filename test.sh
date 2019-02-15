@@ -5,7 +5,7 @@ if [[ "$1" == "-l" ]]; then
   exit 0
 fi
 
-./build.sh
+./build_container.sh
 
 docker run --rm \
            -t \
