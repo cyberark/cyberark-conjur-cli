@@ -30,7 +30,7 @@ setup(
         'console_scripts': ['conjur-py3-cli=conjur_api_python3:Cli.launch'],
 
         'setuptools.installation': [
-            'eggsecutable = conjur_api_python3:yCli.launch',
+            'eggsecutable = conjur_api_python3:Cli.launch',
         ]
     },
 
