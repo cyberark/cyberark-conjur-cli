@@ -10,3 +10,8 @@ __pycache__
 
 # Test outputs
 output/*.xml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
