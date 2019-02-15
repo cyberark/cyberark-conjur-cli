@@ -8,8 +8,4 @@ sys.path.append("..")
 from conjur_api_python3.cli import Cli
 
 if __name__ == '__main__':
-    print("Starting...")
-    exit_code = Cli.launch()
-
-    print("Exiting...")
-    sys.exit(exit_code)
+    Cli.launch()

@@ -12,7 +12,7 @@ from setuptools import setup, find_packages
 
 PACKAGE_NAME = "conjur_api_python3"
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
-VERSION_FILE = os.path.join(CURRENT_DIR, PACKAGE_NAME, "__version__.py")
+VERSION_FILE = os.path.join(CURRENT_DIR, PACKAGE_NAME, "version.py")
 
 VERSION_DATA = {}
 with open(VERSION_FILE, 'r') as version_fp:

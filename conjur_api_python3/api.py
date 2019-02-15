@@ -28,10 +28,6 @@ class Api(object):
     def __init__(self, url=None, ca_bundle=None, plugins=[],
             account='default', api_key=None, login_id=None, ssl_verify=True, http_debug=False):
 
-        if not url or not account:
-            # TODO: Use custom error
-            raise RuntimeError("Missing parameters in Api creation!")
-
         self._url = url
         self._ca_bundle = ca_bundle
         self._account = account

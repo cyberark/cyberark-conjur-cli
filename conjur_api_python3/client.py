@@ -38,16 +38,6 @@ class Client(object):
 
         logging.info("Initializing configuration...")
 
-        if url is None:
-            raise ConfigException("Appliance URL not found!")
-
-        # TODO: This probably should be optional
-        logging.debug("Verifying the certificate...")
-        # TODO: Implement me!
-
-        logging.debug("Verifying the URL...")
-        # TODO: Implement me!
-
         self._login_id = login_id
 
         config = {
@@ -56,8 +46,8 @@ class Client(object):
             'ca_bundle': ca_bundle,
         }
 
-        if not login_id or not password:
-            logging.info("Login id or password not provided. Using conjurrc as credential store...")
+        if not url or not account or not login_id or not password:
+            logging.info("Not all expected variables were provided. Using conjurrc as credential store...")
             config = dict(ApiConfig())
 
         self._api = Api(**config, ssl_verify=ssl_verify, http_debug=http_debug)

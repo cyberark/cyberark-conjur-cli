@@ -1,19 +1,68 @@
 import sys
+import argparse
+
+from .client import Client
+
+from .version import __version__
+
 
 class Cli(object):
-    def __init__(self):
-        print("String CLI...")
-
     def run(self, *args, **kwargs):
-        print("Invoking CLI runner...")
-        cli_args = sys.argv
-        print("CLI args:", cli_args)
-        print("Args:", args)
-        print("Kwargs:", kwargs)
+        parser = argparse.ArgumentParser(description='Conjur Python3 API CLI')
+
+        resource_subparsers = parser.add_subparsers(dest='resource')
+
+        variable_parser = resource_subparsers.add_parser('variable',
+            help='Perform variable-related actions . See "variable -help" for more options')
+
+        variable_subparsers = variable_parser.add_subparsers(dest='action')
+        get_variable_parser = variable_subparsers.add_parser('get',
+            help='Get the value of a variable')
+        set_variable_parser = variable_subparsers.add_parser('set',
+            help='Set the value of a variable')
+
+        get_variable_parser.add_argument('variable_id',
+            help='ID of the variable')
+
+        set_variable_parser.add_argument('variable_id',
+            help='ID of the variable')
+        set_variable_parser.add_argument('value',
+            help='New value of the variable')
+
+
+        parser.add_argument('-v', '--version', action='version',
+            version='%(prog)s v' + __version__)
+
+        parser.add_argument('--debug',
+            help='Enable debugging output',
+            action='store_true')
+
+        parser.add_argument('--verbose',
+            help='Enable verbose debugging output',
+            action='store_true')
+
+
+        resource, args = self._parse_args(parser)
+        client = Client()
+
+        if resource == 'variable':
+            variable_id = args.variable_id
+            if args.action == 'get':
+                variable_value = client.get(variable_id)
+                print(variable_value.decode('utf-8'), end='')
+            else:
+                client.set(variable_id, args.value)
+
+    def _parse_args(self, parser):
+        args = parser.parse_args()
+
+        if not args.resource:
+            parser.print_help()
+
+        return args.resource, args
 
     @staticmethod
     def launch():
-        print("Launching app")
         return Cli().run()
 
 if __name__ == '__main__':
