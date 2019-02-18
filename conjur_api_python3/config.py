@@ -12,33 +12,40 @@ NETRC_HOST_URL="{url}/authn"
 
 class Config(object):
     DEFAULT_CONFIG_FILE = os.path.expanduser(os.path.join('~', '.conjurrc'))
+    DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', '.netrc'))
 
     # We intentionally remap some fields to friendlier names
+    # Conjurrc field / Config name / Mandatory
     FIELDS = [
-        ('account', 'account'),
-        ('appliance_url', 'url'),
-        ('cert_file', 'ca_bundle'),
-        ('plugins', 'plugins'),
+        ('account', 'account', True),
+        ('appliance_url', 'url', True),
+        ('cert_file', 'ca_bundle', False),
+        ('plugins', 'plugins', False),
     ]
 
     _config = {}
 
-    def __init__(self, config_file=DEFAULT_CONFIG_FILE):
+    def __init__(self, config_file=DEFAULT_CONFIG_FILE, netrc_file=DEFAULT_NETRC_FILE):
         logging.info("Trying to get configuration from filesystem ({})...".format(config_file))
 
         config = None
         with open(config_file, 'r') as config_fp:
             config = load(config_fp, Loader=Loader)
 
-        for config_field_name, attribute_name in self.FIELDS:
+        for config_field_name, attribute_name, mandatory in self.FIELDS:
+            if mandatory:
+                assert(config_field_name in config)
+
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
 
         logging.info("Trying to get API key from netrc...")
-        netrc_obj = netrc.netrc()
-        netrc_auth = netrc_obj.authenticators(NETRC_HOST_URL.format(**self._config))
+        netrc_obj = netrc.netrc(netrc_file)
+        netrc_host_url = NETRC_HOST_URL.format(**self._config)
+        netrc_auth = netrc_obj.authenticators(netrc_host_url)
         if netrc_auth is None:
-            raise RuntimeError("Netrc didn't contain auth info for {}!".format(self._config['url']))
+            raise RuntimeError("Netrc '{}' didn't contain auth info for {}!".format(netrc_file,
+                netrc_host_url))
 
         login_id, _, api_key = netrc_auth
 

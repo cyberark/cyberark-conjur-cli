@@ -1,0 +1,4 @@
+---
+plugins: ['foo', 'bar']
+appliance_url: https://someurl/somepath
+cert_file: "/cert/file/location"

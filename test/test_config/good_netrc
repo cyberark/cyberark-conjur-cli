@@ -1,0 +1,7 @@
+machine https://randommachine/
+  login randomlogin
+  password randompass
+
+machine https://someurl/somepath/authn
+  login someadmin
+  password conjurapikey
