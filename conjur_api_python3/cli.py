@@ -66,6 +66,7 @@ class Cli(object):
 
         if not args.resource:
             parser.print_help()
+            sys.exit(0)
 
         return args.resource, args
 
