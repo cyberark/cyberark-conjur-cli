@@ -29,8 +29,7 @@ pipeline {
 
     stage('Integration tests') {
       steps {
-        // sh './bin/test_integration'
-        sh 'true'
+        sh './bin/test_integration'
       }
 
       post {
