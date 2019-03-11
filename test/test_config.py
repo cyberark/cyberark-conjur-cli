@@ -69,6 +69,6 @@ class ConfigTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Config(config_file=self.MISSING_ACCOUNT_CONJURRC, netrc_file=self.GOOD_NETRC)
 
-    def test_config_with_no_conjurrc_account_raises_error(self):
+    def test_config_with_no_conjurrc_url_raises_error(self):
         with self.assertRaises(AssertionError):
             Config(config_file=self.MISSING_URL_CONJURRC, netrc_file=self.GOOD_NETRC)
