@@ -2,6 +2,12 @@
 
 Proof-of-concept Python3-based APIs for Conjur v5
 
+## Building
+
+```
+$ ./bin/build
+```
+
 ## Development
 
 Create a directory that will hold all the virtualenv packages and files:
@@ -16,5 +22,5 @@ $ source venv/bin/activate
 
 # Testing
 
-1. Change the login credentials in `test.sh` file
-1. Run `./test.sh`
+1. Change the login credentials in `test` file
+1. Run `./bin/test`

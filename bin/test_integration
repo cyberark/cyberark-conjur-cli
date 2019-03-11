@@ -1,0 +1,35 @@
+#!/bin/bash -e
+
+cleanup() {
+  echo "Cleaning up..."
+  docker-compose rm --stop --force -v
+}
+
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
+cleanup
+
+echo "Building API container..."
+docker-compose build
+
+echo "Starting Conjur..."
+docker-compose up -d conjur
+docker-compose exec -T conjur conjurctl wait
+
+echo "Configuring Conjur..."
+admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
+export CONJUR_AUTHN_API_KEY=$admin_api_key
+
+conjur_host_port=$(docker-compose port conjur 80)
+conjur_port="${conjur_host_port##*:}"
+
+#TODO: Use the Conjur instance to create conjurrc and netrc
+
+echo "Starting test env..."
+docker-compose up -d test
+
+rm -rf $CURRENT_DIR/output/*
+docker-compose run \
+  --rm \
+  --no-deps \
+  test \
+  nose2 -v -A 'integration' $@

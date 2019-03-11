@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+CURRENT_DIR=$(pwd)
+
+echo "Running unit tests..."
+$CURRENT_DIR/bin/test_unit
+echo "Unit tests completed"
+
+echo "Running integration tests..."
+$CURRENT_DIR/bin/test_integration
+echo "Integration tests completed"
+
+echo "All tests complete!"

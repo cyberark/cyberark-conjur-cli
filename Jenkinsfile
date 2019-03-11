@@ -17,7 +17,20 @@ pipeline {
 
     stage('Unit tests') {
       steps {
-        sh './test.sh'
+        sh './bin/test'
+      }
+
+      post {
+        always {
+          junit 'output/**/*.xml'
+        }
+      }
+    }
+
+    stage('Integration tests') {
+      steps {
+        # sh './bin/test_integration'
+        sh 'true'
       }
 
       post {

@@ -1,0 +1,32 @@
+version: '2'
+services:
+  pg:
+    image: postgres:9.4
+
+  conjur:
+    image: cyberark/conjur:1.3.5
+    command: server -a dev -f /policy/policy.yml
+    environment:
+      CONJUR_DATA_KEY: 'OyXV68Mip14xj33huGaQKewmmS+gKtDlp6ECZ2iATpU='
+      DATABASE_URL: postgres://postgres@pg/postgres
+      RAILS_ENV: development
+    ports:
+      - 80
+    volumes:
+      - ./test/test_config:/policy
+    depends_on:
+      - pg
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: env http_proxy=http://secretless:8080 test_integration
+    environment:
+      CONJUR_APPLIANCE_URL: http://conjur
+      CONJUR_ACCOUNT: dev
+      CONJUR_AUTHN_TOKEN: myauthntoken
+    depends_on:
+      - conjur
+    volumes:
+      - ./output:/opt/conjur-api-python3/output

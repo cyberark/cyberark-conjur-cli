@@ -11,7 +11,7 @@ from conjur_api_python3.cli import Cli
 from conjur_api_python3.version import __version__
 
 class CliTest(unittest.TestCase):
-    def cli_test(cli_args=[]):
+    def cli_test(cli_args=[], integration=False):
         def test_cli_decorator(original_function):
             @wraps(original_function)
             def test_wrapper_func(self, *inner_args, **inner_kwargs):
@@ -23,6 +23,9 @@ class CliTest(unittest.TestCase):
 
                 self.assertEqual(sys_exit.exception.code, 0)
                 original_function(self, capture_stream.getvalue())
+
+            # Set integration flag if specified
+            test_wrapper_func.integration = integration
 
             return test_wrapper_func
         return test_cli_decorator
@@ -47,5 +50,12 @@ class CliTest(unittest.TestCase):
     def test_cli_shows_version_with_long_version_flag(self, output):
         self.assertEquals("cli v{}\n".format(__version__), output)
 
-    # TODO: Test variable get
-    # TODO: Test variable set
+    ### Integration tests
+
+    @cli_test(["variable", "set", "one/password", "onepasswordvalue"], integration=True)
+    def test_cli_can_set_a_variable(self, output):
+        self.assertEquals("aaa", "bbb")
+
+    @cli_test(["variable", "get", "one/password"], integration=True)
+    def test_cli_can_get_a_variable(self, output):
+        self.assertEquals("onepasswordvalue", output)

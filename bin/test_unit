@@ -1,0 +1,17 @@
+#!/bin/bash -ex
+
+CURRENT_DIR=$(pwd)
+
+if [[ "$1" == "-l" ]]; then
+  shift
+  nose2 -v -A '!integration' $@
+  exit 0
+fi
+
+$CURRENT_DIR/bin/build_container
+
+rm -rf $CURRENT_DIR/output/*
+docker run --rm \
+           -t \
+           -v "$(pwd):/opt/conjur-api-python3" \
+           conjur-api-python3-test nose2 -v -A '!integration' $@

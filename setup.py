@@ -24,7 +24,7 @@ setup(
     packages=find_packages(),
     zip_safe=True,
 
-    scripts=['bin/conjur-py3-cli'],
+    scripts=['pkg_bin/conjur-py3-cli'],
 
     entry_points = {
         'console_scripts': ['conjur-py3-cli=conjur_api_python3:Cli.launch'],
