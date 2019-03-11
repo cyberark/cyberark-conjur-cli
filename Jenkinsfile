@@ -17,7 +17,7 @@ pipeline {
 
     stage('Unit tests') {
       steps {
-        sh './bin/test'
+        sh './bin/test_unit'
       }
 
       post {
