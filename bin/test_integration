@@ -32,4 +32,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  nose2 -v -A 'integration' $@
+  nose2 -v -X -A 'integration' $@
