@@ -33,6 +33,13 @@ class Cli(object):
         parser.add_argument('-v', '--version', action='version',
             version='%(prog)s v' + __version__)
 
+        parser.add_argument('-l', '--url')
+        parser.add_argument('-a', '--account')
+
+        # The external names for these are unfortunately named so we remap them
+        parser.add_argument('-u', '--user', dest='login_id')
+        parser.add_argument('-k', '--api-key', dest='password')
+
         parser.add_argument('-d', '--debug',
             help='Enable debugging output',
             action='store_true')
@@ -50,8 +57,17 @@ class Cli(object):
 
         self._run_client_action(resource, args)
 
+        # Explicit exit (required for tests)
+        sys.exit(0)
+
     def _run_client_action(self, resource, args):
-        client = Client(debug=args.debug)
+        # We want explicit definition of things to pass into the client
+        # to avoid ambiguity
+        client = Client(url=args.url,
+                        account=args.account,
+                        login_id=args.login_id,
+                        password=args.password,
+                        debug=args.debug)
 
         if resource == 'variable':
             variable_id = args.variable_id
@@ -60,6 +76,7 @@ class Cli(object):
                 print(variable_value.decode('utf-8'), end='')
             else:
                 client.set(variable_id, args.value)
+                print("Value set: '{}'".format(variable_id))
 
     def _parse_args(self, parser):
         args = parser.parse_args()
@@ -72,7 +89,7 @@ class Cli(object):
 
     @staticmethod
     def launch():
-        return Cli().run()
+        Cli().run()
 
 if __name__ == '__main__':
     Cli.launch()
