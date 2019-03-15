@@ -32,7 +32,7 @@ class Client(object):
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    def __init__(self, url=None, ca_bundle=None, account='default', login_id=None,
+    def __init__(self, api_class=Api, url=None, ca_bundle=None, account='default', login_id=None,
             password=None, ssl_verify=True, debug=False, http_debug=False):
         self._setup_logging(debug)
 
@@ -48,9 +48,12 @@ class Client(object):
 
         if not url or not account or not login_id or not password:
             logging.info("Not all expected variables were provided. Using conjurrc as credential store...")
-            config = dict(ApiConfig())
+            try:
+                config = dict(ApiConfig())
+            except Exception as e:
+                raise ConfigException(e)
 
-        self._api = Api(**config, ssl_verify=ssl_verify, http_debug=http_debug)
+        self._api = api_class(**config, ssl_verify=ssl_verify, http_debug=http_debug)
 
         if password:
             logging.info("Creating API key with password...")
