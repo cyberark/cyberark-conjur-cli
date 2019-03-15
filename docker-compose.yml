@@ -23,9 +23,10 @@ services:
       dockerfile: Dockerfile.test
     command: env http_proxy=http://secretless:8080 test_integration
     environment:
-      CONJUR_APPLIANCE_URL: http://conjur
-      CONJUR_ACCOUNT: dev
-      CONJUR_AUTHN_TOKEN: myauthntoken
+      - CONJUR_APPLIANCE_URL
+      - CONJUR_ACCOUNT
+      - CONJUR_AUTHN_LOGIN
+      - CONJUR_AUTHN_API_KEY
     depends_on:
       - conjur
     volumes:

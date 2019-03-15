@@ -22,7 +22,14 @@ export CONJUR_AUTHN_API_KEY=$admin_api_key
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
 
-#TODO: Use the Conjur instance to create conjurrc and netrc
+# Docker-compose will pick this file up when starting containers
+# so we will have these variables in the container
+cat <<ENV > .env
+CONJUR_APPLIANCE_URL=http://localhost:$conjur_port
+CONJUR_ACCOUNT=dev
+CONJUR_AUTHN_LOGIN=admin
+CONJUR_AUTHN_API_KEY=$admin_api_key
+ENV
 
 echo "Starting test env..."
 docker-compose up -d test

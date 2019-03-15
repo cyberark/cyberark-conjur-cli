@@ -8,7 +8,8 @@ venv/
 *.pyc
 __pycache__
 
-# Test outputs
+# Test artifacts
+.env
 output/*.xml
 
 # Build artifacts

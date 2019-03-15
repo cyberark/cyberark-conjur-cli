@@ -10,3 +10,6 @@ __pycache__
 
 # Test outputs
 output/*.xml
+
+# Docker-compose isn't needed in container
+docker-compose.yml
