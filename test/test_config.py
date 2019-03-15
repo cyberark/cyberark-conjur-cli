@@ -50,7 +50,9 @@ class ConfigTest(unittest.TestCase):
             "    api_key: conjurapikey\n" +
             "    ca_bundle: /cert/file/location\n" +
             "    login_id: someadmin\n" +
-            "    plugins: [foo, bar]\n" +
+            "    plugins:\n" +
+            "    - foo\n" +
+            "    - bar\n" +
             "    url: https://someurl/somepath\n")
 
     def test_config_with_no_conjurrc_raises_error(self):
