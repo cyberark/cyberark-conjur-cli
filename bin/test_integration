@@ -6,6 +6,7 @@ cleanup() {
 }
 
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
+trap 'cleanup' EXIT
 cleanup
 
 echo "Building API container..."
@@ -32,6 +33,7 @@ echo "Starting test env..."
 docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
+
 docker-compose run \
   --rm \
   --no-deps \
