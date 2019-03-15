@@ -21,13 +21,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    command: env http_proxy=http://secretless:8080 test_integration
+    command: ['sleep', '999d']
     environment:
-      - CONJUR_APPLIANCE_URL
-      - CONJUR_ACCOUNT
-      - CONJUR_AUTHN_LOGIN
-      - CONJUR_AUTHN_API_KEY
+      CONJUR_APPLIANCE_URL: http://conjur
+      CONJUR_ACCOUNT: dev
+      CONJUR_AUTHN_LOGIN: admin
+      CONJUR_AUTHN_API_KEY: Null
     depends_on:
       - conjur
     volumes:
-      - ./output:/opt/conjur-api-python3/output
+      - .:/opt/conjur-api-python3

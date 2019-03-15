@@ -25,9 +25,6 @@ conjur_port="${conjur_host_port##*:}"
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
 cat <<ENV > .env
-CONJUR_APPLIANCE_URL=http://localhost:$conjur_port
-CONJUR_ACCOUNT=dev
-CONJUR_AUTHN_LOGIN=admin
 CONJUR_AUTHN_API_KEY=$admin_api_key
 ENV
 
