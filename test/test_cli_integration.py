@@ -15,6 +15,8 @@ class CliIntegrationTest(unittest.TestCase):
         'CONJUR_AUTHN_API_KEY': 'api-key',
     }
 
+    DEFINED_VARIABLE_ID = 'one/password'
+
     def setUp(self):
         self.cli_auth_params = ['--debug']
         for required_env_var, param_name in self.REQUIRED_ENV_VARS.items():
@@ -28,21 +30,21 @@ class CliIntegrationTest(unittest.TestCase):
             self.cli_auth_params += ['--{}'.format(param_name), os.environ[required_env_var]]
 
         # Reset variable "one/password"
-        set_params = self.cli_auth_params + \
-            ["variable", "set", "one/password", "garbagevalue"]
-        invoke_cli(self, set_params)
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, 'garbagevalue')
+
+    def set_variable(self, variable_id, value):
+        return invoke_cli(self, self.cli_auth_params,
+            ['variable', 'set', variable_id, value])
+
+    def get_variable(self, variable_id):
+        return invoke_cli(self, self.cli_auth_params,
+            ['variable', 'get', variable_id])
 
     @integration_test
-    def test_cli_can_set_and_get_a_variable(self):
+    def test_cli_can_set_and_get_a_defined_variable(self):
         expected_value='expected ' + uuid.uuid4().hex
 
-        # Implicitly relies on the setter
-        set_params = self.cli_auth_params + \
-            ["variable", "set", "one/password", expected_value]
-        invoke_cli(self, set_params)
-
-        set_params = self.cli_auth_params + \
-            ["variable", "get", "one/password"]
-        output = invoke_cli(self, set_params)
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
+        output = self.get_variable(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
         self.assertEquals(expected_value, output)
