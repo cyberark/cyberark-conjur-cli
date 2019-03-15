@@ -1,3 +1,4 @@
+import os
 import sys
 import argparse
 
@@ -36,6 +37,8 @@ class Cli(object):
         parser.add_argument('-l', '--url')
         parser.add_argument('-a', '--account')
 
+        parser.add_argument('-c', '--ca-bundle')
+
         # The external names for these are unfortunately named so we remap them
         parser.add_argument('-u', '--user', dest='login_id')
         parser.add_argument('-k', '--api-key', dest='password')
@@ -61,12 +64,17 @@ class Cli(object):
         sys.exit(0)
 
     def _run_client_action(self, resource, args):
+        ca_bundle=None
+        if len(args.ca_bundle) > 0:
+            ca_bundle = os.path.expanduser(args.ca_bundle)
+
         # We want explicit definition of things to pass into the client
         # to avoid ambiguity
         client = Client(url=args.url,
                         account=args.account,
                         login_id=args.login_id,
                         password=args.password,
+                        ca_bundle=ca_bundle,
                         debug=args.debug)
 
         if resource == 'variable':
