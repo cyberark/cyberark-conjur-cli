@@ -10,6 +10,8 @@ import requests
 class HttpVerb(Enum):
     GET = auto()
     POST = auto()
+    PUT = auto()
+    DELETE = auto()
 
 class ConjurEndpoint(Enum):
     AUTHENTICATE = "{url}/authn/{account}/{login}/authenticate"
