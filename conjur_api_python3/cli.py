@@ -65,7 +65,7 @@ class Cli(object):
 
     def _run_client_action(self, resource, args):
         ca_bundle=None
-        if len(args.ca_bundle) > 0:
+        if args.ca_bundle and len(args.ca_bundle) > 0:
             ca_bundle = os.path.expanduser(args.ca_bundle)
 
         # We want explicit definition of things to pass into the client
