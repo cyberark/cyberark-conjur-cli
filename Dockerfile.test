@@ -1,11 +1,14 @@
-FROM python:3.7-alpine
+FROM alpine:3.9
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
+
+RUN apk add --no-cache bash \
+                       python3
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
 COPY requirements.txt $INSTALL_DIR/
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY . $INSTALL_DIR
