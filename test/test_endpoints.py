@@ -2,6 +2,7 @@ import unittest
 
 from conjur_api_python3.endpoints import ConjurEndpoint
 
+
 class EndpointsTest(unittest.TestCase):
     def test_http_verb_has_correct_authenticate_template_string(self):
         auth_endpoint = ConjurEndpoint.AUTHENTICATE.value.format(url='http://host',

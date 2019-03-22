@@ -1,13 +1,10 @@
-import base64
 import logging
 
 from datetime import datetime, timedelta
 from urllib.parse import quote
 
-import requests
-
 from .endpoints import ConjurEndpoint
-from .http import HttpVerb
+from .http import HttpVerb, invoke_endpoint
 
 class Api(object):
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
@@ -18,8 +15,15 @@ class Api(object):
     _api_token = None
     _api_token_expires_on = None
 
-    def __init__(self, url=None, ca_bundle=None, plugins=[],
-            account='default', api_key=None, login_id=None, ssl_verify=True, http_debug=False):
+    def __init__(self,
+                 account='default',
+                 api_key=None,
+                 ca_bundle=None,
+                 http_debug=False,
+                 login_id=None,
+                 plugins=[],
+                 ssl_verify=True,
+                 url=None):
 
         self._url = url
         self._ca_bundle = ca_bundle
@@ -27,7 +31,7 @@ class Api(object):
 
         self._ssl_verify = ssl_verify
         if ca_bundle:
-            self._ssl_verify=ca_bundle
+            self._ssl_verify = ca_bundle
 
         self.api_key = api_key
         self.login_id = login_id
@@ -92,9 +96,10 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
 
-        logging.info("Logging in to {}...".format(self._url))
-        self.api_key = self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
-                None, auth=(login_id, password)).text
+        logging.info("Logging in to %s...", self._url)
+        self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
+                                       self._default_params, auth=(login_id, password),
+                                       ssl_verify=self._ssl_verify).text
         self.login_id = login_id
 
         return self.api_key
@@ -108,45 +113,30 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
-        logging.info("Authenticating to {}...".format(self._url))
-        return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
-                { 'login': quote(self.login_id) }, self.api_key).text
+        params={'login': quote(self.login_id)}
+        params.update(self._default_params)
+
+        logging.info("Authenticating to %s...", self._url)
+        return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
+                               self.api_key, ssl_verify=self._ssl_verify).text
 
     def set_variable(self, variable_id, value):
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
         }
+        params.update(self._default_params)
 
-        return self._invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
-                                     value, api_token=self.api_token).text
+        return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
+                               value, api_token=self.api_token,
+                               ssl_verify=self._ssl_verify).text
 
     def get_variable(self, variable_id):
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
         }
+        params.update(self._default_params)
 
-        return self._invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
-                                     api_token=self.api_token).content
-
-    def _invoke_endpoint(self, verb_id, endpoint_id, params, *args,
-            check_errors=True, auth=None, api_token=None):
-
-        params = params or {}
-
-        url = ConjurEndpoint(endpoint_id).value.format(**self._default_params, **params)
-
-        headers={}
-        if api_token and len(api_token) > 0:
-            encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
-            headers['Authorization'] = 'Token token="{}"'.format(encoded_token)
-
-        verb = HttpVerb(verb_id).name.lower()
-        request_method = getattr(requests, verb)
-
-        response = request_method(url, *args, verify=self._ssl_verify, auth=auth, headers=headers)
-        if check_errors:
-            response.raise_for_status()
-
-        return response
+        return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
+                               api_token=self.api_token, ssl_verify=self._ssl_verify).content
