@@ -77,7 +77,9 @@ class Api(object):
 
     def login(self, login_id=None, password=None):
         """
-        TODO
+        This method uses the basic auth login id (username) and password
+        to retrieve an api key from the server that can be later used to
+        retrieve short-lived api tokens.
         """
 
         if not self._url or not login_id or not password:
@@ -94,7 +96,9 @@ class Api(object):
 
     def authenticate(self):
         """
-        TODO
+        Authenticate uses the api_key to fetch a short-lived api token that
+        for a limited time will allow you to interact fully with the Conjur
+        vault.
         """
 
         if not self._url or not self.login_id or not self.api_key:
@@ -109,6 +113,11 @@ class Api(object):
                                self.api_key, ssl_verify=self._ssl_verify).text
 
     def set_variable(self, variable_id, value):
+        """
+        This method is used to set a secret (aka "variable") to a value of
+        your choosing.
+        """
+
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
@@ -120,6 +129,11 @@ class Api(object):
                                ssl_verify=self._ssl_verify).text
 
     def get_variable(self, variable_id):
+        """
+        This method is used to fetch a secret's (aka "variable") value from
+        Conjur vault.
+        """
+
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': quote(variable_id)
