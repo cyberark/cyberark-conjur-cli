@@ -1,4 +1,5 @@
 import base64
+import logging
 from enum import auto, Enum
 
 import requests
@@ -31,3 +32,16 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
         response.raise_for_status()
 
     return response
+
+def enable_http_logging(self):
+    logging.warn("WARN: Using HTTP logging!")
+    import logging
+    from http.client import HTTPConnection
+
+    HTTPConnection.debuglevel = 1
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+    requests_log = logging.getLogger("urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True

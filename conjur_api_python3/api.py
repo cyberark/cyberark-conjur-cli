@@ -45,20 +45,8 @@ class Api(object):
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        # We don't want to record data on the line under any conditions other
-        # than development
-        # if http_debug:
-        if False:
-            import logging
-            from http.client import HTTPConnection
-
-            HTTPConnection.debuglevel = 1
-
-            logging.basicConfig()
-            logging.getLogger().setLevel(logging.DEBUG)
-            requests_log = logging.getLogger("urllib3")
-            requests_log.setLevel(logging.DEBUG)
-            requests_log.propagate = True
+        # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINE BELOW UNCOMMENTED
+        # if http_debug: enable_http_logging()
 
     @property
     def api_token(self):
