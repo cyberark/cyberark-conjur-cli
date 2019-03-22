@@ -6,14 +6,14 @@ from urllib.parse import quote
 from .endpoints import ConjurEndpoint
 from .http import HttpVerb, invoke_endpoint
 
+
 class Api(object):
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
     API_TOKEN_DURATION = 5
 
-    KIND_VARIABLE='variable'
+    KIND_VARIABLE = 'variable'
 
     _api_token = None
-    _api_token_expires_on = None
 
     def __init__(self,
                  account='default',
@@ -36,6 +36,8 @@ class Api(object):
         self.api_key = api_key
         self.login_id = login_id
 
+        self.api_token_expiration = None
+
         self._default_params = {
             'url': url,
             'account': quote(account)
@@ -48,11 +50,15 @@ class Api(object):
         # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINE BELOW UNCOMMENTED
         # if http_debug: enable_http_logging()
 
+        # Sanity checks
+        if not self._url:
+            raise Exception("ERROR: API instantiation parameter 'url' cannot be empty!")
+
     @property
     def api_token(self):
-        if not self._api_token or datetime.now() > self._api_token_expires_on:
+        if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.info("API token missing or expired. Fetching new one...")
-            self._api_token_expires_on = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
+            self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
             self._api_token = self.authenticate()
             return self._api_token
 
@@ -66,7 +72,7 @@ class Api(object):
         retrieve short-lived api tokens.
         """
 
-        if not self._url or not login_id or not password:
+        if not login_id or not password:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
 
@@ -85,7 +91,7 @@ class Api(object):
         vault.
         """
 
-        if not self._url or not self.login_id or not self.api_key:
+        if not self.login_id or not self.api_key:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
@@ -95,6 +101,21 @@ class Api(object):
         logging.info("Authenticating to %s...", self._url)
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
+
+    def get_variable(self, variable_id):
+        """
+        This method is used to fetch a secret's (aka "variable") value from
+        Conjur vault.
+        """
+
+        params = {
+            'kind': self.KIND_VARIABLE,
+            'identifier': quote(variable_id)
+        }
+        params.update(self._default_params)
+
+        return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
+                               api_token=self.api_token, ssl_verify=self._ssl_verify).content
 
     def set_variable(self, variable_id, value):
         """
@@ -111,18 +132,3 @@ class Api(object):
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
-
-    def get_variable(self, variable_id):
-        """
-        This method is used to fetch a secret's (aka "variable") value from
-        Conjur vault.
-        """
-
-        params = {
-            'kind': self.KIND_VARIABLE,
-            'identifier': quote(variable_id)
-        }
-        params.update(self._default_params)
-
-        return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
-                               api_token=self.api_token, ssl_verify=self._ssl_verify).content
