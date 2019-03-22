@@ -59,22 +59,6 @@ class Api(object):
         logging.info("Using cached API token...")
         return self._api_token
 
-    @property
-    def api_key(self):
-        return self._api_key
-
-    @api_key.setter
-    def api_key(self, value):
-        self._api_key = value
-
-    @property
-    def login_id(self):
-        return self._login_id
-
-    @login_id.setter
-    def login_id(self, value):
-        self._login_id = value
-
     def login(self, login_id=None, password=None):
         """
         This method uses the basic auth login id (username) and password
