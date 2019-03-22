@@ -32,8 +32,21 @@ class Client(object):
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    def __init__(self, api_class=Api, url=None, ca_bundle=None, account='default', login_id=None,
-            password=None, ssl_verify=True, debug=False, http_debug=False):
+
+    # The method signature is long but we want to explicitly control
+    # what paramteres are allowed
+    def __init__(self,
+                 account='default',
+                 api_class=Api,
+                 api_config_class=ApiConfig,
+                 ca_bundle=None,
+                 debug=False,
+                 http_debug=False,
+                 login_id=None,
+                 password=None,
+                 ssl_verify=True,
+                 url=None):
+
         self._setup_logging(debug)
 
         logging.info("Initializing configuration...")
@@ -49,11 +62,16 @@ class Client(object):
         if not url or not account or not login_id or not password:
             logging.info("Not all expected variables were provided. Using conjurrc as credential store...")
             try:
-                config = dict(ApiConfig())
+                on_disk_config = dict(api_config_class())
+
+                # We want to retain any overrides that the user provided from params
+                on_disk_config.update(config)
+                config = on_disk_config
+
             except Exception as e:
                 raise ConfigException(e)
 
-        self._api = api_class(**config, ssl_verify=ssl_verify, http_debug=http_debug)
+        self._api = api_class(ssl_verify=ssl_verify, http_debug=http_debug, **config)
 
         if password:
             logging.info("Creating API key with password...")
@@ -68,6 +86,8 @@ class Client(object):
             logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
         else:
             logging.basicConfig(level=logging.WARNING, format=self.LOGGING_FORMAT)
+
+    ### API passthrough
 
     def get(self, variable_id):
         return self._api.get_variable(variable_id)

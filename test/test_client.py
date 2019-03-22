@@ -6,6 +6,41 @@ from unittest.mock import MagicMock, Mock, patch
 from conjur_api_python3.client import ConfigException, Client
 from conjur_api_python3 import api
 
+
+# ApiConfig mocking class
+class MockApiConfig(object):
+    CONFIG = {
+        'key1': 'value1',
+        'key2': 'value2',
+
+        'url': 'apiconfigurl',
+        'account': 'apiconfigaccount',
+        'ca_bundle': 'apiconfigcabundle',
+    }
+
+    def __repr__(self):
+        return self.CONFIG
+
+    def __iter__(self):
+        return iter(self.CONFIG.items())
+
+
+# Api mocking class
+class MockApiHelper(object):
+    def __init__(self, **kwargs):
+        self.verify_init_args(**kwargs)
+
+    def login(self, username, password):
+        pass
+
+    def verify_init_args(self, **kwargs):
+        pass
+
+    def verify_apiconfig_dict_in(self, test_instance, **kwargs):
+        test_instance.assertEquals(kwargs['key1'], 'value1')
+        test_instance.assertEquals(kwargs['key2'], 'value2')
+
+
 class ClientTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):
         with self.assertRaises(ConfigException):
@@ -15,48 +50,106 @@ class ClientTest(unittest.TestCase):
         with self.assertRaises(ConfigException):
             Client()
 
-    def test_client_passes_url_and_account_to_api_initializer(self):
-        class MockApi(object):
-            def __init__(*args, **kwargs):
-                self.assertEquals(kwargs['url'], 'http://foo')
-                self.assertEquals(kwargs['account'], 'foo')
-                self.assertEquals(kwargs['ca_bundle'], None)
+    def test_client_passes_init_config_params_to_api_initializer(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                self.assertEquals(kwargs['url'], 'http://myurl')
+                self.assertEquals(kwargs['account'], 'myacct')
+                self.assertEquals(kwargs['ca_bundle'], 'mybundle')
+                self.assertEquals(kwargs['ssl_verify'], False)
 
-            def login(*args):
-                pass
+        Client(api_class=MockApi, url='http://myurl', account='myacct', login_id='mylogin',
+               password='mypass', ca_bundle="mybundle", ssl_verify=False)
 
-        Client(api_class=MockApi, url='http://foo', account='foo', login_id='bar', password='baz')
+    def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                self.assertEquals(kwargs['url'], 'http://myurl')
+                self.assertEquals(kwargs['account'], 'default')
+                self.assertEquals(kwargs['ca_bundle'], 'mybundle')
 
-    def test_client_passes_ca_bundle_to_api_initializer_if_provided(self):
-        class MockApi(object):
-            def __init__(*args, **kwargs):
-                self.assertEquals(kwargs['ca_bundle'], 'bundle_path')
+        Client(api_class=MockApi, url='http://myurl', login_id='mylogin',
+               password='mypass', ca_bundle="mybundle")
 
-            def login(*args):
-                pass
-
-        Client(api_class=MockApi, url='http://foo', ca_bundle='bundle_path',
-                account='foo', login_id='bar', password='baz')
-
-    def test_client_performs_api_login_if_password_is_provided(self):
-        class MockApi(object):
-            def __init__(*args, **kwargs):
-                pass
+    def test_client_performs_password_api_login_if_password_is_provided(self):
+        class MockApi(MockApiHelper):
+            pass
         MockApi.login = MagicMock()
 
-        Client(api_class=MockApi, url='http://foo', ca_bundle='bundle_path',
-                account='foo', login_id='login id', password='login password')
+        Client(api_class=MockApi, url='http://foo', account='myacct', login_id='mylogin',
+               password='mypass')
 
-        MockApi.login.assert_called_once_with('login id', 'login password')
+        MockApi.login.assert_called_once_with('mylogin', 'mypass')
 
-    @unittest.skip("Skipped until ApiConfig is mocked")
     def test_client_performs_no_api_login_if_password_is_not_provided(self):
-        class MockApi(object):
-            def __init__(*args, **kwargs):
-                pass
+        class MockApi(MockApiHelper):
+            pass
         MockApi.login = MagicMock()
 
-        Client(api_class=MockApi, url='http://foo', ca_bundle='bundle_path',
-                account='foo', login_id='login id')
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
+               account='myacct', login_id='mylogin')
 
         MockApi.login.assert_not_called()
+
+    def test_client_passes_config_from_apiconfig_if_url_is_not_provided(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig,
+               account='myacct', login_id='mylogin', password="mypass")
+
+    def test_client_passes_config_from_apiconfig_if_account_is_empty(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
+               account=None, login_id='mylogin', password="mypass")
+
+    def test_client_passes_config_from_apiconfig_if_login_id_is_not_provided(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
+               account='myacct', password="mypass")
+
+    def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
+               account='myacct', login_id='mylogin')
+
+    def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+                self.assertEqual(kwargs['account'], 'myacct')
+                self.assertEqual(kwargs['url'], 'http://foo')
+                self.assertEqual(kwargs['ca_bundle'], 'mybundle')
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
+               account='myacct', login_id='mylogin', ca_bundle='mybundle')
+
+    ### API passthrough tests ###
+
+    def test_client_passes_through_api_get_variable_params(self):
+        class MockApi(MockApiHelper):
+            pass
+        MockApi.get_variable = MagicMock()
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig).get('variable_id')
+
+        MockApi.get_variable.assert_called_once_with('variable_id')
+
+    def test_client_passes_through_api_set_variable_params(self):
+        class MockApi(MockApiHelper):
+            pass
+        MockApi.set_variable = MagicMock()
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig).set('variable_id', 'variable_value')
+
+        MockApi.set_variable.assert_called_once_with('variable_id', 'variable_value')
