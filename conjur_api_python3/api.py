@@ -2,21 +2,12 @@ import base64
 import logging
 
 from datetime import datetime, timedelta
-from enum import auto, Enum
 from urllib.parse import quote
 
 import requests
 
-class HttpVerb(Enum):
-    GET = auto()
-    POST = auto()
-    PUT = auto()
-    DELETE = auto()
-
-class ConjurEndpoint(Enum):
-    AUTHENTICATE = "{url}/authn/{account}/{login}/authenticate"
-    LOGIN = "{url}/authn/{account}/login"
-    SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
+from .endpoints import ConjurEndpoint
+from .http import HttpVerb
 
 class Api(object):
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
