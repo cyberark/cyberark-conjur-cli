@@ -3,6 +3,7 @@ FROM alpine:3.9
 ENV INSTALL_DIR=/opt/conjur-api-python3
 
 RUN apk add --no-cache bash \
+                       binutils \
                        python3
 
 RUN mkdir -p $INSTALL_DIR

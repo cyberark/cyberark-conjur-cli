@@ -1,0 +1,19 @@
+#!/bin/bash -e
+
+BIN_BUILD_CMD="pyinstaller --onefile pkg_bin/conjur-py3-cli"
+
+rm -rf dist/
+
+if [[ "$1" == "-l" ]]; then
+  $BIN_BUILD_CMD
+  exit 0
+fi
+
+docker build -f Dockerfile.test \
+             -t conjur-api-python3-test \
+             .
+
+docker run --rm -it \
+  -v $(pwd)/dist:/opt/conjur-api-python3/dist \
+  conjur-api-python3-test \
+    $BIN_BUILD_CMD
