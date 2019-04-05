@@ -2,6 +2,15 @@
 
 Python3-based API SDK for [Conjur OSS v5.x](https://www.conjur.org/) / [AAM Dynamic Access Provider v10.9+](https://www.cyberark.com/products/privileged-account-security-solution/application-access-manager/). The repo also includes a self-contained CLI tool that wraps the API in a simple executable script/binary.
 
+***
+
+### **Status**: Alpha
+
+#### **Warning: Naming and API's are still subject to breaking changes!**
+
+***
+
+
 ## Installing the code
 
 ### From PyPI
