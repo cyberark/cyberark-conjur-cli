@@ -95,7 +95,7 @@ class Client():
 
     def get(self, variable_id):
         """
-        Gets a variable based on its ID
+        Gets a variable value based on its ID
         """
         return self._api.get_variable(variable_id)
 
