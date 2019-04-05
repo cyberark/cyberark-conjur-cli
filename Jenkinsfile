@@ -11,7 +11,7 @@ pipeline {
   stages {
     stage('Linting') {
       steps {
-        sh 'true'
+        sh './bin/test_linting'
       }
     }
 
