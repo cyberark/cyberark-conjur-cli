@@ -13,3 +13,6 @@ output/*.xml
 
 # Docker-compose isn't needed in container
 docker-compose.yml
+
+# Documentation
+docs/

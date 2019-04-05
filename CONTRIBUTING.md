@@ -7,7 +7,7 @@ any additional information for contributing code to this project.
 ## Legal mumbo-jumbo
 
 Before contributing, please take a moment to read and sign our
-[Contributor Agreement](https://github.com/cyberark/secretless-broker/blob/master/Contributing_OSS/CyberArk_Open_Source_Contributor_Agreement.pdf).
+[Contributor Agreement](docs/CyberArk_Open_Source_Contributor_Agreement.pdf).
 This provides patent protection for all SDK users and allows
 CyberArk to enforce its license terms. Please email a signed
 copy to [oss@cyberark.com](oss@cyberark.com).
