@@ -1,6 +1,6 @@
 # conjur-api-python3
 
-Python3-based API SDK for [Conjur OSS v5.x](https://www.conjur.org/). The repo
+Python3-based API SDK for [Conjur OSS](https://www.conjur.org/). The repo
 also includes a self-contained CLI tool that wraps the API in a simple executable
 script/binary.
 
@@ -112,8 +112,9 @@ with plans to expand the integration testing to all supported platforms.*
 
 ### Unit and Integration tests
 
-1. Change the login credentials in `test` file
-1. Run `./bin/test`
+```
+$ ./bin/test
+```
 
 ### Linting
 
