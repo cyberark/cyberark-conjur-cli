@@ -7,10 +7,16 @@ SRC_DIRS=( "./conjur_api_python3"
 # E0401: Import error - these are not accurate currently
 DISABLED_ERRORS="W0511,E0401"
 
+echo "Building API container..."
+docker-compose build
+
 for src_dir in "${SRC_DIRS[@]}"; do
   echo "Checking linting in $src_dir..."
   set -x
-  pylint -r n -f parseable --disable="$DISABLED_ERRORS" "${src_dir}"
+  docker-compose run --rm \
+    --no-deps \
+    test \
+    pylint -r n -f parseable --disable="$DISABLED_ERRORS" "$src_dir"
 done
 
 echo "Linting completed!"

@@ -4,7 +4,9 @@ ENV INSTALL_DIR=/opt/conjur-api-python3
 
 RUN apk add --no-cache bash \
                        binutils \
-                       python3
+                       build-base \
+                       python3 \
+                       python3-dev
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
