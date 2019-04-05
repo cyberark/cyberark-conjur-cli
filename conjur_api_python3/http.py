@@ -1,6 +1,7 @@
 import base64
 import logging
 from enum import auto, Enum
+from urllib.parse import quote
 
 import requests
 
@@ -15,7 +16,15 @@ class HttpVerb(Enum):
 def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                     ssl_verify=True, auth=None, api_token=None):
 
-    params = params or {}
+    orig_params = params or {}
+
+    # Escape all params
+    params = {}
+    for key, value in orig_params.items():
+        if key == 'url':
+            params[key] = value
+            continue
+        params[key] = quote(value)
 
     url = endpoint.value.format(**params)
 

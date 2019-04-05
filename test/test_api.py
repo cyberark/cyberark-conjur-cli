@@ -49,6 +49,14 @@ class ApiTest(unittest.TestCase):
         api.authenticate.assert_called_once_with()
 
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_if_account_is_empty_throw_an_error(self, mock_http_client):
+        empty_values = [ None, "" ]
+        for empty_value in empty_values:
+            with self.subTest(account=empty_value):
+                with self.assertRaises(RuntimeError):
+                    api = Api(url='http://localhost', account=empty_value)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_not_expired_dont_fetch_new_one(self, mock_http_client):
         api = Api(url='http://localhost')
         api.authenticate = MagicMock(return_value='mytoken')
@@ -80,6 +88,23 @@ class ApiTest(unittest.TestCase):
                                                      'url': 'http://localhost',
                                                      'login': 'mylogin',
                                                      'account': 'default',
+                                                 },
+                                                 'apikey',
+                                                 ssl_verify=True)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_account_info_is_passed_down_to_http_call(self, mock_http_client):
+        Api(url='http://localhost',
+            account='myacct',
+            login_id='mylogin',
+            api_key='apikey').authenticate()
+
+        mock_http_client.assert_called_once_with(HttpVerb.POST,
+                                                 ConjurEndpoint.AUTHENTICATE,
+                                                 {
+                                                     'url': 'http://localhost',
+                                                     'login': 'mylogin',
+                                                     'account': 'myacct',
                                                  },
                                                  'apikey',
                                                  ssl_verify=True)

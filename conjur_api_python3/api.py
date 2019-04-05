@@ -1,7 +1,6 @@
 import logging
 
 from datetime import datetime, timedelta
-from urllib.parse import quote
 
 from .endpoints import ConjurEndpoint
 from .http import HttpVerb, invoke_endpoint
@@ -27,7 +26,10 @@ class Api(object):
 
         self._url = url
         self._ca_bundle = ca_bundle
+
         self._account = account
+        if not self._account or len(self._account) == 0:
+            raise RuntimeError("Account cannot be empty!")
 
         self._ssl_verify = ssl_verify
         if ca_bundle:
@@ -40,7 +42,7 @@ class Api(object):
 
         self._default_params = {
             'url': url,
-            'account': quote(account)
+            'account': account
         }
 
         if not ssl_verify:
@@ -95,7 +97,7 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
-        params={'login': quote(self.login_id)}
+        params={'login': self.login_id}
         params.update(self._default_params)
 
         logging.info("Authenticating to %s...", self._url)
@@ -110,7 +112,7 @@ class Api(object):
 
         params = {
             'kind': self.KIND_VARIABLE,
-            'identifier': quote(variable_id)
+            'identifier': variable_id,
         }
         params.update(self._default_params)
 
@@ -125,7 +127,7 @@ class Api(object):
 
         params = {
             'kind': self.KIND_VARIABLE,
-            'identifier': quote(variable_id)
+            'identifier': variable_id,
         }
         params.update(self._default_params)
 

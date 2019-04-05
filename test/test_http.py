@@ -18,9 +18,21 @@ class HttpVerbTest(unittest.TestCase):
 
 
 class HttpInvokeEndpointTest(unittest.TestCase):
+    UNESCAPED_PARAMS = {
+        'url': 'https://foo.bar',
+        'one': 'abc/$!@#$%^&*() \\[]{}',
+        'two': ')(*&^%$#@![]{} <>?',
+    }
+
+    ESCAPED_PARAMS = [
+        'abc/%24%21%40%23%24%25%5E%26%2A%28%29%20%5C%5B%5D%7B%7D',
+        '%29%28%2A%26%5E%25%24%23%40%21%5B%5D%7B%7D%20%3C%3E%3F',
+    ]
+
     class MockEndpoint(Enum):
         NO_PARAMS = "no/params"
         WITH_URL = "{url}/no/params"
+        PARAMETER_ESCAPING = "{url}/{one}/{two}"
 
     @patch.object(requests, 'get')
     def test_invoke_endpoint_can_invoke_http_client(self, mock_get):
@@ -83,6 +95,14 @@ class HttpInvokeEndpointTest(unittest.TestCase):
         invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, 'a', 'b')
 
         mock_get.assert_called_once_with('no/params', 'a', 'b', auth=None, verify=True, headers={})
+
+    @patch.object(requests, 'get')
+    def test_invoke_endpoint_quotes_all_params_except_url(self, mock_get):
+        invoke_endpoint(HttpVerb.GET, self.MockEndpoint.PARAMETER_ESCAPING,
+                self.UNESCAPED_PARAMS, '$#\\% ^%')
+
+        quoted_endpoint = '/'.join([self.UNESCAPED_PARAMS['url']] + self.ESCAPED_PARAMS)
+        mock_get.assert_called_once_with(quoted_endpoint, '$#\\% ^%', auth=None, verify=True, headers={})
 
     @patch.object(requests, 'get')
     def test_invoke_endpoint_raises_error_if_bad_status_code_is_returned(self, mock_get):
