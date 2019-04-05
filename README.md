@@ -101,3 +101,7 @@ You can now run the tests and the CLI with modifiable files!
 ```
 $ ./bin/test_linting
 ```
+
+## License
+
+This project is [licensed under Apache License v2.0](LICENSE.md)
