@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+CLI module
+
+This module is the main entrypoint for all CLI-like usages of this
+module where only the minimal invocation configuration is required.
+"""
+
 import os
 import sys
 import argparse
@@ -7,8 +16,18 @@ from .client import Client
 from .version import __version__
 
 
-class Cli(object):
-    def run(self, *args, **kwargs):
+class Cli():
+    """
+    Main wrapper around CLI-like usages of this module. Provides various
+    helpers around parsing of parameters and running client commands.
+    """
+
+    #pylint: disable=no-self-use,bad-continuation
+    def run(self, *args):
+        """
+        Main entrypoint for the class invocation from both CLI, Package, and
+        test sources. Parses CLI args and invokes the appropriate client command.
+        """
         parser = argparse.ArgumentParser(description='Conjur Python3 API CLI')
 
         resource_subparsers = parser.add_subparsers(dest='resource')
@@ -52,20 +71,26 @@ class Cli(object):
             action='store_true')
 
 
-        resource, args = self._parse_args(parser)
+        resource, args = Cli._parse_args(parser)
 
         # We don't have a good "debug" vs "verbose" separation right now
         if args.verbose is True:
             args.debug = True
 
-        self._run_client_action(resource, args)
+        Cli.run_client_action(resource, args)
 
         # Explicit exit (required for tests)
         sys.exit(0)
 
-    def _run_client_action(self, resource, args):
-        ca_bundle=None
-        if args.ca_bundle and len(args.ca_bundle) > 0:
+    @staticmethod
+    def run_client_action(resource, args):
+        """
+        Helper for creating the Client instance and invoking the appropriate
+        api class method with the specified parameters.
+        """
+
+        ca_bundle = None
+        if args.ca_bundle:
             ca_bundle = os.path.expanduser(args.ca_bundle)
 
         # We want explicit definition of things to pass into the client
@@ -86,7 +111,8 @@ class Cli(object):
                 client.set(variable_id, args.value)
                 print("Value set: '{}'".format(variable_id))
 
-    def _parse_args(self, parser):
+    @staticmethod
+    def _parse_args(parser):
         args = parser.parse_args()
 
         if not args.resource:
@@ -97,6 +123,9 @@ class Cli(object):
 
     @staticmethod
     def launch():
+        """
+        Static wrapper around instantiating and invoking the CLI that
+        """
         Cli().run()
 
 if __name__ == '__main__':

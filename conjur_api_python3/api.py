@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+
+"""
+API module
+
+Provides high-level interface for programmatic API interactions
+"""
+
 import logging
 
 from datetime import datetime, timedelta
@@ -6,7 +14,13 @@ from .endpoints import ConjurEndpoint
 from .http import HttpVerb, invoke_endpoint
 
 
-class Api(object):
+#pylint: disable=too-many-instance-attributes
+class Api():
+    """
+    This module provides a high-level programmatic access to the HTTP API
+    when all the needed arguments and parameters are well-known
+    """
+
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
     API_TOKEN_DURATION = 5
 
@@ -14,13 +28,16 @@ class Api(object):
 
     _api_token = None
 
+    # We explicitly want to enumerate all params needed to instantiate this
+    # class but this might not be needed in the future
+    #pylint: disable=unused-argument,too-many-arguments
     def __init__(self,
                  account='default',
                  api_key=None,
                  ca_bundle=None,
                  http_debug=False,
                  login_id=None,
-                 plugins=[],
+                 plugins=None,
                  ssl_verify=True,
                  url=None):
 
@@ -28,7 +45,7 @@ class Api(object):
         self._ca_bundle = ca_bundle
 
         self._account = account
-        if not self._account or len(self._account) == 0:
+        if not self._account:
             raise RuntimeError("Account cannot be empty!")
 
         self._ssl_verify = ssl_verify
@@ -57,6 +74,7 @@ class Api(object):
             raise Exception("ERROR: API instantiation parameter 'url' cannot be empty!")
 
     @property
+    #pylint: disable=missing-docstring
     def api_token(self):
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.info("API token missing or expired. Fetching new one...")
@@ -97,7 +115,9 @@ class Api(object):
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
 
-        params={'login': self.login_id}
+        params = {
+            'login': self.login_id
+        }
         params.update(self._default_params)
 
         logging.info("Authenticating to %s...", self._url)

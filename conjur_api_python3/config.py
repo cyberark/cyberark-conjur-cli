@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+Config module
+
+This module provides high-level parsing and setting of configuration
+variables needed for the API to be used with minimal effort
+"""
+
 import logging
 import netrc
 import os.path
@@ -8,9 +17,14 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-NETRC_HOST_URL="{url}/authn"
+NETRC_HOST_URL = "{url}/authn"
 
-class Config(object):
+class Config():
+    """
+    Used for handling setting and parsing of various configuration
+    settings required for the API to connect to the Conjur instance.
+    """
+
     DEFAULT_CONFIG_FILE = os.path.expanduser(os.path.join('~', '.conjurrc'))
     DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', '.netrc'))
 
@@ -26,7 +40,7 @@ class Config(object):
     _config = {}
 
     def __init__(self, config_file=DEFAULT_CONFIG_FILE, netrc_file=DEFAULT_NETRC_FILE):
-        logging.info("Trying to get configuration from filesystem ({})...".format(config_file))
+        logging.info("Trying to get configuration from filesystem (%s)...", config_file)
 
         config = None
         with open(config_file, 'r') as config_fp:
@@ -34,7 +48,7 @@ class Config(object):
 
         for config_field_name, attribute_name, mandatory in self.FIELDS:
             if mandatory:
-                assert(config_field_name in config)
+                assert config_field_name in config
 
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
@@ -45,7 +59,7 @@ class Config(object):
         netrc_auth = netrc_obj.authenticators(netrc_host_url)
         if netrc_auth is None:
             raise RuntimeError("Netrc '{}' didn't contain auth info for {}!".format(netrc_file,
-                netrc_host_url))
+                                                                                    netrc_host_url))
 
         login_id, _, api_key = netrc_auth
 
@@ -59,4 +73,4 @@ class Config(object):
         return dump({'config': self._config}, Dumper=Dumper, indent=4)
 
     def __iter__(self):
-       return iter(self._config.items())
+        return iter(self._config.items())

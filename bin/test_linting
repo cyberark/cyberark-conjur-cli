@@ -3,9 +3,7 @@
 SRC_DIRS=( "./conjur_api_python3"
            "./pkg_bin" )
 
-# W0511: TODOs
-# E0401: Import error - these are not accurate currently
-DISABLED_ERRORS="W0511,E0401"
+DISABLED_ERRORS="fixme"
 
 echo "Building API container..."
 docker-compose build

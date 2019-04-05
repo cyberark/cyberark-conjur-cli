@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+
 """
 Client module
 
 This module is used to setup an API client that will be used fo interactions with
 the Conjur server
 """
+
 import logging
 
 from .api import Api
@@ -16,10 +19,9 @@ class ConfigException(Exception):
 
     This class is used to wrap a regular exception with a more-descriptive class name
     """
-    pass
 
 
-class Client(object):
+class Client():
     """
     Client
 
@@ -35,6 +37,7 @@ class Client(object):
 
     # The method signature is long but we want to explicitly control
     # what paramteres are allowed
+    #pylint: disable=too-many-arguments
     def __init__(self,
                  account='default',
                  api_class=Api,
@@ -60,7 +63,8 @@ class Client(object):
         }
 
         if not url or not account or not login_id or not password:
-            logging.info("Not all expected variables were provided. Using conjurrc as credential store...")
+            logging.info("Not all expected variables were provided. " \
+                "Using conjurrc as credential store...")
             try:
                 on_disk_config = dict(api_config_class())
 
@@ -68,8 +72,8 @@ class Client(object):
                 on_disk_config.update(config)
                 config = on_disk_config
 
-            except Exception as e:
-                raise ConfigException(e)
+            except Exception as exc:
+                raise ConfigException(exc)
 
         self._api = api_class(ssl_verify=ssl_verify, http_debug=http_debug, **config)
 
@@ -90,7 +94,13 @@ class Client(object):
     ### API passthrough
 
     def get(self, variable_id):
+        """
+        Gets a variable based on its ID
+        """
         return self._api.get_variable(variable_id)
 
     def set(self, variable_id, value):
+        """
+        Sets a variable to a specific value based on its ID
+        """
         self._api.set_variable(variable_id, value)
