@@ -53,8 +53,8 @@ that should be decoded to your system's encoding (e.g.
 
 Sets a variable to a specific value based on its ID.
 
-*Note: Policy to create the variable must have been already loaded
-otherwise you will get a 404 error during invocation*.
+Note: Policy to create the variable must have been already loaded
+otherwise you will get a 404 error during invocation.
 
 ## Building
 
@@ -88,6 +88,11 @@ $ pip3 install -r requirements.txt
 ```
 
 You can now run the tests and the CLI with modifiable files!
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for additional info on how to contribute
+to this repo.
 
 ## Testing
 
