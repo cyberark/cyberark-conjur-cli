@@ -13,9 +13,31 @@ services:
     ports:
       - 80
     volumes:
-      - ./test/test_config:/policy
+      - ./test/test_config:/policy:ro
     depends_on:
       - pg
+
+  conjur-https:
+    image: nginx:alpine
+    ports:
+      - 443
+    volumes:
+      - ./test/test_config/https/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./test/test_config/https/conjur.conf:/etc/nginx/sites-enabled/conjur.conf:ro
+      - ./test/test_config/https/dhparams.pem:/etc/nginx/dhparams.pem:ro
+      - ./test/test_config/https/conjur.crt:/cert/tls.crt:ro
+      - ./test/test_config/https/conjur.key:/cert/tls.key:ro
+      - ./test/test_config/https/ca.crt:/ca/tls.crt:ro
+    depends_on:
+      - conjur
+
+  conjur-cli:
+    image: cyberark/conjur-cli:5
+    entrypoint: [ "bash", "-c" ]
+    command: [ "sleep 999d" ]
+    depends_on:
+      - conjur
+      - conjur-https
 
   test:
     build:
