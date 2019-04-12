@@ -5,7 +5,7 @@ services:
 
   conjur:
     image: cyberark/conjur:1.3.5
-    command: server -a dev -f /policy/policy.yml
+    command: server -a dev -f /policy/initial_policy.yml
     environment:
       CONJUR_DATA_KEY: 'OyXV68Mip14xj33huGaQKewmmS+gKtDlp6ECZ2iATpU='
       DATABASE_URL: postgres://postgres@pg/postgres

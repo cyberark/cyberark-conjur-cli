@@ -28,6 +28,9 @@ class CliIntegrationTest(unittest.TestCase):
 
     DEFINED_VARIABLE_ID = 'one/password'
 
+
+    # *************** HELPERS ***************
+
     def setup_cli_params(self, env_vars, *params):
         self.cli_auth_params = ['--debug']
 

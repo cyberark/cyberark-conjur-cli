@@ -5,6 +5,11 @@ cleanup() {
   docker-compose rm --stop --force -v
 }
 
+if [ "$1" == "-d" ]; then
+  DEBUG="true"
+  shift
+fi
+
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
@@ -33,6 +38,11 @@ echo "Starting test env..."
 docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
+
+if [[ "$DEBUG" == "true" ]]; then
+  docker-compose exec test bash
+  exit
+fi
 
 docker-compose run \
   --rm \
