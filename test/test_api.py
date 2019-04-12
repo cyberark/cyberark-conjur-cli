@@ -20,6 +20,8 @@ class ApiTest(unittest.TestCase):
         def content(self):
             return self._content
 
+    POLICY_FILE = './test/test_config/policies/variables.yml'
+
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_invokes_http_client_correctly(self, mock_http_client):
         Api(url='http://localhost').login('myuser', 'mypass')
@@ -207,3 +209,51 @@ class ApiTest(unittest.TestCase):
                                                  'myvalue',
                                                  api_token='apitoken',
                                                  ssl_verify='verify')
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_apply_policy_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+
+        policy_data = None
+        with open(self.POLICY_FILE, 'r') as content_file:
+            policy_data = content_file.read()
+
+        mock_http_client.assert_called_once_with(HttpVerb.POST,
+                                                 ConjurEndpoint.POLICIES,
+                                                 {
+                                                     'url': 'http://localhost',
+                                                     'account': 'default',
+                                                     'identifier': 'mypolicyname',
+                                                 },
+                                                 policy_data,
+                                                 api_token='apitoken',
+                                                 ssl_verify=True)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_apply_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+
+        policy_data = None
+        with open(self.POLICY_FILE, 'r') as content_file:
+            policy_data = content_file.read()
+
+        mock_http_client.assert_called_once_with(HttpVerb.POST,
+                                                 ConjurEndpoint.POLICIES,
+                                                 {
+                                                     'url': 'http://localhost',
+                                                     'account': 'default',
+                                                     'identifier': 'mypolicyname',
+                                                 },
+                                                 policy_data,
+                                                 api_token='apitoken',
+                                                 ssl_verify='ssl_verify')

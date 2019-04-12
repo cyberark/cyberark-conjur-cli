@@ -153,3 +153,12 @@ class ClientTest(unittest.TestCase):
         Client(api_class=MockApi, api_config_class=MockApiConfig).set('variable_id', 'variable_value')
 
         MockApi.set_variable.assert_called_once_with('variable_id', 'variable_value')
+
+    def test_client_passes_through_api_apply_policy_params(self):
+        class MockApi(MockApiHelper):
+            pass
+        MockApi.apply_policy_file = MagicMock()
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig).apply_policy_file('name', 'policy')
+
+        MockApi.apply_policy_file.assert_called_once_with('name', 'policy')

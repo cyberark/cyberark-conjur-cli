@@ -21,3 +21,9 @@ class EndpointsTest(unittest.TestCase):
                                                             kind='varkind',
                                                             identifier='varid')
         self.assertEqual(auth_endpoint, 'http://host/secrets/myacct/varkind/varid')
+
+    def test_http_verb_has_correct_policy_template_string(self):
+        auth_endpoint = ConjurEndpoint.POLICIES.value.format(url='http://host',
+                                                             account='myacct',
+                                                             identifier='polid')
+        self.assertEqual(auth_endpoint, 'http://host/policies/myacct/policy/polid')

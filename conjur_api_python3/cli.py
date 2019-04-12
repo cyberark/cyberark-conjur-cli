@@ -34,8 +34,8 @@ class Cli():
 
         variable_parser = resource_subparsers.add_parser('variable',
             help='Perform variable-related actions . See "variable -help" for more options')
-
         variable_subparsers = variable_parser.add_subparsers(dest='action')
+
         get_variable_parser = variable_subparsers.add_parser('get',
             help='Get the value of a variable')
         set_variable_parser = variable_subparsers.add_parser('set',
@@ -48,6 +48,17 @@ class Cli():
             help='ID of the variable')
         set_variable_parser.add_argument('value',
             help='New value of the variable')
+
+        policy_parser = resource_subparsers.add_parser('policy',
+            help='Perform policy-related actions . See "policy -help" for more options')
+        policy_subparsers = policy_parser.add_subparsers(dest='action')
+
+        apply_policy_parser = policy_subparsers.add_parser('apply',
+            help='Apply a policy file')
+        apply_policy_parser.add_argument('name',
+            help='Name of the policy (usually "root")')
+        apply_policy_parser.add_argument('policy',
+            help='File containing the YAML policy')
 
 
         parser.add_argument('-v', '--version', action='version',
@@ -115,6 +126,8 @@ class Cli():
             else:
                 client.set(variable_id, args.value)
                 print("Value set: '{}'".format(variable_id))
+        elif resource == 'policy' and args.action == 'apply':
+            client.apply_policy_file(args.name, args.policy)
 
     @staticmethod
     def _parse_args(parser):

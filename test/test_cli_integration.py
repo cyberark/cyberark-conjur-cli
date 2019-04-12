@@ -1,4 +1,5 @@
 import os
+import tempfile
 import uuid
 import unittest
 
@@ -51,6 +52,10 @@ class CliIntegrationTest(unittest.TestCase):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'set', variable_id, value])
 
+    def apply_policy(self, policy_path):
+        return invoke_cli(self, self.cli_auth_params,
+            ['policy', 'apply', 'root', policy_path])
+
     def get_variable(self, variable_id):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', variable_id])
@@ -98,3 +103,38 @@ class CliIntegrationTest(unittest.TestCase):
     def test_https_cli_fails_if_cert_is_not_provided(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS)
         self.assert_variable_set_fails(requests.exceptions.SSLError)
+
+    @integration_test
+    def test_https_can_create_policy(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        POLICY_VARIABLE1_ID = 'simple/basic/{}'.format(uuid.uuid4().hex)
+        POLICY_VARIABLE2_ID = 'simple/space filled/{}'.format(uuid.uuid4().hex)
+        POLICY_VARIABLE3_ID = 'simple/special @#$%^&*(){{}}[].,+/{id}'.format(id=uuid.uuid4().hex)
+
+        policy = \
+"""
+- !variable
+  id: {variable_1}
+- !variable
+  id: {variable_2}
+- !variable
+  id: {variable_3}
+"""
+
+        dynamic_policy = policy.format(variable_1=POLICY_VARIABLE1_ID,
+                                       variable_2=POLICY_VARIABLE2_ID,
+                                       variable_3=POLICY_VARIABLE3_ID)
+
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(dynamic_policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            self.apply_policy(temp_policy_file.name)
+
+        self.assert_set_and_get(POLICY_VARIABLE1_ID)
+        self.assert_set_and_get(POLICY_VARIABLE2_ID)
+        self.assert_set_and_get(POLICY_VARIABLE3_ID)

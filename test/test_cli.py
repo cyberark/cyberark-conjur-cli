@@ -24,3 +24,15 @@ class CliTest(unittest.TestCase):
     @cli_test(["--version"])
     def test_cli_shows_version_with_long_version_flag(self, cli_invocation, output, client):
         self.assertEquals("cli v{}\n".format(__version__), output)
+
+    @cli_test(["variable", "set", "foo", "bar"])
+    def test_cli_invokes_variable_set_correctly(self, cli_invocation, output, client):
+        client.set.assert_called_once_with('foo', 'bar')
+
+    @cli_test(["variable", "get", "foo"])
+    def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
+        client.get.assert_called_once_with('foo')
+
+    @cli_test(["policy", "apply", "foo", "foopolicy"])
+    def test_cli_invokes_policy_apply_correctly(self, cli_invocation, output, client):
+        client.apply_policy_file.assert_called_once_with('foo', 'foopolicy')

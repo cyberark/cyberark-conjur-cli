@@ -104,3 +104,9 @@ class Client():
         Sets a variable to a specific value based on its ID
         """
         self._api.set_variable(variable_id, value)
+
+    def apply_policy_file(self, policy_name, policy_file):
+        """
+        Applies a file-based policy to the Conjur instance
+        """
+        self._api.apply_policy_file(policy_name, policy_file)

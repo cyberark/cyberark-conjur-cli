@@ -1,0 +1,6 @@
+- !variable
+  id: simple/basic/variable
+- !variable
+  id: simple/space filled/variable
+- !variable
+  id: simple/special @#$%^&*(){}[].,+/variable

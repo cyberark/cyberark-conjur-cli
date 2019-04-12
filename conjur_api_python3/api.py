@@ -158,3 +158,22 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
+
+    def apply_policy_file(self, policy_id, policy_file):
+        """
+        This method is used to load a file-based policy into the desired
+        name.
+        """
+
+        params = {
+            'identifier': policy_id,
+        }
+        params.update(self._default_params)
+
+        policy_data = None
+        with open(policy_file, 'r') as content_file:
+            policy_data = content_file.read()
+
+        return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.POLICIES, params,
+                               policy_data, api_token=self.api_token,
+                               ssl_verify=self._ssl_verify).text
