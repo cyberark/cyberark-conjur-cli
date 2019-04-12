@@ -55,15 +55,25 @@ class CliIntegrationTest(unittest.TestCase):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', variable_id])
 
+    def assert_set_and_get(self, variable_id):
+        expected_value = uuid.uuid4().hex
+
+        self.set_variable(variable_id, expected_value)
+        output = self.get_variable(variable_id)
+
+        self.assertEquals(expected_value, output)
+
+    def assert_variable_set_fails(self, error_class):
+        with self.assertRaises(error_class):
+            self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, uuid.uuid4().hex)
+
+
+    # *************** TESTS ***************
+
     @integration_test
     def test_http_cli_can_set_and_get_a_defined_variable(self):
         self.setup_cli_params(self.HTTP_ENV_VARS)
-        expected_value='expected ' + uuid.uuid4().hex
-
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
-        output = self.get_variable(CliIntegrationTest.DEFINED_VARIABLE_ID)
-
-        self.assertEquals(expected_value, output)
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable(self):
@@ -72,35 +82,19 @@ class CliIntegrationTest(unittest.TestCase):
             **self.HTTPS_CA_BUNDLE_ENV_VAR
         })
 
-        expected_value='expected ' + uuid.uuid4().hex
-
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
-        output = self.get_variable(CliIntegrationTest.DEFINED_VARIABLE_ID)
-
-        self.assertEquals(expected_value, output)
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS, '--insecure')
-        expected_value='expected ' + uuid.uuid4().hex
-
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
-        output = self.get_variable(CliIntegrationTest.DEFINED_VARIABLE_ID)
-
-        self.assertEquals(expected_value, output)
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
     @integration_test
     def test_https_cli_fails_if_cert_is_bad(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS, '--ca-bundle', './test/test_config/https/nginx.conf')
-        expected_value='expected ' + uuid.uuid4().hex
-
-        with self.assertRaises(requests.exceptions.SSLError):
-            self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
+        self.assert_variable_set_fails(requests.exceptions.SSLError)
 
     @integration_test
     def test_https_cli_fails_if_cert_is_not_provided(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS)
-        expected_value='expected ' + uuid.uuid4().hex
-
-        with self.assertRaises(requests.exceptions.SSLError):
-            self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_ID, expected_value)
+        self.assert_variable_set_fails(requests.exceptions.SSLError)
