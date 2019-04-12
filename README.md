@@ -107,9 +107,6 @@ to this repo.
 
 ## Testing
 
-*Note that testing is currently only done against non-https `Conjur OSS` product 
-with plans to expand the integration testing to all supported platforms.*
-
 ### Unit and Integration tests
 
 ```

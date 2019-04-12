@@ -63,6 +63,10 @@ class Api():
         }
 
         if not ssl_verify:
+            logging.warning("*" * 60)
+            logging.warning("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!")
+            logging.warning("*" * 60)
+
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

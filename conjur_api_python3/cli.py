@@ -57,6 +57,10 @@ class Cli():
         parser.add_argument('-a', '--account')
 
         parser.add_argument('-c', '--ca-bundle')
+        parser.add_argument('--insecure',
+            help='Skip verification of server certificate (not recommended)',
+            dest='ssl_verify',
+            action='store_false')
 
         # The external names for these are unfortunately named so we remap them
         parser.add_argument('-u', '--user', dest='login_id')
@@ -99,6 +103,7 @@ class Cli():
                         account=args.account,
                         login_id=args.login_id,
                         password=args.password,
+                        ssl_verify=args.ssl_verify,
                         ca_bundle=ca_bundle,
                         debug=args.debug)
 

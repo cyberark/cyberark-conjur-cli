@@ -45,11 +45,14 @@ services:
       dockerfile: Dockerfile.test
     command: ['sleep', '999d']
     environment:
-      CONJUR_APPLIANCE_URL: http://conjur
+      CONJUR_HTTP_APPLIANCE_URL: http://conjur
+      CONJUR_HTTPS_APPLIANCE_URL: https://conjur-https
       CONJUR_ACCOUNT: dev
       CONJUR_AUTHN_LOGIN: admin
       CONJUR_AUTHN_API_KEY: Null
+      CONJUR_CA_BUNDLE: /opt/conjur-api-python3/test/test_config/https/ca.crt
     depends_on:
       - conjur
+      - conjur-https
     volumes:
       - .:/opt/conjur-api-python3
