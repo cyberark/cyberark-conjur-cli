@@ -52,6 +52,7 @@ new_value = client.get('conjur/my/variable')
 print("Variable value is:", new_value.decode('utf-8'))
 ```
 
+
 ### Currently supported client methods:
 
 #### `get(variable_id)`
@@ -66,6 +67,12 @@ Sets a variable to a specific value based on its ID.
 
 Note: Policy to create the variable must have been already loaded
 otherwise you will get a 404 error during invocation.
+
+#### `apply_policy_file(policy_name, policy_file)`
+
+Applies a file-based YAML to a named policy. This method only
+supports additive changes.
+
 
 ## Building
 
