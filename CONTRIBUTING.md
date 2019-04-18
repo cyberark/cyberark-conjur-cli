@@ -1,5 +1,14 @@
 # Contributing
 
+## Table of Contents
+
+- [Legal mumbo-jumbo](#legal-mumbo-jumbo)
+- [Building](#building)
+- [Development](#development)
+- [Testing](#testing)
+- [Pull Request Workflow](#pull-request-workflow)
+- [Releasing](#releasing)
+
 Majority of the instructions on how to build, develop, and run the code in
 this repo is located in the main [README.md](README.md) but this file adds
 any additional information for contributing code to this project.
@@ -11,6 +20,53 @@ Before contributing, please take a moment to read and sign our
 This provides patent protection for all SDK users and allows
 CyberArk to enforce its license terms. Please email a signed
 copy to [oss@cyberark.com](oss@cyberark.com).
+
+## Building
+
+### Egg format
+
+```
+$ ./bin/build
+```
+
+### Static/portable CLI binary
+
+```
+$ ./bin/build_binary
+```
+
+## Development
+
+- Create a directory that will hold all the virtualenv packages and files:
+```
+$ python3 -m venv venv
+```
+
+- Enable your terminal to use those files with this command:
+```
+$ source venv/bin/activate
+```
+
+- Install requirements:
+```
+$ pip3 install -r requirements.txt
+```
+
+You can now run the tests and the CLI with modifiable files!
+
+## Testing
+
+### Unit and Integration tests
+
+```
+$ ./bin/test
+```
+
+### Linting
+
+```
+$ ./bin/test_linting
+```
 
 ## Pull Request Workflow
 
