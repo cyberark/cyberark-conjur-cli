@@ -8,7 +8,7 @@ script/binary.
 
 ### **Status**: Alpha
 
-#### **Warning: Naming and API's are still subject to breaking changes!**
+#### **Warning: Naming and APIs are still subject to breaking changes!**
 
 ***
 
