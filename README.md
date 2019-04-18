@@ -52,7 +52,6 @@ new_value = client.get('conjur/my/variable')
 print("Variable value is:", new_value.decode('utf-8'))
 ```
 
-
 ### Currently supported client methods:
 
 #### `get(variable_id)`
@@ -74,57 +73,11 @@ Applies a file-based YAML to a named policy. This method only
 supports additive changes.
 
 
-## Building
-
-### Egg format
-
-```
-$ ./bin/build
-```
-
-### Static/portable CLI binary
-
-```
-$ ./bin/build_binary
-```
-
-## Development
-
-- Create a directory that will hold all the virtualenv packages and files:
-```
-$ python3 -m venv venv
-```
-
-- Enable your terminal to use those files with this command:
-```
-$ source venv/bin/activate
-```
-
-- Install requirements:
-```
-$ pip3 install -r requirements.txt
-```
-
-You can now run the tests and the CLI with modifiable files!
-
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for additional info on how to contribute
-to this repo.
-
-## Testing
-
-### Unit and Integration tests
-
-```
-$ ./bin/test
-```
-
-### Linting
-
-```
-$ ./bin/test_linting
-```
+We store instructions for development and guidelines for how to build and test this
+project in the [CONTRIBUTING.md](CONTRIBUTING.md) - please refer to that document
+if you would like to contribute.
 
 ## License
 
