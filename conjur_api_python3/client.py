@@ -11,6 +11,7 @@ import logging
 
 from .api import Api
 from .config import Config as ApiConfig
+from .util import get_api_methods
 
 
 class ConfigException(Exception):
@@ -21,11 +22,14 @@ class ConfigException(Exception):
     """
 
 
+#pylint: disable=too-few-public-methods
 class Client():
     """
     Client
 
-    This class is used to construct a client for API interaction
+    This class is used to construct a client for API interaction. Most of the
+    methods get tacked on to the instances during runtime so it's a relatively
+    thin wrapper.
     """
 
     _api = None
@@ -37,7 +41,7 @@ class Client():
 
     # The method signature is long but we want to explicitly control
     # what paramteres are allowed
-    #pylint: disable=too-many-arguments
+    #pylint: disable=too-many-arguments,too-many-locals
     def __init__(self,
                  account='default',
                  api_class=Api,
@@ -77,6 +81,14 @@ class Client():
 
         self._api = api_class(ssl_verify=ssl_verify, http_debug=http_debug, **config)
 
+        # Pass-through for all the API client-facing methods. Dynamically populated
+        # based on the decorators on methods:
+        # - get(self, variable_id)
+        # - set(self, variable_id, value)
+        # - apply_policy_file(self, policy_name, policy_file)
+        for method_name, method_info in get_api_methods(Api).items():
+            setattr(self, method_name, getattr(self._api, method_info['matching_method_name']))
+
         if password:
             logging.info("Creating API key with password...")
             self._api_key = self._api.login(login_id, password)
@@ -90,23 +102,3 @@ class Client():
             logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
         else:
             logging.basicConfig(level=logging.WARNING, format=self.LOGGING_FORMAT)
-
-    ### API passthrough
-
-    def get(self, variable_id):
-        """
-        Gets a variable value based on its ID
-        """
-        return self._api.get_variable(variable_id)
-
-    def set(self, variable_id, value):
-        """
-        Sets a variable to a specific value based on its ID
-        """
-        self._api.set_variable(variable_id, value)
-
-    def apply_policy_file(self, policy_name, policy_file):
-        """
-        Applies a file-based policy to the Conjur instance
-        """
-        self._api.apply_policy_file(policy_name, policy_file)

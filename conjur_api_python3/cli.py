@@ -118,6 +118,9 @@ class Cli():
                         ca_bundle=ca_bundle,
                         debug=args.debug)
 
+        # The client methods are dynamically created so pylint will not
+        # know that they exist
+        #pylint: disable=no-member
         if resource == 'variable':
             variable_id = args.variable_id
             if args.action == 'get':

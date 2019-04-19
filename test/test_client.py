@@ -40,6 +40,10 @@ class MockApiHelper(object):
         test_instance.assertEquals(kwargs['key1'], 'value1')
         test_instance.assertEquals(kwargs['key2'], 'value2')
 
+    def get_variable(self, variable_id): pass
+    def set_variable(self, variable_id, value): pass
+    def apply_policy_file(self, policy_name, policy_file): pass
+
 
 class ClientTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):

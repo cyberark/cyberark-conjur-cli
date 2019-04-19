@@ -128,6 +128,22 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
+    # We want to keep this decorator within the class but we can't use class/static
+    # method decorator sadly but pylink keeps complaining about it
+    #pylint: disable=no-self-use,no-self-argument
+    def client_api_method(name):
+        """
+        Dummy decorator that allows us to indicate what methods are part
+        of the client API without needing to explicitly define it
+        """
+
+        def wrapper_func(original_function):
+            return original_function
+
+        return wrapper_func
+
+
+    @client_api_method('get')
     def get_variable(self, variable_id):
         """
         This method is used to fetch a secret's (aka "variable") value from
@@ -143,6 +159,7 @@ class Api():
         return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                api_token=self.api_token, ssl_verify=self._ssl_verify).content
 
+    @client_api_method('set')
     def set_variable(self, variable_id, value):
         """
         This method is used to set a secret (aka "variable") to a value of
@@ -159,6 +176,7 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
+    @client_api_method('apply_policy_file')
     def apply_policy_file(self, policy_id, policy_file):
         """
         This method is used to load a file-based policy into the desired
