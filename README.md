@@ -72,6 +72,11 @@ otherwise you will get a 404 error during invocation.
 Applies a file-based YAML to a named policy. This method only
 supports additive changes.
 
+#### `replace_policy_file(policy_name, policy_file)`
+
+Replaces a named policy with one from the provided file. This is
+usually a destructive invocation.
+
 
 ## Contributing
 
