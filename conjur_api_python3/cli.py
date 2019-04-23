@@ -60,6 +60,13 @@ class Cli():
         apply_policy_parser.add_argument('policy',
             help='File containing the YAML policy')
 
+        replace_policy_parser = policy_subparsers.add_parser('replace',
+            help='Replace a policy file')
+        replace_policy_parser.add_argument('name',
+            help='Name of the policy (usually "root")')
+        replace_policy_parser.add_argument('policy',
+            help='File containing the YAML policy')
+
 
         parser.add_argument('-v', '--version', action='version',
             version='%(prog)s v' + __version__)
@@ -126,8 +133,12 @@ class Cli():
             else:
                 client.set(variable_id, args.value)
                 print("Value set: '{}'".format(variable_id))
-        elif resource == 'policy' and args.action == 'apply':
-            client.apply_policy_file(args.name, args.policy)
+        elif resource == 'policy':
+            if args.action == 'replace':
+                client.replace_policy_file(args.name, args.policy)
+            else:
+                client.apply_policy_file(args.name, args.policy)
+
 
     @staticmethod
     def _parse_args(parser):
