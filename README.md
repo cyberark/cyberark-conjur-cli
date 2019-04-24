@@ -60,6 +60,12 @@ Gets a variable value based on its ID. Variable is binary data
 that should be decoded to your system's encoding (e.g.
 `get(variable_id).decode('utf-8')`.
 
+#### `get_many(variable_id[,variable_id...])`
+
+Gets multiple variable values based on their IDs. Variables are
+returned in a python dictionary that maps the variable name to its
+value.
+
 #### `set(variable_id, value)`
 
 Sets a variable to a specific value based on its ID.
