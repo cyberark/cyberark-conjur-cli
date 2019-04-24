@@ -99,6 +99,13 @@ class Client():
         """
         return self._api.get_variable(variable_id)
 
+    def get_many(self, *variable_ids):
+        """
+        Gets multiple variable values based on their IDs. Returns a
+        dictionary of mapped values.
+        """
+        return self._api.get_variables(*variable_ids)
+
     def set(self, variable_id, value):
         """
         Sets a variable to a specific value based on its ID

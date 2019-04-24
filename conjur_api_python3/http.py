@@ -27,7 +27,7 @@ class HttpVerb(Enum):
 
 #pylint: disable=too-many-locals
 def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
-                    ssl_verify=True, auth=None, api_token=None):
+                    ssl_verify=True, auth=None, api_token=None, query=None):
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -52,7 +52,11 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     request_method = getattr(requests, http_verb.name.lower())
 
     #pylint: disable=not-callable
-    response = request_method(url, *args, verify=ssl_verify, auth=auth, headers=headers)
+    response = request_method(url, *args,
+                              params=query,
+                              verify=ssl_verify,
+                              auth=auth,
+                              headers=headers)
 
     if check_errors:
         response.raise_for_status()

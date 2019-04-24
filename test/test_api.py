@@ -9,21 +9,16 @@ from conjur_api_python3.api import Api
 
 
 class ApiTest(unittest.TestCase):
-    class MockClientResponse(object):
+    class MockClientResponse():
         def __init__(self, text='myretval', content='mycontent'):
-            self._text = text
-            self._content = content
-
-        def text(self):
-            return self._text
-
-        def content(self):
-            return self._content
+            setattr(self, 'content', content.encode('utf-8'))
+            setattr(self, 'text', text)
 
     POLICY_FILE = './test/test_config/policies/variables.yml'
 
     def verify_http_call(self, http_client, method, endpoint, *args,
-            ssl_verify=None, api_token=True, auth=None, account='default', **kwargs):
+            ssl_verify=None, api_token='apitoken', auth=None, query=None,
+            account='default', **kwargs):
 
         params = {
             'url': 'http://localhost',
@@ -34,11 +29,9 @@ class ApiTest(unittest.TestCase):
             params[name] = value
 
         extra_args = {}
-        if api_token:
-            extra_args['api_token'] = 'apitoken'
-
-        if auth:
-            extra_args['auth'] = auth
+        for extra_arg_name in ['api_token', 'auth', 'query']:
+            if locals()[extra_arg_name]:
+                extra_args[extra_arg_name] = locals()[extra_arg_name]
 
         http_client.assert_called_once_with(method, endpoint, params, *args,
                                             **extra_args,
@@ -273,3 +266,35 @@ class ApiTest(unittest.TestCase):
                               policy_data,
                               identifier='mypolicyname',
                               ssl_verify='ssl_verify')
+
+    # Get variables
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
+    def test_get_variables_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.get_variables('myvar', 'myvar2')
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.BATCH_SECRETS,
+                              query={
+                                  'variable_ids': 'default:variable:myvar,default:variable:myvar2'
+                              },
+                              ssl_verify=True)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
+    def test_get_variables_passes_down_ssl_verify_parameter(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='sslverify')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.get_variables('myvar', 'myvar2')
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.BATCH_SECRETS,
+                              query={
+                                  'variable_ids': 'default:variable:myvar,default:variable:myvar2'
+                              },
+                              ssl_verify='sslverify')

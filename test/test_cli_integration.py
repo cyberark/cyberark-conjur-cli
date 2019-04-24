@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 import uuid
@@ -68,9 +69,9 @@ class CliIntegrationTest(unittest.TestCase):
         return invoke_cli(self, self.cli_auth_params,
             ['policy', 'replace', 'root', policy_path])
 
-    def get_variable(self, variable_id):
+    def get_variable(self, *variable_ids):
         return invoke_cli(self, self.cli_auth_params,
-            ['variable', 'get', variable_id])
+            ['variable', 'get', *variable_ids])
 
     def assert_set_and_get(self, variable_id):
         expected_value = uuid.uuid4().hex
@@ -87,7 +88,7 @@ class CliIntegrationTest(unittest.TestCase):
     def generate_policy_string(self):
         variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
         variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
-        variable_3 = 'simple/special @#$%^&*(){{}}[].,+/{id}'.format(id=uuid.uuid4().hex)
+        variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
 
         policy = \
 """
@@ -136,6 +137,32 @@ class CliIntegrationTest(unittest.TestCase):
     def test_https_cli_fails_if_cert_is_not_provided(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS)
         self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ID, requests.exceptions.SSLError)
+
+    @integration_test
+    def test_https_cli_can_batch_get_multiple_variables(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        policy, variables = self.generate_policy_string()
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            self.apply_policy(temp_policy_file.name)
+
+        value_map = {}
+        for variable in variables:
+            value = uuid.uuid4().hex
+            self.set_variable(variable, value)
+            value_map[variable] = value
+
+        batch_result_string = self.get_variable(*variables)
+        batch_result = json.loads(batch_result_string)
+
+        for variable_name, variable_value in value_map.items():
+            self.assertEquals(variable_value, batch_result[variable_name])
 
     @integration_test
     def test_https_can_apply_policy(self):

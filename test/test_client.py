@@ -145,6 +145,15 @@ class ClientTest(unittest.TestCase):
 
         MockApi.get_variable.assert_called_once_with('variable_id')
 
+    def test_client_passes_through_api_get_many_variables_params(self):
+        class MockApi(MockApiHelper):
+            pass
+        MockApi.get_variables = MagicMock()
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig).get_many('variable_id', 'variable_id2')
+
+        MockApi.get_variables.assert_called_once_with('variable_id', 'variable_id2')
+
     def test_client_passes_through_api_set_variable_params(self):
         class MockApi(MockApiHelper):
             pass

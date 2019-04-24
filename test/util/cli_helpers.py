@@ -30,7 +30,7 @@ def integration_test(original_function):
 
     return test_wrapper_func
 
-def cli_test(cli_args=[], integration=False):
+def cli_test(cli_args=[], integration=False, get_many_output=None):
     cli_command = 'cli {}'.format(' '.join(cli_args))
 
     def test_cli_decorator(original_function):
@@ -38,12 +38,14 @@ def cli_test(cli_args=[], integration=False):
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
             capture_stream = io.StringIO()
             client_instance_mock = MagicMock()
+            client_instance_mock.get_many.return_value = get_many_output
 
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
                             patch('conjur_api_python3.cli.Client') as mock_client:
                         mock_client.return_value = client_instance_mock
+
                         Cli().run()
 
             self.assertEqual(sys_exit.exception.code, 0,
