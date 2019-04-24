@@ -29,9 +29,25 @@ class CliTest(unittest.TestCase):
     def test_cli_invokes_variable_set_correctly(self, cli_invocation, output, client):
         client.set.assert_called_once_with('foo', 'bar')
 
+    @cli_test(["variable"])
+    def test_cli_variable_parser_doesnt_break_without_action(self, cli_invocation, output, client):
+        self.assertIn("usage: cli", output)
+
     @cli_test(["variable", "get", "foo"])
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
         client.get.assert_called_once_with('foo')
+
+    @cli_test(["variable", "get", "foo", "bar"], get_many_output={ "foo": "A", "bar": "B"})
+    def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output, client):
+        client.get_many.assert_called_once_with('foo', 'bar')
+
+    @cli_test(["variable", "get", "foo", "bar"], get_many_output={ "foo": "A", "bar": "B"})
+    def test_cli_variable_get_with_multiple_vars_outputs_formatted_json(self, cli_invocation, output, client):
+        self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
+
+    @cli_test(["policy"])
+    def test_cli_policy_parser_doesnt_break_without_action(self, cli_invocation, output, client):
+        self.assertIn("usage: cli", output)
 
     @cli_test(["policy", "apply", "foo", "foopolicy"])
     def test_cli_invokes_policy_apply_correctly(self, cli_invocation, output, client):

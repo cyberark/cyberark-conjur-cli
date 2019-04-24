@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 
+"""
+CLI
+
+This script is the main runner for the CLI module and allows for
+full use of the APIs through it.
+"""
+
 # Ensure that we can run this from both the repo and the egg
 import sys
 sys.path.append(".")
 sys.path.append("..")
 
+#pylint: disable=wrong-import-position
 from conjur_api_python3.cli import Cli
 
 if __name__ == '__main__':

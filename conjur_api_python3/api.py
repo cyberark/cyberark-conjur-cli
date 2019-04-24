@@ -6,6 +6,7 @@ API module
 Provides high-level interface for programmatic API interactions
 """
 
+import json
 import logging
 
 from datetime import datetime, timedelta
@@ -25,6 +26,8 @@ class Api():
     API_TOKEN_DURATION = 5
 
     KIND_VARIABLE = 'variable'
+    SECRET_ID_FORMAT = '{account}:{kind}:{id}'
+    SECRET_ID_RETURN_PREFIX = '{account}:{kind}:'
 
     _api_token = None
 
@@ -70,7 +73,8 @@ class Api():
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINE BELOW UNCOMMENTED
+        # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINES BELOW UNCOMMENTED
+        # from .http import enable_http_logging
         # if http_debug: enable_http_logging()
 
         # Sanity checks
@@ -142,6 +146,42 @@ class Api():
 
         return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                api_token=self.api_token, ssl_verify=self._ssl_verify).content
+
+    def get_variables(self, *variable_ids):
+        """
+        This method is used to fetch multiple secret's (aka "variable") values from
+        Conjur vault.
+        """
+
+        assert variable_ids, 'Variable IDs must not be empty!'
+
+        full_variable_ids = []
+        for variable_id in variable_ids:
+            full_variable_ids.append(self.SECRET_ID_FORMAT.format(account=self._account,
+                                                                  kind=self.KIND_VARIABLE,
+                                                                  id=variable_id))
+        query_params = {
+            'variable_ids': ','.join(full_variable_ids),
+        }
+
+        json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.BATCH_SECRETS,
+                                        self._default_params,
+                                        api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify,
+                                        query=query_params,
+                                        ).content
+
+        variable_map = json.loads(json_response.decode('utf-8'))
+
+        # Remove the 'account:variable:' prefix from result's variable names
+        remapped_keys_dict = {}
+        prefix_length = len(self.SECRET_ID_RETURN_PREFIX.format(account=self._account,
+                                                                kind=self.KIND_VARIABLE))
+        for variable_name, variable_value in variable_map.items():
+            new_variable_name = variable_name[prefix_length:]
+            remapped_keys_dict[new_variable_name] = variable_value
+
+        return remapped_keys_dict
 
     def set_variable(self, variable_id, value):
         """

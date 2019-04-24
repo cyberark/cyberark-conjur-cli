@@ -7,9 +7,10 @@ This module is the main entrypoint for all CLI-like usages of this
 module where only the minimal invocation configuration is required.
 """
 
+import argparse
+import json
 import os
 import sys
-import argparse
 
 from .client import Client
 
@@ -42,7 +43,7 @@ class Cli():
             help='Set the value of a variable')
 
         get_variable_parser.add_argument('variable_id',
-            help='ID of the variable')
+            help='ID of a variable', nargs='+')
 
         set_variable_parser.add_argument('variable_id',
             help='ID of the variable')
@@ -128,8 +129,12 @@ class Cli():
         if resource == 'variable':
             variable_id = args.variable_id
             if args.action == 'get':
-                variable_value = client.get(variable_id)
-                print(variable_value.decode('utf-8'), end='')
+                if len(variable_id) == 1:
+                    variable_value = client.get(variable_id[0])
+                    print(variable_value.decode('utf-8'), end='')
+                else:
+                    variable_values = client.get_many(*variable_id)
+                    print(json.dumps(variable_values, indent=4))
             else:
                 client.set(variable_id, args.value)
                 print("Value set: '{}'".format(variable_id))
@@ -145,6 +150,10 @@ class Cli():
         args = parser.parse_args()
 
         if not args.resource:
+            parser.print_help()
+            sys.exit(0)
+
+        if not args.action:
             parser.print_help()
             sys.exit(0)
 

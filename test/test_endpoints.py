@@ -22,6 +22,10 @@ class EndpointsTest(unittest.TestCase):
                                                             identifier='varid')
         self.assertEqual(auth_endpoint, 'http://host/secrets/myacct/varkind/varid')
 
+    def test_http_verb_has_correct_batch_secrets_template_string(self):
+        batch_endpoint = ConjurEndpoint.BATCH_SECRETS.value.format(url='http://host')
+        self.assertEqual(batch_endpoint, 'http://host/secrets')
+
     def test_http_verb_has_correct_policy_template_string(self):
         auth_endpoint = ConjurEndpoint.POLICIES.value.format(url='http://host',
                                                              account='myacct',
