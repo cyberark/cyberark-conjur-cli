@@ -134,6 +134,8 @@ class ApiTest(unittest.TestCase):
                               login='mylogin',
                               ssl_verify='verify')
 
+    # Get variable
+
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
@@ -162,6 +164,8 @@ class ApiTest(unittest.TestCase):
                               kind='variable',
                               identifier='myvar',
                               ssl_verify='verify')
+
+    # Set variable
 
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
     def test_set_variable_invokes_http_client_correctly(self, mock_http_client):
@@ -193,6 +197,8 @@ class ApiTest(unittest.TestCase):
                               kind='variable',
                               identifier='myvar',
                               ssl_verify='verify')
+
+    # Policy apply
 
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
     def test_apply_policy_invokes_http_client_correctly(self, mock_http_client):
@@ -226,6 +232,44 @@ class ApiTest(unittest.TestCase):
             policy_data = content_file.read()
 
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.POLICIES,
+                              policy_data,
+                              identifier='mypolicyname',
+                              ssl_verify='ssl_verify')
+
+    # Policy replace
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_replace_policy_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.replace_policy_file('mypolicyname', self.POLICY_FILE)
+
+        policy_data = None
+        with open(self.POLICY_FILE, 'r') as content_file:
+            policy_data = content_file.read()
+
+        self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.POLICIES,
+                              policy_data,
+                              identifier='mypolicyname',
+                              ssl_verify=True)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_replace_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.replace_policy_file('mypolicyname', self.POLICY_FILE)
+
+        policy_data = None
+        with open(self.POLICY_FILE, 'r') as content_file:
+            policy_data = content_file.read()
+
+        self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
                               ssl_verify='ssl_verify')

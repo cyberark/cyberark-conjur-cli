@@ -36,3 +36,7 @@ class CliTest(unittest.TestCase):
     @cli_test(["policy", "apply", "foo", "foopolicy"])
     def test_cli_invokes_policy_apply_correctly(self, cli_invocation, output, client):
         client.apply_policy_file.assert_called_once_with('foo', 'foopolicy')
+
+    @cli_test(["policy", "replace", "foo", "foopolicy"])
+    def test_cli_invokes_policy_replace_correctly(self, cli_invocation, output, client):
+        client.replace_policy_file.assert_called_once_with('foo', 'foopolicy')
