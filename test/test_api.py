@@ -1,3 +1,4 @@
+import json
 import unittest
 from datetime import datetime
 from unittest.mock import call, patch, MagicMock
@@ -6,6 +7,22 @@ from conjur_api_python3.http import HttpVerb
 from conjur_api_python3.endpoints import ConjurEndpoint
 
 from conjur_api_python3.api import Api
+
+
+MOCK_RESOURCE_LIST = [
+    {
+        'a': 'a value',
+        'b': 'b value',
+        'id': 'first:id',
+        'c': 'c value',
+    },
+    {
+        'x': 'x value',
+        'y': 'y value',
+        'id': 'second:id',
+        'z': 'z value',
+    },
+]
 
 
 class ApiTest(unittest.TestCase):
@@ -298,3 +315,16 @@ class ApiTest(unittest.TestCase):
                                   'variable_ids': 'default:variable:myvar,default:variable:myvar2'
                               },
                               ssl_verify='sslverify')
+
+    @patch('conjur_api_python3.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
+    def test_get_variables_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.list_resources()
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                              ssl_verify=True)

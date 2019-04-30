@@ -33,6 +33,9 @@ class Cli():
 
         resource_subparsers = parser.add_subparsers(dest='resource')
 
+        resource_subparsers.add_parser('list',
+            help='Lists all available resources beloging to this account')
+
         variable_parser = resource_subparsers.add_parser('variable',
             help='Perform variable-related actions . See "variable -help" for more options')
         variable_subparsers = variable_parser.add_subparsers(dest='action')
@@ -128,7 +131,10 @@ class Cli():
                         ca_bundle=ca_bundle,
                         debug=args.debug)
 
-        if resource == 'variable':
+        if resource == 'list':
+            result = client.list()
+            print(json.dumps(result, indent=4))
+        elif resource == 'variable':
             variable_id = args.variable_id
             if args.action == 'get':
                 if len(variable_id) == 1:
@@ -155,9 +161,10 @@ class Cli():
             parser.print_help()
             sys.exit(0)
 
-        if not args.action:
-            parser.print_help()
-            sys.exit(0)
+        if args.resource not in ['list']:
+            if 'action' not in args or not args.action:
+                parser.print_help()
+                sys.exit(0)
 
         return args.resource, args
 

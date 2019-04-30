@@ -106,6 +106,12 @@ class Client():
 
     ### API passthrough
 
+    def list(self):
+        """
+        Lists all available resources
+        """
+        return self._api.list_resources()
+
     def get(self, variable_id):
         """
         Gets a variable value based on its ID
