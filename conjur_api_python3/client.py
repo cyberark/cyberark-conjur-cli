@@ -37,11 +37,12 @@ class Client():
 
     # The method signature is long but we want to explicitly control
     # what paramteres are allowed
-    #pylint: disable=too-many-arguments
+    #pylint: disable=too-many-arguments,too-many-locals
     def __init__(self,
                  account='default',
                  api_class=Api,
                  api_config_class=ApiConfig,
+                 api_key=None,
                  ca_bundle=None,
                  debug=False,
                  http_debug=False,
@@ -62,7 +63,7 @@ class Client():
             'ca_bundle': ca_bundle,
         }
 
-        if not url or not account or not login_id or not password:
+        if not url or not account or not login_id or (not password and not api_key):
             logging.info("Not all expected variables were provided. " \
                 "Using conjurrc as credential store...")
             try:
@@ -75,13 +76,25 @@ class Client():
             except Exception as exc:
                 raise ConfigException(exc)
 
-        self._api = api_class(ssl_verify=ssl_verify, http_debug=http_debug, **config)
 
-        if password:
-            logging.info("Creating API key with password...")
-            self._api_key = self._api.login(login_id, password)
+        if api_key:
+            logging.info("Using API key from parameters...")
+            self._api = api_class(api_key=api_key,
+                                  http_debug=http_debug,
+                                  login_id=login_id,
+                                  ssl_verify=ssl_verify,
+                                  **config)
+        elif password:
+            logging.info("Creating API key with login ID/password combo...")
+            self._api = api_class(http_debug=http_debug,
+                                  ssl_verify=ssl_verify,
+                                  **config)
+            self._api.login(login_id, password)
         else:
             logging.info("Using API key with netrc credentials...")
+            self._api = api_class(http_debug=http_debug,
+                                  ssl_verify=ssl_verify,
+                                  **config)
 
         logging.info("Client initialized")
 

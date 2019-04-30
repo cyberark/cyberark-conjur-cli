@@ -81,6 +81,17 @@ class ClientTest(unittest.TestCase):
 
         MockApi.login.assert_called_once_with('mylogin', 'mypass')
 
+    def test_client_initializes_client_with_api_key_if_its_provided(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                self.assertEqual(kwargs['account'], 'myacct')
+                self.assertEqual(kwargs['url'], 'http://foo')
+                self.assertEqual(kwargs['login_id'], 'mylogin')
+                self.assertEqual(kwargs['api_key'], 'someapikey')
+
+        Client(api_class=MockApi, url='http://foo', account='myacct', login_id='mylogin',
+               api_key='someapikey')
+
     def test_client_performs_no_api_login_if_password_is_not_provided(self):
         class MockApi(MockApiHelper):
             pass

@@ -1,6 +1,6 @@
 import unittest
 
-from .util.cli_helpers import cli_test
+from .util.cli_helpers import cli_arg_test, cli_test
 
 from conjur_api_python3.version import __version__
 
@@ -24,6 +24,64 @@ class CliTest(unittest.TestCase):
     @cli_test(["--version"])
     def test_cli_shows_version_with_long_version_flag(self, cli_invocation, output, client):
         self.assertEquals("cli v{}\n".format(__version__), output)
+
+
+    # Optional params
+
+    # Account
+    @cli_arg_test(["-a", "myaccount"], account='myaccount')
+    def test_cli_passes_account_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--account", "myaccount"], account='myaccount')
+    def test_cli_passes_account_long_flag_to_client(self): pass
+
+    # API key
+    @cli_arg_test(["-k", "myapikey"], api_key='myapikey')
+    def test_cli_passes_api_key_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--api-key", "myapikey"], api_key='myapikey')
+    def test_cli_passes_api_key_long_flag_to_client(self): pass
+
+    # CA Bundle
+    @cli_arg_test(["-c", "mycabundle"], ca_bundle='mycabundle')
+    def test_cli_passes_ca_bundle_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--ca-bundle", "mycabundle"], ca_bundle='mycabundle')
+    def test_cli_passes_ca_bundle_long_flag_to_client(self): pass
+
+    # Debug
+    @cli_arg_test(["-d"], debug=True)
+    def test_cli_passes_debug_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--debug"], debug=True)
+    def test_cli_passes_debug_long_flag_to_client(self): pass
+
+    # User
+    @cli_arg_test(["-u", "myuser"], login_id='myuser')
+    def test_cli_passes_login_id_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--user", "myuser"], login_id='myuser')
+    def test_cli_passes_login_id_long_flag_to_client(self): pass
+
+    # Password
+    @cli_arg_test(["-p", "mypassword"], password='mypassword')
+    def test_cli_passes_password_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--password", "mypassword"], password='mypassword')
+    def test_cli_passes_password_long_flag_to_client(self): pass
+
+    # SSL Verify
+    @cli_arg_test(["--insecure"], ssl_verify=False)
+    def test_cli_passes_insecure_flag_to_client(self): pass
+
+    # URL
+    @cli_arg_test(["-l", "myurl"], url='myurl')
+    def test_cli_passes_url_short_flag_to_client(self): pass
+
+    @cli_arg_test(["--url", "myurl"], url='myurl')
+    def test_cli_passes_url_long_flag_to_client(self): pass
+
+    # Main method invocations
 
     @cli_test(["variable", "set", "foo", "bar"])
     def test_cli_invokes_variable_set_correctly(self, cli_invocation, output, client):
