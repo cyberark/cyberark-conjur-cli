@@ -4,6 +4,13 @@ from .util.cli_helpers import cli_arg_test, cli_test
 
 from conjur_api_python3.version import __version__
 
+
+RESOURCE_LIST = [
+    'some_id1',
+    'some_id2',
+]
+
+
 class CliTest(unittest.TestCase):
     @cli_test()
     def test_cli_without_args_shows_help(self, cli_invocation, output, client):
@@ -114,3 +121,11 @@ class CliTest(unittest.TestCase):
     @cli_test(["policy", "replace", "foo", "foopolicy"])
     def test_cli_invokes_policy_replace_correctly(self, cli_invocation, output, client):
         client.replace_policy_file.assert_called_once_with('foo', 'foopolicy')
+
+    @cli_test(["list"], list_output=RESOURCE_LIST)
+    def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
+        client.list.assert_called_once_with()
+
+    @cli_test(["list"], list_output=RESOURCE_LIST)
+    def test_cli_resource_listing_outputs_formatted_json(self, cli_invocation, output, client):
+        self.assertEquals('[\n    "some_id1",\n    "some_id2"\n]\n', output)

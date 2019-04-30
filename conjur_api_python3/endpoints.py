@@ -20,4 +20,5 @@ class ConjurEndpoint(Enum):
     BATCH_SECRETS = "{url}/secrets"
     LOGIN = "{url}/authn/{account}/login"
     POLICIES = "{url}/policies/{account}/policy/{identifier}"
+    RESOURCES = "{url}/resources/{account}"
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"

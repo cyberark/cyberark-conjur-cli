@@ -165,6 +165,18 @@ class CliIntegrationTest(unittest.TestCase):
             self.assertEquals(variable_value, batch_result[variable_name])
 
     @integration_test
+    def test_https_can_list_resources(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        output = invoke_cli(self, self.cli_auth_params, ['list'])
+
+        self.assertEquals(output,
+                          '[\n    "dev:policy:root",\n    "dev:variable:one/password"\n]\n')
+
+    @integration_test
     def test_https_can_apply_policy(self):
         self.setup_cli_params({
             **self.HTTPS_ENV_VARS,

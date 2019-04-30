@@ -191,3 +191,12 @@ class ClientTest(unittest.TestCase):
         Client(api_class=MockApi, api_config_class=MockApiConfig).replace_policy_file('name', 'policy')
 
         MockApi.replace_policy_file.assert_called_once_with('name', 'policy')
+
+    def test_client_passes_through_resource_list_method(self):
+        class MockApi(MockApiHelper):
+            pass
+        MockApi.list_resources = MagicMock()
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig).list()
+
+        MockApi.list_resources.assert_called_once_with()
