@@ -32,7 +32,7 @@ you will want to use `pip3` if it's available for your platform.
 
 Most usage is done by creating a Client instance and then invoking the API on it:
 
-### With login ID and password
+#### With login ID and password
 
 ```python3
 #!/usr/bin/env python3
@@ -54,7 +54,7 @@ new_value = client.get('conjur/my/variable')
 print("Variable value is:", new_value.decode('utf-8'))
 ```
 
-### With login Id and API key
+#### With login Id and API key
 
 Write the code same as in the first example but create the client with the following arguments:
 
@@ -66,7 +66,7 @@ client = Client(url='https://conjur.myorg.com',
                 ca_bundle='/path/to/my/ca/bundle')
 ```
 
-### With `.netrc` and `.conjurrc` settings
+#### With `.netrc` and `.conjurrc` settings
 
 Write the code same as in the first example but create the client with the following arguments:
 
@@ -74,7 +74,7 @@ Write the code same as in the first example but create the client with the follo
 client = Client()
 ```
 
-### Currently supported client methods:
+## Currently supported client methods:
 
 #### `get(variable_id)`
 
