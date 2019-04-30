@@ -105,6 +105,11 @@ supports additive changes.
 Replaces a named policy with one from the provided file. This is
 usually a destructive invocation.
 
+#### `list()`
+
+Returns a Python list of all the available resources for the current
+account.
+
 
 ## Contributing
 
