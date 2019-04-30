@@ -83,7 +83,8 @@ class Cli():
 
         # The external names for these are unfortunately named so we remap them
         parser.add_argument('-u', '--user', dest='login_id')
-        parser.add_argument('-k', '--api-key', dest='password')
+        parser.add_argument('-k', '--api-key')
+        parser.add_argument('-p', '--password')
 
         parser.add_argument('-d', '--debug',
             help='Enable debugging output',
@@ -120,6 +121,7 @@ class Cli():
         # to avoid ambiguity
         client = Client(url=args.url,
                         account=args.account,
+                        api_key=args.api_key,
                         login_id=args.login_id,
                         password=args.password,
                         ssl_verify=args.ssl_verify,

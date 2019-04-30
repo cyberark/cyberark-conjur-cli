@@ -15,7 +15,7 @@ class CliIntegrationTest(unittest.TestCase):
     REQUIRED_ENV_VARS = {
         'CONJUR_ACCOUNT': 'account',
         'CONJUR_AUTHN_LOGIN': 'user',
-        'CONJUR_AUTHN_API_KEY': 'api-key',
+        'CONJUR_AUTHN_API_KEY': 'password',
     }
 
     HTTP_ENV_VARS = {
