@@ -73,6 +73,15 @@ def enable_http_logging(): #pragma: no cover
     WARNING: Do not check in code with this method called or you
              may leak secrets to stdout!
     """
+
+    # This exception here is to allow code reviewers to explicitly
+    # see if anyone is trying to enable this functionality in clients
+    # that should never be checked in. This line should always be at
+    # the beginning of the method.
+    raise RuntimeError("If this line gets checked in uncommented or"
+                       "is removed, the PR should not be approved")
+
+    # pylint: disable=unreachable
     import logging
     from http.client import HTTPConnection
     HTTPConnection.debuglevel = 1
