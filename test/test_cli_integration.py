@@ -196,6 +196,77 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.assert_set_and_get(variable)
 
     @integration_test
+    def test_https_apply_policy_can_output_returned_data(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        user_id1 = uuid.uuid4().hex
+        user_id2 = uuid.uuid4().hex
+        policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
+                                                                   user_id2=user_id2)
+
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            output = self.apply_policy(temp_policy_file.name)
+
+        json_result = json.loads(output)
+        self.maxDiff = None
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {
+                'dev:user:' + user_id1: {
+                    'id': 'dev:user:' + user_id1,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id1]['api_key'],
+                },
+                'dev:user:' + user_id2: {
+                    'id': 'dev:user:' + user_id2,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id2]['api_key'],
+                }
+            }
+        }
+
+        self.assertDictEqual(json_result, expected_object)
+
+    @integration_test
+    def test_https_apply_policy_doesnt_break_if_no_created_roles(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        user_id1 = uuid.uuid4().hex
+        user_id2 = uuid.uuid4().hex
+        policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
+                                                                   user_id2=user_id2)
+
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Ensure that the accounts exist
+            self.apply_policy(temp_policy_file.name)
+
+            # Run the new apply that should not result in newly created roles
+            output = self.apply_policy(temp_policy_file.name)
+
+        json_result = json.loads(output)
+        self.maxDiff = None
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {}
+        }
+
+        self.assertDictEqual(json_result, expected_object)
+
+    @integration_test
     def test_https_can_replace_policy(self):
         self.setup_cli_params({
             **self.HTTPS_ENV_VARS,
@@ -221,3 +292,66 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         for old_variable in old_variables:
             self.assert_variable_set_fails(old_variable, requests.exceptions.HTTPError)
+
+    @integration_test
+    def test_https_replace_policy_can_output_returned_data(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        user_id1 = uuid.uuid4().hex
+        user_id2 = uuid.uuid4().hex
+        policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
+                                                                   user_id2=user_id2)
+
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            output = self.replace_policy(temp_policy_file.name)
+
+        json_result = json.loads(output)
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {
+                'dev:user:' + user_id1: {
+                    'id': 'dev:user:' + user_id1,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id1]['api_key'],
+                },
+                'dev:user:' + user_id2: {
+                    'id': 'dev:user:' + user_id2,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id2]['api_key'],
+                }
+            }
+        }
+
+        self.assertDictEqual(json_result, expected_object)
+
+    @integration_test
+    def test_https_replace_policy_doesnt_break_if_no_created_roles(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        policy = "- !policy foo\n"
+
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Run the new apply that should not result in newly created roles
+            output = self.replace_policy(temp_policy_file.name)
+
+        json_result = json.loads(output)
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {}
+        }
+
+        self.assertDictEqual(json_result, expected_object)

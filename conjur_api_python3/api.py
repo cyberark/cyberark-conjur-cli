@@ -234,9 +234,12 @@ class Api():
         with open(policy_file, 'r') as content_file:
             policy_data = content_file.read()
 
-        return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.POLICIES, params,
-                               policy_data, api_token=self.api_token,
-                               ssl_verify=self._ssl_verify).text
+        json_response = invoke_endpoint(HttpVerb.POST, ConjurEndpoint.POLICIES, params,
+                                        policy_data, api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).text
+
+        policy_changes = json.loads(json_response)
+        return policy_changes
 
     def replace_policy_file(self, policy_id, policy_file):
         """
@@ -253,6 +256,9 @@ class Api():
         with open(policy_file, 'r') as content_file:
             policy_data = content_file.read()
 
-        return invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.POLICIES, params,
-                               policy_data, api_token=self.api_token,
-                               ssl_verify=self._ssl_verify).text
+        json_response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.POLICIES, params,
+                                        policy_data, api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).text
+
+        policy_changes = json.loads(json_response)
+        return policy_changes
