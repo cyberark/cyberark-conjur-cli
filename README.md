@@ -4,13 +4,13 @@ Python3-based API SDK for [Conjur OSS](https://www.conjur.org/). The repo
 also includes a self-contained CLI tool that wraps the API in a simple executable
 script/binary.
 
-***
+---
 
 ### **Status**: Alpha
 
 #### **Warning: Naming and APIs are still subject to breaking changes!**
 
-***
+---
 
 
 ## Installing the code
@@ -85,8 +85,7 @@ that should be decoded to your system's encoding (e.g.
 #### `get_many(variable_id[,variable_id...])`
 
 Gets multiple variable values based on their IDs. Variables are
-returned in a python dictionary that maps the variable name to its
-value.
+returned in a dictionary that maps the variable name to its value.
 
 #### `set(variable_id, value)`
 
@@ -98,12 +97,14 @@ otherwise you will get a 404 error during invocation.
 #### `apply_policy_file(policy_name, policy_file)`
 
 Applies a file-based YAML to a named policy. This method only
-supports additive changes.
+supports additive changes. Result is a dictionary object constructed
+from the returned JSON data.
 
 #### `replace_policy_file(policy_name, policy_file)`
 
 Replaces a named policy with one from the provided file. This is
-usually a destructive invocation.
+usually a destructive invocation. Result is a dictionary object
+constructed from the returned JSON data.
 
 #### `list()`
 
