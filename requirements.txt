@@ -1,5 +1,6 @@
 # Keep this in sync with setup.py
 nose2>=0.8.0
+nose2[coverage_plugin]>=0.6.5
 pylint>=2.3.1
 PyInstaller>=3.4
 PyYAML>=3.13

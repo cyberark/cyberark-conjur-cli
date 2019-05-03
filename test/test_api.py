@@ -318,7 +318,7 @@ class ApiTest(unittest.TestCase):
 
     @patch('conjur_api_python3.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
-    def test_get_variables_invokes_http_client_correctly(self, mock_http_client):
+    def test_get_resources_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'

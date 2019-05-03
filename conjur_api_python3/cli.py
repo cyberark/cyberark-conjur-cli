@@ -176,4 +176,5 @@ class Cli():
         Cli().run()
 
 if __name__ == '__main__':
-    Cli.launch()
+    # Not coverage-tested since the integration tests do this
+    Cli.launch() # pragma: no cover
