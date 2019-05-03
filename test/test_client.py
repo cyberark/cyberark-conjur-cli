@@ -1,5 +1,6 @@
 import os
 import unittest
+import uuid
 
 from unittest.mock import MagicMock, Mock, patch
 
@@ -153,6 +154,16 @@ class ClientTest(unittest.TestCase):
 
         MockApi.get_variable.assert_called_once_with('variable_id')
 
+    def test_client_returns_get_variable_result(self):
+        class MockApi(MockApiHelper):
+            pass
+
+        MockApi.get_variable = MagicMock()
+        MockApi.get_variable.return_value = uuid.uuid4().hex
+
+        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).get('variable_id')
+        self.assertEquals(return_value, MockApi.get_variable.return_value)
+
     def test_client_passes_through_api_get_many_variables_params(self):
         class MockApi(MockApiHelper):
             pass
@@ -161,6 +172,16 @@ class ClientTest(unittest.TestCase):
         Client(api_class=MockApi, api_config_class=MockApiConfig).get_many('variable_id', 'variable_id2')
 
         MockApi.get_variables.assert_called_once_with('variable_id', 'variable_id2')
+
+    def test_client_returns_get_variables_result(self):
+        class MockApi(MockApiHelper):
+            pass
+
+        MockApi.get_variables = MagicMock()
+        MockApi.get_variables.return_value = uuid.uuid4().hex
+
+        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).get_many('variable_id', 'variable_id2')
+        self.assertEquals(return_value, MockApi.get_variables.return_value)
 
     def test_client_passes_through_api_set_variable_params(self):
         class MockApi(MockApiHelper):
@@ -180,6 +201,16 @@ class ClientTest(unittest.TestCase):
 
         MockApi.apply_policy_file.assert_called_once_with('name', 'policy')
 
+    def test_client_returns_apply_policy_result(self):
+        class MockApi(MockApiHelper):
+            pass
+
+        MockApi.apply_policy_file = MagicMock()
+        MockApi.apply_policy_file.return_value = uuid.uuid4().hex
+
+        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).apply_policy_file('name', 'policy')
+        self.assertEquals(return_value, MockApi.apply_policy_file.return_value)
+
     def test_client_passes_through_api_replace_policy_params(self):
         class MockApi(MockApiHelper):
             pass
@@ -188,6 +219,16 @@ class ClientTest(unittest.TestCase):
         Client(api_class=MockApi, api_config_class=MockApiConfig).replace_policy_file('name', 'policy')
 
         MockApi.replace_policy_file.assert_called_once_with('name', 'policy')
+
+    def test_client_returns_replace_policy_result(self):
+        class MockApi(MockApiHelper):
+            pass
+
+        MockApi.replace_policy_file = MagicMock()
+        MockApi.replace_policy_file.return_value = uuid.uuid4().hex
+
+        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).replace_policy_file('name', 'policy')
+        self.assertEquals(return_value, MockApi.replace_policy_file.return_value)
 
     def test_client_passes_through_resource_list_method(self):
         class MockApi(MockApiHelper):

@@ -102,11 +102,15 @@ class CliTest(unittest.TestCase):
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
         client.get.assert_called_once_with('foo')
 
-    @cli_test(["variable", "get", "foo", "bar"], get_many_output={ "foo": "A", "bar": "B"})
+    @cli_test(["variable", "get", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
     def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output, client):
         client.get_many.assert_called_once_with('foo', 'bar')
 
-    @cli_test(["variable", "get", "foo", "bar"], get_many_output={ "foo": "A", "bar": "B"})
+    @cli_test(["variable", "get", "foo", "bar"], get_many_output={})
+    def test_cli_variable_get_with_multiple_vars_doesnt_break_on_empty_input(self, cli_invocation, output, client):
+        self.assertEquals('{}\n', output)
+
+    @cli_test(["variable", "get", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
     def test_cli_variable_get_with_multiple_vars_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
@@ -118,9 +122,25 @@ class CliTest(unittest.TestCase):
     def test_cli_invokes_policy_apply_correctly(self, cli_invocation, output, client):
         client.apply_policy_file.assert_called_once_with('foo', 'foopolicy')
 
+    @cli_test(["policy", "apply", "foo", "foopolicy"], policy_change_output={})
+    def test_cli_policy_apply_doesnt_break_on_empty_input(self, cli_invocation, output, client):
+        self.assertEquals('{}\n', output)
+
+    @cli_test(["policy", "apply", "foo", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    def test_cli_policy_apply_outputs_formatted_json(self, cli_invocation, output, client):
+        self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
+
     @cli_test(["policy", "replace", "foo", "foopolicy"])
     def test_cli_invokes_policy_replace_correctly(self, cli_invocation, output, client):
         client.replace_policy_file.assert_called_once_with('foo', 'foopolicy')
+
+    @cli_test(["policy", "replace", "foo", "foopolicy"], policy_change_output={})
+    def test_cli_policy_replace_doesnt_break_on_empty_input(self, cli_invocation, output, client):
+        self.assertEquals('{}\n', output)
+
+    @cli_test(["policy", "replace", "foo", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    def test_cli_policy_replace_outputs_formatted_json(self, cli_invocation, output, client):
+        self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):

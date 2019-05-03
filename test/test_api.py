@@ -24,6 +24,19 @@ MOCK_RESOURCE_LIST = [
     },
 ]
 
+MOCK_POLICY_CHANGE_OBJECT = {
+    "created_roles": {
+        "myorg:user:alice": {
+            "id": "myorg:user:alice",
+            "api_key": "apikey1"
+        },
+        "myorg:user:bob": {
+            "id": "myorg:user:bob",
+            "api_key": "apikey2"
+        }
+    },
+    "version": 4
+}
 
 class ApiTest(unittest.TestCase):
     class MockClientResponse():
@@ -210,7 +223,7 @@ class ApiTest(unittest.TestCase):
 
     # Policy apply
 
-    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_apply_policy_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
@@ -228,7 +241,17 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify=True)
 
-    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
+    def test_apply_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        output = api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+        self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_apply_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
@@ -248,7 +271,7 @@ class ApiTest(unittest.TestCase):
 
     # Policy replace
 
-    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_replace_policy_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
@@ -266,7 +289,17 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify=True)
 
-    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
+    def test_replace_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        output = api.replace_policy_file('mypolicyname', self.POLICY_FILE)
+        self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
+
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_replace_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():

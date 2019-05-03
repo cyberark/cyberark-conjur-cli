@@ -148,9 +148,11 @@ class Cli():
                 print("Value set: '{}'".format(variable_id))
         elif resource == 'policy':
             if args.action == 'replace':
-                client.replace_policy_file(args.name, args.policy)
+                resources = client.replace_policy_file(args.name, args.policy)
+                print(json.dumps(resources, indent=4))
             else:
-                client.apply_policy_file(args.name, args.policy)
+                resources = client.apply_policy_file(args.name, args.policy)
+                print(json.dumps(resources, indent=4))
 
 
     @staticmethod
