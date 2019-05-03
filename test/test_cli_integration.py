@@ -71,6 +71,28 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         return invoke_cli(self, self.cli_auth_params,
             ['policy', 'replace', 'root', policy_path])
 
+    def replace_policy_from_string(self, policy):
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Run the new apply that should not result in newly created roles
+            output = self.replace_policy(temp_policy_file.name)
+
+        return output
+
+    def apply_policy_from_string(self, policy):
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Run the new apply that should not result in newly created roles
+            output = self.apply_policy(temp_policy_file.name)
+
+        return output
+
     def get_variable(self, *variable_ids):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', *variable_ids])
@@ -186,11 +208,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         })
 
         policy, variables = self.generate_policy_string()
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            self.apply_policy(temp_policy_file.name)
+        self.apply_policy_from_string(policy)
 
         for variable in variables:
             self.assert_set_and_get(variable)
@@ -207,15 +225,8 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
 
-        output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            output = self.apply_policy(temp_policy_file.name)
-
-        json_result = json.loads(output)
-        self.maxDiff = None
+        # Run the new apply that should not result in newly created roles
+        json_result = json.loads(self.apply_policy_from_string(policy))
 
         expected_object = {
             'version': json_result['version'],
@@ -244,20 +255,11 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         user_id2 = uuid.uuid4().hex
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
+        # Ensure that the accounts exist
+        self.apply_policy_from_string(policy)
 
-        output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Ensure that the accounts exist
-            self.apply_policy(temp_policy_file.name)
-
-            # Run the new apply that should not result in newly created roles
-            output = self.apply_policy(temp_policy_file.name)
-
-        json_result = json.loads(output)
-        self.maxDiff = None
+        # Run the new apply that should not result in newly created roles
+        json_result = json.loads(self.apply_policy_from_string(policy))
 
         expected_object = {
             'version': json_result['version'],
@@ -281,11 +283,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.apply_policy(temp_policy_file.name)
 
         replacement_policy, new_variables = self.generate_policy_string()
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(replacement_policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            self.replace_policy(temp_policy_file.name)
+        self.replace_policy_from_string(replacement_policy)
 
         for new_variable in new_variables:
             self.assert_set_and_get(new_variable)
@@ -304,15 +302,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         user_id2 = uuid.uuid4().hex
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
-
-        output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            output = self.replace_policy(temp_policy_file.name)
-
-        json_result = json.loads(output)
+        json_result = json.loads(self.replace_policy_from_string(policy))
 
         expected_object = {
             'version': json_result['version'],
@@ -338,16 +328,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         })
 
         policy = "- !policy foo\n"
-
-        output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Run the new apply that should not result in newly created roles
-            output = self.replace_policy(temp_policy_file.name)
-
-        json_result = json.loads(output)
+        json_result = json.loads(self.replace_policy_from_string(policy))
 
         expected_object = {
             'version': json_result['version'],
