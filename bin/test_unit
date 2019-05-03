@@ -2,9 +2,11 @@
 
 CURRENT_DIR=$(pwd)
 
+rm -rf coverage.xml
+
 if [[ "$1" == "-l" ]]; then
   shift
-  nose2 -v -X -A '!integration' $@
+  nose2 -v -X -A '!integration' --with-coverage $@
   exit 0
 fi
 
@@ -14,4 +16,4 @@ rm -rf $CURRENT_DIR/output/*
 docker run --rm \
            -t \
            -v "$(pwd):/opt/conjur-api-python3" \
-           conjur-api-python3-test nose2 -v -X -A '!integration' $@
+           conjur-api-python3-test nose2 -v -X -A '!integration' --with-coverage $@

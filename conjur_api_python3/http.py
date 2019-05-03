@@ -63,7 +63,9 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
 
     return response
 
-def enable_http_logging():
+# Not coverage tested since this code should never be hit
+# from checked-in code
+def enable_http_logging(): #pragma: no cover
     """
     This method enables verbose http logging, which may be useful
     for debugging problems with invocation code.

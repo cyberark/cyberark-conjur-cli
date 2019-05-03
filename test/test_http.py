@@ -128,7 +128,8 @@ class HttpInvokeEndpointTest(unittest.TestCase):
     def test_invoke_endpoint_does_not_raise_error_if_bad_status_but_check_errors_is_false(self, mock_get):
         class MockResponse(object):
             def raise_for_status(self):
-                raise Exception('bad status code!')
+                # This line should not be hit but if it is, it's a test failure
+                raise Exception('bad status code!') # pragma: no cover
         mock_get.return_value = MockResponse()
 
         invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, check_errors=False)

@@ -11,7 +11,9 @@ from .util.cli_helpers import integration_test, invoke_cli
 from conjur_api_python3.version import __version__
 
 
-class CliIntegrationTest(unittest.TestCase):
+# Not coverage tested since integration tests doesn't run in
+# the same build step
+class CliIntegrationTest(unittest.TestCase): # pragma: no cover
     REQUIRED_ENV_VARS = {
         'CONJUR_ACCOUNT': 'account',
         'CONJUR_AUTHN_LOGIN': 'user',

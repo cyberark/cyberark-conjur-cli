@@ -1,0 +1,6 @@
+[run]
+omit =
+        *__init__*
+        *__main__*
+        *cli_helpers.py
+        setup.py

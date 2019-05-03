@@ -11,6 +11,8 @@ __pycache__
 # Test artifacts
 .env
 output/*.xml
+.coverage
+coverage.xml
 
 # Build artifacts
 build/

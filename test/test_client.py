@@ -18,9 +18,6 @@ class MockApiConfig(object):
         'ca_bundle': 'apiconfigcabundle',
     }
 
-    def __repr__(self):
-        return self.CONFIG
-
     def __iter__(self):
         return iter(self.CONFIG.items())
 
