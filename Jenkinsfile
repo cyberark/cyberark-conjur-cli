@@ -39,6 +39,18 @@ pipeline {
         }
       }
     }
+
+    // Only publish to PyPI if the HEAD is
+    // tagged with the same version as in __version__.py
+    stage('Publish to PyPI') {
+      steps {
+        sh 'summon -e production ./bin/publish'
+      }
+
+      when {
+        branch "master"
+      }
+    }
   }
 
   post {
