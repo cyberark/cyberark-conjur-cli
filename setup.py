@@ -23,7 +23,7 @@ with open('README.md', 'r') as readme_file:
     long_description = readme_file.read()
 
 setup(
-    name="conjur-api",
+    name="conjur-client",
     version=VERSION_DATA['__version__'],
     python_requires='>=3.5',
     packages=find_packages(exclude=("test")),
@@ -67,9 +67,9 @@ setup(
     ],
     classifiers=[
         "Programming Language :: Python :: 3 :: Only",
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Natural Language :: English",
         "Topic :: Office/Business",
