@@ -18,6 +18,10 @@ VERSION_DATA = {}
 with open(VERSION_FILE, 'r') as version_fp:
     exec(version_fp.read(), VERSION_DATA)
 
+long_description=""
+with open('README.md', 'r') as readme_file:
+    long_description = readme_file.read()
+
 setup(
     name="conjur-api",
     version=VERSION_DATA['__version__'],
@@ -49,6 +53,8 @@ setup(
     author="CyberArk Software, Inc",
     author_email="CyberArk Maintainers <conj_maintainers@cyberark.com>",
     description="APIs for interacting with the Conjur v5 appliance",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     license="MIT",
     url="https://github.com/conjurinc/conjur-api-python3",
     keywords=[
