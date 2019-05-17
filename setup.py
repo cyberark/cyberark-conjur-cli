@@ -10,7 +10,7 @@ import os.path
 
 from setuptools import setup, find_packages
 
-PACKAGE_NAME = "conjur_api_python3"
+PACKAGE_NAME = "conjur"
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 VERSION_FILE = os.path.join(CURRENT_DIR, PACKAGE_NAME, "version.py")
 
@@ -19,18 +19,19 @@ with open(VERSION_FILE, 'r') as version_fp:
     exec(version_fp.read(), VERSION_DATA)
 
 setup(
-    name="conjur-api-python",
+    name="conjur-api",
     version=VERSION_DATA['__version__'],
-    packages=find_packages(),
+    python_requires='>=3.5',
+    packages=find_packages(exclude=("test")),
     zip_safe=True,
 
-    scripts=['pkg_bin/conjur-py3-cli'],
+    scripts=['pkg_bin/conjur-cli'],
 
-    entry_points = {
-        'console_scripts': ['conjur-py3-cli=conjur_api_python3:Cli.launch'],
+    entry_points={
+        'console_scripts': ['conjur-cli=conjur:Cli.launch'],
 
         'setuptools.installation': [
-            'eggsecutable = conjur_api_python3:Cli.launch',
+            'eggsecutable = conjur:Cli.launch',
         ]
     },
 
@@ -53,11 +54,11 @@ setup(
     keywords=[
         "conjur",
         "cyberark",
+        "microservices"
+        "privileged access",
         "security",
         "vault",
-        "privileged access",
-        "microservices"
-        ],
+    ],
     classifiers=[
         "Programming Language :: Python :: 3 :: Only",
         "Development Status :: 2 - Pre-Alpha",
@@ -74,5 +75,5 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Systems Administration :: Authentication/Directory",
         "Topic :: Utilities",
-        ],
+    ],
 )

@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from conjur_api_python3.config import Config
+from conjur.config import Config
 
 class ConfigTest(unittest.TestCase):
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))

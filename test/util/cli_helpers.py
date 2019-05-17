@@ -6,7 +6,7 @@ from functools import wraps
 
 from unittest.mock import patch, MagicMock
 
-from conjur_api_python3.cli import Cli
+from conjur.cli import Cli
 
 def invoke_cli(test_runner, *args):
     capture_stream = io.StringIO()
@@ -47,7 +47,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
-                            patch('conjur_api_python3.cli.Client') as mock_client:
+                            patch('conjur.cli.Client') as mock_client:
                         mock_client.return_value = client_instance_mock
 
                         Cli().run()
@@ -87,7 +87,7 @@ def cli_arg_test(cli_args=[], **kwargs):
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
-                            patch('conjur_api_python3.cli.Client') as mock_client:
+                            patch('conjur.cli.Client') as mock_client:
                         mock_client.return_value = MagicMock()
                         client = mock_client
 

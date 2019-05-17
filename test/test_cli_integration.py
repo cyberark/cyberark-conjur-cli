@@ -8,7 +8,7 @@ import requests
 
 from .util.cli_helpers import integration_test, invoke_cli
 
-from conjur_api_python3.version import __version__
+from conjur.version import __version__
 
 
 # Not coverage tested since integration tests doesn't run in

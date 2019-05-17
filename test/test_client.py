@@ -4,8 +4,8 @@ import uuid
 
 from unittest.mock import MagicMock, Mock, patch
 
-from conjur_api_python3.client import ConfigException, Client
-from conjur_api_python3 import api
+from conjur.client import ConfigException, Client
+from conjur import api
 
 
 # ApiConfig mocking class

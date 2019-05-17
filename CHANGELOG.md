@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.0.2] - 2019-05-17
+
+### Changed
+- Package prefix changed from `conjur_api_python3` to `conjur`
+- Bundle name changed from `conjur-api-python` to `conjur-api`
+- CLI renamed from `conjur-py3-cli` to `conjur-cli`
+
 ### Added
 - Support for returning output from policy changes invocations
 
@@ -13,4 +20,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 The first tagged version.
 
-[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.1...0.0.2

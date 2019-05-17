@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-SRC_DIRS=( "./conjur_api_python3"
+SRC_DIRS=( "./conjur"
            "./pkg_bin" )
 
 DISABLED_ERRORS="fixme"
