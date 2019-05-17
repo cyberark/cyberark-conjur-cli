@@ -24,6 +24,7 @@ MOCK_RESOURCE_LIST = [
     },
 ]
 
+MOCK_BATCH_GET_RESPONSE = '{"myaccount:variable:foo": "a", "myaccount:variable:bar": "b"}'
 MOCK_POLICY_CHANGE_OBJECT = {
     "created_roles": {
         "myorg:user:alice": {
@@ -334,6 +335,20 @@ class ApiTest(unittest.TestCase):
                               },
                               ssl_verify=True)
 
+    @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(content=MOCK_BATCH_GET_RESPONSE))
+    def test_get_variables_converts_returned_data_to_expected_objects(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', account='myaccount')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        output = api.get_variables('myvar', 'myvar2')
+        self.assertEqual(output,
+                         {
+                             'foo': 'a',
+                             'bar': 'b',
+                         })
+
     @patch('conjur_api_python3.api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
     def test_get_variables_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='sslverify')
@@ -348,6 +363,8 @@ class ApiTest(unittest.TestCase):
                                   'variable_ids': 'default:variable:myvar,default:variable:myvar2'
                               },
                               ssl_verify='sslverify')
+
+    # List resources
 
     @patch('conjur_api_python3.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
