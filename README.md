@@ -1,8 +1,8 @@
 # conjur-api-python3
 
 Python3-based API SDK for [Conjur OSS](https://www.conjur.org/). The repo
-also includes a self-contained CLI tool that wraps the API in a simple executable
-script/binary.
+also includes a self-contained CLI tool (`conjur-cli`) that wraps the API
+in a simple executable script/binary.
 
 ---
 
@@ -30,6 +30,23 @@ you will want to use `pip3` if it's available for your platform.
 
 ## Usage
 
+### CLI
+
+CLI can either be used with the included executable script:
+
+```shell
+conjur-cli --insecure -l https://myserver -a orgname -u admin -p secret \
+  variable get foo/bar
+```
+
+Or through the installed module:
+
+```shell
+python -m conjur --insecure -l https://myserver -a orgname -u admin -p secret list
+```
+
+### API
+
 Most usage is done by creating a Client instance and then invoking the API on it:
 
 #### With login ID and password
@@ -37,7 +54,7 @@ Most usage is done by creating a Client instance and then invoking the API on it
 ```python3
 #!/usr/bin/env python3
 
-from conjur_api_python3 import Client
+from conjur import Client
 
 client = Client(url='https://conjur.myorg.com',
                 account='default',

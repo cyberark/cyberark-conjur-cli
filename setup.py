@@ -10,7 +10,7 @@ import os.path
 
 from setuptools import setup, find_packages
 
-PACKAGE_NAME = "conjur_api_python3"
+PACKAGE_NAME = "conjur"
 CURRENT_DIR = os.path.abspath(os.path.dirname(__file__))
 VERSION_FILE = os.path.join(CURRENT_DIR, PACKAGE_NAME, "version.py")
 
@@ -18,19 +18,24 @@ VERSION_DATA = {}
 with open(VERSION_FILE, 'r') as version_fp:
     exec(version_fp.read(), VERSION_DATA)
 
+long_description=""
+with open('README.md', 'r') as readme_file:
+    long_description = readme_file.read()
+
 setup(
-    name="conjur-api-python",
+    name="conjur-client",
     version=VERSION_DATA['__version__'],
-    packages=find_packages(),
+    python_requires='>=3.5',
+    packages=find_packages(exclude=("test")),
     zip_safe=True,
 
-    scripts=['pkg_bin/conjur-py3-cli'],
+    scripts=['pkg_bin/conjur-cli'],
 
-    entry_points = {
-        'console_scripts': ['conjur-py3-cli=conjur_api_python3:Cli.launch'],
+    entry_points={
+        'console_scripts': ['conjur-cli=conjur:Cli.launch'],
 
         'setuptools.installation': [
-            'eggsecutable = conjur_api_python3:Cli.launch',
+            'eggsecutable = conjur:Cli.launch',
         ]
     },
 
@@ -48,21 +53,23 @@ setup(
     author="CyberArk Software, Inc",
     author_email="CyberArk Maintainers <conj_maintainers@cyberark.com>",
     description="APIs for interacting with the Conjur v5 appliance",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     license="MIT",
     url="https://github.com/conjurinc/conjur-api-python3",
     keywords=[
         "conjur",
         "cyberark",
+        "microservices"
+        "privileged access",
         "security",
         "vault",
-        "privileged access",
-        "microservices"
-        ],
+    ],
     classifiers=[
         "Programming Language :: Python :: 3 :: Only",
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Natural Language :: English",
         "Topic :: Office/Business",
@@ -74,5 +81,5 @@ setup(
         "Topic :: System :: Systems Administration",
         "Topic :: System :: Systems Administration :: Authentication/Directory",
         "Topic :: Utilities",
-        ],
+    ],
 )

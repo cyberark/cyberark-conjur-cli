@@ -1,6 +1,6 @@
 import unittest
 
-from conjur_api_python3.endpoints import ConjurEndpoint
+from conjur.endpoints import ConjurEndpoint
 
 
 class EndpointsTest(unittest.TestCase):

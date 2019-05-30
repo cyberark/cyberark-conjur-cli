@@ -9,7 +9,7 @@ sys.path.append("..")
 import os
 import time
 
-import conjur_api_python3 as conjur
+import conjur
 
 VARIABLE_PATH = 'a/ b/c'
 USE_CONJURRC = True

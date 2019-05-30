@@ -2,7 +2,7 @@ import unittest
 
 from .util.cli_helpers import cli_arg_test, cli_test
 
-from conjur_api_python3.version import __version__
+from conjur.version import __version__
 
 
 RESOURCE_LIST = [

@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import requests
 
-from conjur_api_python3.endpoints import ConjurEndpoint
-from conjur_api_python3.http import HttpVerb, invoke_endpoint
+from conjur.endpoints import ConjurEndpoint
+from conjur.http import HttpVerb, invoke_endpoint
 
 
 class HttpVerbTest(unittest.TestCase):

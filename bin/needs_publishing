@@ -1,0 +1,47 @@
+#!/bin/bash -e
+
+PYPI_URL="${1-https://pypi.org}"
+echo "Using $PYPI_URL as the publish endpoint"
+
+package_name=$(python3 ./setup.py --name)
+package_name=Conjur
+
+echo "Determining if publishing is needed for package '$package_name'..."
+
+local_version=$(python3 ./setup.py --version)
+echo "Local version: $local_version"
+
+published_version=$(curl -Ls $PYPI_URL/pypi/$package_name/json | jq -r '.info.version' || echo "<not published>")
+echo "Published version on $PYPI_URL: $published_version"
+if [[ "$local_version" == "$current_published_version" ]]; then
+  echo "WARN: Local version of $package_name ($local_version) is the same as published version ($published_version)!"
+  echo "WARN: Skipping publishing!"
+  exit 1
+fi
+
+echo "Published version ($published_version) does not match local version ($local_version)!"
+echo "Checking current git tag to see if it matches this commit..."
+
+# Jenkins git plugin is broken and always fetches with `--no-tags`
+# (or `--tags`, neither of which is what you want), so tags end up
+# not being fetched. Try to fix that.
+# (Unfortunately this fetches all remote heads, so we may have to find
+# another solution for bigger repos.)
+git fetch -q
+
+tag_commit=$(git rev-list -n 1 "v$local_version" 2>/dev/null || true)
+echo "Tag v$local_version commit: '$tag_commit'"
+
+head_commit=$(git rev-parse HEAD)
+echo "Head commit: '$head_commit'"
+
+if [[ "$head_commit" != "$tag_commit" ]]; then
+  echo "WARN: HEAD commit '$head_commit' does not match version commit '$tag_commit'!"
+  echo "WARN: Skipping publishing!"
+  exit 1
+fi
+
+echo "We are on a tagged commit that matches our declared version!"
+echo "*** Publishing is needed! ***"
+
+exit 0
