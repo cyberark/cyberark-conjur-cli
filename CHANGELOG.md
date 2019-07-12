@@ -27,3 +27,4 @@ The first tagged version.
 
 [Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.2...HEAD
 [0.0.2]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.1...0.0.2
+[0.0.1]: https://github.com/cyberark/conjur-api-python3/tree/v0.0.1
