@@ -70,12 +70,14 @@ class Client():
                 on_disk_config = dict(api_config_class())
 
                 # We want to retain any overrides that the user provided from params
-                on_disk_config.update(config)
+                # but only if those values are valid
+                for field_name, field_value in config.items():
+                    if field_value:
+                        on_disk_config[field_name] = field_value
                 config = on_disk_config
 
             except Exception as exc:
                 raise ConfigException(exc)
-
 
         if api_key:
             logging.info("Using API key from parameters...")
