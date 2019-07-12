@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed application of conjurrc overrides of `Client` initialization params [#14](https://github.com/cyberark/conjur-api-python3/issues/14)
+
 ## [0.0.2] - 2019-05-17
 
 ### Changed
@@ -23,3 +27,4 @@ The first tagged version.
 
 [Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.2...HEAD
 [0.0.2]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.1...0.0.2
+[0.0.1]: https://github.com/cyberark/conjur-api-python3/tree/v0.0.1

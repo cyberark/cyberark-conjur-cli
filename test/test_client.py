@@ -17,6 +17,8 @@ class MockApiConfig(object):
         'url': 'apiconfigurl',
         'account': 'apiconfigaccount',
         'ca_bundle': 'apiconfigcabundle',
+        'login_id': 'apiconfigloginid',
+        'api_key': 'apiconfigapikey',
     }
 
     def __iter__(self):
@@ -142,6 +144,20 @@ class ClientTest(unittest.TestCase):
 
         Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
                account='myacct', login_id='mylogin', ca_bundle='mybundle')
+
+    def test_client_does_not_override_apiconfig_values_with_empty_values(self):
+        class MockApi(MockApiHelper):
+            def verify_init_args(api_instance, **kwargs):
+                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+                self.assertEqual(kwargs['account'], 'apiconfigaccount')
+                self.assertEqual(kwargs['url'], 'apiconfigurl')
+                self.assertEqual(kwargs['ca_bundle'], 'apiconfigcabundle')
+                self.assertEqual(kwargs['login_id'], 'apiconfigloginid')
+                self.assertEqual(kwargs['api_key'], 'apiconfigapikey')
+
+        Client(api_class=MockApi, api_config_class=MockApiConfig, url=None,
+               account=None, login_id=None, ca_bundle=None)
+
 
     ### API passthrough tests ###
 
