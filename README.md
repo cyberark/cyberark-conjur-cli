@@ -17,7 +17,9 @@ in a simple executable script/binary.
 
 ### From PyPI
 
-TODO: Publish the package on PyPI
+```
+$ pip3 install conjur-client
+```
 
 ### From source
 
