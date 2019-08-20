@@ -200,7 +200,6 @@ class ProfileManagerTest(unittest.TestCase):
 
         self.assertTrue(Path(default_profile_config_file).exists())
 
-
         profile_manager = ProfileManager(base_dir=base_dir)
         with self.assertRaises(RuntimeError):
             profile_manager.current
@@ -324,33 +323,6 @@ class ProfileManagerTest(unittest.TestCase):
         profile_instance.assert_called_with(expected_profile_path)
         self.assertEqual(profile_instance.return_value, actual_profile)
 
-    # update() test
-
-    @patch('conjur.profile_manager.Profile')
-    def test_updating_profile_delegates_to_profile_class(self, profile_instance):
-        base_dir = self.create_temp_config_dir(self.SINGLE_PROFILE_NO_CONFIG_DIR)
-        profile_manager = ProfileManager(base_dir=base_dir)
-        expected_profile_path = PurePath.joinpath(Path(profile_manager.config_dir),
-                                                  'test_profile.yml')
-
-        kwargs = {
-            "foo": "fooval",
-            "bar": "barval",
-        }
-
-        profile_manager.update("test_profile", **kwargs)
-
-        profile_instance.assert_called_with(expected_profile_path)
-        profile_instance.return_value.update.assert_called_with(**kwargs)
-
-    @patch('conjur.profile_manager.Profile')
-    def test_updating_profile_returns_profile_instance(self, profile_instance):
-        base_dir = self.create_temp_config_dir(self.SINGLE_PROFILE_NO_CONFIG_DIR)
-        profile_manager = ProfileManager(base_dir=base_dir)
-
-        actual_profile = profile_manager.update("profile_name")
-
-        self.assertEqual(profile_instance.return_value.update.return_value, actual_profile)
 
     # delete() test
 

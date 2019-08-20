@@ -1,0 +1,13 @@
+---
+account: myaccount
+appliance_url: myurl
+login_id: myloginid
+name: test
+
+# Optional fields
+api_key: myapikey
+ca_bundle: /cert/file/location  # default: ./<profile_name>.pem
+debug: False                    # default: false
+insecure: False                 # default: false
+password: mypassword
+tofu: True                      # default: true

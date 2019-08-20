@@ -7,7 +7,6 @@ This module contains all functionality needed to interact with
 profile management on the user's system
 """
 
-import logging
 import os
 from pathlib import Path, PurePath
 
@@ -26,9 +25,6 @@ class ProfileManager:
     PROFILE_NOT_FOUND_ERROR = "ERROR: Profile file '{}.yml' not found!"
 
     def __init__(self, base_dir=None):
-        logging.warn("{} is not funtional until Profile class is implemented in full!".
-            format(self.__class__.__name__))
-
         if not base_dir:
             base_dir = Path.home()
 
