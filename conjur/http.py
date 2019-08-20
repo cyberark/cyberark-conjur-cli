@@ -40,7 +40,7 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
         if key == 'url':
             params[key] = value
             continue
-        params[key] = quote(value)
+        params[key] = quote(value, safe='')
 
     url = endpoint.value.format(**params)
 

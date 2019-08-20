@@ -25,7 +25,7 @@ class HttpInvokeEndpointTest(unittest.TestCase):
     }
 
     ESCAPED_PARAMS = [
-        'abc/%24%21%40%23%24%25%5E%26%2A%28%29%20%5C%5B%5D%7B%7D',
+        'abc%2F%24%21%40%23%24%25%5E%26%2A%28%29%20%5C%5B%5D%7B%7D',
         '%29%28%2A%26%5E%25%24%23%40%21%5B%5D%7B%7D%20%3C%3E%3F',
     ]
 
