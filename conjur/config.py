@@ -13,9 +13,9 @@ import os.path
 
 from yaml import load, dump
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CSafeLoader as SafeLoader, CDumper as Dumper
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import SafeLoader, Dumper
 
 NETRC_HOST_URL = "{url}/authn"
 
@@ -44,7 +44,7 @@ class Config():
 
         config = None
         with open(config_file, 'r') as config_fp:
-            config = load(config_fp, Loader=Loader)
+            config = load(config_fp, Loader=SafeLoader)
 
         for config_field_name, attribute_name, mandatory in self.FIELDS:
             if mandatory:
