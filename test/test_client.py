@@ -1,3 +1,4 @@
+import logging
 import os
 import unittest
 import uuid
@@ -39,6 +40,22 @@ class ClientTest(unittest.TestCase):
     def test_client_throws_error_when_no_config(self):
         with self.assertRaises(ConfigException):
             Client()
+
+    @patch('conjur.client.Api')
+    @patch('logging.basicConfig')
+    def test_client_initializes_logging(self, mock_logging, mock_api):
+        Client(url='http://myurl', account='myacct', login_id='mylogin',
+               password='mypass')
+
+        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.WARNING)
+
+    @patch('conjur.client.Api')
+    @patch('logging.basicConfig')
+    def test_client_increases_logging_with_debug_flag(self, mock_logging, mock_api):
+        Client(url='http://myurl', account='myacct', login_id='mylogin',
+               password='mypass', debug=True)
+
+        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
 
     @patch('conjur.client.Api')
     def test_client_passes_init_config_params_to_api_initializer(self, mock_api_instance):
