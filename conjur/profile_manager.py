@@ -106,6 +106,9 @@ class ProfileManager:
             return None
 
         default_profile_file = self._profile_file(profile_name)
+
+        # PyLint doesn't have up-to-date member listing of pathlib methods
+        #pylint: disable=no-member
         resolved_profile_file = default_profile_file.resolve()
         if not resolved_profile_file.is_file():
             raise RuntimeError(self.PROFILE_NOT_FOUND_ERROR.format(resolved_profile_file))
@@ -119,6 +122,8 @@ class ProfileManager:
 
         target_profile_file = self._profile_file(profile_name)
 
+        # PyLint doesn't have up-to-date member listing of pathlib methods
+        #pylint: disable=no-member
         if not target_profile_file.is_file():
             raise OSError(self.PROFILE_NOT_FOUND_ERROR.format(target_profile_file))
 
