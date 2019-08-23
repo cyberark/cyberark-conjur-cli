@@ -3,6 +3,8 @@ import unittest
 from datetime import datetime
 from unittest.mock import call, patch, MagicMock
 
+import urllib3
+
 from conjur.http import HttpVerb
 from conjur.endpoints import ConjurEndpoint
 
@@ -68,6 +70,27 @@ class ApiTest(unittest.TestCase):
                                             **extra_args,
                                             ssl_verify=ssl_verify)
 
+    def test_new_client_throws_error_when_no_url(self):
+        with self.assertRaises(Exception):
+            Api(login_id='mylogin', api_key='apikey', ssl_verify=False)
+
+    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_new_client_delegates_ssl_verify_flag(self, mock_http_client):
+        Api(url='http://localhost', ssl_verify=True).login('myuser', 'mypass')
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
+                              auth=('myuser', 'mypass'),
+                              api_token=False,
+                              ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_new_client_overrides__ssl_verify_flag_with_ca_bundle_if_provided(self, mock_http_client):
+        Api(url='http://localhost', ssl_verify=True,
+                ca_bundle='cabundle').login('myuser', 'mypass')
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
+                              auth=('myuser', 'mypass'),
+                              api_token=False,
+                              ssl_verify='cabundle')
+
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_invokes_http_client_correctly(self, mock_http_client):
@@ -77,6 +100,14 @@ class ApiTest(unittest.TestCase):
                               api_token=False,
                               ssl_verify=True)
 
+    def test_login_throws_error_when_username_not_provided(self):
+        with self.assertRaises(RuntimeError):
+            Api(url='http://localhost').login(None, 'mypass')
+
+    def test_login_throws_error_when_password_not_provided(self):
+        with self.assertRaises(RuntimeError):
+            Api(url='http://localhost').login('myuser', None)
+
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_saves_login_id(self, _):
         api = Api(url='http://localhost')
@@ -84,6 +115,30 @@ class ApiTest(unittest.TestCase):
         api.login('myuser', 'mypass')
 
         self.assertEquals(api.login_id, 'myuser')
+
+    @patch('logging.warning')
+    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_new_client_shows_warning_when_ssl_verify_is_false(self, mock_http_client,
+            logging_warn_func):
+        Api(url='http://localhost', login_id='mylogin', api_key='apikey',
+                ssl_verify=False)
+
+        calls = [
+            call("************************************************************"),
+            call("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!"),
+            call("************************************************************"),
+        ]
+        logging_warn_func.assert_has_calls(calls)
+
+    @patch('urllib3.disable_warnings')
+    @patch('logging.warning')
+    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_new_client_disables_insecure_warnings_in_urllib_when_sslverify_is_false(self,
+            mock_http_client, logging_warn_func, disable_warning_func):
+        Api(url='http://localhost', login_id='mylogin', api_key='apikey',
+                ssl_verify=False)
+
+        disable_warning_func.assert_called_once_with(urllib3.exceptions.InsecureRequestWarning)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_missing_fetch_a_new_one(self, mock_http_client):
@@ -132,6 +187,14 @@ class ApiTest(unittest.TestCase):
                               login='mylogin',
                               api_token=False,
                               ssl_verify=True)
+
+    def test_authenticate_throws_error_without_login_id_specified(self):
+        with self.assertRaises(RuntimeError):
+            Api(url='http://localhost', api_key='apikey').authenticate()
+
+    def test_authenticate_throws_error_without_api_key_specified(self):
+        with self.assertRaises(RuntimeError):
+            Api(url='http://localhost', login_id='mylogin').authenticate()
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_account_info_is_passed_down_to_http_call(self, mock_http_client):
