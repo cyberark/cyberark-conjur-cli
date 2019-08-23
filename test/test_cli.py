@@ -1,9 +1,10 @@
 import unittest
+from unittest.mock import patch
 
 from .util.cli_helpers import cli_arg_test, cli_test
 
 from conjur.version import __version__
-
+from conjur.cli import Cli
 
 RESOURCE_LIST = [
     'some_id1',
@@ -15,6 +16,12 @@ class CliTest(unittest.TestCase):
     @cli_test()
     def test_cli_without_args_shows_help(self, cli_invocation, output, client):
         self.assertIn("usage: cli", output)
+
+    @patch('conjur.cli.Cli')
+    def test_cli_is_run_when_launch_is_invoked(self, cli_instance):
+        Cli.launch()
+
+        cli_instance.return_value.run.assert_called_once_with()
 
     @cli_test(["-h"])
     def test_cli_shows_help_with_short_help_flag(self, cli_invocation, output, client):
@@ -62,6 +69,9 @@ class CliTest(unittest.TestCase):
 
     @cli_arg_test(["--debug"], debug=True)
     def test_cli_passes_debug_long_flag_to_client(self): pass
+
+    @cli_arg_test(["--verbose"], debug=True)
+    def test_cli_passes_verbose_as_the_debug_long_flag_to_client(self): pass
 
     # User
     @cli_arg_test(["-u", "myuser"], login_id='myuser')
