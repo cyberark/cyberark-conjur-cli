@@ -24,6 +24,10 @@ class MockApiConfig(object):
     def __iter__(self):
         return iter(self.CONFIG.items())
 
+class MissingMockApiConfig(object):
+    def __init__(self):
+        raise FileNotFoundError("oops!")
+
 
 # Api mocking class
 class MockApiHelper(object):
@@ -48,7 +52,7 @@ class ClientTest(unittest.TestCase):
 
     def test_client_throws_error_when_no_config(self):
         with self.assertRaises(ConfigException):
-            Client()
+            Client(api_config_class=MissingMockApiConfig)
 
     def test_client_passes_init_config_params_to_api_initializer(self):
         class MockApi(MockApiHelper):
