@@ -3,7 +3,15 @@
 SRC_DIRS=( "./conjur"
            "./pkg_bin" )
 
-DISABLED_ERRORS="fixme"
+# Duplicate code linting error cannot be disabled:
+# https://github.com/PyCQA/pylint/issues/214
+DISABLED_ERRORS=( "fixme"
+                  "duplicate-code" )
+
+disabled_error_args=""
+for disabled_error in ${DISABLED_ERRORS[@]}; do
+  disabled_error_args+=" --disable $disabled_error"
+done
 
 echo "Building API container..."
 docker-compose build
@@ -14,7 +22,7 @@ for src_dir in "${SRC_DIRS[@]}"; do
   docker-compose run --rm \
     --no-deps \
     test \
-    pylint -r n -f parseable --disable="$DISABLED_ERRORS" "$src_dir"
+    pylint -r n -f parseable $disabled_error_args "$src_dir"
 done
 
 echo "Linting completed!"
