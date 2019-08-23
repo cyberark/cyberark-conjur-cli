@@ -29,232 +29,280 @@ class MissingMockApiConfig(object):
         raise FileNotFoundError("oops!")
 
 
-# Api mocking class
-class MockApiHelper(object):
-    def __init__(self, **kwargs):
-        self.verify_init_args(**kwargs)
-
-    def login(self, username, password):
-        pass
-
-    def verify_init_args(self, **kwargs):
-        pass
-
-    def verify_apiconfig_dict_in(self, test_instance, **kwargs):
-        test_instance.assertEquals(kwargs['key1'], 'value1')
-        test_instance.assertEquals(kwargs['key2'], 'value2')
-
-
-class ClientTest(unittest.TestCase):
+class ConfigErrorTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):
         with self.assertRaises(ConfigException):
             raise ConfigException('abc')
 
+class ClientTest(unittest.TestCase):
+    @patch('conjur.client.ApiConfig', new=MissingMockApiConfig)
     def test_client_throws_error_when_no_config(self):
         with self.assertRaises(ConfigException):
-            Client(api_config_class=MissingMockApiConfig)
+            Client()
 
-    def test_client_passes_init_config_params_to_api_initializer(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                self.assertEquals(kwargs['url'], 'http://myurl')
-                self.assertEquals(kwargs['account'], 'myacct')
-                self.assertEquals(kwargs['ca_bundle'], 'mybundle')
-                self.assertEquals(kwargs['ssl_verify'], False)
-
-        Client(api_class=MockApi, url='http://myurl', account='myacct', login_id='mylogin',
+    @patch('conjur.client.Api')
+    def test_client_passes_init_config_params_to_api_initializer(self, mock_api_instance):
+        Client(url='http://myurl', account='myacct', login_id='mylogin',
                password='mypass', ca_bundle="mybundle", ssl_verify=False)
 
-    def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                self.assertEquals(kwargs['url'], 'http://myurl')
-                self.assertEquals(kwargs['account'], 'default')
-                self.assertEquals(kwargs['ca_bundle'], 'mybundle')
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            ca_bundle='mybundle',
+            http_debug=False,
+            ssl_verify=False,
+            url='http://myurl',
+        )
 
-        Client(api_class=MockApi, url='http://myurl', login_id='mylogin',
-               password='mypass', ca_bundle="mybundle")
+    @patch('conjur.client.Api')
+    def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self, mock_api_instance):
+        Client(url='http://myurl', login_id='mylogin', password='mypass',
+               ca_bundle="mybundle")
 
-    def test_client_performs_password_api_login_if_password_is_provided(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.login = MagicMock()
+        mock_api_instance.assert_called_with(
+            account='default',
+            ca_bundle='mybundle',
+            http_debug=False,
+            ssl_verify=True,
+            url='http://myurl',
+        )
 
-        Client(api_class=MockApi, url='http://foo', account='myacct', login_id='mylogin',
+    @patch('conjur.client.Api')
+    def test_client_performs_password_api_login_if_password_is_provided(self, mock_api_instance):
+        Client(url='http://foo', account='myacct', login_id='mylogin',
                password='mypass')
 
-        MockApi.login.assert_called_once_with('mylogin', 'mypass')
+        mock_api_instance.return_value.login.assert_called_once_with('mylogin', 'mypass')
 
-    def test_client_initializes_client_with_api_key_if_its_provided(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                self.assertEqual(kwargs['account'], 'myacct')
-                self.assertEqual(kwargs['url'], 'http://foo')
-                self.assertEqual(kwargs['login_id'], 'mylogin')
-                self.assertEqual(kwargs['api_key'], 'someapikey')
-
-        Client(api_class=MockApi, url='http://foo', account='myacct', login_id='mylogin',
+    @patch('conjur.client.Api')
+    def test_client_initializes_client_with_api_key_if_its_provided(self, mock_api_instance):
+        Client(url='http://foo', account='myacct', login_id='mylogin',
                api_key='someapikey')
 
-    def test_client_performs_no_api_login_if_password_is_not_provided(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.login = MagicMock()
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            api_key='someapikey',
+            ca_bundle=None,
+            http_debug=False,
+            login_id='mylogin',
+            ssl_verify=True,
+            url='http://foo',
+        )
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
-               account='myacct', login_id='mylogin')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_performs_no_api_login_if_password_is_not_provided(self, mock_api_instance,
+            mock_api_config):
+        Client(url='http://foo', account='myacct', login_id='mylogin')
 
-        MockApi.login.assert_not_called()
+        mock_api_instance.return_value.login.assert_not_called()
 
-    def test_client_passes_config_from_apiconfig_if_url_is_not_provided(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_config_from_apiconfig_if_url_is_not_provided(self, mock_api_instance,
+            mock_api_config):
+        Client(account='myacct', login_id='mylogin', password="mypass")
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig,
-               account='myacct', login_id='mylogin', password="mypass")
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            api_key='apiconfigapikey',
+            ca_bundle='apiconfigcabundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='apiconfigurl',
+        )
 
-    def test_client_passes_config_from_apiconfig_if_account_is_empty(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_config_from_apiconfig_if_account_is_empty(self, mock_api_instance,
+            mock_api_config):
+        Client(url='http://foo', account=None, login_id='mylogin', password="mypass")
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
-               account=None, login_id='mylogin', password="mypass")
+        mock_api_instance.assert_called_with(
+            account='apiconfigaccount',
+            api_key='apiconfigapikey',
+            ca_bundle='apiconfigcabundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='http://foo',
+        )
 
-    def test_client_passes_config_from_apiconfig_if_login_id_is_not_provided(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_config_from_apiconfig_if_login_id_is_not_provided(self, mock_api_instance,
+            mock_api_config):
+        Client(url='http://foo', account='myacct', password="mypass")
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
-               account='myacct', password="mypass")
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            api_key='apiconfigapikey',
+            ca_bundle='apiconfigcabundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='http://foo',
+        )
 
-    def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self, mock_api_instance,
+            mock_api_config):
+        Client(url='http://foo', account='myacct', login_id='mylogin')
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
-               account='myacct', login_id='mylogin')
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            api_key='apiconfigapikey',
+            ca_bundle='apiconfigcabundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='http://foo',
+        )
 
-    def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
-                self.assertEqual(kwargs['account'], 'myacct')
-                self.assertEqual(kwargs['url'], 'http://foo')
-                self.assertEqual(kwargs['ca_bundle'], 'mybundle')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self, mock_api_instance,
+            mock_api_config):
+        Client(url='http://foo', account='myacct', login_id='mylogin',
+               ca_bundle='mybundle')
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url='http://foo',
-               account='myacct', login_id='mylogin', ca_bundle='mybundle')
+        mock_api_instance.assert_called_with(
+            account='myacct',
+            api_key='apiconfigapikey',
+            ca_bundle='mybundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='http://foo',
+        )
 
-    def test_client_does_not_override_apiconfig_values_with_empty_values(self):
-        class MockApi(MockApiHelper):
-            def verify_init_args(api_instance, **kwargs):
-                api_instance.verify_apiconfig_dict_in(self, **kwargs)
-                self.assertEqual(kwargs['account'], 'apiconfigaccount')
-                self.assertEqual(kwargs['url'], 'apiconfigurl')
-                self.assertEqual(kwargs['ca_bundle'], 'apiconfigcabundle')
-                self.assertEqual(kwargs['login_id'], 'apiconfigloginid')
-                self.assertEqual(kwargs['api_key'], 'apiconfigapikey')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_does_not_override_apiconfig_values_with_empty_values(self, mock_api_instance,
+            mock_api_config):
+        Client(url=None, account=None, login_id=None, ca_bundle=None)
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig, url=None,
-               account=None, login_id=None, ca_bundle=None)
+        mock_api_instance.assert_called_with(
+            account='apiconfigaccount',
+            api_key='apiconfigapikey',
+            ca_bundle='apiconfigcabundle',
+            http_debug=False,
+            key1='value1',
+            key2='value2',
+            login_id='apiconfigloginid',
+            ssl_verify=True,
+            url='apiconfigurl',
+        )
 
 
     ### API passthrough tests ###
 
-    def test_client_passes_through_api_get_variable_params(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.get_variable = MagicMock()
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_get_variable_params(self, mock_api_instance,
+            mock_api_config):
+        Client().get('variable_id')
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig).get('variable_id')
+        mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id')
 
-        MockApi.get_variable.assert_called_once_with('variable_id')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_returns_get_variable_result(self, mock_api_instance,
+            mock_api_config):
+        variable_value = uuid.uuid4().hex
+        mock_api_instance.return_value.get_variable.return_value = variable_value
 
-    def test_client_returns_get_variable_result(self):
-        class MockApi(MockApiHelper):
-            pass
+        return_value = Client().get('variable_id')
+        self.assertEquals(return_value, variable_value)
 
-        MockApi.get_variable = MagicMock()
-        MockApi.get_variable.return_value = uuid.uuid4().hex
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_get_many_variables_params(self, mock_api_instance,
+            mock_api_config):
+        Client().get_many('variable_id', 'variable_id2')
 
-        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).get('variable_id')
-        self.assertEquals(return_value, MockApi.get_variable.return_value)
+        mock_api_instance.return_value.get_variables.assert_called_once_with(
+            'variable_id',
+            'variable_id2'
+        )
 
-    def test_client_passes_through_api_get_many_variables_params(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.get_variables = MagicMock()
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_returns_get_variables_result(self, mock_api_instance,
+            mock_api_config):
+        variable_values = uuid.uuid4().hex
+        mock_api_instance.return_value.get_variables.return_value = variable_values
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig).get_many('variable_id', 'variable_id2')
+        return_value = Client().get_many('variable_id', 'variable_id2')
+        self.assertEquals(return_value, variable_values)
 
-        MockApi.get_variables.assert_called_once_with('variable_id', 'variable_id2')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_set_variable_params(self, mock_api_instance,
+            mock_api_config):
+        Client().set('variable_id', 'variable_value')
 
-    def test_client_returns_get_variables_result(self):
-        class MockApi(MockApiHelper):
-            pass
+        mock_api_instance.return_value.set_variable.assert_called_once_with(
+            'variable_id',
+            'variable_value',
+        )
 
-        MockApi.get_variables = MagicMock()
-        MockApi.get_variables.return_value = uuid.uuid4().hex
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_apply_policy_params(self, mock_api_instance,
+            mock_api_config):
+        Client().apply_policy_file('name', 'policy')
 
-        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).get_many('variable_id', 'variable_id2')
-        self.assertEquals(return_value, MockApi.get_variables.return_value)
+        mock_api_instance.return_value.apply_policy_file.assert_called_once_with(
+            'name',
+            'policy',
+        )
 
-    def test_client_passes_through_api_set_variable_params(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.set_variable = MagicMock()
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_returns_apply_policy_result(self, mock_api_instance, mock_api_config):
+        apply_policy_result = uuid.uuid4().hex
+        mock_api_instance.return_value.apply_policy_file.return_value = apply_policy_result
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig).set('variable_id', 'variable_value')
+        return_value = Client().apply_policy_file('name', 'policy')
+        self.assertEquals(return_value, apply_policy_result)
 
-        MockApi.set_variable.assert_called_once_with('variable_id', 'variable_value')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_replace_policy_params(self, mock_api_instance,
+            mock_api_config):
+        Client().replace_policy_file('name', 'policy')
 
-    def test_client_passes_through_api_apply_policy_params(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.apply_policy_file = MagicMock()
+        mock_api_instance.return_value.replace_policy_file.assert_called_once_with(
+            'name',
+            'policy'
+        )
 
-        Client(api_class=MockApi, api_config_class=MockApiConfig).apply_policy_file('name', 'policy')
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_returns_replace_policy_result(self, mock_api_instance,
+            mock_api_config):
+        replace_policy_result = uuid.uuid4().hex
+        mock_api_instance.return_value.replace_policy_file.return_value = replace_policy_result
 
-        MockApi.apply_policy_file.assert_called_once_with('name', 'policy')
+        return_value = Client().replace_policy_file('name', 'policy')
+        self.assertEquals(return_value, replace_policy_result)
 
-    def test_client_returns_apply_policy_result(self):
-        class MockApi(MockApiHelper):
-            pass
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_resource_list_method(self, mock_api_instance,
+            mock_api_config):
+        Client().list()
 
-        MockApi.apply_policy_file = MagicMock()
-        MockApi.apply_policy_file.return_value = uuid.uuid4().hex
-
-        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).apply_policy_file('name', 'policy')
-        self.assertEquals(return_value, MockApi.apply_policy_file.return_value)
-
-    def test_client_passes_through_api_replace_policy_params(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.replace_policy_file = MagicMock()
-
-        Client(api_class=MockApi, api_config_class=MockApiConfig).replace_policy_file('name', 'policy')
-
-        MockApi.replace_policy_file.assert_called_once_with('name', 'policy')
-
-    def test_client_returns_replace_policy_result(self):
-        class MockApi(MockApiHelper):
-            pass
-
-        MockApi.replace_policy_file = MagicMock()
-        MockApi.replace_policy_file.return_value = uuid.uuid4().hex
-
-        return_value = Client(api_class=MockApi, api_config_class=MockApiConfig).replace_policy_file('name', 'policy')
-        self.assertEquals(return_value, MockApi.replace_policy_file.return_value)
-
-    def test_client_passes_through_resource_list_method(self):
-        class MockApi(MockApiHelper):
-            pass
-        MockApi.list_resources = MagicMock()
-
-        Client(api_class=MockApi, api_config_class=MockApiConfig).list()
-
-        MockApi.list_resources.assert_called_once_with()
+        mock_api_instance.return_value.list_resources.assert_called_once_with()
