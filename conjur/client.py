@@ -40,8 +40,6 @@ class Client():
     #pylint: disable=too-many-arguments,too-many-locals
     def __init__(self,
                  account='default',
-                 api_class=Api,
-                 api_config_class=ApiConfig,
                  api_key=None,
                  ca_bundle=None,
                  debug=False,
@@ -67,7 +65,7 @@ class Client():
             logging.info("Not all expected variables were provided. " \
                 "Using conjurrc as credential store...")
             try:
-                on_disk_config = dict(api_config_class())
+                on_disk_config = dict(ApiConfig())
 
                 # We want to retain any overrides that the user provided from params
                 # but only if those values are valid
@@ -81,22 +79,22 @@ class Client():
 
         if api_key:
             logging.info("Using API key from parameters...")
-            self._api = api_class(api_key=api_key,
-                                  http_debug=http_debug,
-                                  login_id=login_id,
-                                  ssl_verify=ssl_verify,
-                                  **config)
+            self._api = Api(api_key=api_key,
+                            http_debug=http_debug,
+                            login_id=login_id,
+                            ssl_verify=ssl_verify,
+                            **config)
         elif password:
             logging.info("Creating API key with login ID/password combo...")
-            self._api = api_class(http_debug=http_debug,
-                                  ssl_verify=ssl_verify,
-                                  **config)
+            self._api = Api(http_debug=http_debug,
+                            ssl_verify=ssl_verify,
+                            **config)
             self._api.login(login_id, password)
         else:
             logging.info("Using API key with netrc credentials...")
-            self._api = api_class(http_debug=http_debug,
-                                  ssl_verify=ssl_verify,
-                                  **config)
+            self._api = Api(http_debug=http_debug,
+                            ssl_verify=ssl_verify,
+                            **config)
 
         logging.info("Client initialized")
 
