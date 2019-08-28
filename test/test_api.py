@@ -83,7 +83,7 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
-    def test_new_client_overrides__ssl_verify_flag_with_ca_bundle_if_provided(self, mock_http_client):
+    def test_new_client_overrides_ssl_verify_flag_with_ca_bundle_if_provided(self, mock_http_client):
         Api(url='http://localhost', ssl_verify=True,
                 ca_bundle='cabundle').login('myuser', 'mypass')
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
