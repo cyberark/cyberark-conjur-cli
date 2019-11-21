@@ -81,8 +81,9 @@ def enable_http_logging(): #pragma: no cover
     raise RuntimeError("If this line gets checked in uncommented or"
                        "is removed, the PR should not be approved")
 
-    # pylint: disable=unreachable
+    # pylint: disable=unreachable,import-outside-toplevel
     import logging
+    #pylint: disable=import-outside-toplevel
     from http.client import HTTPConnection
     HTTPConnection.debuglevel = 1
 
