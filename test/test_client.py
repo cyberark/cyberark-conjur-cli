@@ -131,23 +131,20 @@ class ClientTest(unittest.TestCase):
             url='apiconfigurl',
         )
 
-    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.client.Api')
-    def test_client_passes_config_from_apiconfig_if_account_is_empty(self, mock_api_instance,
-            mock_api_config):
-        Client(url='http://foo', account=None, login_id='mylogin', password="mypass")
+    def test_client_does_not_pass_config_from_apiconfig_if_only_account_is_empty(
+            self, mock_api_instance):
+        Client(url='http://foo', login_id='mylogin', password="mypass")
 
         mock_api_instance.assert_called_with(
-            account='apiconfigaccount',
-            api_key='apiconfigapikey',
-            ca_bundle='apiconfigcabundle',
+            account='default',
+            ca_bundle=None,
             http_debug=False,
-            key1='value1',
-            key2='value2',
-            login_id='apiconfigloginid',
             ssl_verify=True,
             url='http://foo',
         )
+
+        mock_api_instance.return_value.login.assert_called_once_with('mylogin', 'mypass')
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.client.Api')
