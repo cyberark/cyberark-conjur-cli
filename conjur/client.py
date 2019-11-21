@@ -39,7 +39,7 @@ class Client():
     # what paramteres are allowed
     #pylint: disable=too-many-arguments,too-many-locals
     def __init__(self,
-                 account='default',
+                 account=None,
                  api_key=None,
                  ca_bundle=None,
                  debug=False,
@@ -61,7 +61,7 @@ class Client():
             'ca_bundle': ca_bundle,
         }
 
-        if not url or not account or not login_id or (not password and not api_key):
+        if not url or not login_id or (not password and not api_key):
             logging.info("Not all expected variables were provided. " \
                 "Using conjurrc as credential store...")
             try:
@@ -76,6 +76,11 @@ class Client():
 
             except Exception as exc:
                 raise ConfigException(exc)
+
+        # We only want to override missing account info with "default"
+        # if we can't find it anywhere else.
+        if config['account'] is None:
+            config['account'] = "default"
 
         if api_key:
             logging.info("Using API key from parameters...")

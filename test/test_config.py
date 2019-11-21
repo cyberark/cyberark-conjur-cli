@@ -1,4 +1,5 @@
 import os
+import re
 import unittest
 
 from conjur.config import Config
@@ -44,16 +45,17 @@ class ConfigTest(unittest.TestCase):
     def test_config_printed_shows_formatted_fields(self):
         test_data = str(Config(config_file=self.GOOD_CONJURRC, netrc_file=self.GOOD_NETRC))
 
-        self.assertEquals(test_data,
-            "config:\n" +
-            "    account: accountname\n" +
-            "    api_key: conjurapikey\n" +
-            "    ca_bundle: /cert/file/location\n" +
-            "    login_id: someadmin\n" +
-            "    plugins:\n" +
-            "    - foo\n" +
-            "    - bar\n" +
-            "    url: https://someurl/somepath\n")
+        self.assertRegex(test_data,
+            re.compile(
+                "^config:\n" +
+                "\s+account: accountname\n" +
+                "\s+api_key: conjurapikey\n" +
+                "\s+ca_bundle: /cert/file/location\n" +
+                "\s+login_id: someadmin\n" +
+                "\s+plugins:.*foo.*bar.*\n" +
+                "\s+url: https://someurl/somepath\n",
+                re.MULTILINE | re.DOTALL,
+            ))
 
     def test_config_with_no_conjurrc_raises_error(self):
         with self.assertRaises(FileNotFoundError):

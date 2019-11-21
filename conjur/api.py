@@ -70,7 +70,9 @@ class Api():
             logging.warning("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!")
             logging.warning("*" * 60)
 
+            #pylint: disable=import-outside-toplevel
             import urllib3
+
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINES BELOW UNCOMMENTED
