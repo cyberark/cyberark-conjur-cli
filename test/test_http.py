@@ -15,6 +15,7 @@ class HttpVerbTest(unittest.TestCase):
         self.assertTrue(HttpVerb.PUT)
         self.assertTrue(HttpVerb.POST)
         self.assertTrue(HttpVerb.DELETE)
+        self.assertTrue(HttpVerb.PATCH)
 
 
 class HttpInvokeEndpointTest(unittest.TestCase):

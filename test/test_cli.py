@@ -152,6 +152,18 @@ class CliTest(unittest.TestCase):
     def test_cli_policy_replace_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
+    @cli_test(["policy", "delete", "foo", "foopolicy"])
+    def test_cli_invokes_policy_delete_correctly(self, cli_invocation, output, client):
+        client.delete_policy_file.assert_called_once_with('foo', 'foopolicy')
+
+    @cli_test(["policy", "delete", "foo", "foopolicy"], policy_change_output={})
+    def test_cli_policy_delete_doesnt_break_on_empty_input(self, cli_invocation, output, client):
+        self.assertEquals('{}\n', output)
+
+    @cli_test(["policy", "delete", "foo", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    def test_cli_policy_delete_outputs_formatted_json(self, cli_invocation, output, client):
+        self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
+
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
         client.list.assert_called_once_with()

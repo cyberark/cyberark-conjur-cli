@@ -71,6 +71,13 @@ class Cli():
         replace_policy_parser.add_argument('policy',
             help='File containing the YAML policy')
 
+        delete_policy_parser = policy_subparsers.add_parser('delete',
+            help='Delete a policy file')
+        delete_policy_parser.add_argument('name',
+            help='Name of the policy (usually "root")')
+        delete_policy_parser.add_argument('policy',
+            help='File containing the YAML policy')
+
 
         parser.add_argument('-v', '--version', action='version',
             version='%(prog)s v' + __version__)
@@ -149,6 +156,9 @@ class Cli():
         elif resource == 'policy':
             if args.action == 'replace':
                 resources = client.replace_policy_file(args.name, args.policy)
+                print(json.dumps(resources, indent=4))
+            elif args.action == 'delete':
+                resources = client.delete_policy_file(args.name, args.policy)
                 print(json.dumps(resources, indent=4))
             else:
                 resources = client.apply_policy_file(args.name, args.policy)

@@ -67,21 +67,6 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         return invoke_cli(self, self.cli_auth_params,
             ['policy', 'apply', 'root', policy_path])
 
-    def replace_policy(self, policy_path):
-        return invoke_cli(self, self.cli_auth_params,
-            ['policy', 'replace', 'root', policy_path])
-
-    def replace_policy_from_string(self, policy):
-        output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Run the new apply that should not result in newly created roles
-            output = self.replace_policy(temp_policy_file.name)
-
-        return output
-
     def apply_policy_from_string(self, policy):
         output = None
         with tempfile.NamedTemporaryFile() as temp_policy_file:
@@ -93,6 +78,36 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         return output
 
+    def replace_policy(self, policy_path):
+        return invoke_cli(self, self.cli_auth_params,
+            ['policy', 'replace', 'root', policy_path])
+
+    def replace_policy_from_string(self, policy):
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Run the new replace that should not result in newly created roles
+            output = self.replace_policy(temp_policy_file.name)
+
+        return output
+
+    def delete_policy(self, policy_path):
+        return invoke_cli(self, self.cli_auth_params,
+            ['policy', 'delete', 'root', policy_path])
+
+    def delete_policy_from_string(self, policy):
+        output = None
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            # Run the new delete that should not result in newly created roles
+            output = self.delete_policy(temp_policy_file.name)
+        
+        return output
+    
     def get_variable(self, *variable_ids):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', *variable_ids])
@@ -329,6 +344,75 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         policy = "- !policy foo\n"
         json_result = json.loads(self.replace_policy_from_string(policy))
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {}
+        }
+
+        self.assertDictEqual(json_result, expected_object)
+
+
+    @integration_test
+    def test_https_can_delete_policy(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        policy, variables = self.generate_policy_string()
+        self.delete_policy_from_string(policy)
+
+        for variable in variables:
+            self.assert_set_and_get(variable)
+
+    @integration_test
+    def test_https_delete_policy_can_output_returned_data(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        user_id1 = uuid.uuid4().hex
+        user_id2 = uuid.uuid4().hex
+        policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
+                                                                   user_id2=user_id2)
+
+        # Run the new delete that should not result in newly created roles
+        json_result = json.loads(self.delete_policy_from_string(policy))
+
+        expected_object = {
+            'version': json_result['version'],
+            'created_roles': {
+                'dev:user:' + user_id1: {
+                    'id': 'dev:user:' + user_id1,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id1]['api_key'],
+                },
+                'dev:user:' + user_id2: {
+                    'id': 'dev:user:' + user_id2,
+                    'api_key': json_result['created_roles']['dev:user:' + user_id2]['api_key'],
+                }
+            }
+        }
+
+        self.assertDictEqual(json_result, expected_object)
+
+    @integration_test
+    def test_https_delete_policy_doesnt_break_if_no_created_roles(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        user_id1 = uuid.uuid4().hex
+        user_id2 = uuid.uuid4().hex
+        policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
+                                                                   user_id2=user_id2)
+        # Ensure that the accounts exist
+        self.delete_policy_from_string(policy)
+
+        # Run the new apply that should not result in newly created roles
+        json_result = json.loads(self.delete_policy_from_string(policy))
 
         expected_object = {
             'version': json_result['version'],

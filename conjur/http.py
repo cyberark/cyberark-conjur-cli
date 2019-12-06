@@ -23,6 +23,7 @@ class HttpVerb(Enum):
     POST = auto()
     PUT = auto()
     DELETE = auto()
+    PATCH = auto()
 
 
 #pylint: disable=too-many-locals
