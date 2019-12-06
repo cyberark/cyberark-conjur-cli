@@ -43,6 +43,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             client_instance_mock.list.return_value = list_output
             client_instance_mock.apply_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
+            client_instance_mock.delete_policy_file.return_value = policy_change_output
 
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):

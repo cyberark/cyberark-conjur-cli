@@ -313,6 +313,28 @@ class ClientTest(unittest.TestCase):
         return_value = Client().replace_policy_file('name', 'policy')
         self.assertEquals(return_value, replace_policy_result)
 
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_delete_policy_params(self, mock_api_instance,
+            mock_api_config):
+        Client().delete_policy_file('name', 'policy')
+
+        mock_api_instance.return_value.delete_policy_file.assert_called_once_with(
+            'name',
+            'policy'
+        )
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_returns_delete_policy_result(self, mock_api_instance,
+            mock_api_config):
+        delete_policy_result = uuid.uuid4().hex
+        mock_api_instance.return_value.delete_policy_file.return_value = delete_policy_result
+
+        return_value = Client().delete_policy_file('name', 'policy')
+        self.assertEquals(return_value, delete_policy_result)
+
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.client.Api')
     def test_client_passes_through_resource_list_method(self, mock_api_instance,
