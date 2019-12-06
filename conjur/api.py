@@ -221,9 +221,10 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-    def apply_policy_file(self, policy_id, policy_file):
+
+    def _load_policy_file(self, policy_id, policy_file, http_verb):
         """
-        This method is used to load a file-based policy into the desired
+        This method is used to load, replace or delete a file-based policy into the desired
         name.
         """
 
@@ -236,12 +237,20 @@ class Api():
         with open(policy_file, 'r') as content_file:
             policy_data = content_file.read()
 
-        json_response = invoke_endpoint(HttpVerb.POST, ConjurEndpoint.POLICIES, params,
+        json_response = invoke_endpoint(http_verb, ConjurEndpoint.POLICIES, params,
                                         policy_data, api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).text
 
         policy_changes = json.loads(json_response)
         return policy_changes
+
+    def apply_policy_file(self, policy_id, policy_file):
+        """
+        This method is used to load a file-based policy into the desired
+        name.
+        """
+
+        return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
     def replace_policy_file(self, policy_id, policy_file):
         """
@@ -249,18 +258,12 @@ class Api():
         policy ID.
         """
 
-        params = {
-            'identifier': policy_id,
-        }
-        params.update(self._default_params)
+        return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-        policy_data = None
-        with open(policy_file, 'r') as content_file:
-            policy_data = content_file.read()
+    def delete_policy_file(self, policy_id, policy_file):
+        """
+        This method is used to delete a file-based policy into the desired
+        policy ID.
+        """
 
-        json_response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.POLICIES, params,
-                                        policy_data, api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).text
-
-        policy_changes = json.loads(json_response)
-        return policy_changes
+        return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)

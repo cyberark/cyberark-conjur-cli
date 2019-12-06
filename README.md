@@ -125,6 +125,13 @@ Replaces a named policy with one from the provided file. This is
 usually a destructive invocation. Result is a dictionary object
 constructed from the returned JSON data.
 
+#### `delete_policy_file(policy_name, policy_file)`
+
+Modifies an existing Conjur policy. Data may be explicitly
+deleted using the !delete, !revoke, and !deny statements. Unlike
+"replace" mode, no data is ever implicitly deleted. Result is a
+dictionary object constructed from the returned JSON data.
+
 #### `list()`
 
 Returns a Python list of all the available resources for the current
