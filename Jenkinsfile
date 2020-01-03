@@ -45,7 +45,17 @@ pipeline {
     // tagged with the same version as in __version__.py
     stage('Publish to PyPI') {
       steps {
-        sh 'summon -e production ./bin/publish'
+        sh 'summon -e production ./bin/publish_package'
+      }
+
+      when {
+        branch "master"
+      }
+    }
+
+    stage('Publish containers') {
+      steps {
+        sh './bin/publish_container'
       }
 
       when {
