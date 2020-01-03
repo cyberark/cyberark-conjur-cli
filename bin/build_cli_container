@@ -2,6 +2,10 @@
 
 echo "Building CLI container..."
 
+VERSION=$(cat conjur/version.py | grep '__version__' | sed -e "s/.*'\(.*\)'.*/\\1/")
+FULL_VERSION_TAG="$VERSION-$(git rev-parse --short HEAD)"
+
 docker build -f Dockerfile \
              -t conjur-python-cli \
+             -t "conjur-python-cli:${FULL_VERSION_TAG}" \
              .
