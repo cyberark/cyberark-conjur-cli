@@ -1,0 +1,53 @@
+#!/bin/bash -e
+
+CURRENT_DIR=$(pwd)
+
+IMAGE_NAME="conjur-python-cli"
+
+REGISTRY="cyberark"
+INTERNAL_REGISTRY="registry.tld"
+
+VERSION=$(cat conjur/version.py | grep '__version__' | sed -e "s/.*'\(.*\)'.*/\\1/")
+FULL_VERSION_TAG="$VERSION-$(git rev-parse --short HEAD)"
+
+echo "Using version: v$VERSION (v$FULL_VERSION_TAG)"
+
+# Generate less specific versions, eg. given 1.2.3 will print 1.2 and 1
+# (note: the argument itself is not printed, append it explicitly if needed)
+function gen_versions() {
+  local version=$1
+  while [[ $version = *.* ]]; do
+    version=${version%.*}
+    echo $version
+  done
+}
+
+$CURRENT_DIR/bin/build_cli_container
+
+readonly TAGS=(
+  "$VERSION"
+  "latest"
+)
+
+# Fetching tags is required for git_description to work
+git fetch --tags
+git_description=$(git describe --tags)
+
+# Always push the tag with the commit hash to internal registry
+echo "Tagging $INTERNAL_REGISTRY/$IMAGE_NAME:${FULL_VERSION_TAG}"
+docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
+echo "Pushing $INTERNAL_REGISTRY/$IMAGE_NAME:${FULL_VERSION_TAG}"
+docker push "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
+
+# if the tag matches the VERSION, push VERSION and latest releases
+# and x and x.y releases
+if [ "$git_description" = "v${VERSION}" ]; then
+  echo "Revision $git_description matches version $VERSION exactly. Pushing to Dockerhub..."
+
+  for tag in "${TAGS[@]}" $(gen_versions "$VERSION"); do
+    echo "Tagging and pushing $REGISTRY/$IMAGE_NAME:$tag"
+
+    docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$REGISTRY/$IMAGE_NAME:$tag"
+    docker push "$REGISTRY/$IMAGE_NAME:$tag"
+  done
+fi

@@ -52,6 +52,16 @@ pipeline {
         branch "master"
       }
     }
+
+    stage('Publish containers') {
+      steps {
+        sh './bin/publish_container'
+      }
+
+      when {
+        branch "master"
+      }
+    }
   }
 
   post {
