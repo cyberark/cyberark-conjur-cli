@@ -10,7 +10,7 @@ if [[ "$1" == "-l" ]]; then
   exit 0
 fi
 
-$CURRENT_DIR/bin/build_container
+$CURRENT_DIR/bin/build_test_container
 
 rm -rf $CURRENT_DIR/output/*
 docker run --rm \
