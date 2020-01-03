@@ -6,7 +6,9 @@ RUN apt-get update && \
     apt-get install -y bash \
                        binutils \
                        build-essential \
+                       curl \
                        git \
+                       jq \
                        libffi-dev \
                        libssl-dev \
                        python3 \

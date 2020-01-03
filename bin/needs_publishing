@@ -22,11 +22,18 @@ fi
 echo "Published version ($published_version) does not match local version ($local_version)!"
 echo "Checking current git tag to see if it matches this commit..."
 
+# Git fetch will fail if we don't have the host added in our known_hosts
+# which will happen in a clean container
+echo "Adding ssh key of GitHub to known_hosts..."
+mkdir -p ~/.ssh
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+
 # Jenkins git plugin is broken and always fetches with `--no-tags`
 # (or `--tags`, neither of which is what you want), so tags end up
 # not being fetched. Try to fix that.
 # (Unfortunately this fetches all remote heads, so we may have to find
 # another solution for bigger repos.)
+echo "Fetching known tags..."
 git fetch -q
 
 tag_commit=$(git rev-list -n 1 "v$local_version" 2>/dev/null || true)

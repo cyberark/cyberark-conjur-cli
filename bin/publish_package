@@ -26,7 +26,7 @@ docker run --rm \
            -v "$(pwd):/opt/conjur-api-python3" \
            conjur-api-python3-test bash -exc "
                echo 'Installing new versions of pip and wheel...'
-               /usr/bin/env pip3 install --progress-bar off --upgrade pip wheel
+               /usr/bin/env pip3 install --upgrade pip wheel
 
                if ! ./bin/needs_publishing \$TWINE_REPOSITORY_URL; then
                  echo 'WARN: Publishing skipped!'
