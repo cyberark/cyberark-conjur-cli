@@ -18,6 +18,9 @@ RUN apt-get update && \
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
+# Workaround for https://bugs.launchpad.net/usd-importer/+bug/1794041
+RUN pip3 install --upgrade keyrings.alt
+
 COPY requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
 
