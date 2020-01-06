@@ -41,25 +41,28 @@ pipeline {
       }
     }
 
-    // Only publish to PyPI if the HEAD is
-    // tagged with the same version as in __version__.py
-    stage('Publish to PyPI') {
-      steps {
-        sh 'summon -e production ./bin/publish_package'
-      }
+    // Only publish if the HEAD is tagged with the same version as in __version__.py
+    stage('Publish') {
+      parallel {
+        stage('Publish to PyPI') {
+          steps {
+            sh 'summon -e production ./bin/publish_package'
+          }
 
-      when {
-        branch "master"
-      }
-    }
+          when {
+            branch "master"
+          }
+        }
 
-    stage('Publish containers') {
-      steps {
-        sh './bin/publish_container'
-      }
+        stage('Publish containers') {
+          steps {
+            sh './bin/publish_container'
+          }
 
-      when {
-        branch "master"
+          when {
+            branch "master"
+          }
+        }
       }
     }
   }
