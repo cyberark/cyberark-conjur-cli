@@ -4,6 +4,8 @@ Python3-based API SDK for [Conjur OSS](https://www.conjur.org/). The repo
 also includes a self-contained CLI tool (`conjur-cli`) that wraps the API
 in a simple executable script/binary.
 
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
+
 ---
 
 ### **Status**: Alpha
