@@ -10,8 +10,14 @@ pipeline {
 
   stages {
     stage('Linting') {
-      steps {
-        sh './bin/test_linting'
+      parallel {
+        stage('Code') {
+          steps { sh './bin/test_linting' }
+        }
+
+        stage('Changelog') {
+          steps { sh './bin/test_changelog' }
+        }
       }
     }
 
