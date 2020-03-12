@@ -1,5 +1,7 @@
 # Contributing
 
+For general contribution and community guidelines, please see the [community repo](https://github.com/cyberark/community).
+
 ## Table of Contents
 
 - [Legal mumbo-jumbo](#legal-mumbo-jumbo)
