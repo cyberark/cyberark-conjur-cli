@@ -8,7 +8,7 @@ HTTP-based endpoints in a generic way
 """
 
 import base64
-from enum import auto, Enum
+from enum import Enum
 from urllib.parse import quote
 
 import requests
@@ -19,11 +19,11 @@ class HttpVerb(Enum):
     Enumeration of all possible HTTP methods that we may use against
     the HTTP API endpoint
     """
-    GET = auto()
-    POST = auto()
-    PUT = auto()
-    DELETE = auto()
-    PATCH = auto()
+    GET = 1
+    POST = 2
+    PUT = 3
+    DELETE = 4
+    PATCH = 5
 
 
 #pylint: disable=too-many-locals

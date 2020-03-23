@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Changed
+- Removed references to `enum.auto` to support Python3.5 [#43](https://github.com/cyberark/conjur-api-python3/issues/43).
+
 ## [0.1.0] - 2020-01-03
 ### Added
 - Added ability to publish the container to DockerHub [#28](https://github.com/cyberark/conjur-api-python3/issues/28)
