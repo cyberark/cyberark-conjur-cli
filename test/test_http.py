@@ -1,6 +1,6 @@
 import unittest
 
-from enum import auto, Enum
+from enum import Enum
 from unittest.mock import patch
 
 import requests
