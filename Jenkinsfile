@@ -74,7 +74,7 @@ pipeline {
 
     stage('Scan Docker image') {
       steps{
-        scanAndReport("conjur-python-cli:latest", "NONE")
+        scanAndReport("conjur-python-cli:latest", "CRITICAL")
       }
 
       when {
