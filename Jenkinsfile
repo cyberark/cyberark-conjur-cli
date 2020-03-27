@@ -71,6 +71,16 @@ pipeline {
         }
       }
     }
+
+    stage('Scan Docker image') {
+      steps{
+        scanAndReport("conjur-python-cli:latest", "NONE")
+      }
+
+      when {
+        branch "master"
+      }
+    }
   }
 
   post {
