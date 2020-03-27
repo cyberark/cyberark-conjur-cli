@@ -71,6 +71,16 @@ pipeline {
         }
       }
     }
+
+    stage('Scan Docker image') {
+      steps{
+        scanAndReport("conjur-python-cli:latest", "CRITICAL")
+      }
+
+      when {
+        branch "master"
+      }
+    }
   }
 
   post {
