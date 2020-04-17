@@ -73,8 +73,18 @@ pipeline {
     }
 
     stage('Scan Docker image') {
-      steps{
-        scanAndReport("conjur-python-cli:latest", "CRITICAL")
+      parallel {
+        stage('Scan Docker image for fixable vulns') {
+          steps {
+            scanAndReport("conjur-python-cli:latest", "HIGH", false)
+          }
+        }
+
+        stage('Scan Docker image for total vulns') {
+          steps {
+            scanAndReport("conjur-python-cli:latest", "NONE", true)
+          }
+        }
       }
 
       when {
