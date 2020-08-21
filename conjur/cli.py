@@ -23,7 +23,7 @@ class Cli():
     helpers around parsing of parameters and running client commands.
     """
 
-    #pylint: disable=no-self-use,bad-continuation
+    #pylint: disable=no-self-use
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and

@@ -75,7 +75,7 @@ class Client():
                 config = on_disk_config
 
             except Exception as exc:
-                raise ConfigException(exc)
+                raise ConfigException(exc) from Exception
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
