@@ -1,10 +1,11 @@
 # Contributing
 
 For general contribution and community guidelines, please see the [community repo](https://github.com/cyberark/community).
+In particular, before contributing please review our [contributor licensing guide](https://github.com/cyberark/community/blob/master/CONTRIBUTING.md#when-the-repo-does-not-include-the-cla)
+to ensure your contribution is compliant with our contributor license agreements.
 
 ## Table of Contents
 
-- [Legal mumbo-jumbo](#legal-mumbo-jumbo)
 - [Building](#building)
 - [Development](#development)
 - [Testing](#testing)
@@ -14,14 +15,6 @@ For general contribution and community guidelines, please see the [community rep
 Majority of the instructions on how to build, develop, and run the code in
 this repo is located in the main [README.md](README.md) but this file adds
 any additional information for contributing code to this project.
-
-## Legal mumbo-jumbo
-
-Before contributing, please take a moment to read and sign our
-[Contributor Agreement](docs/CyberArk_Open_Source_Contributor_Agreement.pdf).
-This provides patent protection for all SDK users and allows
-CyberArk to enforce its license terms. Please email a signed
-copy to [oss@cyberark.com](oss@cyberark.com).
 
 ## Building
 
