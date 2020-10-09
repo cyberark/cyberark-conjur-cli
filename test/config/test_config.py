@@ -7,12 +7,12 @@ from conjur.config import Config
 class ConfigTest(unittest.TestCase):
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    GOOD_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'good_conjurrc')
-    GOOD_NETRC = os.path.join(CURRENT_DIR, 'test_config', 'good_netrc')
+    GOOD_CONJURRC = os.path.join(CURRENT_DIR, 'test_configs', 'good_conjurrc')
+    GOOD_NETRC = os.path.join(CURRENT_DIR, 'test_configs', 'good_netrc')
 
-    MISSING_ACCOUNT_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_account_conjurrc')
-    MISSING_URL_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_url_conjurrc')
-    MISSING_MACHINE_NETRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_machine_netrc')
+    MISSING_ACCOUNT_CONJURRC = os.path.join(CURRENT_DIR, 'test_configs', 'missing_account_conjurrc')
+    MISSING_URL_CONJURRC = os.path.join(CURRENT_DIR, 'test_configs', 'missing_url_conjurrc')
+    MISSING_MACHINE_NETRC = os.path.join(CURRENT_DIR, 'test_configs', 'missing_machine_netrc')
 
     EXPECTED_CONFIG = {
       'account': 'accountname',
