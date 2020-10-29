@@ -45,9 +45,10 @@ if [ "$git_description" = "v${VERSION}" ]; then
   echo "Revision $git_description matches version $VERSION exactly. Pushing to Dockerhub..."
 
   for tag in "${TAGS[@]}" $(gen_versions "$VERSION"); do
-    echo "Tagging and pushing $REGISTRY/$IMAGE_NAME:$tag"
+    echo "SKIP: Tagging and pushing $REGISTRY/$IMAGE_NAME:$tag"
 
-    docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$REGISTRY/$IMAGE_NAME:$tag"
-    docker push "$REGISTRY/$IMAGE_NAME:$tag"
+# Temporarily disabled until project reaches appropriate certification level
+#    docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$REGISTRY/$IMAGE_NAME:$tag"
+#    docker push "$REGISTRY/$IMAGE_NAME:$tag"
   done
 fi
