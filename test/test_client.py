@@ -342,3 +342,11 @@ class ClientTest(unittest.TestCase):
         Client().list()
 
         mock_api_instance.return_value.list_resources.assert_called_once_with()
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.client.Api')
+    def test_client_passes_through_resource_list_method(self, mock_api_instance,
+            mock_api_config):
+        Client().whoami()
+
+        mock_api_instance.return_value.whoami.assert_called_once_with()

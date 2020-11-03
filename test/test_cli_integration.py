@@ -216,6 +216,19 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
                           '[\n    "dev:policy:root",\n    "dev:variable:one/password"\n]\n')
 
     @integration_test
+    def test_https_can_get_whoami(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        output = invoke_cli(self, self.cli_auth_params, ['whoami'])
+        response = json.loads(output)
+        self.assertEquals(response.get('account'), 'account')
+        self.assertEquals(response.get('username'), 'user')
+
+
+    @integration_test
     def test_https_can_apply_policy(self):
         self.setup_cli_params({
             **self.HTTPS_ENV_VARS,

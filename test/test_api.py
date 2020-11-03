@@ -489,3 +489,16 @@ class ApiTest(unittest.TestCase):
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
                               ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps({})))
+    def test_whoami_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.whoami()
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.WHOAMI,
+                              ssl_verify=True)

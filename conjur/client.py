@@ -111,6 +111,13 @@ class Client():
 
     ### API passthrough
 
+    def whoami(self):
+        """
+        Provides dictionary of information about the client making an API request (such as its ip address,
+        user agent, Conjur account etc.).
+        """
+        return self._api.whoami()
+
     def list(self):
         """
         Lists all available resources
