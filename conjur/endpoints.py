@@ -22,3 +22,4 @@ class ConjurEndpoint(Enum):
     POLICIES = "{url}/policies/{account}/policy/{identifier}"
     RESOURCES = "{url}/resources/{account}"
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
+    WHOAMI = "{url}/whoami"

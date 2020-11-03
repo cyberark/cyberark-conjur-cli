@@ -33,6 +33,9 @@ class Cli():
 
         resource_subparsers = parser.add_subparsers(dest='resource')
 
+        resource_subparsers.add_parser('whoami',
+            help='provides information about the client making an API request.')
+
         resource_subparsers.add_parser('list',
             help='Lists all available resources beloging to this account')
 
@@ -141,6 +144,9 @@ class Cli():
         if resource == 'list':
             result = client.list()
             print(json.dumps(result, indent=4))
+        elif resource == 'whoami':
+            result = client.whoami()
+            print(json.dumps(result, indent=4))
         elif resource == 'variable':
             variable_id = args.variable_id
             if args.action == 'get':
@@ -173,7 +179,7 @@ class Cli():
             parser.print_help()
             sys.exit(0)
 
-        if args.resource not in ['list']:
+        if args.resource not in ['list', 'whoami']:
             if 'action' not in args or not args.action:
                 parser.print_help()
                 sys.exit(0)
