@@ -113,8 +113,7 @@ class Client():
 
     def whoami(self):
         """
-        Provides dictionary of information about the client making an API request (such as its ip address,
-        user agent, Conjur account etc.).
+        Provides dictionary of information about the client making an API request
         """
         return self._api.whoami()
 
