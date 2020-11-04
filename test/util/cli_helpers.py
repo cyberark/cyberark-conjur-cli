@@ -31,7 +31,7 @@ def integration_test(original_function):
     return test_wrapper_func
 
 def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=None,
-        policy_change_output={}):
+        policy_change_output={}, whoami_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
 
     def test_cli_decorator(original_function):
@@ -44,6 +44,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             client_instance_mock.apply_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
             client_instance_mock.delete_policy_file.return_value = policy_change_output
+            client_instance_mock.whoami.return_value = whoami_output
 
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):

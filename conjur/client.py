@@ -111,6 +111,12 @@ class Client():
 
     ### API passthrough
 
+    def whoami(self):
+        """
+        Provides dictionary of information about the user making an API request
+        """
+        return self._api.whoami()
+
     def list(self):
         """
         Lists all available resources

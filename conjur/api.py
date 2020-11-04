@@ -15,7 +15,7 @@ from .endpoints import ConjurEndpoint
 from .http import HttpVerb, invoke_endpoint
 
 
-#pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes
 class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
@@ -33,7 +33,7 @@ class Api():
 
     # We explicitly want to enumerate all params needed to instantiate this
     # class but this might not be needed in the future
-    #pylint: disable=unused-argument,too-many-arguments
+    # pylint: disable=unused-argument,too-many-arguments
     def __init__(self,
                  account='default',
                  api_key=None,
@@ -70,7 +70,7 @@ class Api():
             logging.warning("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!")
             logging.warning("*" * 60)
 
-            #pylint: disable=import-outside-toplevel
+            # pylint: disable=import-outside-toplevel
             import urllib3
 
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -84,7 +84,7 @@ class Api():
             raise Exception("ERROR: API instantiation parameter 'url' cannot be empty!")
 
     @property
-    #pylint: disable=missing-docstring
+    # pylint: disable=missing-docstring
     def api_token(self):
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.info("API token missing or expired. Fetching new one...")
@@ -221,7 +221,6 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-
     def _load_policy_file(self, policy_id, policy_file, http_verb):
         """
         This method is used to load, replace or delete a file-based policy into the desired
@@ -267,3 +266,14 @@ class Api():
         """
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
+
+    def whoami(self):
+        """
+        This method provides dictionary of information about the user making an API request.
+        """
+        json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.WHOAMI,
+                                        self._default_params,
+                                        api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).content
+
+        return json.loads(json_response.decode('utf-8'))

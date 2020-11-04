@@ -10,7 +10,9 @@ RESOURCE_LIST = [
     'some_id1',
     'some_id2',
 ]
-
+WHOAMI_RESPONSE = {
+    "account": "myaccount"
+}
 
 class CliTest(unittest.TestCase):
     @cli_test()
@@ -171,3 +173,11 @@ class CliTest(unittest.TestCase):
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_resource_listing_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('[\n    "some_id1",\n    "some_id2"\n]\n', output)
+
+    @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
+    def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
+        client.whoami.assert_called_once_with()
+
+    @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
+    def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
+        self.assertEquals('{\n    "account": "myaccount"\n}\n', output)
