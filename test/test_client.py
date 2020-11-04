@@ -345,7 +345,7 @@ class ClientTest(unittest.TestCase):
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.client.Api')
-    def test_client_passes_through_resource_list_method(self, mock_api_instance,
+    def test_client_passes_through_whoami_method(self, mock_api_instance,
             mock_api_config):
         Client().whoami()
 
