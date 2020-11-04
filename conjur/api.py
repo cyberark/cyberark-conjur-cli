@@ -269,7 +269,7 @@ class Api():
 
     def whoami(self):
         """
-        This method provides dictionary of information about the client making an API request.
+        This method provides dictionary of information about the user making an API request.
         """
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.WHOAMI,
                                         self._default_params,
