@@ -34,7 +34,7 @@ class Cli():
         resource_subparsers = parser.add_subparsers(dest='resource')
 
         resource_subparsers.add_parser('whoami',
-            help='Provides information about the client making an API request.')
+            help='Provides information about the user making an API request.')
 
         resource_subparsers.add_parser('list',
             help='Lists all available resources beloging to this account')
@@ -179,7 +179,8 @@ class Cli():
             parser.print_help()
             sys.exit(0)
 
-        # Check whether arguments were supplied to a command which demands them.
+        # Check whether we are running a command with required additional
+        # arguments and if so, validate that those additional arguments are present
         if args.resource not in ['list', 'whoami']:
             if 'action' not in args or not args.action:
                 parser.print_help()

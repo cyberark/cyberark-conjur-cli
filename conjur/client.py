@@ -113,7 +113,7 @@ class Client():
 
     def whoami(self):
         """
-        Provides dictionary of information about the client making an API request
+        Provides dictionary of information about the user making an API request
         """
         return self._api.whoami()
 

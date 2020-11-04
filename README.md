@@ -151,11 +151,12 @@ account.
 
 #### `whoami()`
 
+_Note: This method requires Conjur v1.9+_
+
 Returns a Python dictionary of information about the client making an
 API request (such as its ip address, user, account,
 token expiration date etc.).
 
-Please note that Conjur server version must be 1.9 or higher.
 
 
 ## Contributing
