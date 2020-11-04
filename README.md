@@ -149,6 +149,12 @@ dictionary object constructed from the returned JSON data.
 Returns a Python list of all the available resources for the current
 account.
 
+#### `whoami()`
+
+Returns a Python dictionary of information about the client making an
+API request (such as its ip address, user, account,
+token expiration date etc.)
+
 
 ## Contributing
 
