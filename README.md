@@ -153,7 +153,9 @@ account.
 
 Returns a Python dictionary of information about the client making an
 API request (such as its ip address, user, account,
-token expiration date etc.)
+token expiration date etc.).
+
+Please note that Conjur server version must be 1.9 or higher.
 
 
 ## Contributing
