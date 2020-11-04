@@ -175,9 +175,9 @@ class CliTest(unittest.TestCase):
         self.assertEquals('[\n    "some_id1",\n    "some_id2"\n]\n', output)
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
-    def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
+    def test_cli_invokes_whoami_correctly(self, cli_invocation, output, client):
         client.whoami.assert_called_once_with()
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
-    def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
+    def test_cli_invokes_whoami_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "account": "myaccount"\n}\n', output)
