@@ -105,9 +105,9 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
             # Run the new delete that should not result in newly created roles
             output = self.delete_policy(temp_policy_file.name)
-        
+
         return output
-    
+
     def get_variable(self, *variable_ids):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', *variable_ids])
@@ -214,19 +214,6 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         self.assertEquals(output,
                           '[\n    "dev:policy:root",\n    "dev:variable:one/password"\n]\n')
-
-    @integration_test
-    def test_https_can_get_whoami(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
-
-        output = invoke_cli(self, self.cli_auth_params, ['whoami'])
-        response = json.loads(output)
-        self.assertEquals(response.get('account'), 'account')
-        self.assertEquals(response.get('username'), 'user')
-
 
     @integration_test
     def test_https_can_apply_policy(self):
@@ -433,3 +420,15 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         }
 
         self.assertDictEqual(json_result, expected_object)
+
+    @integration_test
+    def test_https_can_get_whoami(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        output = invoke_cli(self, self.cli_auth_params, ['whoami'])
+        response = json.loads(output)
+        self.assertEquals(response.get('account'), 'account')
+        self.assertEquals(response.get('username'), 'user')
