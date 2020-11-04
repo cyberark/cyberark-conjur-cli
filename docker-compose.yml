@@ -6,7 +6,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
 
   conjur:
-    image: cyberark/conjur:1.5
+    image: cyberark/conjur:1.9
     command: server -a dev -f /policy/initial_policy.yml
     environment:
       CONJUR_DATA_KEY: 'OyXV68Mip14xj33huGaQKewmmS+gKtDlp6ECZ2iATpU='

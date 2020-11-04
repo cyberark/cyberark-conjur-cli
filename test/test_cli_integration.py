@@ -430,5 +430,5 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         output = invoke_cli(self, self.cli_auth_params, ['whoami'])
         response = json.loads(output)
-        self.assertEquals(response.get('account'), 'account')
-        self.assertEquals(response.get('username'), 'user')
+        self.assertEquals(response.get('account'), 'dev')
+        self.assertEquals(response.get('username'), 'admin')
