@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [0.1.1] - 2020-11-05
+
+### Added
+- Method `whoami`is now availabe in both CLI and API (requires Conjur v1.9+).
+  [cyberark/conjur-api-python3#68](https://github.com/cyberark/conjur-api-python3/pull/68)
+
 ### Changed
 - Removed references to `enum.auto` to support Python3.5 [#43](https://github.com/cyberark/conjur-api-python3/issues/43).
 
@@ -47,7 +53,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - The first tagged version.
 
-[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.5...v0.1.0
 [0.0.5]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.4...v0.0.5
 [0.0.4]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.3...v0.0.4
