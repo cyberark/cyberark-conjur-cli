@@ -41,13 +41,13 @@ setup(
 
     # Keep this in sync with requirements.txt
     install_requires=[
-        "nose2>=0.8.0",
+        "nose2>=0.9.2",
         "nose2[coverage_plugin]>=0.6.5",
-        "pylint>=2.3.1",
-        "PyInstaller>=3.4",
-        "PyYAML>=3.13",
-        "requests>=2.21.0",
-        "twine>=1.13.0",
+        "pylint>=2.6.0",
+        "PyInstaller>=4.0",
+        "PyYAML>=5.31",
+        "requests>=2.24.0",
+        "twine>=3.2.0",
         "urllib3>=1.25.9"
     ],
 
