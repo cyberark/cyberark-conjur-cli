@@ -45,7 +45,7 @@ setup(
         "nose2[coverage_plugin]>=0.6.5",
         "pylint>=2.6.0",
         "PyInstaller>=4.0",
-        "PyYAML>=5.31",
+        "PyYAML>=5.3.1",
         "requests>=2.24.0",
         "twine>=3.2.0",
         "urllib3>=1.25.9"
