@@ -25,13 +25,13 @@ Help command
 
 
 
-<img src="/Users/ssax/Desktop/images/help-screen.png" alt="help-screen" style="zoom:50%;" />
+<img src="../images/help-screen.png" alt="help-screen" style="zoom:50%;" />
 
 The structure of command in the CLI is below - for example: Conjur help on 'init' command
 
 The texts for each command is written in the epic itself. This is the guidelines on how the UI of the help should.
 
-<img src="/Users/ssax/Desktop/images/init-help.png" alt="init-help" style="zoom:50%;" />
+<img src="../images/init-help.png" alt="init-help" style="zoom:50%;" />
 
 
 
