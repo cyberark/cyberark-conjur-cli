@@ -33,7 +33,7 @@
 
    The help for each command is written in the epic itself.
    Example of this help screen: 
-   <img src="../images/help-screen.png" alt="help-screen" style="zoom:30%;" />
+   <img src="../images/help-screen.png" alt="help-screen" style="zoom:20%;" />
 
    
 
