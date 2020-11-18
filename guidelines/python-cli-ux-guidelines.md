@@ -21,22 +21,23 @@ This list intends to provide UX guidelines for Conjur's new Python CLI, focusing
 
 8. Keep a structured syntax and easy to type, so it will be efficient to use (especially for double word commands.
    The structure would be: `conjur [global options] command subcommand [options] [arguments...]`
+
    1. Example of double-word commands: `conjur user update-password`
-   2. Example of multiple arguments (separated by commas): `conjur variable get secrets/secret1,secrets/secret2`
+   2. Example of multiple arguments: `conjur variable get "secrets/secret1" "secrets/secret2"`
 
 9. Help command structure:
+
    1. CLI header (title and short explanation)
    2. Copyright
    3. Usage: title + explanation
    4. Global options: title + list of options and their explanation
    5. Commands: title + list of commands and their explanation 
    6. Footer: To get help on a specific command, type: conjur command -h
-   
+
    Note: The help for each command is written in the epic itself.
-   
+
    Example of this help screen: 
    <img src="../images/help-screen.png" alt="help-screen" style="zoom:20%;" />
-   
 
 ## Nice to have:
 
