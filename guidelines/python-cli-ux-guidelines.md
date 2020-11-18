@@ -12,7 +12,7 @@ This list intends to provide UX guidelines for Conjur's new Python CLI, focusing
 
 5. Provide helpful and **readable** **errors** (we currently show exception and line code). A typical error message would be: `ERROR: Command failed. No such file or directory: ‘/Users/sharonr/.conjurrc’` (need to consider of we need to show an error log number).
 
-6. When a command is executed with **missing** **parts** (subcommand, argument), unfamiliar syntax and so on, show the relevant error along with the command's help below that. A list of various error scenarios is provided on a separate file.
+6. When a command is executed with **missing** **parts** (subcommand, argument), unfamiliar syntax and so on, show the relevant error along with the command's help below that. Note: a list of various error scenarios is provided on a separate file.
    Example of an unknown command:
    `Error: Unknown command 'test'`
    The CLI help screen will be displayed below the error.
@@ -30,7 +30,7 @@ This list intends to provide UX guidelines for Conjur's new Python CLI, focusing
    3. Usage: title + explanation
    4. Global options: title + list of options and their explanation
    5. Commands: title + list of commands and their explanation 
-   6. Footer: To get help on a specific command, type: conjur <command> -h
+   6. Footer: To get help on a specific command, type: conjur command -h
    
    Note: The help for each command is written in the epic itself.
    
@@ -41,6 +41,7 @@ This list intends to provide UX guidelines for Conjur's new Python CLI, focusing
 ## Nice to have:
 
 1. Use terminal colors – We can add colors for command and subcommands to better differentiate them.
+Reference: https://www.geeksforgeeks.org/print-colors-python-terminal/
 
 2. We should support **tab**-**completion**:
    - Typing the first few characters of the command name followed by <tab> <tab>, will auto-complete the command.
