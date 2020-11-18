@@ -1,44 +1,46 @@
 # Python CLI UX Guidelines
 
-1. The tool’s executable name should be “**conjur**” (regardless to its supported platform), so “conjur-py3-cli-darwin” is not a good experience.
-2. Once the CLI tool is executed **without** **any** **commands**, we should show the help and usage.
-3. Make sure to provide short-form options (e.g. -h) and long-form options (--help)
-4. Provide helpful and **readable** **feedback** (output) at all times. E.g., when a command succeeds and doesn’t have output, it is ended (in new line) with: Command succeeded! Data set to variable: XYZ
-5. Provide helpful and **readable** **errors** (we currently show exception and line code): E.g.,:  conjur exception cli_err01: command failed. No such file or directory: ‘/Users/sharonr/.conjurrc’
-6. When a command is executed with **missing** **parts** (subcommand, argument), or the CLI is executed with unfamiliar syntax, show error and right after the help of the command:
+1. The tool’s executable name should be “**conjur**” (regardless of its supported platform), so “conjur-py3-cli-darwin” is not a good experience.
 
-conjur exception cli_err02: command not found. 
+2. If the CLI tool is executed **without** **any** **commands**, we should show the help and usage.
 
-Conjur help text…
+3. Make sure to provide short-form (e.g. -h) and long-form (--help) for each option.
 
-conjur exception cli_err03: argument not found. type conjur <command> -h for more information.
+4. Provide helpful and **readable** **feedback** when a command succeeds and doesn’t have an output. It should end in a new line and show a feedback message. E.g., `Success! Data written to: <target>`
 
+5. Provide helpful and **readable** **errors** (we currently show exception and line code). A typical error message would be: `ERROR: Command failed. No such file or directory: ‘/Users/sharonr/.conjurrc’` (need to consider of we need to show an error log number).
 
+6. When a command is executed with **missing** **parts** (subcommand, argument), unfamiliar syntax and so on, show the relevant error along with the command's help below that. A list of various error scenarios is provided on a separate file.
+   Example of an unknown command:
+   `Error: Unknown command 'test'`
+   `[Conjur CLI help screen]`
 
-7. Exit codes: commands with no errors will return exit code 0, while errors will return exit code 1 exit code 2 is for ??
+7. Exit codes: commands with no errors will return exit code 0, while errors will return exit code 1. 
 
-8. Keep a structured language and easy to type, so it will be efficient to use (especially for double word commands), e.g.:
+8. Keep a structured syntax and easy to type, so it will be efficient to use (especially for double word commands.
+   The structure would be: `conjur [global options] command subcommand [options] [arguments...]`
+   Example of double-word commands: `conjur user update-password`
+   Example of multiple arguments (separated by commas): `conjur variable get secrets/secret1,secrets/secret2`
 
-conjur user update**-**password <arg>
+9. Help command structure:
 
-Help command 
+   1. CLI header (title and short explanation)
+   2. Copyright
+   3. Usage: title + explanation
+   4. Global options: title + list of options and their explanation
+   5. Commands: title + list of commands and their explanation 
+   6. Footer: To get help on a specific command, type: conjur <command> -h
 
+   The help for each command is written in the epic itself.
+   Example of this help screen: 
+   <img src="../images/help-screen.png" alt="help-screen" style="zoom:50%;" />
 
-
-<img src="../images/help-screen.png" alt="help-screen" style="zoom:50%;" />
-
-The structure of command in the CLI is below - for example: Conjur help on 'init' command
-
-The texts for each command is written in the epic itself. This is the guidelines on how the UI of the help should.
-
-<img src="../images/init-help.png" alt="init-help" style="zoom:50%;" />
-
-
+   
 
 ## Nice to have:
 
-1. Use terminal colors – nice to have but very cool. We can add colors for command and subcommands to better differentiate them
+1. Use terminal colors – We can add colors for command and subcommands to better differentiate them.
 
 2. We should support **tab**-**completion**:
-   - Typing the first few characters of the command name followed by <tab> <tab>, will auto-complete the command
+   - Typing the first few characters of the command name followed by <tab> <tab>, will auto-complete the command.
    - Hit space after a command, then <tab> <tab> again, will shows a list of available sub-commands
