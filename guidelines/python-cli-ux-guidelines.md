@@ -30,11 +30,10 @@
    4. Global options: title + list of options and their explanation
    5. Commands: title + list of commands and their explanation 
    6. Footer: To get help on a specific command, type: conjur <command> -h
+The help for each command is written in the epic itself.
 
-   The help for each command is written in the epic itself.
-   Example of this help screen: 
+Example of this help screen: 
    <img src="../images/help-screen.png" alt="help-screen" style="zoom:20%;" />
-
    
 
 ## Nice to have:
