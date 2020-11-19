@@ -37,8 +37,8 @@ These guidelines intend to provide UX guidelines for Conjur's new Python CLI, fo
    5. Commands: title + list of commands and their explanation 
    6. Footer: To get help on a specific command, type: conjur command -h
 
-   Note: The help for each command can be found here.
-
+   Note: The general help screen and the help for each command can be found here: https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1
+   
    Example of this help screen: 
    <img src="../assets/help-screen.png" alt="help-screen" style="zoom:20%;" />
 
