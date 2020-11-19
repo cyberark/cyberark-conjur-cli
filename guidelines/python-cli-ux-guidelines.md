@@ -40,7 +40,7 @@ These guidelines intend to provide UX guidelines for Conjur's new Python CLI, fo
    Note: The help for each command can be found here.
 
    Example of this help screen: 
-   <img src="../images/help-screen.png" alt="help-screen" style="zoom:20%;" />
+   <img src="../assets/help-screen.png" alt="help-screen" style="zoom:20%;" />
 
 ## Nice to have:
 

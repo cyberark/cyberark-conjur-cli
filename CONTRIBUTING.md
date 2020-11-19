@@ -63,6 +63,10 @@ $ ./bin/test
 $ ./bin/test_linting
 ```
 
+### UX Guidelines
+
+See [here](guidelines/python-cli-ux-guidelines.md) for full UX guidelines to follow during development. These guidelines give structure and uniformity when designing and adding CLI commands to the codebase.
+
 ## Pull Request Workflow
 
 1. Search the [open issues](../../issues) in GitHub to find out what has been planned
