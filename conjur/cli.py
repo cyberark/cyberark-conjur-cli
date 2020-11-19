@@ -11,26 +11,40 @@ import argparse
 import json
 import os
 import sys
-
+import textwrap
 from .client import Client
 
 from .version import __version__
 
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        #print("Sigal " +message)
+
+        sys.stderr.write('Error %s\n'  % message)
+        self.print_help()
+        exit(1)
 
 class Cli():
     """
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
     """
-
     #pylint: disable=no-self-use
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
         """
-        parser = argparse.ArgumentParser(description='Conjur Python3 API CLI')
-
+        parser = MyParser(description=textwrap.dedent('''\
+                                      Conjur’s CLI for managing roles, resources and privileges
+                                      \n
+                                      Copyright © 1999-2020 CyberArk Software Ltd. All rights reserved.
+                                      ''')
+                                      , epilog="CONJUR")
+        # parser = argparse.ArgumentParser(description='Conjur Pythonss3 API CLI')
+        parser._positionals.title = 'Positional arguments'
+        parser._optionals.title = 'Optional arguments'
+        parser.add_argument_group("sigal")
         resource_subparsers = parser.add_subparsers(dest='resource')
 
         resource_subparsers.add_parser('whoami',
@@ -43,8 +57,9 @@ class Cli():
             help='Perform variable-related actions . See "variable -help" for more options')
         variable_subparsers = variable_parser.add_subparsers(dest='action')
 
+
         get_variable_parser = variable_subparsers.add_parser('get',
-            help='Get the value of a variable')
+            help='Get the value of a variable', usage="sgi")
         set_variable_parser = variable_subparsers.add_parser('set',
             help='Set the value of a variable')
 
@@ -55,6 +70,10 @@ class Cli():
             help='ID of the variable')
         set_variable_parser.add_argument('value',
             help='New value of the variable')
+
+
+        get_variable_parser._positionals.title = 'Positional arguments'
+        get_variable_parser._optionals.title = 'Optional arguments'
 
         policy_parser = resource_subparsers.add_parser('policy',
             help='Perform policy-related actions . See "policy -help" for more options')
@@ -113,11 +132,13 @@ class Cli():
         # We don't have a good "debug" vs "verbose" separation right now
         if args.verbose is True:
             args.debug = True
-
-        Cli.run_client_action(resource, args)
-
-        # Explicit exit (required for tests)
-        sys.exit(0)
+        try:
+            Cli.run_client_action(resource, args)
+        except Exception as e:
+            print(e)
+        else:
+            # Explicit exit (required for tests)
+            sys.exit(0)
 
     @staticmethod
     def run_client_action(resource, args):
@@ -170,11 +191,10 @@ class Cli():
                 resources = client.apply_policy_file(args.name, args.policy)
                 print(json.dumps(resources, indent=4))
 
-
     @staticmethod
     def _parse_args(parser):
         args = parser.parse_args()
-
+        print("Argument ", args)
         if not args.resource:
             parser.print_help()
             sys.exit(0)
@@ -182,7 +202,12 @@ class Cli():
         # Check whether we are running a command with required additional
         # arguments and if so, validate that those additional arguments are present
         if args.resource not in ['list', 'whoami']:
+            # if action = list
+                # print_help for list
+            # if
+            print("sigaaal")
             if 'action' not in args or not args.action:
+                # print("sigaaal")
                 parser.print_help()
                 sys.exit(0)
 
