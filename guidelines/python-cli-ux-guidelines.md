@@ -37,15 +37,14 @@ These guidelines intend to provide UX guidelines for Conjur's new Python CLI, fo
    5. Commands: title + list of commands and their explanation 
    6. Footer: To get help on a specific command, type: conjur command -h
 
-   Note: The general help screen and the help for each command can be found here: https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1
+   Note: The general help screen and the help for each command can be found in this [mockup](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
    
    Example of this help screen: 
    <img src="../assets/help-screen.png" alt="help-screen" style="zoom:20%;" />
 
 ## Nice to have:
 
-1. Use terminal colors – We can add colors for command and subcommands to better differentiate them.
-Reference: https://www.geeksforgeeks.org/print-colors-python-terminal/
+1. Use terminal colors – We can add colors for command and subcommands to better differentiate them. [See reference](https://www.geeksforgeeks.org/print-colors-python-terminal/).
 
 2. We should support **tab**-**completion**:
    - Typing the first few characters of the command name followed by `<tab> <tab>`, will auto-complete the command.
