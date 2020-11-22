@@ -11,15 +11,13 @@ import argparse
 import json
 import os
 import sys
-import textwrap
+
 from .client import Client
 
 from .version import __version__
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
-        #print("Sigal " +message)
-
         sys.stderr.write('Error %s\n'  % message)
         self.print_help()
         exit(1)
@@ -30,22 +28,34 @@ class Cli():
     helpers around parsing of parameters and running client commands.
     """
     #pylint: disable=no-self-use
+
+    def des(name=None):
+        return '''
+*****************************************************************
+*   Conjur’s CLI for managing roles, resources and privileges   *
+*****************************************************************
+Copyright © 1999-2020 CyberArk Software Ltd. All rights reserved.
+
+Usage:
+    conjur [global options] command subcommand [options] [arguments…]'''
+
+# def variable_description(name=None):
+#         return '''
+# Usage:
+#     conjur [global options] command subcommand [arguments…]'''
+
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
         """
-        parser = MyParser(description=textwrap.dedent('''\
-                                      Conjur’s CLI for managing roles, resources and privileges
-                                      \n
-                                      Copyright © 1999-2020 CyberArk Software Ltd. All rights reserved.
-                                      ''')
-                                      , epilog="CONJUR")
+        parser = MyParser(description=self.des(),
+                          epilog="CONJUR",
+                          usage=argparse.SUPPRESS, add_help=False, formatter_class=argparse.RawTextHelpFormatter)
         # parser = argparse.ArgumentParser(description='Conjur Pythonss3 API CLI')
-        parser._positionals.title = 'Positional arguments'
-        parser._optionals.title = 'Optional arguments'
-        parser.add_argument_group("sigal")
-        resource_subparsers = parser.add_subparsers(dest='resource')
+
+        globals_optionals = parser.add_argument_group("Global arguments")
+        resource_subparsers = parser.add_subparsers(dest='resource', title="Commands")
 
         resource_subparsers.add_parser('whoami',
             help='Provides information about the user making an API request.')
@@ -53,15 +63,17 @@ class Cli():
         resource_subparsers.add_parser('list',
             help='Lists all available resources beloging to this account')
 
-        variable_parser = resource_subparsers.add_parser('variable',
-            help='Perform variable-related actions . See "variable -help" for more options')
-        variable_subparsers = variable_parser.add_subparsers(dest='action')
+        variable_parser = resource_subparsers.add_parser('variable', description="sgal",
+            help='Perform variable-related actions . See "variable -help" for more options', add_help=False, usage='conjur [global options] command subcommand [options] [arguments…]')
 
-
+        variable_subparsers = variable_parser.add_subparsers(dest='action', title="Subcommands")
         get_variable_parser = variable_subparsers.add_parser('get',
-            help='Get the value of a variable', usage="sgi")
+            help='Get the value of a variable')
         set_variable_parser = variable_subparsers.add_parser('set',
             help='Set the value of a variable')
+
+        glob_option = variable_parser.add_argument_group("Global arguments")
+        glob_option.add_argument('-h', '--help', action='help', help="show this help message and exit")
 
         get_variable_parser.add_argument('variable_id',
             help='ID of a variable', nargs='+')
@@ -70,10 +82,6 @@ class Cli():
             help='ID of the variable')
         set_variable_parser.add_argument('value',
             help='New value of the variable')
-
-
-        get_variable_parser._positionals.title = 'Positional arguments'
-        get_variable_parser._optionals.title = 'Optional arguments'
 
         policy_parser = resource_subparsers.add_parser('policy',
             help='Perform policy-related actions . See "policy -help" for more options')
@@ -101,28 +109,29 @@ class Cli():
             help='File containing the YAML policy')
 
 
-        parser.add_argument('-v', '--version', action='version',
+        globals_optionals.add_argument('-h', '--help', action='help', help="show this help message and exit")
+        globals_optionals.add_argument('-v', '--version', action='version',
             version='%(prog)s v' + __version__)
 
-        parser.add_argument('-l', '--url')
-        parser.add_argument('-a', '--account')
+        globals_optionals.add_argument('-l', '--url')
+        globals_optionals.add_argument('-a', '--account')
 
-        parser.add_argument('-c', '--ca-bundle')
-        parser.add_argument('--insecure',
+        globals_optionals.add_argument('-c', '--ca-bundle')
+        globals_optionals.add_argument('--insecure',
             help='Skip verification of server certificate (not recommended)',
             dest='ssl_verify',
             action='store_false')
 
         # The external names for these are unfortunately named so we remap them
-        parser.add_argument('-u', '--user', dest='login_id')
-        parser.add_argument('-k', '--api-key')
-        parser.add_argument('-p', '--password')
+        globals_optionals.add_argument('-u', '--user', dest='login_id')
+        globals_optionals.add_argument('-k', '--api-key')
+        globals_optionals.add_argument('-p', '--password')
 
-        parser.add_argument('-d', '--debug',
+        globals_optionals.add_argument('-d', '--debug',
             help='Enable debugging output',
             action='store_true')
 
-        parser.add_argument('--verbose',
+        globals_optionals.add_argument('--verbose',
             help='Enable verbose debugging output',
             action='store_true')
 
@@ -194,7 +203,6 @@ class Cli():
     @staticmethod
     def _parse_args(parser):
         args = parser.parse_args()
-        print("Argument ", args)
         if not args.resource:
             parser.print_help()
             sys.exit(0)
@@ -202,12 +210,7 @@ class Cli():
         # Check whether we are running a command with required additional
         # arguments and if so, validate that those additional arguments are present
         if args.resource not in ['list', 'whoami']:
-            # if action = list
-                # print_help for list
-            # if
-            print("sigaaal")
             if 'action' not in args or not args.action:
-                # print("sigaaal")
                 parser.print_help()
                 sys.exit(0)
 
