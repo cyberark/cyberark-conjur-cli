@@ -17,10 +17,35 @@ from .client import Client
 from .version import __version__
 
 class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('Error %s\n'  % message)
+   def error(self, message):
+        sys.stderr.write('Error %s\n' % message)
         self.print_help()
         exit(1)
+
+   def liav_error(self, message, help):
+        sys.stderr.write('Error %s\n' % message)
+        sys.stderr.write('%s\n' % help)
+        exit(1)
+
+   def parse_args(self, args=None, namespace=None):
+        args, argv = self.parse_known_args(args, namespace)
+        action = args.resource if args else None
+        print(action)
+        if argv:
+            print(argv)
+            msg = 'unrecognized arguments: %s'
+            err_msg = (msg % ' '.join(argv))
+            if action:
+                # find the subparser for requesting action (list/whoami)
+                c_help = self._subparsers._actions[0].choices.get(action)
+                if c_help:
+                    # format_help prints the help for each respective action
+                    self.liav_error(err_msg, c_help.format_help())
+                else:
+                    self.error(err_msg)
+            else:
+                self.error(err_msg)
+        return args
 
 class Cli():
     """
@@ -60,8 +85,10 @@ Usage:
         resource_subparsers.add_parser('whoami',
             help='Provides information about the user making an API request.')
 
-        resource_subparsers.add_parser('list',
-            help='Lists all available resources beloging to this account')
+        list_subparsers = resource_subparsers.add_parser('list')
+        list_subparsers.add_argument('-k', '--kind')
+
+        #list_subparsers.add_argument('-l', '--url')
 
         variable_parser = resource_subparsers.add_parser('variable', description="sgal",
             help='Perform variable-related actions . See "variable -help" for more options', add_help=False, usage='conjur [global options] command subcommand [options] [arguments…]')
@@ -151,6 +178,8 @@ Usage:
 
     @staticmethod
     def run_client_action(resource, args):
+        print("Resource " + resource)
+        print(args)
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
@@ -200,9 +229,11 @@ Usage:
                 resources = client.apply_policy_file(args.name, args.policy)
                 print(json.dumps(resources, indent=4))
 
+
     @staticmethod
     def _parse_args(parser):
         args = parser.parse_args()
+
         if not args.resource:
             parser.print_help()
             sys.exit(0)
