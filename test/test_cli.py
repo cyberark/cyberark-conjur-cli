@@ -35,12 +35,11 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["-v"])
     def test_cli_shows_version_with_short_version_flag(self, cli_invocation, output, client):
-        self.assertEquals("cli v{}\n".format(__version__), output)
+        self.assertEquals("cli version {}\n".format(__version__), output)
 
     @cli_test(["--version"])
     def test_cli_shows_version_with_long_version_flag(self, cli_invocation, output, client):
-        self.assertEquals("cli v{}\n".format(__version__), output)
-
+        self.assertEquals("cli version {}\n".format(__version__), output)
 
     # Optional params
 
