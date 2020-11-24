@@ -29,10 +29,10 @@ setup(
     packages=find_packages(exclude=("test")),
     zip_safe=True,
 
-    scripts=['pkg_bin/conjur-cli'],
+    scripts=['pkg_bin/conjur'],
 
     entry_points={
-        'console_scripts': ['conjur-cli=conjur:Cli.launch'],
+        'console_scripts': ['conjur=conjur:Cli.launch'],
 
         'setuptools.installation': [
             'eggsecutable = conjur:Cli.launch',

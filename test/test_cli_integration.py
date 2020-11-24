@@ -124,6 +124,12 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         with self.assertRaises(error_class):
             self.set_variable(variable_id,  uuid.uuid4().hex)
 
+    def print_instead_of_raise_error(self, variable_id, error_message_regex):
+        output = invoke_cli(self,  self.cli_auth_params,
+            ['variable', 'set', variable_id, uuid.uuid4().hex], exit_code=1)
+
+        self.assertRegex(output, error_message_regex)
+
     def generate_policy_string(self):
         variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
         variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
@@ -304,7 +310,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.assert_set_and_get(new_variable)
 
         for old_variable in old_variables:
-            self.assert_variable_set_fails(old_variable, requests.exceptions.HTTPError)
+            self.print_instead_of_raise_error(old_variable, "404 Client Error: Not Found for url")
 
     @integration_test
     def test_https_replace_policy_can_output_returned_data(self):

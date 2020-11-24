@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 from conjur.cli import Cli
 
-def invoke_cli(test_runner, *args):
+def invoke_cli(test_runner, *args, exit_code=0):
     capture_stream = io.StringIO()
     cli_args = list(itertools.chain(*args))
 
@@ -17,7 +17,7 @@ def invoke_cli(test_runner, *args):
             with patch.object(sys, 'argv', ["cli"] + cli_args):
                 Cli().run()
 
-    test_runner.assertEqual(sys_exit.exception.code, 0,
+    test_runner.assertEqual(sys_exit.exception.code, exit_code,
         "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
     return capture_stream.getvalue()
 
@@ -45,7 +45,6 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             client_instance_mock.replace_policy_file.return_value = policy_change_output
             client_instance_mock.delete_policy_file.return_value = policy_change_output
             client_instance_mock.whoami.return_value = whoami_output
-
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
