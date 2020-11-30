@@ -13,93 +13,18 @@ pipeline {
   }
 
   stages {
-    stage('Linting') {
-      parallel {
-        stage('Code') {
-          steps { sh './bin/test_linting' }
-        }
-
-        stage('Changelog') {
-          steps { sh './bin/test_changelog' }
-        }
-      }
-    }
-
-    stage('Unit tests') {
+    // Pack into executable
+    stage('Pack into executable') {
       steps {
-        sh './bin/test_unit'
-      }
-
-      post {
-        always {
-          junit 'output/**/*.xml'
-          cobertura autoUpdateHealth: true, autoUpdateStability: true, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '100, 0, 0', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '100, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '100, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-          ccCoverage("coverage.py")
-        }
-      }
-    }
-
-    stage('Integration tests') {
-      steps {
-        sh './bin/test_integration'
-      }
-
-      post {
-        always {
-          junit 'output/**/*.xml'
-        }
-      }
-    }
-
-    // Only publish if the HEAD is tagged with the same version as in __version__.py
-    stage('Publish') {
-      parallel {
-        stage('Publish to PyPI') {
-          steps {
-            sh 'summon -e production ./bin/publish_package'
-          }
-
-          when {
-            branch "master"
-          }
-        }
-
-        stage('Publish containers') {
-          steps {
-            sh './bin/publish_container'
-          }
-
-          when {
-            branch "master"
+        script {
+          // Node is used to pack the CLI into a window's executable
+          node('executor-windows-2016-containers'){
+            powershell """
+            ./bin/pack_executable_windows
+            """
           }
         }
       }
-    }
-
-    stage('Scan Docker image') {
-      parallel {
-        stage('Scan Docker image for fixable vulns') {
-          steps {
-            scanAndReport("conjur-python-cli:latest", "HIGH", false)
-          }
-        }
-
-        stage('Scan Docker image for total vulns') {
-          steps {
-            scanAndReport("conjur-python-cli:latest", "NONE", true)
-          }
-        }
-      }
-
-      when {
-        branch "master"
-      }
-    }
-  }
-
-  post {
-    always {
-      cleanupAndNotify(currentBuild.currentResult)
     }
   }
 }

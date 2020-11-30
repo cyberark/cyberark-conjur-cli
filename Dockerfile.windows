@@ -1,0 +1,23 @@
+# ========== BUILD CONTAINER ===========
+FROM mcr.microsoft.com/windows:1903
+
+ENV INSTALL_DIR=/opt/conjur-api-python3
+
+RUN apt-get update && \
+    apt-get install -y bash \
+                       binutils \
+                       build-essential \
+                       git \
+                       libffi-dev \
+                       libssl-dev \
+                       python3 \
+                       python3-dev \
+                       python3-pip
+
+RUN mkdir -p $INSTALL_DIR
+WORKDIR $INSTALL_DIR
+
+COPY requirements.txt $INSTALL_DIR/
+RUN pip3 install -r requirements.txt
+
+COPY . $INSTALL_DIR
