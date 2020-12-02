@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.1.1] - 2020-11-05
 
 ### Added
-- Method `whoami`is now availabe in both CLI and API (requires Conjur v1.9+).
+- Method `whoami` is now availabe in both CLI and API (requires Conjur v1.9+).
   [cyberark/conjur-api-python3#68](https://github.com/cyberark/conjur-api-python3/pull/68)
 
 ### Changed
