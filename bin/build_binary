@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-BIN_BUILD_CMD="pyinstaller --onefile pkg_bin/conjur-cli"
+BIN_BUILD_CMD="pyinstaller --onefile pkg_bin/conjur"
 
 rm -rf dist/
 

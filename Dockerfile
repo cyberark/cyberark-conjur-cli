@@ -22,7 +22,7 @@ RUN pip3 install -r requirements.txt
 
 COPY . $INSTALL_DIR
 
-RUN pyinstaller --onefile pkg_bin/conjur-cli
+RUN pyinstaller --onefile pkg_bin/conjur
 
 
 # ========== MAIN CONTAINER ===========

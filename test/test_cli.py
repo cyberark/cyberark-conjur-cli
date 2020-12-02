@@ -17,7 +17,7 @@ WHOAMI_RESPONSE = {
 class CliTest(unittest.TestCase):
     @cli_test()
     def test_cli_without_args_shows_help(self, cli_invocation, output, client):
-        self.assertIn("usage: cli", output)
+        self.assertIn("Usage:", output)
 
     @patch('conjur.cli.Cli')
     def test_cli_is_run_when_launch_is_invoked(self, cli_instance):
@@ -27,20 +27,19 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["-h"])
     def test_cli_shows_help_with_short_help_flag(self, cli_invocation, output, client):
-        self.assertIn("usage: cli", output)
+        self.assertIn("Usage:", output)
 
     @cli_test(["--help"])
     def test_cli_shows_help_with_long_help_flag(self, cli_invocation, output, client):
-        self.assertIn("usage: cli", output)
+        self.assertIn("Usage:", output)
 
     @cli_test(["-v"])
     def test_cli_shows_version_with_short_version_flag(self, cli_invocation, output, client):
-        self.assertEquals("cli v{}\n".format(__version__), output)
+        self.assertRegex(str(output), f"Conjur Python CLI version {(__version__)}")
 
     @cli_test(["--version"])
     def test_cli_shows_version_with_long_version_flag(self, cli_invocation, output, client):
-        self.assertEquals("cli v{}\n".format(__version__), output)
-
+        self.assertRegex(str(output), f"Conjur Python CLI version {format(__version__)}")
 
     # Optional params
 
@@ -108,7 +107,7 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["variable"])
     def test_cli_variable_parser_doesnt_break_without_action(self, cli_invocation, output, client):
-        self.assertIn("usage: cli", output)
+        self.assertIn("Usage", output)
 
     @cli_test(["variable", "get", "foo"])
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
@@ -128,7 +127,7 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["policy"])
     def test_cli_policy_parser_doesnt_break_without_action(self, cli_invocation, output, client):
-        self.assertIn("usage: cli", output)
+        self.assertIn("Usage:", output)
 
     @cli_test(["policy", "apply", "foo", "foopolicy"])
     def test_cli_invokes_policy_apply_correctly(self, cli_invocation, output, client):
