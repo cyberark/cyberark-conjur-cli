@@ -28,7 +28,7 @@ RUN pyinstaller --onefile pkg_bin/conjur
 # ========== MAIN CONTAINER ===========
 FROM ubuntu:18.04 as conjur-python-cli
 
-ENTRYPOINT [ "/usr/local/bin/conjur-cli" ]
+ENTRYPOINT [ "/usr/local/bin/conjur" ]
 
-COPY --from=conjur-cli-builder "/opt/conjur-api-python3/dist/conjur-cli" \
-                               /usr/local/bin/conjur-cli
+COPY --from=conjur-cli-builder "/opt/conjur-api-python3/dist/conjur" \
+                               /usr/local/bin/conjur
