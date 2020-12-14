@@ -129,7 +129,7 @@ Copyright © 2020 CyberArk Software Ltd. All rights reserved.
         global_optional.add_argument('-h', '--help', action='help', help="Display help list")
         global_optional.add_argument('-v', '--version', action='version',
                                      help="Display version number",
-                                     version='Conjur Python CLI version ' + __version__ + "\n"
+                                     version='Conjur CLI version ' + __version__ + "\n"
                                              + self.copyright())
 
         global_optional.add_argument('-l', '--url')
