@@ -59,7 +59,7 @@ To get help on a specific command, see `conjur <command> -h`
         This method builds the copyright description
         """
         return '''
-Copyright © 2020 CyberArk Software Ltd. All rights reserved.
+Copyright 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 '''
 
