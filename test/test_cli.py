@@ -44,14 +44,14 @@ class CliTest(unittest.TestCase):
     @cli_test(["-v"])
     def test_cli_check_copyright_short_version_flag(self, cli_invocation, output, client):
         self.assertRegex(str(output), '''
-Copyright © 2020 CyberArk Software Ltd. All rights reserved.
+Copyright 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 ''')
 
     @cli_test(["--version"])
     def test_cli_check_copyright_long_version_flag(self, cli_invocation, output, client):
         self.assertRegex(str(output), '''
-Copyright © 2020 CyberArk Software Ltd. All rights reserved.
+Copyright 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 ''')
 
