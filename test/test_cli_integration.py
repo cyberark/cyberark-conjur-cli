@@ -1,67 +1,144 @@
+# -*- coding: utf-8 -*-
+
+"""
+CLI Integration tests
+
+This test file has two separate classes to cover two different client flows.
+The first class is for testing configurations of the CLI. The second
+assumes the client has been initialized.
+"""
 import json
 import os
 import tempfile
 import uuid
 import unittest
+from unittest.mock import patch
 
 import requests
 
 from .util.cli_helpers import integration_test, invoke_cli
 
-from conjur.version import __version__
-
-
-# Not coverage tested since integration tests doesn't run in
-# the same build step
-class CliIntegrationTest(unittest.TestCase): # pragma: no cover
-    REQUIRED_ENV_VARS = {
-        'CONJUR_ACCOUNT': 'account',
-        'CONJUR_AUTHN_LOGIN': 'user',
-        'CONJUR_AUTHN_API_KEY': 'password',
-    }
-
-    HTTP_ENV_VARS = {
-        'CONJUR_HTTP_APPLIANCE_URL': 'url',
-    }
-
-    HTTPS_ENV_VARS = {
-        'CONJUR_HTTPS_APPLIANCE_URL': 'url',
-    }
-
-    HTTPS_CA_BUNDLE_ENV_VAR = { 'CONJUR_CA_BUNDLE': 'ca-bundle' }
-
-    DEFINED_VARIABLE_ID = 'one/password'
-
+class CliIntegrationTestConfigurations(unittest.TestCase):
 
     # *************** HELPERS ***************
 
     def setup_cli_params(self, env_vars, *params):
         self.cli_auth_params = ['--debug']
+        self.cli_auth_params += params
 
-        cli_params_map = {**self.REQUIRED_ENV_VARS, **env_vars}
-        for required_env_var, param_name in cli_params_map.items():
-            self.assertIsNotNone(os.environ[required_env_var],
-                    'ERROR: {} env var must be available for this test to work!'.format(required_env_var))
-            self.assertGreater(len(os.environ[required_env_var]), 0,
-                    'ERROR: {} env var must have a valid value for this test to work!'.format(required_env_var))
+        return self.cli_auth_params
 
-            self.cli_auth_params += ['--{}'.format(param_name), os.environ[required_env_var]]
+    def print_instead_of_raise_error(self, error_class, error_message_regex, exit_code):
+        output = invoke_cli(self, self.cli_auth_params,
+            ['list'], exit_code=exit_code)
+        self.assertRegex(output, error_message_regex)
 
+    def evoke_list(self, exit_code=0):
+        return invoke_cli(self, self.cli_auth_params,
+            ['list'], exit_code=exit_code)
+
+    # *************** INITIAL CONFIGURATION TESTS ***************
+
+    '''
+    Validates that the conjurrc was created on the machine 
+    '''
+    @integration_test
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
+        os.system('rm /root/.conjurrc')
+        self.setup_cli_params({})
+        invoke_cli(self, self.cli_auth_params,
+            ['init', '--url', 'https://conjur-https', '--account', 'soemaccount'], exit_code=0)
+
+        assert os.path.isfile("/root/.conjurrc")
+
+    '''
+    Validates that when passed as commandline arguments, the configuration 
+    data is written properly to conjurrc 
+    '''
+    @integration_test
+    @patch('builtins.input', side_effect=['https://conjur-https', 'yes', 'someotheraccount', 'yes', 'yes'])
+    def test_https_conjurrc_is_created_with_no_parameters_given(self, mock_input):
+        os.system('rm /root/.conjurrc')
+        self.setup_cli_params({})
+        invoke_cli(self, self.cli_auth_params,
+            ['init'], exit_code=0)
+
+        with open("/root/.conjurrc", 'r') as conjurrc:
+            lines = conjurrc.readlines()
+            assert "---" in lines[0]
+            assert "account: someotheraccount" in lines[1]
+            assert "appliance_url: https://conjur-https" in lines[2]
+
+    '''
+    Validates that if user does not trust the certificate, 
+    the conjurrc is not be created on the user's machine
+    '''
+    @integration_test
+    @patch('builtins.input', side_effect=['https://conjur-https', 'no'])
+    def test_https_conjurrc_user_does_not_trust_cert(self, mock_input):
+        os.system('rm /root/.conjurrc')
+        self.setup_cli_params({})
+        output = invoke_cli(self, self.cli_auth_params,
+            ['init'], exit_code=1)
+
+        self.assertRegex(output, "You decided not to trust the certificate")
+        assert not os.path.isfile("/root/.conjurrc")
+
+    '''
+    Validates that when the user adds the force flag, 
+    no confirmation is required 
+    '''
+    @integration_test
+    # The additional side effects here ('somesideffect') would prompt the CLI to
+    # request for confirmation which would fail the test
+    @patch('builtins.input', side_effect=['yes', 'somesideeffect', 'somesideeffect'])
+    def test_https_conjurrc_user_forces_overwrite_does_not_request_confirmation(self, mock_input):
+        self.setup_cli_params({})
+        output = invoke_cli(self, self.cli_auth_params,
+            ['init', '--url', 'https://conjur-https', '--account', 'dev', '--force'], exit_code=0)
+
+        assert "Not overwriting" not in output
+
+    @integration_test
+    def test_https_cli_fails_if_cert_is_bad(self):
+        os.system('cp ./test/test_config/bad_cert_conjurrc /root/.conjurrc')
+        self.setup_cli_params({})
+        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+
+    @integration_test
+    def test_https_cli_fails_if_cert_is_not_provided(self):
+        os.system('cp ./test/test_config/no_cert_conjurrc /root/.conjurrc')
+        self.setup_cli_params({})
+        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+
+# Not coverage tested since integration tests doesn't run in
+# the same build step
+class CliIntegrationTest(unittest.TestCase): # pragma: no cover
+    os.system('cp ./test/test_config/conjurrc /root/.conjurrc')
+    DEFINED_VARIABLE_ID = 'one/password'
+
+    # *************** HELPERS ***************
+    # Resets the conjurrc for the next run run
+    def setup_cli_params(self, env_vars, *params):
+        self.cli_auth_params = ['--debug']
         self.cli_auth_params += params
 
         return self.cli_auth_params
 
     def setUp(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
         return invoke_cli(self, self.cli_auth_params,
             ['policy', 'replace', 'root', 'test/test_config/initial_policy.yml'])
 
-    def set_variable(self, variable_id, value):
+    def set_variable(self, variable_id, value, exit_code=0):
         return invoke_cli(self, self.cli_auth_params,
-            ['variable', 'set', variable_id, value])
+            ['variable', 'set', variable_id, value], exit_code=exit_code)
+
+
+    def initalize_cli(self, variable_id, value, exit_code=0):
+        return invoke_cli(self, self.cli_auth_params,
+            ['init', '--url', 'https://localhost-https', '--account', 'dev'], exit_code=exit_code)
 
     def apply_policy(self, policy_path):
         return invoke_cli(self, self.cli_auth_params,
@@ -117,12 +194,11 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         self.set_variable(variable_id, expected_value)
         output = self.get_variable(variable_id)
-
         self.assertEquals(expected_value, output)
 
-    def assert_variable_set_fails(self, variable_id, error_class):
+    def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
         with self.assertRaises(error_class):
-            self.set_variable(variable_id,  uuid.uuid4().hex)
+            self.set_variable(variable_id,  uuid.uuid4().hex, exit_code)
 
     def print_instead_of_raise_error(self, variable_id, error_message_regex):
         output = invoke_cli(self,  self.cli_auth_params,
@@ -153,42 +229,38 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
 
     # *************** TESTS ***************
-
+    '''
+    A non-existent policy file will return FileNotFound error message
+    '''
     @integration_test
-    def test_http_cli_can_set_and_get_a_defined_variable(self):
-        self.setup_cli_params(self.HTTP_ENV_VARS)
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+    def test_apply_policy_raises_file_not_exists_error(self):
+        output = invoke_cli(self, self.cli_auth_params,
+            ['policy', 'apply', 'root', 'somepolicy.yml'], exit_code=1)
+        self.assertRegex(output, "Error: No such file or directory:")
+
+    '''
+    A non-existent variable file will return a 404 Not Found error message
+    '''
+    @integration_test
+    def test_unknown_secret_raises_not_found_error(self):
+        output = invoke_cli(self, self.cli_auth_params,
+            ['variable', 'get', 'unknown'], exit_code=1)
+        self.assertRegex(output, "404 Client Error: Not Found for url:")
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
-        self.setup_cli_params(self.HTTPS_ENV_VARS, '--insecure')
+        self.setup_cli_params({}, '--insecure')
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
 
     @integration_test
-    def test_https_cli_fails_if_cert_is_bad(self):
-        self.setup_cli_params(self.HTTPS_ENV_VARS, '--ca-bundle', './test/test_config/https/nginx.conf')
-        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ID, requests.exceptions.SSLError)
-
-    @integration_test
-    def test_https_cli_fails_if_cert_is_not_provided(self):
-        self.setup_cli_params(self.HTTPS_ENV_VARS)
-        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ID, requests.exceptions.SSLError)
-
-    @integration_test
     def test_https_cli_can_batch_get_multiple_variables(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         policy, variables = self.generate_policy_string()
         with tempfile.NamedTemporaryFile() as temp_policy_file:
@@ -211,10 +283,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_can_list_resources(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         output = invoke_cli(self, self.cli_auth_params, ['list'])
 
@@ -223,10 +292,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_can_apply_policy(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         policy, variables = self.generate_policy_string()
         self.apply_policy_from_string(policy)
@@ -236,10 +302,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_apply_policy_can_output_returned_data(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
         user_id2 = uuid.uuid4().hex
@@ -267,10 +330,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_apply_policy_doesnt_break_if_no_created_roles(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
         user_id2 = uuid.uuid4().hex
@@ -291,12 +351,10 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_can_replace_policy(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         orig_policy, old_variables = self.generate_policy_string()
+        print(old_variables)
         with tempfile.NamedTemporaryFile() as temp_policy_file:
             temp_policy_file.write(orig_policy.encode('utf-8'))
             temp_policy_file.flush()
@@ -310,14 +368,12 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.assert_set_and_get(new_variable)
 
         for old_variable in old_variables:
-            self.print_instead_of_raise_error(old_variable, "404 Client Error: Not Found for url")
+            print(old_variables)
+            self.print_instead_of_raise_error(old_variable,  "404 Client Error: Not Found for url")
 
     @integration_test
     def test_https_replace_policy_can_output_returned_data(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
         user_id2 = uuid.uuid4().hex
@@ -343,10 +399,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_replace_policy_doesnt_break_if_no_created_roles(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         policy = "- !policy foo\n"
         json_result = json.loads(self.replace_policy_from_string(policy))
@@ -361,10 +414,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_can_delete_policy(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         policy, variables = self.generate_policy_string()
         self.delete_policy_from_string(policy)
@@ -374,10 +424,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_delete_policy_can_output_returned_data(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
         user_id2 = uuid.uuid4().hex
@@ -405,10 +452,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_delete_policy_doesnt_break_if_no_created_roles(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
         user_id2 = uuid.uuid4().hex
@@ -429,10 +473,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     @integration_test
     def test_https_can_get_whoami(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
+        self.setup_cli_params({})
 
         output = invoke_cli(self, self.cli_auth_params, ['whoami'])
         response = json.loads(output)

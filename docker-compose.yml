@@ -15,7 +15,7 @@ services:
     ports:
       - 80
     volumes:
-      - ./test/test_config:/policy:ro
+      - ${PWD}/test/test_config:/policy:ro
     depends_on:
       - pg
 
@@ -24,12 +24,12 @@ services:
     ports:
       - 443
     volumes:
-      - ./test/test_config/https/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./test/test_config/https/conjur.conf:/etc/nginx/sites-enabled/conjur.conf:ro
-      - ./test/test_config/https/dhparams.pem:/etc/nginx/dhparams.pem:ro
-      - ./test/test_config/https/conjur.crt:/cert/tls.crt:ro
-      - ./test/test_config/https/conjur.key:/cert/tls.key:ro
-      - ./test/test_config/https/ca.crt:/ca/tls.crt:ro
+      - ${PWD}/test/test_config/https/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${PWD}/test/test_config/https/conjur.conf:/etc/nginx/sites-enabled/conjur.conf:ro
+      - ${PWD}/test/test_config/https/dhparams.pem:/etc/nginx/dhparams.pem:ro
+      - ${PWD}/test/test_config/https/conjur.crt:/cert/tls.crt:ro
+      - ${PWD}/test/test_config/https/conjur.key:/cert/tls.key:ro
+      - ${PWD}/test/test_config/https/ca.crt:/ca/tls.crt:ro
     depends_on:
       - conjur
 
@@ -47,14 +47,10 @@ services:
       dockerfile: Dockerfile.test
     command: ['sleep', '999d']
     environment:
-      CONJUR_HTTP_APPLIANCE_URL: http://conjur
-      CONJUR_HTTPS_APPLIANCE_URL: https://conjur-https
-      CONJUR_ACCOUNT: dev
-      CONJUR_AUTHN_LOGIN: admin
       CONJUR_AUTHN_API_KEY: Null
-      CONJUR_CA_BUNDLE: /opt/conjur-api-python3/test/test_config/https/ca.crt
     depends_on:
       - conjur
       - conjur-https
     volumes:
-      - .:/opt/conjur-api-python3
+      - ${PWD}:/opt/conjur-api-python3
+      - .netrc:/root/.netrc

@@ -1,4 +1,4 @@
 ---
 account: accountname
-plugins: ['foo', 'bar']
 cert_file: "/cert/file/location"
+plugins: ['foo', 'bar']
