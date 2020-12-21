@@ -38,6 +38,14 @@ class Cli():
   conjur [global options] command [subcommand] [value] [--option=arg]'''
 
     @staticmethod
+    def usage(*args):
+        """
+        This method builds the header for the main screen.
+        """
+        return '''Usage:
+     {}'''.format(*args)
+
+    @staticmethod
     def main_epilog():
         """
         This method builds the footer for the main help screen.
@@ -69,6 +77,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
         """
+        formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog,
+                                                                     max_help_position=50,
+                                                                     width=50)
+
         parser = ArgparseWrapper(description=self.main_description(),
                                  epilog=self.main_epilog(),
                                  usage=argparse.SUPPRESS,
@@ -85,21 +97,33 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             help='List all available resources belonging to this account')
 
         variable_parser = resource_subparsers.add_parser('variable',
-            help='Manage variables')
+                                                         help='Manage variables',
+                                                         description=self.usage(
+                                                             'conjur [global options] variable <subcommand> [options] <VARIABLE_ID> <VALUE>'),
+                                                         usage=argparse.SUPPRESS,
+                                                         add_help=False,
+                                                         formatter_class=formatter_class
+                                                         )
+
+        var_options = variable_parser.add_argument_group(title=self.title("Options"))
+
+        var_options.add_argument('-h', '--help', action='help', help='Display help list and exit')
+        # TODO: missing Example section in help
+
         variable_subparsers = variable_parser.add_subparsers(dest='action')
 
         get_variable_parser = variable_subparsers.add_parser('get',
-            help='Get the value of a variable')
+                                                             help='Get the value of one or more variables')
         set_variable_parser = variable_subparsers.add_parser('set',
-            help='Set the value of a variable')
+                                                             help='Set the value of a variable')
 
         get_variable_parser.add_argument('variable_id',
-            help='ID of a variable', nargs='+')
+                                         help='ID of a variable', nargs='+')
 
         set_variable_parser.add_argument('variable_id',
-            help='ID of the variable')
+                                         help='ID of the variable')
         set_variable_parser.add_argument('value',
-            help='New value of the variable')
+                                         help='New value of the variable')
 
         policy_parser = resource_subparsers.add_parser('policy',
             help='Manage policies')

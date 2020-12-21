@@ -13,7 +13,7 @@ from conjur.version import __version__
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
-class CliIntegrationTest(unittest.TestCase): # pragma: no cover
+class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
     REQUIRED_ENV_VARS = {
         'CONJUR_ACCOUNT': 'account',
         'CONJUR_AUTHN_LOGIN': 'user',
@@ -28,10 +28,11 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         'CONJUR_HTTPS_APPLIANCE_URL': 'url',
     }
 
-    HTTPS_CA_BUNDLE_ENV_VAR = { 'CONJUR_CA_BUNDLE': 'ca-bundle' }
+    HTTPS_CA_BUNDLE_ENV_VAR = {'CONJUR_CA_BUNDLE': 'ca-bundle'}
 
     DEFINED_VARIABLE_ID = 'one/password'
-
+    DEFINED_VARIABLE2 = 'two/username'
+    DEFINED_VARIABLE3 = 'three/secret'
 
     # *************** HELPERS ***************
 
@@ -108,17 +109,23 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         return output
 
-    def get_variable(self, *variable_ids):
+    def get_variable(self, variable_ids):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', *variable_ids])
 
     def assert_set_and_get(self, variable_id):
         expected_value = uuid.uuid4().hex
-
         self.set_variable(variable_id, expected_value)
-        output = self.get_variable(variable_id)
+        output = self.get_variable([variable_id])
 
         self.assertEquals(expected_value, output)
+
+    def assert_json_equals(self, json1_str, json2_str):
+        json1 = json.loads(json1_str)
+        json2 = json.loads(json2_str)
+        json11 = json.dumps(json1, sort_keys=True)
+        json22 = json.dumps(json2, sort_keys=True)
+        self.assertTrue(json11 == json22)
 
     def assert_variable_set_fails(self, variable_id, error_class):
         with self.assertRaises(error_class):
@@ -136,14 +143,14 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
 
         policy = \
-"""
-- !variable
-  id: {variable_1}
-- !variable
-  id: {variable_2}
-- !variable
-  id: {variable_3}
-"""
+            """
+            - !variable
+              id: {variable_1}
+            - !variable
+              id: {variable_2}
+            - !variable
+              id: {variable_3}
+            """
 
         dynamic_policy = policy.format(variable_1=variable_1,
                                        variable_2=variable_2,
@@ -151,13 +158,16 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         return (dynamic_policy, [variable_1, variable_2, variable_3])
 
-
     # *************** TESTS ***************
-
     @integration_test
     def test_http_cli_can_set_and_get_a_defined_variable(self):
         self.setup_cli_params(self.HTTP_ENV_VARS)
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # "!@#$%asdfgh&*()g,lpokmnjiub")
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE3, "1")
+        output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+        self.assert_json_equals(output,
+                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable(self):
@@ -166,7 +176,12 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             **self.HTTPS_CA_BUNDLE_ENV_VAR
         })
 
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # "!@#$%asdfgh&*()g,lpokmnjiub")
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE3, "1")
+        output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+        self.assert_json_equals(output,
+                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
@@ -203,7 +218,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.set_variable(variable, value)
             value_map[variable] = value
 
-        batch_result_string = self.get_variable(*variables)
+        batch_result_string = self.get_variable(variables)
         batch_result = json.loads(batch_result_string)
 
         for variable_name, variable_value in value_map.items():
@@ -218,8 +233,9 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         output = invoke_cli(self, self.cli_auth_params, ['list'])
 
-        self.assertEquals(output,
-                          '[\n    "dev:policy:root",\n    "dev:variable:one/password"\n]\n')
+        self.assertRegex(output,
+                         "dev:policy:root", "root not found")
+        self.assertRegex(output, "dev:variable:one/password", "variable one/password not found")
 
     @integration_test
     def test_https_can_apply_policy(self):
