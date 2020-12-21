@@ -8,8 +8,6 @@ import requests
 
 from .util.cli_helpers import integration_test, invoke_cli
 
-from conjur.version import __version__
-
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
@@ -33,6 +31,7 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
     DEFINED_VARIABLE_ID = 'one/password'
     DEFINED_VARIABLE2 = 'two/username'
     DEFINED_VARIABLE3 = 'three/secret'
+    DEFINED_VARIABLE_SPECIAL_ID = '_!@#$%^&*'
 
     # *************** HELPERS ***************
 
@@ -123,9 +122,9 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
     def assert_json_equals(self, json1_str, json2_str):
         json1 = json.loads(json1_str)
         json2 = json.loads(json2_str)
-        json11 = json.dumps(json1, sort_keys=True)
-        json22 = json.dumps(json2, sort_keys=True)
-        self.assertTrue(json11 == json22)
+        json1_sorted = json.dumps(json1, sort_keys=True)
+        json2_sorted = json.dumps(json2, sort_keys=True)
+        self.assertTrue(json1_sorted == json2_sorted)
 
     def assert_variable_set_fails(self, variable_id, error_class):
         with self.assertRaises(error_class):
@@ -167,7 +166,8 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
         output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
         self.assert_json_equals(output,
-                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
+                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" +
+                                CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable(self):
@@ -176,12 +176,64 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
             **self.HTTPS_CA_BUNDLE_ENV_VAR
         })
 
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # "!@#$%asdfgh&*()g,lpokmnjiub")
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # TODO: value should be special chars and it fails "!@#$%asdfgh&*()g,lpokmnjiub")
         self.set_variable(CliIntegrationTest.DEFINED_VARIABLE3, "1")
         output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
         self.assert_json_equals(output,
                                 "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
+
+    @integration_test
+    def test_https_cli_can_batch_get_multiple_variables(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        policy, variables = self.generate_policy_string()
+        with tempfile.NamedTemporaryFile() as temp_policy_file:
+            temp_policy_file.write(policy.encode('utf-8'))
+            temp_policy_file.flush()
+
+            self.apply_policy(temp_policy_file.name)
+
+        value_map = {}
+        for variable in variables:
+            value = uuid.uuid4().hex
+            self.set_variable(variable, value)
+            value_map[variable] = value
+
+        batch_result_string = self.get_variable(variables)
+        batch_result = json.loads(batch_result_string)
+
+        for variable_name, variable_value in value_map.items():
+            self.assertEquals(variable_value, batch_result[variable_name])
+
+    @integration_test
+    def test_variable_special_char(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_SPECIAL_ID)
+
+    '''Given you have executable python file
+and run conjur init and authn login and policy load successful (with right parameters)
+When run conjur variable get var_not_exists
+Then you will get value not found 404 with error message
+
+This test does not pass need fixing
+    @integration_test
+    def test_variable_not_exists(self):
+        self.setup_cli_params({
+            **self.HTTPS_ENV_VARS,
+            **self.HTTPS_CA_BUNDLE_ENV_VAR
+        })
+        output = self.get_variable("no_such_id")
+        print("ooo=" + output)
+        #self.assertIn()
+    '''
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
@@ -373,7 +425,6 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
         }
 
         self.assertDictEqual(json_result, expected_object)
-
 
     @integration_test
     def test_https_can_delete_policy(self):
