@@ -17,9 +17,10 @@ class ConjurEndpoint(Enum):
     required parameters for the paths
     """
     AUTHENTICATE = "{url}/authn/{account}/{login}/authenticate"
-    BATCH_SECRETS = "{url}/secrets"
     LOGIN = "{url}/authn/{account}/login"
+    INFO = "{url}/info"
     POLICIES = "{url}/policies/{account}/policy/{identifier}"
-    RESOURCES = "{url}/resources/{account}"
+    BATCH_SECRETS = "{url}/secrets"
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
+    RESOURCES = "{url}/resources/{account}"
     WHOAMI = "{url}/whoami"

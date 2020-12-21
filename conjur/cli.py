@@ -78,8 +78,8 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         test sources. Parses CLI args and invokes the appropriate client command.
         """
         formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog,
-                                                                     max_help_position=500,
-                                                                     width=500)
+                                                                     max_help_position=60,
+                                                                     width=60)
         # pylint: disable=line-too-long
         parser = ArgparseWrapper(description=self.usage('conjur [global options] <command> <subcommand> [options] [args]'),
                                  epilog=self.main_epilog(),

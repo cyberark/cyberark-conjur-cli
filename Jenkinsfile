@@ -33,7 +33,7 @@ pipeline {
       post {
         always {
           junit 'output/**/*.xml'
-          cobertura autoUpdateHealth: false, autoUpdateStability: true, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '75, 0, 75', failUnhealthy: true, failUnstable: true, lineCoverageTargets: '70, 0, 70', maxNumberOfBuilds: 0, methodCoverageTargets: '75, 0, 75', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+          cobertura autoUpdateHealth: false, autoUpdateStability: true, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '75, 0, 75', failUnhealthy: true, failUnstable: true, lineCoverageTargets: '55, 0, 55', maxNumberOfBuilds: 0, methodCoverageTargets: '75, 0, 75', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
           ccCoverage("coverage.py")
         }
       }

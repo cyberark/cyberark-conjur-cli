@@ -36,8 +36,8 @@ class SSLService:
         conjur_sock.connect((hostname, port))
         conjur_sock.do_handshake()
 
-        logging.info("TLS Connection established. " \
-                     "Fetching certificate from server...")
+        logging.debug(f"TLS Connection established. " \
+                     f"Fetching certificate from Conjur server")
 
         return conjur_sock
 

@@ -9,6 +9,7 @@ assumes the client has been initialized.
 """
 import json
 import os
+import shutil
 import tempfile
 import uuid
 import unittest
@@ -102,20 +103,20 @@ class CliIntegrationTestConfigurations(unittest.TestCase):
 
     @integration_test
     def test_https_cli_fails_if_cert_is_bad(self):
-        os.system('cp ./test/test_config/bad_cert_conjurrc /root/.conjurrc')
+        shutil.copy('./test/test_config/bad_cert_conjurrc', '/root/.conjurrc')
         self.setup_cli_params({})
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
 
     @integration_test
     def test_https_cli_fails_if_cert_is_not_provided(self):
-        os.system('cp ./test/test_config/no_cert_conjurrc /root/.conjurrc')
+        shutil.copy('./test/test_config/no_cert_conjurrc', '/root/.conjurrc')
         self.setup_cli_params({})
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
 class CliIntegrationTest(unittest.TestCase): # pragma: no cover
-    os.system('cp ./test/test_config/conjurrc /root/.conjurrc')
+    shutil.copy('./test/test_config/conjurrc', '/root/.conjurrc')
     DEFINED_VARIABLE_ID = 'one/password'
 
     # *************** HELPERS ***************
