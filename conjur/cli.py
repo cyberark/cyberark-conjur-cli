@@ -22,6 +22,7 @@ from conjur.argparse_wrapper import ArgparseWrapper
 from conjur.client import Client
 from conjur.version import __version__
 
+
 # pylint: disable=too-many-statements
 class Cli():
     """
@@ -91,24 +92,24 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         resource_subparsers = parser.add_subparsers(dest='resource', title=self.title("Commands"))
 
         resource_subparsers.add_parser('whoami',
-            help='Provides information about the current logged-in user')
+                                       help='Provides information about the current logged-in user')
 
         resource_subparsers.add_parser('list',
-            help='List all available resources belonging to this account')
+                                       help='List all available resources belonging to this account')
 
         variable_parser = resource_subparsers.add_parser('variable',
-                                             help='Manage variables',
-                                             description=self.usage(
-                                                 'conjur '
-                                                 '[global options] '
-                                                 'variable '
-                                                 '<subcommand> '
-                                                 '[options] '
-                                                 '<VARIABLE_ID> '
-                                                 '<VALUE>'),
-                                                 usage=argparse.SUPPRESS,
-                                                 add_help=False,
-                                                 formatter_class=formatter_class)
+                                                         help='Manage variables',
+                                                         description=self.usage(
+                                                             'conjur '
+                                                             '[global options] '
+                                                             'variable '
+                                                             '<subcommand> '
+                                                             '[options] '
+                                                             '<VARIABLE_ID> '
+                                                             '<VALUE>'),
+                                                         usage=argparse.SUPPRESS,
+                                                         add_help=False,
+                                                         formatter_class=formatter_class)
 
         var_options = variable_parser.add_argument_group(title=self.title("Options"))
 
@@ -119,7 +120,8 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_subparsers = variable_parser.add_subparsers(dest='action')
 
         get_variable_parser = variable_subparsers.add_parser('get',
-                                                             help='Get the value of one or more variables')
+                                                             help='Get the value'
+                                                                  ' of one or more variables')
         set_variable_parser = variable_subparsers.add_parser('set',
                                                              help='Set the value of a variable')
 
@@ -132,29 +134,29 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                          help='New value of the variable')
 
         policy_parser = resource_subparsers.add_parser('policy',
-            help='Manage policies')
+                                                       help='Manage policies')
         policy_subparsers = policy_parser.add_subparsers(dest='action')
 
         apply_policy_parser = policy_subparsers.add_parser('apply',
-            help='Apply a policy file')
+                                                           help='Apply a policy file')
         apply_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                         help='Name of the policy (usually "root")')
         apply_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                         help='File containing the YAML policy')
 
         replace_policy_parser = policy_subparsers.add_parser('replace',
-            help='Replace a policy file')
+                                                             help='Replace a policy file')
         replace_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                           help='Name of the policy (usually "root")')
         replace_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                           help='File containing the YAML policy')
 
         delete_policy_parser = policy_subparsers.add_parser('delete',
-            help='Delete a policy file')
+                                                            help='Delete a policy file')
         delete_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                          help='Name of the policy (usually "root")')
         delete_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                          help='File containing the YAML policy')
 
         global_optional.add_argument('-h', '--help', action='help', help="Display help list")
         global_optional.add_argument('-v', '--version', action='version',
@@ -167,9 +169,9 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         global_optional.add_argument('-c', '--ca-bundle')
         global_optional.add_argument('--insecure',
-            help='Skip verification of server certificate (not recommended)',
-            dest='ssl_verify',
-            action='store_false')
+                                     help='Skip verification of server certificate (not recommended)',
+                                     dest='ssl_verify',
+                                     action='store_false')
 
         # The external names for these are unfortunately named so we remap them
         global_optional.add_argument('-u', '--user', dest='login_id')
@@ -177,13 +179,12 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         global_optional.add_argument('-p', '--password')
 
         global_optional.add_argument('-d', '--debug',
-            help='Enable debugging output',
-            action='store_true')
+                                     help='Enable debugging output',
+                                     action='store_true')
 
         global_optional.add_argument('--verbose',
-            help='Enable verbose debugging output',
-            action='store_true')
-
+                                     help='Enable verbose debugging output',
+                                     action='store_true')
 
         resource, args = Cli._parse_args(parser)
 
@@ -280,6 +281,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         """
         Cli().run()
 
+
 if __name__ == '__main__':
     # Not coverage-tested since the integration tests do this
-    Cli.launch() # pragma: no cover
+    Cli.launch()  # pragma: no cover
