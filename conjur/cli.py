@@ -99,8 +99,13 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
                                                          description=self.usage(
-                                                             'conjur [global options] variable <subcommand> '
-                                                             '[options] <VARIABLE_ID> <VALUE>'),
+                                                             'conjur '
+                                                             '[global options] '
+                                                             'variable '
+                                                             '<subcommand> '
+                                                             '[options] '
+                                                             '<VARIABLE_ID> '
+                                                             '<VALUE>'),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
                                                          formatter_class=formatter_class)
