@@ -1,5 +1,6 @@
 import io
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch, MagicMock
 
 import OpenSSL
@@ -35,11 +36,11 @@ class InitControllerTest(unittest.TestCase):
         self.conjurrc_data.account=None
         with self.assertRaises(RuntimeError):
             self.conjurrc_data.appliance_url = 'https://someurl'
-            InitController.get_account_info(self, self.conjurrc_data, "cert")
+            InitController.get_account_info(self, self.conjurrc_data)
 
     @patch('builtins.input', return_value='someaccount')
     def test_init_host_is_added_to_conjurrc_object(self, mock_input):
-        InitController.get_account_info(self, self.conjurrc_data, "cert")
+        InitController.get_account_info(self, self.conjurrc_data)
         self.assertEquals(self.conjurrc_data.account, 'someaccount')
 
     '''
@@ -88,20 +89,51 @@ class InitControllerTest(unittest.TestCase):
         assert self.conjurrc_data.cert_file == "/some/path/somepem.pem"
         self.assertEquals(fetched_certificate, None)
 
-    @patch('os.path.join')
-    @patch('conjur.init.init_logic')
-    def test_user_does_not_supply_cert_writes_to_file_called(self, mock_init_logic, mock_cert_path):
-        self.conjurrc_data.appliance_url="https://someurl"
-
-        mock_init_logic.write_certificate_to_file.return_value = None
-        mock_cert_path.return_value = "/some/path/somepem.pem"
-        InitController.write_certificate(self, mock_init_logic, self.conjurrc_data, None, "-----BEGIN CERTIFICATE-----")
-
-        assert self.conjurrc_data.cert_file == mock_cert_path.return_value
-        mock_init_logic.write_certificate_to_file.assert_called_once()
-
-
     @patch('conjur.init.init_logic')
     def test_user_supplies_cert_writes_to_file_not_called(self, mock_init_logic):
-        InitController.write_certificate(self, mock_init_logic, self.conjurrc_data, "https://some/cert/path", None)
+        InitController.write_certificate(self, "https://some/cert/path")
         mock_init_logic.write_certificate_to_file.assert_not_called()
+
+    '''
+    Validates that when the user wants to overwrite the certificate file,
+    We attempt to write the certificate twice (initial attempt 
+    and user after confirmation)
+    '''
+    # The certificate file exists and the CLI prompts
+    # if the user wants to overwrite
+    @patch('conjur.init.init_logic')
+    @patch('builtins.input', return_value='yes')
+    def test_user_confirms_force_overwrites_writes_cert_to_file(self, mock_input, mock_init_logic):
+        with redirect_stdout(self.capture_stream):
+            self.conjurrc_data.appliance_url = "https://someurl"
+            init_controller = InitController(self.conjurrc_data, mock_init_logic, False)
+
+            # Mock that a certificate file already exists
+            mock_init_logic.write_certificate_to_file.return_value = False
+            init_controller.write_certificate('some_cert')
+
+        self.assertRegex(self.capture_stream.getvalue(), "Certificate written to")
+        mock_init_logic.write_certificate_to_file.assert_called_with('some_cert', '/root/conjur-server.pem', True)
+        self.assertEquals(mock_init_logic.write_certificate_to_file.call_count, 2)
+
+    '''
+    Validates that when the user wants to overwrite the conjurrc file,
+    We attempt to write the conjurrc twice (initial attempt 
+    and user after confirmation)
+    '''
+    # The conjurrc file exists and the CLI prompts
+    # if the user wants to overwrite
+    @patch('conjur.init.init_logic')
+    @patch('builtins.input', return_value='yes')
+    def test_user_confirms_force_overwrites_writes_conjurrc_to_file(self, mock_input, mock_init_logic):
+        with redirect_stdout(self.capture_stream):
+            self.conjurrc_data.appliance_url = "https://someurl"
+            init_controller = InitController(self.conjurrc_data, mock_init_logic, False)
+
+            # Mock that a conjurrc file already exists
+            mock_init_logic.write_conjurrc.return_value = False
+            init_controller.write_conjurrc()
+
+            self.assertRegex(self.capture_stream.getvalue(), "Configuration written to")
+            mock_init_logic.write_conjurrc.assert_called_with('/root/.conjurrc',self.conjurrc_data, True)
+            self.assertEquals(mock_init_logic.write_conjurrc.call_count, 2)

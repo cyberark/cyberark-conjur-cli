@@ -11,17 +11,29 @@ import socket
 from OpenSSL import SSL
 from OpenSSL.crypto import FILETYPE_PEM, dump_certificate
 
-DEFAULT_PORT = 443
-
+# pylint: disable=too-few-public-methods
 class SSLService:
     """
-    SSLHelper
+    SSLService
+
     This class is a service for connecting to the Conjur socket
     and fetching the certificate
-    ...
     """
-    @staticmethod
-    def connect(hostname, port):
+    @classmethod
+    def get_certificate(cls, hostname, port):
+        """
+        Method for connecting to Conjur to fetch the certificate chain
+        """
+        sock = cls.__connect(hostname, port)
+        chain = sock.get_peer_cert_chain()
+        fingerprint = chain[0].digest("sha1").decode("utf-8")
+        # pylint: disable=line-too-long
+        # Format the certificate chain to make it easier to later write to a file
+        readable_certificate = "".join([str(dump_certificate(FILETYPE_PEM, cert), "utf-8") for cert in chain])
+        return fingerprint, readable_certificate
+
+    @classmethod
+    def __connect(cls, hostname, port):
         """
         Method for opening a socket to the Conjur server
         """
@@ -30,27 +42,14 @@ class SSLService:
         # certificates and not use them to validate yet
         ctx.check_hostname = False
         ctx.verify_mode = False
-
+        # pylint: disable = line-too-long
+        # Taken from https://gist.github.com/brandond/f3d28734a40c49833176207b17a44786#file-sslscan-py-L17
         conjur_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conjur_sock = SSL.Connection(context=ctx, socket=conjur_sock)
         conjur_sock.connect((hostname, port))
         conjur_sock.do_handshake()
 
-        logging.debug(f"TLS Connection established. " \
-                     f"Fetching certificate from Conjur server")
+        logging.debug("TLS connection established. " \
+                      "Fetching certificate from Conjur server")
 
         return conjur_sock
-
-    def get_certificate(self, hostname, port):
-        """
-        Method for connecting to Conjur to fetch the certificate chain
-        """
-        sock = self.connect(hostname, port)
-        chain = sock.get_peer_cert_chain()
-        cert = chain[0]
-        fingerprint = cert.digest("sha1").decode("utf-8")
-        # pylint: disable=line-too-long
-        # Format the certificate chain to make it easier to later write to a file
-        readable_certificate = "".join([str(dump_certificate(FILETYPE_PEM, cert), "utf-8") for cert in chain])
-
-        return fingerprint, readable_certificate

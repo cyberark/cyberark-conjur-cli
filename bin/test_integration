@@ -34,6 +34,7 @@ cat <<ENV > .env
 CONJUR_AUTHN_API_KEY=$admin_api_key
 ENV
 
+echo "Starting test env..."
 sed -e "s#CONJUR_AUTHN_API_KEY#$CONJUR_AUTHN_API_KEY#g" "test/test_config/netrc.template" > .netrc
 docker-compose up -d test
 

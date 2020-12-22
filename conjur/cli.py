@@ -95,24 +95,26 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                         help='Initialize the Conjur configuration',
                                                         description=self.usage('conjur [global options] init [options] [args]'),
                                                         epilog=self.command_epilog('conjur init -a my_org -u https://localhost\t'
-                                                                                   'Initialize conjur configuration and write to file (.conjurrc)'),
+                                                                                   'Initializes Conjur configuration and writes to file (.conjurrc)'),
                                                         usage=argparse.SUPPRESS,
                                                         add_help=False,
                                                         formatter_class=formatter_class)
 
         init_options = init_subparser.add_argument_group(title=self.title("Options"))
         init_options.add_argument('-a', '--account',
-                                  nargs=1, action='store',
-                                  dest='account', help='Provide Conjur organization account name')
+                                  action='store', dest='name',
+                                  help='Provide Conjur account name ' \
+                                  '(obtained from Conjur server unless provided by this option)')
         init_options.add_argument('-c', '--certificate',
-                                  nargs=1, action='store',
-                                  dest='cert', help='Provide Conjur SSL certificate file location')
+                                  action='store', dest='certificate',
+                                  help='Provide Conjur SSL certificate file location' \
+                                  '(obtained from Conjur server unless provided by this option)')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Force overwrite of existing files')
         init_options.add_argument('-u', '--url',
-                                  nargs=1, action='store',
-                                  dest='url', help='Provide URL of Conjur server')
+                                  action='store', dest='url',
+                                  help='Provide URL of Conjur server')
         init_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
 
         # pylint: disable=line-too-long
@@ -204,11 +206,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         api class method with the specified parameters.
         """
         if resource == 'init':
-            client = Client
-            client.setup_logging(client, args.debug)
-            client.initialize(args.url,
-                              args.account,
-                              args.cert,
+            Client.setup_logging(Client, args.debug)
+            Client.initialize(args.url,
+                              args.name,
+                              args.certificate,
                               args.force)
 
             # A successful exit is required to prevent the initialization of

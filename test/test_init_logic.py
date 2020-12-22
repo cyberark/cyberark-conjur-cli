@@ -1,9 +1,10 @@
 import io
+import os
 import unittest
 
 from contextlib import redirect_stdout
 from unittest import mock
-from unittest.mock import patch, mock_open
+from unittest.mock import patch, mock_open, Mock
 
 from conjur.init.init_logic import InitLogic
 from conjur.init.conjurrc_data import ConjurrcData
@@ -34,32 +35,41 @@ class InitLogicTest(unittest.TestCase):
     '''
     @patch('builtins.input', return_value='yes')
     def test_certificate_is_written_to_file(self, mock_input):
-        with mock.patch.object(self.init_logic, '_InitLogic__overwrite_file_if_exists', create=True, return_value=None):
-            with patch("builtins.open", mock_open(read_data=MOCK_CERT)) as mock_file:
-                with redirect_stdout(self.capture_stream):
-                    self.init_logic.write_certificate_to_file(MOCK_CERT, "path/to/cert.pem", False)
+        with patch("builtins.open", mock_open(read_data=MOCK_CERT)):
+            is_written = self.init_logic.write_certificate_to_file(MOCK_CERT, "path/to/cert.pem", False)
+            assert is_written is True
+            assert open("path/to/cert").read() == MOCK_CERT
 
-                    assert open("path/to/cert").read() == MOCK_CERT
-                    self.assertEquals(self.capture_stream.getvalue().strip(), "Wrote certificate to path/to/cert.pem")
+    '''
+    Validates that when the user did not force the overwrite and the certificate 
+    already exists that the certificate is not overwritten
+    '''
+    @patch('os.path.exists')
+    def test_cert_exists_returns_not_written(self, mock_path_exists):
+        mock_path_exists.return_value=True
+        written = self.init_logic.write_certificate_to_file(MOCK_CERT, "/some/path/cert", False)
+        self.assertEquals(written, False)
+
+    '''
+    Validates that when the user did not force the overwrite and the conjurrc already exists
+    that the conjurrc is not written
+    '''
+    @patch('os.path.exists')
+    def test_conjurrc_exists_returns_not_written(self, mock_path_exists):
+        mock_path_exists.return_value=True
+        written = self.init_logic.write_conjurrc(MOCK_CERT, "/some/path/cert", False)
+        self.assertEquals(written, False)
+    test_conjurrc_exists_returns_not_written.tester=True
 
     '''
     Validates that conjurrc was written to the file
     '''
     def test_conjurrc_is_written(self):
-        with mock.patch.object(self.init_logic, '_InitLogic__overwrite_file_if_exists', create=True, return_value=None):
-            with patch("builtins.open", mock_open(read_data=EXPECTED_CONFIG)):
-                with redirect_stdout(self.capture_stream):
-                    self.init_logic.write_conjurrc("path/to/conjurrc", self.conjurrc_data, False)
-
-                    assert open("path/to/conjurrc").read() == EXPECTED_CONFIG
-                    self.assertRegex(self.capture_stream.getvalue().strip(), "Wrote configuration to path/to/conjurrc")
-
-    @patch('builtins.input', return_value='no')
-    @mock.patch('os.path.isfile')
-    def test_user_does_not_want_to_overwrite_raises_exception(self, mock_path, mock_input):
-        mock_path.return_value = True
-        with self.assertRaises(Exception):
-            self.init_logic._overwrite_file_if_exists("somefile", False)
+        with patch("builtins.open", mock_open(read_data=EXPECTED_CONFIG)):
+            is_written = self.init_logic.write_conjurrc("path/to/conjurrc", self.conjurrc_data, False)
+            # assert that the file was written
+            assert is_written is True
+            assert open("path/to/conjurrc").read() == EXPECTED_CONFIG
 
     '''
     Validates that the conjurrc was written in the proper format

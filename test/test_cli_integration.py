@@ -49,7 +49,7 @@ class CliIntegrationTestConfigurations(unittest.TestCase):
         os.system('rm /root/.conjurrc')
         self.setup_cli_params({})
         invoke_cli(self, self.cli_auth_params,
-            ['init', '--url', 'https://conjur-https', '--account', 'soemaccount'], exit_code=0)
+            ['init', '--url', 'https://conjur-https', '--account', 'someaccount'], exit_code=0)
 
         assert os.path.isfile("/root/.conjurrc")
 
@@ -58,9 +58,10 @@ class CliIntegrationTestConfigurations(unittest.TestCase):
     data is written properly to conjurrc 
     '''
     @integration_test
-    @patch('builtins.input', side_effect=['https://conjur-https', 'yes', 'someotheraccount', 'yes', 'yes'])
+    @patch('builtins.input', side_effect=['https://conjur-https', 'yes', 'someotheraccount'])
     def test_https_conjurrc_is_created_with_no_parameters_given(self, mock_input):
         os.system('rm /root/.conjurrc')
+        os.system('rm /root/conjur-server.pem')
         self.setup_cli_params({})
         invoke_cli(self, self.cli_auth_params,
             ['init'], exit_code=0)
