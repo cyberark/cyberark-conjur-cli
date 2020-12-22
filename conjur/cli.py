@@ -92,10 +92,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         resource_subparsers = parser.add_subparsers(dest='resource', title=self.title("Commands"))
 
         resource_subparsers.add_parser('whoami',
-                                       help='Provides information about the current logged-in user')
+        help='Provides information about the current logged-in user')
 
         resource_subparsers.add_parser('list',
-                                       help='List all available resources belonging to this account')
+        help='List all available resources belonging to this account')
 
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
@@ -168,9 +168,9 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         global_optional.add_argument('-c', '--ca-bundle')
         global_optional.add_argument('--insecure',
-                                     help='Skip verification of server certificate (not recommended)',
-                                     dest='ssl_verify',
-                                     action='store_false')
+         help='Skip verification of server certificate (not recommended)',
+         dest='ssl_verify',
+         action='store_false')
 
         # The external names for these are unfortunately named so we remap them
         global_optional.add_argument('-u', '--user', dest='login_id')
