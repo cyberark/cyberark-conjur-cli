@@ -99,19 +99,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
                                                          description=self.usage(
-                                                             'conjur [global options] variable <subcommand> [options] '
-                                                             '<VARIABLE_ID> <VALUE>'),
+                                                             'conjur [global options] variable <subcommand> '
+                                                             '[options] <VARIABLE_ID> <VALUE>'),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
-                                                         formatter_class=formatter_class
-                                                         # epilog=self.command_epilog('''conjur variable get
-                                                         # secrets/mysecret\tGets the value of variable
-                                                         # secrets/mysecret\nconjur variable get secrets/mysecret1
-                                                         # “secrets/my secret”\tGets the values of variables
-                                                         # secrets/mysecret1 and “secrets/my secret”\nconjur variable
-                                                         # set secrets/mysecret my_secret_value\tSets the value of
-                                                         # variable secrets/mysecret to my_secret_value''')
-                                                         )
+                                                         formatter_class=formatter_class)
 
         var_options = variable_parser.add_argument_group(title=self.title("Options"))
 
