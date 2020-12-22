@@ -13,7 +13,36 @@ RESOURCE_LIST = [
 WHOAMI_RESPONSE = {
     "account": "myaccount"
 }
+VAR_HELP = '''Usage:
+     conjur [global options] variable <subcommand> [options] <VARIABLE_ID> <VALUE>
 
+positional arguments:
+  {get,set}
+    get       Get the value of one or more variables
+    set       Set the value of a variable
+
+Options:
+  -h, --help  Display help list and exit
+'''
+
+VAR_GET_HELP = '''usage:  get [-h] variable_id [variable_id ...]
+
+positional arguments:
+  variable_id  ID of a variable
+
+optional arguments:
+  -h, --help   show this help message and exit
+'''
+
+VAR_SET_HELP = '''usage:  set [-h] variable_id value
+
+positional arguments:
+  variable_id  ID of the variable
+  value        New value of the variable
+
+optional arguments:
+  -h, --help   show this help message and exit
+'''
 class CliTest(unittest.TestCase):
     @cli_test()
     def test_cli_without_args_shows_help(self, cli_invocation, output, client):
@@ -122,6 +151,50 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     @cli_test(["variable"])
     def test_cli_variable_parser_doesnt_break_without_action(self, cli_invocation, output, client):
         self.assertIn("Usage", output)
+
+    @cli_test(["variable", "-h"])
+    def test_cli_variable_short_help(self, cli_invocation, output, client):
+        expected = VAR_HELP
+        self.assertEquals(expected, output)
+
+    @cli_test(["variable", "--help"])
+    def test_cli_variable_long_help(self, cli_invocation, output, client):
+        expected = VAR_HELP
+
+        self.assertEquals(expected, output)
+
+    '''TODO - more code is needed for this test to be enabled @cli_test(["variable", "test_var"]) 
+    def test_cli_invokes_variable_without_get_or_set(self, cli_invocation, output, client): expected = "conjur 
+    variable: error: argument action: invalid choice: 'test_var' (choose from 'get', 'set') \n"+ VAR_HELP 
+    self.assertEquals(expected, output) '''
+
+    @cli_test(["variable", "get", "-h"])
+    def test_cli_variable_get_help(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_GET_HELP)
+
+    @cli_test(["variable", "get", "--help"])
+    def test_cli_variable_get_help_long(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_GET_HELP)
+
+    '''TODO - more code is needed for this test to be enabled 
+    @cli_test(["variable", "get"])
+    def test_cli_variable_get_help_no_param(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_GET_HELP)
+    '''
+
+    @cli_test(["variable", "set", "-h"])
+    def test_cli_variable_set_help(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_SET_HELP)
+
+    @cli_test(["variable", "set", "--help"])
+    def test_cli_variable_set_help_long(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_SET_HELP)
+
+    '''TODO - more code is needed for this test to be enabled 
+    @cli_test(["variable", "set"])
+    def test_cli_variable_set_help_no_param(self, cli_invocation, output, client):
+        self.assertEquals(output, VAR_SET_HELP)
+    '''
 
     @cli_test(["variable", "get", "foo"])
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
