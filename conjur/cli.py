@@ -120,18 +120,17 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_subparsers = variable_parser.add_subparsers(dest='action')
 
         get_variable_parser = variable_subparsers.add_parser('get',
-                                                             help='Get the value'
-                                                                  ' of one or more variables')
+        help='Get the value of one or more variables')
         set_variable_parser = variable_subparsers.add_parser('set',
-                                                             help='Set the value of a variable')
+        help='Set the value of a variable')
 
         get_variable_parser.add_argument('variable_id',
-                                         help='ID of a variable', nargs='+')
+        help='ID of a variable', nargs='+')
 
         set_variable_parser.add_argument('variable_id',
-                                         help='ID of the variable')
+        help='ID of the variable')
         set_variable_parser.add_argument('value',
-                                         help='New value of the variable')
+        help='New value of the variable')
 
         policy_parser = resource_subparsers.add_parser('policy',
                                                        help='Manage policies')
