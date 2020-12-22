@@ -28,9 +28,9 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
 
     HTTPS_CA_BUNDLE_ENV_VAR = {'CONJUR_CA_BUNDLE': 'ca-bundle'}
 
-    DEFINED_VARIABLE_ID = 'one/password'
-    DEFINED_VARIABLE2 = 'two/username'
-    DEFINED_VARIABLE3 = 'three/secret'
+    DEFINED_VARIABLE_ONE = 'one/password'
+    DEFINED_VARIABLE_TWO = 'two/username'
+    DEFINED_VARIABLE_THREE = 'three/secret'
     DEFINED_VARIABLE_SPECIAL_ID = '_!@#$%^&*'
 
     # *************** HELPERS ***************
@@ -108,14 +108,14 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
 
         return output
 
-    def get_variable(self, variable_ids):
+    def get_variable(self, *variable_ids):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'get', *variable_ids])
 
     def assert_set_and_get(self, variable_id):
         expected_value = uuid.uuid4().hex
         self.set_variable(variable_id, expected_value)
-        output = self.get_variable([variable_id])
+        output = self.get_variable(variable_id)
 
         self.assertEquals(expected_value, output)
 
@@ -142,14 +142,14 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
         variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
 
         policy = \
-            """
-            - !variable
-              id: {variable_1}
-            - !variable
-              id: {variable_2}
-            - !variable
-              id: {variable_3}
-            """
+        """
+        - !variable
+          id: {variable_1}
+        - !variable
+          id: {variable_2}
+        - !variable
+          id: {variable_3}
+        """
 
         dynamic_policy = policy.format(variable_1=variable_1,
                                        variable_2=variable_2,
@@ -161,13 +161,13 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
     @integration_test
     def test_http_cli_can_set_and_get_a_defined_variable(self):
         self.setup_cli_params(self.HTTP_ENV_VARS)
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # "!@#$%asdfgh&*()g,lpokmnjiub")
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE3, "1")
-        output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_TWO, "r")  # "!@#$%asdfgh&*()g,lpokmnjiub")
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_THREE, "1")
+        output = self.get_variable(*[CliIntegrationTest.DEFINED_VARIABLE_TWO, CliIntegrationTest.DEFINED_VARIABLE_THREE])
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ONE)
         self.assert_json_equals(output,
-                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" +
-                                CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
+                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE_TWO + "\": \"r\", \"" +
+                                CliIntegrationTest.DEFINED_VARIABLE_THREE + "\": \"1\" }")
 
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable(self):
@@ -176,12 +176,14 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
             **self.HTTPS_CA_BUNDLE_ENV_VAR
         })
 
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE2, "r")  # TODO: value should be special chars and it fails "!@#$%asdfgh&*()g,lpokmnjiub")
-        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE3, "1")
-        output = self.get_variable([CliIntegrationTest.DEFINED_VARIABLE2, CliIntegrationTest.DEFINED_VARIABLE3])
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_TWO, "r")  # TODO: value should be special chars and it fails "!@#$%asdfgh&*()g,lpokmnjiub")
+        self.set_variable(CliIntegrationTest.DEFINED_VARIABLE_THREE, "1")
+        variables = [CliIntegrationTest.DEFINED_VARIABLE_TWO, CliIntegrationTest.DEFINED_VARIABLE_THREE]
+        output = self.get_variable(*variables)
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ONE)
         self.assert_json_equals(output,
-                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE2 + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE3 + "\": \"1\" }")
+                                "{ \"" + CliIntegrationTest.DEFINED_VARIABLE_TWO + "\": \"r\", \"" + CliIntegrationTest.DEFINED_VARIABLE_THREE + "\": \"1\" }")
+
 
     @integration_test
     def test_https_cli_can_batch_get_multiple_variables(self):
@@ -238,17 +240,17 @@ This test does not pass need fixing
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS, '--insecure')
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
+        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ONE)
 
     @integration_test
     def test_https_cli_fails_if_cert_is_bad(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS, '--ca-bundle', './test/test_config/https/nginx.conf')
-        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ID, requests.exceptions.SSLError)
+        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ONE, requests.exceptions.SSLError)
 
     @integration_test
     def test_https_cli_fails_if_cert_is_not_provided(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS)
-        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ID, requests.exceptions.SSLError)
+        self.assert_variable_set_fails(CliIntegrationTest.DEFINED_VARIABLE_ONE, requests.exceptions.SSLError)
 
     @integration_test
     def test_https_cli_can_batch_get_multiple_variables(self):
@@ -270,7 +272,7 @@ This test does not pass need fixing
             self.set_variable(variable, value)
             value_map[variable] = value
 
-        batch_result_string = self.get_variable(variables)
+        batch_result_string = self.get_variable(*variables)
         batch_result = json.loads(batch_result_string)
 
         for variable_name, variable_value in value_map.items():
