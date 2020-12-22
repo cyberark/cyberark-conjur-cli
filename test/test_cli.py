@@ -163,11 +163,6 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         self.assertEquals(expected, output)
 
-    '''TODO - more code is needed for this test to be enabled @cli_test(["variable", "test_var"]) 
-    def test_cli_invokes_variable_without_get_or_set(self, cli_invocation, output, client): expected = "conjur 
-    variable: error: argument action: invalid choice: 'test_var' (choose from 'get', 'set') \n"+ VAR_HELP 
-    self.assertEquals(expected, output) '''
-
     @cli_test(["variable", "get", "-h"])
     def test_cli_variable_get_help(self, cli_invocation, output, client):
         self.assertEquals(output, VAR_GET_HELP)
@@ -176,12 +171,6 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     def test_cli_variable_get_help_long(self, cli_invocation, output, client):
         self.assertEquals(output, VAR_GET_HELP)
 
-    '''TODO - more code is needed for this test to be enabled 
-    @cli_test(["variable", "get"])
-    def test_cli_variable_get_help_no_param(self, cli_invocation, output, client):
-        self.assertEquals(output, VAR_GET_HELP)
-    '''
-
     @cli_test(["variable", "set", "-h"])
     def test_cli_variable_set_help(self, cli_invocation, output, client):
         self.assertEquals(output, VAR_SET_HELP)
@@ -189,12 +178,6 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     @cli_test(["variable", "set", "--help"])
     def test_cli_variable_set_help_long(self, cli_invocation, output, client):
         self.assertEquals(output, VAR_SET_HELP)
-
-    '''TODO - more code is needed for this test to be enabled 
-    @cli_test(["variable", "set"])
-    def test_cli_variable_set_help_no_param(self, cli_invocation, output, client):
-        self.assertEquals(output, VAR_SET_HELP)
-    '''
 
     @cli_test(["variable", "get", "foo"])
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):

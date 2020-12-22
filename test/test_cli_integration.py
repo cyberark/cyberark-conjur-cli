@@ -220,23 +220,6 @@ class CliIntegrationTest(unittest.TestCase):  # pragma: no cover
 
         self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_SPECIAL_ID)
 
-    '''Given you have executable python file
-and run conjur init and authn login and policy load successful (with right parameters)
-When run conjur variable get var_not_exists
-Then you will get value not found 404 with error message
-
-This test does not pass need fixing
-    @integration_test
-    def test_variable_not_exists(self):
-        self.setup_cli_params({
-            **self.HTTPS_ENV_VARS,
-            **self.HTTPS_CA_BUNDLE_ENV_VAR
-        })
-        output = self.get_variable("no_such_id")
-        print("ooo=" + output)
-        #self.assertIn()
-    '''
-
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
         self.setup_cli_params(self.HTTPS_ENV_VARS, '--insecure')
