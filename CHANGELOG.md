@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+- Method `init` to initialize the CLI with the Conjur server is now available in both CLI and API
+  [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
+
 ### Changed
 - Update version from 0.x.x to 7.0.0 to prep for the GA release
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).

@@ -24,9 +24,14 @@ class ConfigException(Exception):
     ConfigException
 
     This class is used to wrap a regular exception with a more-descriptive class name
+
+    *************** DEVELOPER NOTE ***************
+    For backwards capability purposes, do not change or remove existing
+    functionality in this class, specifically the constructor. Although via
+    the CLI we do not support commandline arguments, other developers
+    use these parameters defined in this class to initialize our
+    Python SDK in their code.
     """
-
-
 class Client():
     """
     Client
@@ -77,7 +82,8 @@ class Client():
                 loaded_config = on_disk_config
 
             except Exception as exc:
-                raise ConfigException(f"Error: {exc} not found in the loaded conjurrc") from Exception
+                raise ConfigException(f"Error: {exc} not found in \
+                the loaded conjurrc") from Exception
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
@@ -114,6 +120,8 @@ class Client():
         else:
             logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT)
 
+    # Technical debt: refactor when time permits because this function
+    # doesn't belong here
     @staticmethod
     def initialize(url, account, cert, force):
         """
@@ -124,6 +132,7 @@ class Client():
         conjurrc_data = ConjurrcData(url,
                                      account,
                                      cert)
+
         init_logic = InitLogic(ssl_service)
 
         input_controller = InitController(conjurrc_data,

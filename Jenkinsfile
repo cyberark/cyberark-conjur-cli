@@ -30,10 +30,11 @@ pipeline {
         sh './bin/test_unit'
       }
 
+      // We don't want to fail an unstable build because if we do so, Cobertura will not generate a full line coverage scan report
       post {
         always {
           junit 'output/**/*.xml'
-          cobertura autoUpdateHealth: false, autoUpdateStability: true, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '75, 0, 75', failUnhealthy: true, failUnstable: true, lineCoverageTargets: '55, 0, 55', maxNumberOfBuilds: 0, methodCoverageTargets: '75, 0, 75', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+          cobertura autoUpdateHealth: false, autoUpdateStability: true, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '75, 0, 75', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '75, 0, 75', maxNumberOfBuilds: 0, methodCoverageTargets: '75, 0, 75', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
           ccCoverage("coverage.py")
         }
       }

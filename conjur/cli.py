@@ -102,17 +102,18 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         init_options = init_subparser.add_argument_group(title=self.title("Options"))
         init_options.add_argument('-a', '--account',
-                                  nargs=1, action='store',
-                                  dest='account', help='Provide Conjur organization account name')
+                                  action='store', dest='account',
+                                  help='Provide Conjur organization account name ' \
+                                  '(obtained from server unless provided by this option)')
         init_options.add_argument('-c', '--certificate',
-                                  nargs=1, action='store',
-                                  dest='cert', help='Provide Conjur SSL certificate file location')
+                                  action='store', dest='cert',
+                                  help='Provide Conjur SSL certificate file location')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Force overwrite of existing files')
         init_options.add_argument('-u', '--url',
-                                  nargs=1, action='store',
-                                  dest='url', help='Provide URL of Conjur server')
+                                  action='store', dest='url',
+                                  help='Provide URL of Conjur server')
         init_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
 
         # pylint: disable=line-too-long
@@ -204,9 +205,8 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         api class method with the specified parameters.
         """
         if resource == 'init':
-            client = Client
-            client.setup_logging(client, args.debug)
-            client.initialize(args.url,
+            Client.setup_logging(Client, args.debug)
+            Client.initialize(args.url,
                               args.account,
                               args.cert,
                               args.force)
