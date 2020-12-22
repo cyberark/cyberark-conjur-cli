@@ -97,22 +97,23 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             help='List all available resources belonging to this account')
 
         variable_parser = resource_subparsers.add_parser('variable',
-                                                         help='Manage variables',
-                                                         description=self.usage(
-                                                             'conjur '
-                                                             '[global options] '
-                                                             'variable '
-                                                             '<subcommand> '
-                                                             '[options] '
-                                                             '<VARIABLE_ID> '
-                                                             '<VALUE>'),
-                                                         usage=argparse.SUPPRESS,
-                                                         add_help=False,
-                                                         formatter_class=formatter_class)
+                                             help='Manage variables',
+                                             description=self.usage(
+                                                 'conjur '
+                                                 '[global options] '
+                                                 'variable '
+                                                 '<subcommand> '
+                                                 '[options] '
+                                                 '<VARIABLE_ID> '
+                                                 '<VALUE>'),
+                                                 usage=argparse.SUPPRESS,
+                                                 add_help=False,
+                                                 formatter_class=formatter_class)
 
         var_options = variable_parser.add_argument_group(title=self.title("Options"))
 
-        var_options.add_argument('-h', '--help', action='help', help='Display help list and exit')
+        var_options.add_argument('-h', '--help', action='help',
+                                 help='Display help list and exit')
         # TODO: missing Example section in help
 
         variable_subparsers = variable_parser.add_subparsers(dest='action')
