@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from .util.cli_helpers import cli_arg_test, cli_test
-
+from .util.cli_helpers import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
 
@@ -55,66 +54,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 ''')
 
-    # Optional params
-
-    # Account
-    @cli_arg_test(["-a", "myaccount"], account='myaccount')
-    def test_cli_passes_account_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--account", "myaccount"], account='myaccount')
-    def test_cli_passes_account_long_flag_to_client(self): pass
-
-    # API key
-    @cli_arg_test(["-k", "myapikey"], api_key='myapikey')
-    def test_cli_passes_api_key_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--api-key", "myapikey"], api_key='myapikey')
-    def test_cli_passes_api_key_long_flag_to_client(self): pass
-
-    # CA Bundle
-    @cli_arg_test(["-c", "mycabundle"], ca_bundle='mycabundle')
-    def test_cli_passes_ca_bundle_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--ca-bundle", "mycabundle"], ca_bundle='mycabundle')
-    def test_cli_passes_ca_bundle_long_flag_to_client(self): pass
-
-    # Debug
-    @cli_arg_test(["-d"], debug=True)
-    def test_cli_passes_debug_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--debug"], debug=True)
-    def test_cli_passes_debug_long_flag_to_client(self): pass
-
-    @cli_arg_test(["--verbose"], debug=True)
-    def test_cli_passes_verbose_as_the_debug_long_flag_to_client(self): pass
-
-    # User
-    @cli_arg_test(["-u", "myuser"], login_id='myuser')
-    def test_cli_passes_login_id_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--user", "myuser"], login_id='myuser')
-    def test_cli_passes_login_id_long_flag_to_client(self): pass
-
-    # Password
-    @cli_arg_test(["-p", "mypassword"], password='mypassword')
-    def test_cli_passes_password_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--password", "mypassword"], password='mypassword')
-    def test_cli_passes_password_long_flag_to_client(self): pass
-
     # SSL Verify
     @cli_arg_test(["--insecure"], ssl_verify=False)
     def test_cli_passes_insecure_flag_to_client(self): pass
 
-    # URL
-    @cli_arg_test(["-l", "myurl"], url='myurl')
-    def test_cli_passes_url_short_flag_to_client(self): pass
-
-    @cli_arg_test(["--url", "myurl"], url='myurl')
-    def test_cli_passes_url_long_flag_to_client(self): pass
-
     # Main method invocations
-
     @cli_test(["variable", "set", "foo", "bar"])
     def test_cli_invokes_variable_set_correctly(self, cli_invocation, output, client):
         client.set.assert_called_once_with('foo', 'bar')

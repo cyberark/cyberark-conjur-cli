@@ -10,6 +10,10 @@ class EndpointsTest(unittest.TestCase):
                                                                  login='mylogin')
         self.assertEqual(auth_endpoint, 'http://host/authn/myacct/mylogin/authenticate')
 
+    def test_endpoint_has_correct_info_template_string(self):
+        info_endpoint = ConjurEndpoint.INFO.value.format(url='https://host')
+        self.assertEqual(info_endpoint, 'https://host/info')
+
     def test_endpoint_has_correct_login_template_string(self):
         auth_endpoint = ConjurEndpoint.LOGIN.value.format(url='http://host',
                                                           account='myacct')

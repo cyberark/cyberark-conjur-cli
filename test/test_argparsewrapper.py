@@ -1,9 +1,12 @@
 # Builtins
 import io
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 
-#Internals
+# Internals
+from unittest import mock
+from unittest.mock import patch
+
 from conjur.argparse_wrapper import ArgparseWrapper
 
 class ArgparserWrapperTest(unittest.TestCase):
@@ -33,7 +36,7 @@ class ArgparserWrapperTest(unittest.TestCase):
     '''
     def test_no_flag_returns_namespace(self):
         with redirect_stderr(self.capture_stream):
-            output=self.arg_parse.parse_args(['testCommand'])
+            output = self.arg_parse.parse_args(['testCommand'])
 
         self.assertIn("Namespace(action=None, resource='testCommand')", str(output))
 
@@ -43,7 +46,7 @@ class ArgparserWrapperTest(unittest.TestCase):
     '''
     def test_no_flag_returns_prints_command_help(self):
         with redirect_stderr(self.capture_stream):
-            output=self.arg_parse.parse_args([])
+            output = self.arg_parse.parse_args([])
 
         self.assertIn("Namespace(resource=None)", str(output))
 
@@ -65,7 +68,8 @@ class ArgparserWrapperTest(unittest.TestCase):
     def test_action_with_unknown_flag_returns_prints_error(self):
         with self.assertRaises(SystemExit):
             with redirect_stderr(self.capture_stream):
-                self.arg_parse.parse_args(["testCommand", "--unknown"])
+                with patch.object(self.arg_parse, '_get_resource_namespace', return_value=None):
+                    self.arg_parse.parse_args(["testCommand", "--unknown"])
 
         self.assertRegex(self.capture_stream.getvalue(), "Error unrecognized arguments: --unknown")
 
@@ -88,3 +92,16 @@ class ArgparserWrapperTest(unittest.TestCase):
         output = self.arg_parse.parse_args(["testCommand", "subCommand"])
 
         self.assertEquals(str(output), "Namespace(action='subCommand', resource='testCommand')")
+
+    def test_no_resource_namespace(self):
+        with patch.object(self.arg_parse, '_get_resource_namespace', return_value=None):
+            assert self.arg_parse._get_resource_namespace('will return None') == None
+
+    '''
+    Subcommand error will write and exit
+    '''
+    def test_subcommand_prints_and_exits(self):
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(self.capture_stream):
+                self.arg_parse._subcommand_error("oops!", "Usage:")
+            self.assertRegex(self.capture_stream.getvalue(), "Error oops!")

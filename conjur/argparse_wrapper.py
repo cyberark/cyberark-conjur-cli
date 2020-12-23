@@ -40,6 +40,11 @@ class ArgparseWrapper(argparse.ArgumentParser):
         sys.stderr.write(f"{help_screen}\n")
         sys.exit(1)
 
+    # pylint: disable=protected-access
+    # Returns the namespace for the specific resource inputted by the user
+    def _get_resource_namespace(self, resource):
+        return self._subparsers._actions[0].choices.get(resource)
+
     # pylint: disable=arguments-differ
     def parse_args(self, args=None, namespace=None, resource=None):
         args, arg_flags = self.parse_known_args(args, namespace)
@@ -50,8 +55,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
                 self.error(err_msg)
 
             # pylint: disable=protected-access
-            # Get the namespace of the particular resource
-            resource_namespace = self._subparsers._actions[0].choices.get(resource)
+            resource_namespace = self._get_resource_namespace(resource)
             if not resource_namespace:
                 self.error(err_msg)
             # Return the help for the specific resource

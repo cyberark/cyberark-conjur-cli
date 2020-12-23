@@ -11,11 +11,10 @@ module where only the minimal invocation configuration is required.
 import argparse
 import json
 import logging
-import os
 import sys
 
 # Third party
-import requests
+import traceback
 
 # Internals
 from conjur.argparse_wrapper import ArgparseWrapper
@@ -28,14 +27,15 @@ class Cli():
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
     """
+    LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
     @staticmethod
-    def main_description():
+    def usage(*args):
         """
         This method builds the header for the main screen.
         """
         return '''Usage:
-  conjur [global options] command [subcommand] [value] [--option=arg]'''
+  {}'''.format(*args)
 
     @staticmethod
     def main_epilog():
@@ -45,6 +45,14 @@ class Cli():
         return '''
 To get help on a specific command, see `conjur <command> -h`
 '''
+
+    @staticmethod
+    def command_epilog(*args):
+        """
+        This method builds the footer for each command help screen.
+        """
+        return '''Example:
+    {}'''.format(*args)
 
     @staticmethod
     def title(title):
@@ -69,62 +77,94 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
         """
-        parser = ArgparseWrapper(description=self.main_description(),
+        formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog,
+                                                                     max_help_position=60,
+                                                                     width=60)
+        # pylint: disable=line-too-long
+        parser = ArgparseWrapper(description=self.usage('conjur [global options] <command> <subcommand> [options] [args]'),
                                  epilog=self.main_epilog(),
                                  usage=argparse.SUPPRESS,
                                  add_help=False,
-                                 formatter_class=argparse.RawTextHelpFormatter)
+                                 formatter_class=formatter_class)
 
         global_optional = parser.add_argument_group("Global options")
         resource_subparsers = parser.add_subparsers(dest='resource', title=self.title("Commands"))
 
-        resource_subparsers.add_parser('whoami',
-            help='Provides information about the current logged-in user')
+        # pylint: disable=line-too-long
+        init_subparser = resource_subparsers.add_parser('init',
+                                                        help='Initialize the Conjur configuration',
+                                                        description=self.usage('conjur [global options] init [options] [args]'),
+                                                        epilog=self.command_epilog('conjur init -a my_org -u https://localhost\t'
+                                                                                   'Initializes Conjur configuration and writes to file (.conjurrc)'),
+                                                        usage=argparse.SUPPRESS,
+                                                        add_help=False,
+                                                        formatter_class=formatter_class)
 
+        init_options = init_subparser.add_argument_group(title=self.title("Options"))
+        init_options.add_argument('-a', '--account',
+                                  action='store', dest='name',
+                                  help='Provide Conjur account name ' \
+                                  '(obtained from Conjur server unless provided by this option)')
+        init_options.add_argument('-c', '--certificate',
+                                  action='store', dest='certificate',
+                                  help='Provide Conjur SSL certificate file location' \
+                                  '(obtained from Conjur server unless provided by this option)')
+        init_options.add_argument('--force',
+                                  action='store_true',
+                                  dest='force', help='Force overwrite of existing files')
+        init_options.add_argument('-u', '--url',
+                                  action='store', dest='url',
+                                  help='Provide URL of Conjur server')
+        init_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
+
+        # pylint: disable=line-too-long
         resource_subparsers.add_parser('list',
-            help='List all available resources belonging to this account')
-
-        variable_parser = resource_subparsers.add_parser('variable',
-            help='Manage variables')
-        variable_subparsers = variable_parser.add_subparsers(dest='action')
-
-        get_variable_parser = variable_subparsers.add_parser('get',
-            help='Get the value of a variable')
-        set_variable_parser = variable_subparsers.add_parser('set',
-            help='Set the value of a variable')
-
-        get_variable_parser.add_argument('variable_id',
-            help='ID of a variable', nargs='+')
-
-        set_variable_parser.add_argument('variable_id',
-            help='ID of the variable')
-        set_variable_parser.add_argument('value',
-            help='New value of the variable')
+                                       help='List all available resources belonging to this account')
 
         policy_parser = resource_subparsers.add_parser('policy',
-            help='Manage policies')
+                                                       help='Manage policies')
         policy_subparsers = policy_parser.add_subparsers(dest='action')
 
         apply_policy_parser = policy_subparsers.add_parser('apply',
-            help='Apply a policy file')
+                                                           help='Apply a policy file')
         apply_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                         help='Name of the policy (usually "root")')
         apply_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                         help='File containing the YAML policy')
 
         replace_policy_parser = policy_subparsers.add_parser('replace',
-            help='Replace a policy file')
+                                                             help='Replace a policy file')
         replace_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                           help='Name of the policy (usually "root")')
         replace_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                           help='File containing the YAML policy')
 
         delete_policy_parser = policy_subparsers.add_parser('delete',
-            help='Delete a policy file')
+                                                            help='Delete a policy file')
         delete_policy_parser.add_argument('name',
-            help='Name of the policy (usually "root")')
+                                          help='Name of the policy (usually "root")')
         delete_policy_parser.add_argument('policy',
-            help='File containing the YAML policy')
+                                          help='File containing the YAML policy')
+
+        variable_parser = resource_subparsers.add_parser('variable',
+                                                         help='Manage variables',
+                                                         formatter_class=formatter_class)
+        variable_subparsers = variable_parser.add_subparsers(dest='action')
+        get_variable_parser = variable_subparsers.add_parser('get',
+                                                             help='Get the value of a variable')
+        set_variable_parser = variable_subparsers.add_parser('set',
+                                                             help='Set the value of a variable')
+
+        get_variable_parser.add_argument('variable_id',
+                                         help='ID of a variable', nargs='+')
+
+        set_variable_parser.add_argument('variable_id',
+                                         help='ID of the variable')
+        set_variable_parser.add_argument('value',
+                                         help='New value of the variable')
+        # pylint: disable=line-too-long
+        resource_subparsers.add_parser('whoami',
+                                       help='Provides information about the current logged-in user')
 
         global_optional.add_argument('-h', '--help', action='help', help="Display help list")
         global_optional.add_argument('-v', '--version', action='version',
@@ -132,47 +172,31 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                      version='Conjur CLI version ' + __version__ + "\n"
                                              + self.copyright())
 
-        global_optional.add_argument('-l', '--url')
-        global_optional.add_argument('-a', '--account')
-
-        global_optional.add_argument('-c', '--ca-bundle')
-        global_optional.add_argument('--insecure',
-            help='Skip verification of server certificate (not recommended)',
-            dest='ssl_verify',
-            action='store_false')
-
-        # The external names for these are unfortunately named so we remap them
-        global_optional.add_argument('-u', '--user', dest='login_id')
-        global_optional.add_argument('-k', '--api-key')
-        global_optional.add_argument('-p', '--password')
-
         global_optional.add_argument('-d', '--debug',
-            help='Enable debugging output',
-            action='store_true')
+                                     help='Enable debugging output',
+                                     action='store_true')
 
-        global_optional.add_argument('--verbose',
-            help='Enable verbose debugging output',
-            action='store_true')
-
+        global_optional.add_argument('--insecure',
+                                     help='Skip verification of server certificate (not recommended for production)',
+                                     dest='ssl_verify',
+                                     action='store_false')
 
         resource, args = Cli._parse_args(parser)
 
-        # We don't have a good "debug" vs "verbose" separation right now
-        if args.verbose is True:
-            args.debug = True
-
         # TODO Add tests for exception handling logic
+        # pylint: disable=broad-except
         try:
             Cli.run_client_action(resource, args)
         except FileNotFoundError as not_found_error:
+            logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
-            logging.info('Error: No such file or directory: %s', not_found_error.filename)
             sys.exit(1)
-        except requests.exceptions.HTTPError as http_error:
-            sys.stdout.write(str(http_error))
-            logging.info(str(http_error))
+        except Exception as error:
+            logging.debug(traceback.format_exc())
+            sys.stdout.write(str(error))
             sys.exit(1)
         else:
+            # Explicit exit (required for tests)
             sys.exit(0)
 
     @staticmethod
@@ -181,21 +205,18 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
         """
+        if resource == 'init':
+            Client.setup_logging(Client, args.debug)
+            Client.initialize(args.url,
+                              args.name,
+                              args.certificate,
+                              args.force)
 
-        ca_bundle = None
-        if args.ca_bundle:
-            ca_bundle = os.path.expanduser(args.ca_bundle)
+            # A successful exit is required to prevent the initialization of
+            # the Client because the init command does not require the Client
+            sys.exit(0)
 
-        # We want explicit definition of things to pass into the client
-        # to avoid ambiguity
-        client = Client(url=args.url,
-                        account=args.account,
-                        api_key=args.api_key,
-                        login_id=args.login_id,
-                        password=args.password,
-                        ssl_verify=args.ssl_verify,
-                        ca_bundle=ca_bundle,
-                        debug=args.debug)
+        client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
             result = client.list()
@@ -234,9 +255,8 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             parser.print_help()
             sys.exit(0)
 
-        # Check whether we are running a command with required additional
-        # arguments and if so, validate that those additional arguments are present
-        if args.resource not in ['list', 'whoami']:
+        # Check whether we are running a command with required additional arguments/options
+        if args.resource not in ['list', 'whoami', 'init']:
             if 'action' not in args or not args.action:
                 parser.print_help()
                 sys.exit(0)

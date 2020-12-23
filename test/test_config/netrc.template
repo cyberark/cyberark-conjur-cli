@@ -1,0 +1,3 @@
+machine https://conjur-https/authn
+  login admin
+  password CONJUR_AUTHN_API_KEY

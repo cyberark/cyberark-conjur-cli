@@ -9,13 +9,15 @@ variables needed for the API to be used with minimal effort
 
 import logging
 import netrc
-import os.path
 
 from yaml import load, dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:
     from yaml import Loader, Dumper
+
+# Internals
+import conjur.constants
 
 NETRC_HOST_URL = "{url}/authn"
 
@@ -24,9 +26,6 @@ class Config():
     Used for handling setting and parsing of various configuration
     settings required for the API to connect to the Conjur instance.
     """
-
-    DEFAULT_CONFIG_FILE = os.path.expanduser(os.path.join('~', '.conjurrc'))
-    DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', '.netrc'))
 
     # We intentionally remap some fields to friendlier names
     # Conjurrc field / Config name / Mandatory
@@ -39,7 +38,10 @@ class Config():
 
     _config = {}
 
-    def __init__(self, config_file=DEFAULT_CONFIG_FILE, netrc_file=DEFAULT_NETRC_FILE):
+    def __init__(self,
+                 config_file=conjur.constants.DEFAULT_CONFIG_FILE,
+                 netrc_file=conjur.constants.DEFAULT_NETRC_FILE):
+
         logging.info("Trying to get configuration from filesystem (%s)...", config_file)
 
         config = None
@@ -52,7 +54,6 @@ class Config():
 
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
-
         logging.info("Trying to get API key from netrc...")
         netrc_obj = netrc.netrc(netrc_file)
         netrc_host_url = NETRC_HOST_URL.format(**self._config)

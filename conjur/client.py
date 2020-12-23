@@ -7,10 +7,16 @@ This module is used to setup an API client that will be used fo interactions wit
 the Conjur server
 """
 
+# Builtins
 import logging
 
-from .api import Api
-from .config import Config as ApiConfig
+# Internals
+from conjur.api import Api
+from conjur.config import Config as ApiConfig
+from conjur.init.init_controller import InitController
+from conjur.init.init_logic import InitLogic
+from conjur.init.conjurrc_data import ConjurrcData
+from conjur.ssl_service import SSLService
 
 
 class ConfigException(Exception):
@@ -18,26 +24,29 @@ class ConfigException(Exception):
     ConfigException
 
     This class is used to wrap a regular exception with a more-descriptive class name
+
+    *************** DEVELOPER NOTE ***************
+    For backwards capability purposes, do not change or remove existing
+    functionality in this class, specifically the constructor. Although via
+    the CLI we do not support commandline arguments, other developers
+    use these parameters defined in this class to initialize our
+    Python SDK in their code.
     """
-
-
 class Client():
     """
     Client
 
     This class is used to construct a client for API interaction
     """
-
     _api = None
     _login_id = None
     _api_key = None
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-
     # The method signature is long but we want to explicitly control
-    # what paramteres are allowed
-    #pylint: disable=too-many-arguments,too-many-locals
+    # what parameters are allowed
+    # pylint: disable=too-many-arguments,too-many-locals
     def __init__(self,
                  account=None,
                  api_key=None,
@@ -49,38 +58,37 @@ class Client():
                  ssl_verify=True,
                  url=None):
 
-        self._setup_logging(debug)
+        self.setup_logging(debug)
 
         logging.info("Initializing configuration...")
 
         self._login_id = login_id
 
-        config = {
+        loaded_config = {
             'url': url,
             'account': account,
             'ca_bundle': ca_bundle,
         }
-
         if not url or not login_id or (not password and not api_key):
-            logging.info("Not all expected variables were provided. " \
-                "Using conjurrc as credential store...")
+            logging.info("Using conjurrc as credential store...")
             try:
                 on_disk_config = dict(ApiConfig())
 
                 # We want to retain any overrides that the user provided from params
                 # but only if those values are valid
-                for field_name, field_value in config.items():
+                for field_name, field_value in loaded_config.items():
                     if field_value:
                         on_disk_config[field_name] = field_value
-                config = on_disk_config
+                loaded_config = on_disk_config
 
             except Exception as exc:
-                raise ConfigException(exc) from Exception
+                raise ConfigException(f"Error: {exc} not found in \
+                the loaded conjurrc") from Exception
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
-        if config['account'] is None:
-            config['account'] = "default"
+        if loaded_config['account'] is None:
+            loaded_config['account'] = "default"
 
         if api_key:
             logging.info("Using API key from parameters...")
@@ -88,26 +96,49 @@ class Client():
                             http_debug=http_debug,
                             login_id=login_id,
                             ssl_verify=ssl_verify,
-                            **config)
+                            **loaded_config)
         elif password:
             logging.info("Creating API key with login ID/password combo...")
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
-                            **config)
+                            **loaded_config)
             self._api.login(login_id, password)
         else:
             logging.info("Using API key with netrc credentials...")
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
-                            **config)
+                            **loaded_config)
 
         logging.info("Client initialized")
 
-    def _setup_logging(self, debug):
+    def setup_logging(self, debug):
+        """
+        Configures the logging for the client
+        """
         if debug:
             logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
         else:
-            logging.basicConfig(level=logging.WARNING, format=self.LOGGING_FORMAT)
+            logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT)
+
+    # Technical debt: refactor when time permits because this function
+    # doesn't belong here
+    @staticmethod
+    def initialize(url, account, cert, force):
+        """
+        Initializes the client, creating the .conjurrc file
+        """
+        ssl_service = SSLService()
+
+        conjurrc_data = ConjurrcData(url,
+                                     account,
+                                     cert)
+
+        init_logic = InitLogic(ssl_service)
+
+        input_controller = InitController(conjurrc_data,
+                                          init_logic,
+                                          force)
+        input_controller.load()
 
     ### API passthrough
 

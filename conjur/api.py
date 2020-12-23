@@ -5,12 +5,14 @@ API module
 
 Provides high-level interface for programmatic API interactions
 """
-
+# Builtins
 import json
 import logging
 
+# Third party
 from datetime import datetime, timedelta
 
+# Internals
 from .endpoints import ConjurEndpoint
 from .http import HttpVerb, invoke_endpoint
 
@@ -90,6 +92,7 @@ class Api():
             logging.info("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
             self._api_token = self.authenticate()
+
             return self._api_token
 
         logging.info("Using cached API token...")
@@ -120,7 +123,6 @@ class Api():
         for a limited time will allow you to interact fully with the Conjur
         vault.
         """
-
         if not self.login_id or not self.api_key:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
