@@ -38,6 +38,19 @@ class Cli():
   {}'''.format(*args)
 
     @staticmethod
+    def command_description(example, usage):
+        """
+        This method builds the header for the main screen.
+        """
+        return '''
+        
+Name:
+  {}
+
+Usage:
+  {}'''.format(example, usage)
+
+    @staticmethod
     def main_epilog():
         """
         This method builds the footer for the main help screen.
@@ -78,8 +91,8 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         test sources. Parses CLI args and invokes the appropriate client command.
         """
         formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog,
-                                                                     max_help_position=60,
-                                                                     width=60)
+                                                                     max_help_position=100,
+                                                                     width=100)
         # pylint: disable=line-too-long
         parser = ArgparseWrapper(description=self.usage('conjur [global options] <command> <subcommand> [options] [args]'),
                                  epilog=self.main_epilog(),
@@ -90,10 +103,12 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         global_optional = parser.add_argument_group("Global options")
         resource_subparsers = parser.add_subparsers(dest='resource', title=self.title("Commands"))
 
+        init_example= 'init - Initialize Conjur configuration'
+        input_usage='conjur [global options] init [options] [args]'
         # pylint: disable=line-too-long
         init_subparser = resource_subparsers.add_parser('init',
                                                         help='Initialize the Conjur configuration',
-                                                        description=self.usage('conjur [global options] init [options] [args]'),
+                                                        description=self.command_description(init_example, input_usage),
                                                         epilog=self.command_epilog('conjur init -a my_org -u https://localhost\t'
                                                                                    'Initializes Conjur configuration and writes to file (.conjurrc)'),
                                                         usage=argparse.SUPPRESS,
@@ -107,7 +122,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                   '(obtained from Conjur server unless provided by this option)')
         init_options.add_argument('-c', '--certificate',
                                   action='store', dest='certificate',
-                                  help='Provide Conjur SSL certificate file location' \
+                                  help='Provide Conjur SSL certificate file location ' \
                                   '(obtained from Conjur server unless provided by this option)')
         init_options.add_argument('--force',
                                   action='store_true',
@@ -183,17 +198,18 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         resource, args = Cli._parse_args(parser)
 
-        # TODO Add tests for exception handling logic
         # pylint: disable=broad-except
         try:
             Cli.run_client_action(resource, args)
+        except KeyboardInterrupt:
+            sys.exit(0)
         except FileNotFoundError as not_found_error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(str(error))
+            sys.stdout.write(f"{str(error)}\n")
             sys.exit(1)
         else:
             # Explicit exit (required for tests)
@@ -214,7 +230,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
-            sys.exit(0)
+            return
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 

@@ -59,7 +59,6 @@ class InitLogicTest(unittest.TestCase):
         mock_path_exists.return_value=True
         written = self.init_logic.write_conjurrc(MOCK_CERT, "/some/path/cert", False)
         self.assertEquals(written, False)
-    test_conjurrc_exists_returns_not_written.tester=True
 
     '''
     Validates that conjurrc was written to the file
