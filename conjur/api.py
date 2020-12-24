@@ -83,7 +83,7 @@ class Api():
 
         # Sanity checks
         if not self._url:
-            raise Exception("ERROR: API instantiation parameter 'url' cannot be empty!")
+            raise Exception("Error: API instantiation parameter 'url' cannot be empty!")
 
     @property
     # pylint: disable=missing-docstring

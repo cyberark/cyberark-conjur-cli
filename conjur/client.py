@@ -82,8 +82,8 @@ class Client():
                 loaded_config = on_disk_config
 
             except Exception as exc:
-                raise ConfigException(f"Error: {exc} not found in \
-                the loaded conjurrc") from Exception
+                raise ConfigException(f"Error: {exc} not found in " \
+                                      "the loaded conjurrc\n") from Exception
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.

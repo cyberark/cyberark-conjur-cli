@@ -31,13 +31,14 @@ class InitControllerTest(unittest.TestCase):
     '''
     When user does not supply an account a Runtime error should be raised
     '''
-    @patch('builtins.input', return_value=None)
+    @patch('builtins.input', return_value='')
     def test_init_without_host_raises_error(self, mock_input):
-        self.conjurrc_data.account=None
+        mock_conjurrc_data = ConjurrcData()
         with self.assertRaises(RuntimeError):
-            self.conjurrc_data.appliance_url = 'https://someurl'
-            InitController.get_account_info(self, self.conjurrc_data)
+            mock_conjurrc_data.appliance_url = 'https://someurl'
+            InitController.get_account_info(self, mock_conjurrc_data)
 
+    # test_init_without_host_raises_error.tester=True
     @patch('builtins.input', return_value='someaccount')
     def test_init_host_is_added_to_conjurrc_object(self, mock_input):
         InitController.get_account_info(self, self.conjurrc_data)
@@ -55,7 +56,7 @@ class InitControllerTest(unittest.TestCase):
         self.init_logic.connect = MagicMock(return_value = sock)
         self.init_logic.get_certificate = MagicMock(return_value = ["12:AB", "somecertchain"])
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(RuntimeError):
             init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite)
             init_controller.get_server_certificate()
 
@@ -70,15 +71,6 @@ class InitControllerTest(unittest.TestCase):
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite)
         fetched_certificate = init_controller.get_server_certificate()
         self.assertEquals(fetched_certificate, mock_certificate)
-
-    '''
-    When URL scheme is HTTP, no certificate should be returned
-    '''
-    @patch('builtins.input', side_effect=['http://someurl'])
-    def test_http_returns_no_certificate(self, mock_input):
-        init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite)
-        fetched_certificate = init_controller.get_server_certificate()
-        self.assertEquals(fetched_certificate, None)
 
     @patch('builtins.input', side_effect=['http://someurl'])
     def test_user_supplied_certificate_returns_none(self, mock_input):
@@ -137,3 +129,19 @@ class InitControllerTest(unittest.TestCase):
             self.assertRegex(self.capture_stream.getvalue(), "Configuration written to")
             mock_init_logic.write_conjurrc.assert_called_with('/root/.conjurrc',self.conjurrc_data, True)
             self.assertEquals(mock_init_logic.write_conjurrc.call_count, 2)
+
+    @patch('builtins.input', return_value='')
+    def test_user_does_not_input_url_raises_error(self, mock_input):
+        mock_conjurrc_data = ConjurrcData(appliance_url=None)
+        with self.assertRaises(RuntimeError) as context:
+            init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite)
+            init_controller.get_server_certificate()
+        self.assertRegex(str(context.exception), 'Error: URL is required')
+
+    @patch('builtins.input', return_value='somehost')
+    def test_user_does_not_input_https_will_raises_error(self, mock_input):
+        mock_conjurrc_data = ConjurrcData(appliance_url='somehost')
+        with self.assertRaises(RuntimeError) as context:
+            init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite)
+            init_controller.get_server_certificate()
+        self.assertRegex(str(context.exception), 'Error: undefined behavior')
