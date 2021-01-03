@@ -13,11 +13,12 @@ import logging
 # Internals
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
+from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.init.init_controller import InitController
 from conjur.init.init_logic import InitLogic
 from conjur.init.conjurrc_data import ConjurrcData
+from conjur.credentials_from_file import CredentialsFromFile
 from conjur.ssl_service import SSLService
-
 
 class ConfigException(Exception):
     """
@@ -60,7 +61,7 @@ class Client():
 
         self.setup_logging(debug)
 
-        logging.info("Initializing configuration...")
+        logging.debug("Initializing configuration...")
 
         self._login_id = login_id
 
@@ -70,7 +71,6 @@ class Client():
             'ca_bundle': ca_bundle,
         }
         if not url or not login_id or (not password and not api_key):
-            logging.info("Using conjurrc as credential store...")
             try:
                 on_disk_config = dict(ApiConfig())
 
@@ -81,35 +81,42 @@ class Client():
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
 
+            # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:
-                raise ConfigException(f"Error: {exc} not found in " \
-                                      "the loaded conjurrc\n") from Exception
-
+                raise ConfigException(exc) from exc
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
         if loaded_config['account'] is None:
             loaded_config['account'] = "default"
 
         if api_key:
-            logging.info("Using API key from parameters...")
+            logging.debug("Using API key from parameters...")
             self._api = Api(api_key=api_key,
                             http_debug=http_debug,
                             login_id=login_id,
                             ssl_verify=ssl_verify,
                             **loaded_config)
         elif password:
-            logging.info("Creating API key with login ID/password combo...")
+            logging.debug("Creating API key with login ID/password combo...")
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
                             **loaded_config)
             self._api.login(login_id, password)
         else:
-            logging.info("Using API key with netrc credentials...")
+            try:
+                credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
+                loaded_netrc = credentials.load()
+
+            except Exception as exception:
+                # pylint: disable=line-too-long
+                raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again") from exception
+
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
-                            **loaded_config)
+                            **loaded_config,
+                            **loaded_netrc)
 
-        logging.info("Client initialized")
+        logging.debug("Client initialized")
 
     def setup_logging(self, debug):
         """

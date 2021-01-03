@@ -21,7 +21,7 @@ class InitController:
     """
     InitController
 
-    This class represents the Presentation Layer for the init command
+    This class represents the Presentation Layer for the INIT command
     """
     force_overwrite = False
     conjurrc_data = None
@@ -65,7 +65,7 @@ class InitController:
         # and add integration tests
         # At this time, providing ports is not supported and
         # all urls must start with HTTPS.
-        if url.port is not None or url.scheme != 'https':
+        if url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur url format provided "
                    f"'{self.conjurrc_data.appliance_url}' is not supported. "
                    "Consider adding HTTPS as the prefix and remove the port if provided")
@@ -98,7 +98,7 @@ class InitController:
             # pylint: disable=broad-except,logging-fstring-interpolation
             except Exception as error:
                 # pylint: disable=line-too-long,logging-fstring-interpolation
-                logging.debug(f"Unable to fetch the account from the Conjur server. Reason: {error}")
+                logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
                 # If there was a problem fetching the account from the server, we will request one
                 conjurrc_data.account = input("Enter your organization account name: ").strip()
 
