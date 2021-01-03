@@ -38,11 +38,12 @@ class InitControllerTest(unittest.TestCase):
             mock_conjurrc_data.appliance_url = 'https://someurl'
             InitController.get_account_info(self, mock_conjurrc_data)
 
-    # test_init_without_host_raises_error.tester=True
     @patch('builtins.input', return_value='someaccount')
     def test_init_host_is_added_to_conjurrc_object(self, mock_input):
-        InitController.get_account_info(self, self.conjurrc_data)
-        self.assertEquals(self.conjurrc_data.account, 'someaccount')
+        mock_conjurrc_data = ConjurrcData()
+        mock_conjurrc_data.appliance_url="https://someaccount"
+        InitController.get_account_info(self, mock_conjurrc_data)
+        self.assertEquals(mock_conjurrc_data.account, 'someaccount')
 
     '''
     When user does not trust the certificate, an exception will be raised

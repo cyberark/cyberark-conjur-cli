@@ -116,30 +116,6 @@ class ApiTest(unittest.TestCase):
 
         self.assertEquals(api.login_id, 'myuser')
 
-    @patch('logging.warning')
-    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
-    def test_new_client_shows_warning_when_ssl_verify_is_false(self, mock_http_client,
-            logging_warn_func):
-        Api(url='http://localhost', login_id='mylogin', api_key='apikey',
-                ssl_verify=False)
-
-        calls = [
-            call("************************************************************"),
-            call("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!"),
-            call("************************************************************"),
-        ]
-        logging_warn_func.assert_has_calls(calls)
-
-    @patch('urllib3.disable_warnings')
-    @patch('logging.warning')
-    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
-    def test_new_client_disables_insecure_warnings_in_urllib_when_sslverify_is_false(self,
-            mock_http_client, logging_warn_func, disable_warning_func):
-        Api(url='http://localhost', login_id='mylogin', api_key='apikey',
-                ssl_verify=False)
-
-        disable_warning_func.assert_called_once_with(urllib3.exceptions.InsecureRequestWarning)
-
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_missing_fetch_a_new_one(self, mock_http_client):
         api = Api(url='http://localhost')
