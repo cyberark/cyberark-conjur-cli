@@ -35,7 +35,7 @@ class LogoutController:
         try:
             if os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
                 conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
-                self.logout_logic.remove_credentials(conjurrc)
+                self.logout_logic.remove_credentials(conjurrc.appliance_url)
                 logging.debug("Logout successful")
                 sys.stdout.write("Logged out of Conjur\n")
             else:

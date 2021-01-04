@@ -337,7 +337,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             if not os.path.exists(DEFAULT_CONFIG_FILE) or os.path.getsize(DEFAULT_CONFIG_FILE) == 0:
                 sys.stdout.write("Error: The Conjur CLI has not been initialized\n")
                 Cli.handle_init_logic()
-                return
+
             # pylint: disable=line-too-long
             if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
                 sys.stdout.write("Error: You have not logged in\n")

@@ -29,15 +29,13 @@ pipeline {
       steps {
         sh './bin/test_unit'
       }
-      // TEMPORARILY commenting out. UTs will be addressed after main CLI functioanlity has been implemented
-      // We don't want to fail an unstable build because if we do so, Cobertura will not generate a full line coverage scan report
-      // post {
-      //  always {
-      //    junit 'output/**/*.xml'
-      //    cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '75, 0, 75', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '75, 0, 75', maxNumberOfBuilds: 0, methodCoverageTargets: '75, 0, 75', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-      //    ccCoverage("coverage.py")
-      //  }
-      // }
+      post {
+        always {
+          junit 'output/**/*.xml'
+          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+          ccCoverage("coverage.py")
+        }
+      }
     }
 
     stage('Integration tests') {

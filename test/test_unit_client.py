@@ -1,17 +1,17 @@
-import shutil
+import logging
 import unittest
 import uuid
-
 from unittest.mock import patch, MagicMock
-
-import logging
 
 from conjur.client import ConfigException, Client
 
+# CredentialsFromFile mocked class
+MockCredentials = {
+    'login_id': 'apiconfigloginid',
+    'api_key': 'apiconfigapikey',
+}
+
 # ApiConfig mocking class
-from conjur.constants import DEFAULT_CONFIG_FILE
-
-
 class MockApiConfig(object):
     CONFIG = {
         'key1': 'value1',
@@ -25,12 +25,6 @@ class MockApiConfig(object):
     def __iter__(self):
         return iter(self.CONFIG.items())
 
-# CredentialsFromFile mocked class
-MockCredentials = {
-        'login_id': 'apiconfigloginid',
-        'api_key': 'apiconfigapikey',
-    }
-
 class MissingMockApiConfig(object):
     def __init__(self):
         raise FileNotFoundError("oops!")
@@ -43,7 +37,6 @@ class ConfigErrorTest(unittest.TestCase):
 
 class ClientTest(unittest.TestCase):
     # To run properly, we need to configure the loaded conjurrc
-    shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
 
     ### Init configuration tests ###
 

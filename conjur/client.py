@@ -82,10 +82,16 @@ class Client():
                     if field_value:
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
+                # pylint: disable=logging-fstring-interpolation
+                logging.debug("Fetched connection details "
+                              f"{{'account': {loaded_config['account']}, "
+                              f"'appliance_url': {loaded_config['url']}, "
+                              f"'cert_file': {loaded_config['ca_bundle']}}}")
 
             # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:
                 raise ConfigException(exc) from exc
+
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
         if loaded_config['account'] is None:
@@ -106,9 +112,8 @@ class Client():
             self._api.login(login_id, password)
         else:
             try:
-                conjurrc = ConjurrcData.load_from_file()
                 credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
-                loaded_netrc = credentials.load(conjurrc)
+                loaded_netrc = credentials.load(loaded_config['url'])
             except netrc.NetrcParseError as netrc_error:
                 raise Exception("Error: netrc in an invalid format." \
                                 f"Reason: {netrc_error}") from netrc_error
