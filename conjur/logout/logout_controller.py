@@ -13,7 +13,8 @@ import os
 import sys
 
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
+from conjur.init import ConjurrcData
 
 # pylint: disable=too-few-public-methods
 class LogoutController:
@@ -33,11 +34,12 @@ class LogoutController:
         logging.debug("Attempting to log out of Conjur")
         try:
             if os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
-                self.logout_logic.remove_credentials()
+                conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
+                self.logout_logic.remove_credentials(conjurrc)
                 logging.debug("Logout successful")
-                sys.stdout.write("Logged out from Conjur\n")
+                sys.stdout.write("Logged out of Conjur\n")
             else:
                 raise Exception("Please log in")
         except Exception as error:
             # pylint: disable=raise-missing-from
-            raise Exception(f"Failed to logout. {error}")
+            raise Exception(f"Failed to log out. {error}.")

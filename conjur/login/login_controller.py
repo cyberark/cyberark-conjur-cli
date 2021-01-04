@@ -12,7 +12,7 @@ import getpass
 import logging
 import sys
 
-import conjur.constants
+from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
 from conjur.init import ConjurrcData
 
 class LoginController:
@@ -39,11 +39,11 @@ class LoginController:
         self.get_api_key(conjurrc)
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Saving credentials to '{conjur.constants.DEFAULT_NETRC_FILE}'")
+        logging.debug(f"Saving credentials to '{DEFAULT_NETRC_FILE}'")
         self.login_logic.save(self.credential_data)
         # pylint: disable=logging-fstring-interpolation
-        logging.debug("Credentials successfully written to " \
-                      f"'{conjur.constants.DEFAULT_NETRC_FILE}'")
+        logging.debug("Credentials written to " \
+                      f"'{DEFAULT_NETRC_FILE}'")
         sys.stdout.write("Successfully logged in to Conjur\n")
 
     def get_username(self):
@@ -51,8 +51,8 @@ class LoginController:
         Method to fetch the username if the user did not provide one
         """
         if self.credential_data.login is None:
-            # pylint: disable=logging-fstring-interpolation
-            self.credential_data.login = input("Enter your login name to log into Conjur: ").strip()
+            # pylint: disable=logging-fstring-interpolation,line-too-long
+            self.credential_data.login = input("To log in to Conjur, enter your login name: ").strip()
             if self.credential_data.login == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: Login name is required")
@@ -73,8 +73,7 @@ class LoginController:
         properties and to send a login request to Conjur
         """
         conjurrc = ConjurrcData.load_from_file()
-        # pylint: disable=line-too-long
-        self.credential_data.machine = conjurrc.appliance_url + conjur.constants.CREDENTIAL_HOST_PATH
+        self.credential_data.machine = conjurrc.appliance_url + CREDENTIAL_HOST_PATH
 
         return conjurrc
 
@@ -88,5 +87,5 @@ class LoginController:
                                                            self.user_password,
                                                            conjurrc)
         except Exception as error:
-            raise RuntimeError("Failed to login. Unable to authenticate with Conjur. " \
+            raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. " \
                 f"Reason: {error}.") from error

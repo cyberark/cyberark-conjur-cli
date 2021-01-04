@@ -49,7 +49,7 @@ class LoginLogic:
                                   auth=(credential_data.login, password),
                                   ssl_verify=certificate_path).text
 
-        logging.debug("API key retrieved successfully from Conjur")
+        logging.debug("API key retrieved from Conjur")
         return api_key
 
     def save(self, credential_data):

@@ -15,7 +15,7 @@ import sys
 from urllib.parse import urlparse
 
 # Internals
-import conjur.constants
+from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
 
 class InitController:
     """
@@ -113,8 +113,7 @@ class InitController:
         url = urlparse(self.conjurrc_data.appliance_url)
         # pylint: disable=line-too-long
         if self.conjurrc_data.cert_file is None and url.scheme == "https":
-            # pylint: disable=line-too-long
-            self.conjurrc_data.cert_file = conjur.constants.DEFAULT_CERTIFICATE_FILE
+            self.conjurrc_data.cert_file = DEFAULT_CERTIFICATE_FILE
             is_file_written = self.init_logic.write_certificate_to_file(fetched_certificate,
                                                                        self.conjurrc_data.cert_file,
                                                                        self.force_overwrite)
@@ -124,21 +123,21 @@ class InitController:
                                                           self.conjurrc_data.cert_file,
                                                           True)
 
-            sys.stdout.write(f"Certificate written to {conjur.constants.DEFAULT_CERTIFICATE_FILE}\n\n")
+            sys.stdout.write(f"Certificate written to {DEFAULT_CERTIFICATE_FILE}\n\n")
 
     def write_conjurrc(self):
         """
         Method to write the conjurrc configuration on the user's machine
         """
-        is_file_written = self.init_logic.write_conjurrc(conjur.constants.DEFAULT_CONFIG_FILE,
-                                               self.conjurrc_data,
-                                               self.force_overwrite)
+        is_file_written = self.init_logic.write_conjurrc(DEFAULT_CONFIG_FILE,
+                                                         self.conjurrc_data,
+                                                         self.force_overwrite)
         if not is_file_written:
-            self.__ensure_overwrite_file(conjur.constants.DEFAULT_CONFIG_FILE)
-            self.init_logic.write_conjurrc(conjur.constants.DEFAULT_CONFIG_FILE,
+            self.__ensure_overwrite_file(DEFAULT_CONFIG_FILE)
+            self.init_logic.write_conjurrc(DEFAULT_CONFIG_FILE,
                                            self.conjurrc_data,
                                            True)
-        sys.stdout.write(f"Configuration written to {conjur.constants.DEFAULT_CONFIG_FILE}\n\n")
+        sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
 
     @staticmethod
     def __ensure_overwrite_file(config_file):

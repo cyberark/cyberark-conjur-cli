@@ -104,8 +104,9 @@ class Client():
             self._api.login(login_id, password)
         else:
             try:
+                conjurrc = ConjurrcData.load_from_file()
                 credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
-                loaded_netrc = credentials.load()
+                loaded_netrc = credentials.load(conjurrc)
 
             except Exception as exception:
                 # pylint: disable=line-too-long
@@ -113,8 +114,9 @@ class Client():
 
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
-                            **loaded_config,
-                            **loaded_netrc)
+                            login_id=loaded_netrc['login_id'],
+                            api_key=loaded_netrc['api_key'],
+                            **loaded_config)
 
         logging.debug("Client initialized")
 

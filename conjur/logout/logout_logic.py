@@ -17,8 +17,8 @@ class LogoutLogic:
     def __init__(self, credentials):
         self.credentials = credentials
 
-    def remove_credentials(self):
+    def remove_credentials(self, conjurrc):
         """
         Method to remove credentials during logout
         """
-        self.credentials.remove_credentials()
+        self.credentials.remove_credentials(conjurrc)

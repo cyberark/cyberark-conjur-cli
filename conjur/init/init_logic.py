@@ -14,7 +14,7 @@ import os.path
 # Third party
 import yaml
 
-import conjur.constants
+from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.endpoints import ConjurEndpoint
 from conjur.http import invoke_endpoint, HttpVerb
 
@@ -58,7 +58,7 @@ class InitLogic:
         # If the user provides us with the certificate path, we will use it
         # to make a request to /info
         if conjurrc_data.cert_file is None and conjurrc_data.appliance_url.startswith("https"):
-            certificate_path = os.path.join(os.path.dirname(conjur.constants.DEFAULT_CONFIG_FILE),
+            certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
                                           "conjur-server.pem")
         else:
             certificate_path = conjurrc_data.cert_file
