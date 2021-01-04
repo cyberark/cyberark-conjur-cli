@@ -67,16 +67,6 @@ class Api():
             'account': account
         }
 
-        if not ssl_verify:
-            logging.warning("*" * 60)
-            logging.warning("'ssl_verify' is False - YOU ARE VULNERABLE TO MITM ATTACKS!")
-            logging.warning("*" * 60)
-
-            # pylint: disable=import-outside-toplevel
-            import urllib3
-
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
         # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINES BELOW UNCOMMENTED
         # from .http import enable_http_logging
         # if http_debug: enable_http_logging()
@@ -89,13 +79,13 @@ class Api():
     # pylint: disable=missing-docstring
     def api_token(self):
         if not self._api_token or datetime.now() > self.api_token_expiration:
-            logging.info("API token missing or expired. Fetching new one...")
+            logging.debug("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
             self._api_token = self.authenticate()
 
             return self._api_token
 
-        logging.info("Using cached API token...")
+        logging.debug("Using cached API token...")
         return self._api_token
 
     def login(self, login_id=None, password=None):
@@ -109,7 +99,7 @@ class Api():
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
 
-        logging.info("Logging in to %s...", self._url)
+        logging.debug("Logging in to %s...", self._url)
         self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
                                        self._default_params, auth=(login_id, password),
                                        ssl_verify=self._ssl_verify).text
@@ -132,7 +122,7 @@ class Api():
         }
         params.update(self._default_params)
 
-        logging.info("Authenticating to %s...", self._url)
+        logging.debug("Authenticating to %s...", self._url)
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 

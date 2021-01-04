@@ -48,9 +48,9 @@ services:
     command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
+      TEST_ENV: "True"
     depends_on:
       - conjur
       - conjur-https
     volumes:
       - ${PWD}:/opt/conjur-api-python3
-      - .netrc:/root/.netrc

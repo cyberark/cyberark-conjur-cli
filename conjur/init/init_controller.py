@@ -15,13 +15,13 @@ import sys
 from urllib.parse import urlparse
 
 # Internals
-import conjur.constants
+from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
 
 class InitController:
     """
     InitController
 
-    This class represents the Presentation Layer for the init command
+    This class represents the Presentation Layer for the INIT command
     """
     force_overwrite = False
     conjurrc_data = None
@@ -65,7 +65,7 @@ class InitController:
         # and add integration tests
         # At this time, providing ports is not supported and
         # all urls must start with HTTPS.
-        if url.port is not None or url.scheme != 'https':
+        if url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur url format provided "
                    f"'{self.conjurrc_data.appliance_url}' is not supported. "
                    "Consider adding HTTPS as the prefix and remove the port if provided")
@@ -98,7 +98,7 @@ class InitController:
             # pylint: disable=broad-except,logging-fstring-interpolation
             except Exception as error:
                 # pylint: disable=line-too-long,logging-fstring-interpolation
-                logging.debug(f"Unable to fetch the account from the Conjur server. Reason: {error}")
+                logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
                 # If there was a problem fetching the account from the server, we will request one
                 conjurrc_data.account = input("Enter your organization account name: ").strip()
 
@@ -113,8 +113,7 @@ class InitController:
         url = urlparse(self.conjurrc_data.appliance_url)
         # pylint: disable=line-too-long
         if self.conjurrc_data.cert_file is None and url.scheme == "https":
-            # pylint: disable=line-too-long
-            self.conjurrc_data.cert_file = conjur.constants.DEFAULT_CERTIFICATE_FILE
+            self.conjurrc_data.cert_file = DEFAULT_CERTIFICATE_FILE
             is_file_written = self.init_logic.write_certificate_to_file(fetched_certificate,
                                                                        self.conjurrc_data.cert_file,
                                                                        self.force_overwrite)
@@ -124,21 +123,21 @@ class InitController:
                                                           self.conjurrc_data.cert_file,
                                                           True)
 
-            sys.stdout.write(f"Certificate written to {conjur.constants.DEFAULT_CERTIFICATE_FILE}\n\n")
+            sys.stdout.write(f"Certificate written to {DEFAULT_CERTIFICATE_FILE}\n\n")
 
     def write_conjurrc(self):
         """
         Method to write the conjurrc configuration on the user's machine
         """
-        is_file_written = self.init_logic.write_conjurrc(conjur.constants.DEFAULT_CONFIG_FILE,
-                                               self.conjurrc_data,
-                                               self.force_overwrite)
+        is_file_written = self.init_logic.write_conjurrc(DEFAULT_CONFIG_FILE,
+                                                         self.conjurrc_data,
+                                                         self.force_overwrite)
         if not is_file_written:
-            self.__ensure_overwrite_file(conjur.constants.DEFAULT_CONFIG_FILE)
-            self.init_logic.write_conjurrc(conjur.constants.DEFAULT_CONFIG_FILE,
+            self.__ensure_overwrite_file(DEFAULT_CONFIG_FILE)
+            self.init_logic.write_conjurrc(DEFAULT_CONFIG_FILE,
                                            self.conjurrc_data,
                                            True)
-        sys.stdout.write(f"Configuration written to {conjur.constants.DEFAULT_CONFIG_FILE}\n\n")
+        sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
 
     @staticmethod
     def __ensure_overwrite_file(config_file):

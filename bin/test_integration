@@ -35,7 +35,6 @@ CONJUR_AUTHN_API_KEY=$admin_api_key
 ENV
 
 echo "Starting test env..."
-sed -e "s#CONJUR_AUTHN_API_KEY#$CONJUR_AUTHN_API_KEY#g" "test/test_config/netrc.template" > .netrc
 docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
@@ -49,4 +48,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  nose2 -v -X -A 'integration' $@
+  nose2 -v -X --config integration_test.cfg -A 'integration' $@

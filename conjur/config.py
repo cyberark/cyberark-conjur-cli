@@ -8,7 +8,6 @@ variables needed for the API to be used with minimal effort
 """
 
 import logging
-import netrc
 
 from yaml import load, dump
 try:
@@ -17,9 +16,7 @@ except ImportError:
     from yaml import Loader, Dumper
 
 # Internals
-import conjur.constants
-
-NETRC_HOST_URL = "{url}/authn"
+from conjur.constants import DEFAULT_CONFIG_FILE
 
 class Config():
     """
@@ -38,11 +35,9 @@ class Config():
 
     _config = {}
 
-    def __init__(self,
-                 config_file=conjur.constants.DEFAULT_CONFIG_FILE,
-                 netrc_file=conjur.constants.DEFAULT_NETRC_FILE):
-
-        logging.info("Trying to get configuration from filesystem (%s)...", config_file)
+    def __init__(self, config_file=DEFAULT_CONFIG_FILE):
+        # pylint: disable=logging-fstring-interpolation
+        logging.debug(f"Fetching connection details from filesystem {config_file}")
 
         config = None
         with open(config_file, 'r') as config_fp:
@@ -54,21 +49,6 @@ class Config():
 
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
-        logging.info("Trying to get API key from netrc...")
-        netrc_obj = netrc.netrc(netrc_file)
-        netrc_host_url = NETRC_HOST_URL.format(**self._config)
-        netrc_auth = netrc_obj.authenticators(netrc_host_url)
-        if netrc_auth is None:
-            raise RuntimeError("Netrc '{}' didn't contain auth info for {}!".format(netrc_file,
-                                                                                    netrc_host_url))
-
-        login_id, _, api_key = netrc_auth
-
-        setattr(self, 'api_key', api_key)
-        setattr(self, 'login_id', login_id)
-
-        self._config['api_key'] = api_key
-        self._config['login_id'] = login_id
 
     def __repr__(self):
         return dump({'config': self._config}, Dumper=Dumper, indent=4)

@@ -3,9 +3,7 @@
 """
 CLI Integration tests
 
-This test file has two separate classes to cover two different client flows.
-The first class is for testing configurations of the CLI. The second
-assumes the client has been initialized.
+This test file handles the main test flows after initialization and configuration
 """
 import json
 import os
@@ -13,111 +11,15 @@ import shutil
 import tempfile
 import uuid
 import unittest
-from unittest.mock import patch
-
-import requests
 
 from .util.cli_helpers import integration_test, invoke_cli
 
-class CliIntegrationTestConfigurations(unittest.TestCase):
-
-    # *************** HELPERS ***************
-
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
-    def print_instead_of_raise_error(self, error_class, error_message_regex, exit_code):
-        output = invoke_cli(self, self.cli_auth_params,
-            ['list'], exit_code=exit_code)
-        self.assertRegex(output, error_message_regex)
-
-    def evoke_list(self, exit_code=0):
-        return invoke_cli(self, self.cli_auth_params,
-            ['list'], exit_code=exit_code)
-
-    # *************** INITIAL CONFIGURATION TESTS ***************
-
-    '''
-    Validates that the conjurrc was created on the machine 
-    '''
-    @integration_test
-    @patch('builtins.input', return_value='yes')
-    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
-        os.system('rm /root/.conjurrc')
-        self.setup_cli_params({})
-        invoke_cli(self, self.cli_auth_params,
-            ['init', '--url', 'https://conjur-https', '--account', 'someaccount'], exit_code=0)
-
-        assert os.path.isfile("/root/.conjurrc")
-
-    '''
-    Validates that when passed as commandline arguments, the configuration 
-    data is written properly to conjurrc 
-    '''
-    @integration_test
-    @patch('builtins.input', side_effect=['https://conjur-https', 'yes', 'someotheraccount'])
-    def test_https_conjurrc_is_created_with_no_parameters_given(self, mock_input):
-        os.system('rm /root/.conjurrc')
-        os.system('rm /root/conjur-server.pem')
-        self.setup_cli_params({})
-        invoke_cli(self, self.cli_auth_params,
-            ['init'], exit_code=0)
-
-        with open("/root/.conjurrc", 'r') as conjurrc:
-            lines = conjurrc.readlines()
-            assert "---" in lines[0]
-            assert "account: someotheraccount" in lines[1]
-            assert "appliance_url: https://conjur-https" in lines[2]
-
-    '''
-    Validates that if user does not trust the certificate, 
-    the conjurrc is not be created on the user's machine
-    '''
-    @integration_test
-    @patch('builtins.input', side_effect=['https://conjur-https', 'no'])
-    def test_https_conjurrc_user_does_not_trust_cert(self, mock_input):
-        os.system('rm /root/.conjurrc')
-        self.setup_cli_params({})
-        output = invoke_cli(self, self.cli_auth_params,
-            ['init'], exit_code=1)
-
-        self.assertRegex(output, "You decided not to trust the certificate")
-        assert not os.path.isfile("/root/.conjurrc")
-
-    '''
-    Validates that when the user adds the force flag, 
-    no confirmation is required 
-    '''
-    @integration_test
-    # The additional side effects here ('somesideffect') would prompt the CLI to
-    # request for confirmation which would fail the test
-    @patch('builtins.input', side_effect=['yes', 'somesideeffect', 'somesideeffect'])
-    def test_https_conjurrc_user_forces_overwrite_does_not_request_confirmation(self, mock_input):
-        self.setup_cli_params({})
-        output = invoke_cli(self, self.cli_auth_params,
-            ['init', '--url', 'https://conjur-https', '--account', 'dev', '--force'], exit_code=0)
-
-        assert "Not overwriting" not in output
-
-    @integration_test
-    def test_https_cli_fails_if_cert_is_bad(self):
-        shutil.copy('./test/test_config/bad_cert_conjurrc', '/root/.conjurrc')
-        self.setup_cli_params({})
-        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
-
-    @integration_test
-    def test_https_cli_fails_if_cert_is_not_provided(self):
-        shutil.copy('./test/test_config/no_cert_conjurrc', '/root/.conjurrc')
-        self.setup_cli_params({})
-        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, TEST_HOSTNAME
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
 class CliIntegrationTest(unittest.TestCase): # pragma: no cover
-    shutil.copy('./test/test_config/conjurrc', '/root/.conjurrc')
+    shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
     DEFINED_VARIABLE_ID = 'one/password'
 
     # *************** HELPERS ***************
@@ -130,17 +32,19 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
     def setUp(self):
         self.setup_cli_params({})
+        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
+
+        with open(DEFAULT_NETRC_FILE, 'w') as netrc:
+            netrc.write(f"machine {TEST_HOSTNAME}\n")
+            netrc.write("login admin\n")
+            netrc.write(f"password {os.environ['CONJUR_AUTHN_API_KEY']}\n")
+
         return invoke_cli(self, self.cli_auth_params,
             ['policy', 'replace', 'root', 'test/test_config/initial_policy.yml'])
 
     def set_variable(self, variable_id, value, exit_code=0):
         return invoke_cli(self, self.cli_auth_params,
             ['variable', 'set', variable_id, value], exit_code=exit_code)
-
-
-    def initalize_cli(self, variable_id, value, exit_code=0):
-        return invoke_cli(self, self.cli_auth_params,
-            ['init', '--url', 'https://localhost-https', '--account', 'dev'], exit_code=exit_code)
 
     def apply_policy(self, policy_path):
         return invoke_cli(self, self.cli_auth_params,
@@ -356,7 +260,7 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
         self.setup_cli_params({})
 
         orig_policy, old_variables = self.generate_policy_string()
-        print(old_variables)
+
         with tempfile.NamedTemporaryFile() as temp_policy_file:
             temp_policy_file.write(orig_policy.encode('utf-8'))
             temp_policy_file.flush()
@@ -370,7 +274,6 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
             self.assert_set_and_get(new_variable)
 
         for old_variable in old_variables:
-            print(old_variables)
             self.print_instead_of_raise_error(old_variable,  "404 Client Error: Not Found for url")
 
     @integration_test

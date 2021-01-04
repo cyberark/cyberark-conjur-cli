@@ -15,5 +15,6 @@ $CURRENT_DIR/bin/build_test_container
 rm -rf $CURRENT_DIR/output/*
 docker run --rm \
            -t \
+           -e TEST_ENV=true \
            -v "$(pwd):/opt/conjur-api-python3" \
-           conjur-api-python3-test nose2 -v -X -A '!integration' --with-coverage $@
+           conjur-api-python3-test nose2 -v -X -A '!integration' --config unit_test.cfg --with-coverage $@
