@@ -1,3 +1,4 @@
+import shutil
 import unittest
 import uuid
 
@@ -8,6 +9,9 @@ import logging
 from conjur.client import ConfigException, Client
 
 # ApiConfig mocking class
+from conjur.constants import DEFAULT_CONFIG_FILE
+
+
 class MockApiConfig(object):
     CONFIG = {
         'key1': 'value1',
@@ -38,6 +42,8 @@ class ConfigErrorTest(unittest.TestCase):
             raise ConfigException('abc')
 
 class ClientTest(unittest.TestCase):
+    # To run properly, we need to configure the loaded conjurrc
+    shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
 
     ### Init configuration tests ###
 

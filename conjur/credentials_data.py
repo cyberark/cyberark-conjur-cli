@@ -35,12 +35,15 @@ class CredentialsData:
         netrc_obj = netrc.netrc(netrc_path)
         hosts = netrc_obj.hosts
         hosts.pop(netrc_data['machine'], None)
+
+        netrc_obj = netrc.netrc(netrc_path)
+        netrc_obj.hosts.pop(netrc_data['machine'], None)
         with open(DEFAULT_NETRC_FILE, 'w') as netrc_file:
             ret = ""
-            for line in str(netrc_obj).split('\n'):
-                if line.strip().startswith('machine') and not line[0]:
+            for i, entry in enumerate(str(netrc_obj).split('\n')):
+                if entry.strip().startswith('machine') and i != 0:
                     ret += '\n'
-                ret += line + '\n'
+                ret += entry + '\n'
 
             netrc_file.write(ret.replace('\t' ,''))
 
@@ -48,10 +51,3 @@ class CredentialsData:
     def __repr__(self):
         return "{'machine': %r, 'login': %r, 'password': ****}" % (self.machine,
                                                                    self.login)
-    @staticmethod
-    def pretty_print(file, str):
-        """
-        Method to write a string to a file
-        """
-        # pylint: disable=redefined-builtin
-        file.write(f"{str}\n")

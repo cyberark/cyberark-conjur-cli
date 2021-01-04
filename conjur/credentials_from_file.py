@@ -37,16 +37,16 @@ class CredentialsFromFile:
             hosts[credential_data.machine] = (credential_data.login, None, credential_data.api_key)
             with open(DEFAULT_NETRC_FILE, "r+") as netrc_file:
                 ret = ""
-                for i, line in enumerate(str(netrc_obj).split('\n')):
-                    if line.strip().startswith('machine') and not i==0:
+                for i, entry in enumerate(str(netrc_obj).split('\n')):
+                    if entry.strip().startswith('machine') and not i==0:
                         ret += '\n'
-                    ret += line + '\n'
+                    ret += entry + '\n'
                 netrc_file.write(ret.replace('\t', ''))
         else:
             with open(self.netrc_path, "w+") as netrc_file:
-                credential_data.pretty_print(netrc_file, f"machine {credential_data.machine}")
-                credential_data.pretty_print(netrc_file, f"login {credential_data.login}")
-                credential_data.pretty_print(netrc_file, f"password {credential_data.api_key}")
+                netrc_file.write(f"machine {credential_data.machine}")
+                netrc_file.write(f"login {credential_data.login}")
+                netrc_file.write(f"password {credential_data.api_key}")
 
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
@@ -69,19 +69,18 @@ class CredentialsFromFile:
         loaded_netrc = {}
         netrc_host_url = ""
         netrc_obj = netrc.netrc(self.netrc_path)
-        try:
-            for host in netrc_obj.hosts:
-                if conjurrc.appliance_url in host:
-                    netrc_host_url = host
-                    netrc_auth = netrc_obj.authenticators(netrc_host_url)
-
-            login_id, _, api_key = netrc_auth
-
-            loaded_netrc['machine'] = netrc_host_url
-            loaded_netrc['api_key'] = api_key
-            loaded_netrc['login_id'] = login_id
-
-            return loaded_netrc
-        except Exception:
-            # pylint: disable=raise-missing-from
+        if netrc_obj.hosts == {}:
             raise Exception("Please log in")
+
+        for host in netrc_obj.hosts:
+            if conjurrc.appliance_url in host:
+                netrc_host_url = host
+                netrc_auth = netrc_obj.authenticators(netrc_host_url)
+
+        login_id, _, api_key = netrc_auth
+
+        loaded_netrc['machine'] = netrc_host_url
+        loaded_netrc['api_key'] = api_key
+        loaded_netrc['login_id'] = login_id
+
+        return loaded_netrc

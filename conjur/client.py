@@ -11,6 +11,8 @@ the Conjur server
 import logging
 
 # Internals
+import netrc
+
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
@@ -107,7 +109,9 @@ class Client():
                 conjurrc = ConjurrcData.load_from_file()
                 credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
                 loaded_netrc = credentials.load(conjurrc)
-
+            except netrc.NetrcParseError as netrc_error:
+                raise Exception("Error: netrc in an invalid format." \
+                                f"Reason: {netrc_error}") from netrc_error
             except Exception as exception:
                 # pylint: disable=line-too-long
                 raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again") from exception
