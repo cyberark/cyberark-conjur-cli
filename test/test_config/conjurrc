@@ -1,5 +1,5 @@
 ---
-account: dev
-appliance_url: https://conjur-https
-cert_file: /root/conjur-server.pem
+account: cucumber
+appliance_url: https://ec2-3-126-247-26.eu-central-1.compute.amazonaws.com
+cert_file: /Users/mbenita/conjur-server.pem
 plugins: []
