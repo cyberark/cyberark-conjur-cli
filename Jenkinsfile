@@ -60,9 +60,9 @@ pipeline {
             sh 'summon -e production ./bin/publish_package'
           }
 
-          when {
-            branch "master"
-          }
+        //  when {
+        //    branch "master"
+        //  }
         }
 
         stage('Publish containers') {

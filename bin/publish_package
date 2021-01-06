@@ -28,10 +28,10 @@ docker run --rm \
                echo 'Installing new versions of pip and wheel...'
                /usr/bin/env pip3 install --upgrade pip wheel
 
-               if ! ./bin/needs_publishing \$TWINE_REPOSITORY_URL; then
-                 echo 'WARN: Publishing skipped!'
-                 exit 0
-               fi
+             #  if ! ./bin/needs_publishing \$TWINE_REPOSITORY_URL; then
+             #    echo 'WARN: Publishing skipped!'
+             #    exit 0
+             #  fi
 
                echo 'Building distributable package...'
                /usr/bin/env python3 setup.py sdist bdist_wheel
