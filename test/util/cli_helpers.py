@@ -1,24 +1,14 @@
+# Builtins
 import io
-import itertools
 import sys
+
+# Third party
 from contextlib import redirect_stdout
 from functools import wraps
 
+# Internals
 from unittest.mock import patch, MagicMock
-
 from conjur.cli import Cli
-
-def invoke_cli(test_runner, *args, exit_code=0):
-    capture_stream = io.StringIO()
-    cli_args = list(itertools.chain(*args))
-    with test_runner.assertRaises(SystemExit) as sys_exit:
-        with redirect_stdout(capture_stream):
-            with patch.object(sys, 'argv', ["cli"] + cli_args):
-                Cli().run()
-
-    test_runner.assertEqual(sys_exit.exception.code, exit_code,
-                            "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
-    return capture_stream.getvalue()
 
 
 def integration_test(original_function):
@@ -30,9 +20,11 @@ def integration_test(original_function):
 
     return test_wrapper_func
 
+
 def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=None,
              policy_change_output={}, whoami_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
+
     def test_cli_decorator(original_function):
         @wraps(original_function)
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
@@ -47,7 +39,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
-                        patch('conjur.cli.Client') as mock_client:
+                         patch('conjur.cli.Client') as mock_client:
                         mock_client.return_value = client_instance_mock
                         Cli().run()
 
@@ -63,7 +55,9 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
     return test_cli_decorator
 
 
-def cli_arg_test(cli_args=[], **kwargs):
+def cli_arg_test(cli_args=None, **kwargs):
+    if cli_args is None:
+        cli_args = []
     cli_args += ['variable', 'get', 'foo']
     cli_command = 'cli {}'.format(' '.join(cli_args))
 

@@ -257,7 +257,6 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                      action='store_false')
 
         resource, args = Cli._parse_args(parser)
-
         # pylint: disable=broad-except
         try:
             Cli.run_action(resource, args)
