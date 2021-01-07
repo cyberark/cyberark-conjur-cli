@@ -18,43 +18,150 @@ any additional information for contributing code to this project.
 
 ## Building
 
-### Egg format
-
-```
-$ ./bin/build
-```
-
 ### Static/portable CLI binary
 
 ```
 $ ./bin/build_binary
 ```
 
+### Egg format
+
+```
+$ ./bin/build
+```
+
 ## Development
 
-- Create a directory that will hold all the virtualenv packages and files:
+To setup a development environment follow the instructions in this section. Once you have done so, you will be able to see live changes made to the CLI.
+
+1. Create a directory that will hold all the virtualenv packages and files. Note that you will only need to run this command once.
+
+macOS:
+
 ```
 $ python3 -m venv venv
 ```
 
-- Enable your terminal to use those files with this command:
+Windows:
+
+```
+py -m venv venv
+```
+
+2. Enable your terminal to use those files with this command. Note that this command will need to run each time you want to return to your virtual environment.
+
+macOS:
+
 ```
 $ source venv/bin/activate
 ```
 
-- Install requirements:
+Windows:
+
+```
+venv\Scripts\activate.bat
+```
+
+3. Install requirements
+
 ```
 $ pip3 install -r requirements.txt
 ```
 
-You can now run the tests and the CLI with modifiable files!
+4. You can now run the tests and the CLI with modifiable files.
+
+Check it out! Run the following prefix to start seeing changes
+
+```
+$ ./pkg_bin/conjur <command> <subcommand>
+```
 
 ## Testing
 
 ### Unit and Integration tests
 
+To run both unit and integration tests at once in a containerized environment:
+
 ```
 $ ./bin/test
+```
+
+To run unit tests:
+```
+./bin/test_unit
+```
+
+You can run integration tests in the following ways:
+1. In a containerized environment (Python required)
+
+1. As a process (no Python required)
+
+#### Running in a containerized environment
+
+To run specific tests, run the following:
+
+1. Drop down into a test container
+
+```
+$ /bin/test_integration -d
+```
+
+1. Under the individual test add the following:
+
+```
+<name-of-test-function>.<identifier>=True
+
+## Example
+def my-integration-test-function()
+  ...
+
+my-integration-test-function.someidentifier=True
+```
+
+1. Add the identifier of choice to the following command:
+
+```
+root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A '<identifier>' $@
+
+## Example
+root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A 'someidentifier' $@
+```
+
+1. You should see that only that specific test is run. Every change made locally can be seen in the container so you
+do *not* need to rebuild before running these tests again.
+
+#### Running as a process
+
+There is an option of running the integration tests as a process. We wrap our tests in an integration_test_runner
+Python module to run in a Python-free environment. That way, tests can be run cross-platform.
+
+##### Setup
+
+1. Pack the `integration_test_runner.py` using PyInstaller in the platform you wish to run the executable.
+
+  To pack: `pyinstaller --onfile test/util/test_runners/integration_test_runner.py`. Note that you will need
+  to pack each runner in each platform that you want to run the tests.
+
+1. Run the executable: `./integration_test_runner`, supplying the below required parameters via the command line.
+
+###### Required parameters
+
+`--invoke_cli_as_process`, required to run the CLI as a process.
+`--identifier`, the test method with this identifier will be run (integration by default).
+`--working_cli`, the path to a working CLI executable. This path is needed for initial configuration of the CLI.
+You can find this executable under `/test/test_config/binaries/config` in the repo. Copy this executable into every OS
+you wish to run the CLI integration tests.
+
+Parameters like `-u, -a, -l, -p`, will configure the `conjurrc` and `netrc` needed to run the integration tests successfully.
+`--cli_to_test`, path to the CLI executable to test against.
+`--files_folder` path to test assets (policy files, etc). You can find this folder under `/test/test_config` in the
+repo. Copy this executable into every OS you wish to run the CLI integration tests.
+
+
+###### Example
+```
+./integration_test_runner --invoke_cli_as_process --working_cli ~/test/test_config/binaries/config
+-u https://someurl -a someaccount -l somelogin -p superpass`
 ```
 
 ### Linting
@@ -72,11 +179,71 @@ See [here](guidelines/python-cli-ux-guidelines.md) for full UX guidelines to fol
 1. Search the [open issues](../../issues) in GitHub to find out what has been planned
 2. Select an existing issue or open an issue to propose changes or fixes
 3. Add any relevant labels as you work on it
-4. Run tests as described [in the main README](https://github.com/conjurinc/conjur-api-python3#testing),
-ensuring they pass
+4. Run tests as described in the [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/master/CONTRIBUTING.md#testing), ensuring they pass
 5. Submit a pull request, linking the issue in the description
 6. Adjust labels as-needed on the issue. Ask another contributor to review and merge your code if there are delays in merging.
 
 ## Releasing
 
-TODO: Define release workflow once we have a PyPI publishing in place
+To create a tag and release follow the instructions in this section.
+
+### Update the version, changelog, and notices
+
+1. Create a new branch for the version bump
+
+1. Based on the unreleased content, determine the new version number and update the version in `version.py`
+
+1. Review the git log and ensure the changelog contains all relevant recent changes with references to GitHub issues or PRs, if possible
+
+1. Review the changes since the last tag, and if the dependencies have changed revise the [NOTICES](NOTICES.txt) file to correctly capture the added dependencies and their licenses / copyrights
+
+1. Before creating a release, ensure that all documentation that needs to be written has been written by TW, approved by PO/Engineer, and pushed to the forward-facing documentation
+
+1. Commit these changes to the branch. Bump version to x.y.z is an acceptable commit message and open a PR for review
+
+Add a git tag
+
+1. Once your changes have been reviewed and merged into master, tag the version using `git tag -s v0.1.1`. Note this requires you to be able to sign releases. Consult the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification) on how to set this up vx.y.z is an acceptable tag message
+1. Push the tag: `git push vx.y.z` (or `git push origin vx.y.z` if you are working from your local machine)
+
+### Add release artifacts
+
+Currently, packing the client into an executable is a manual process. For Linux and Windows, you will need to pack the client using the different VMs we have available to us. For macOS, you will need to use your local machine.
+
+#### For all OS types:
+
+1. Clone the repo by running `git clone https://github.com/cyberark/conjur-api-python3.git`
+1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Python](https://realpython.com/installing-python/) if not already on the machine
+1. Activate [venv](#development) and install the requirements
+
+#### Linux
+
+1. Run `./bin/build_binary -l`. Once this is run, a `dist` folder will be created with the executable in it
+2. Once an executable has been created, run `tar -cvf conjur-cli-linux.tar conjur` to archive the file in a tar.gz format
+3. Add the archive file as an asset in the release
+
+#### macOS
+
+1. Run `./bin/build_binary -l`. Once this is run, a `dist` folder will be created with the executable in it
+2. Once an executable has been created, run `tar -cvf conjur-cli-darwin.tar conjur` to archive the file in a tar.gz format
+3. Add the archive file as an asset in the release
+
+#### Windows
+
+1. Run `pyinstaller --onefile pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable in it
+1. Once an executable has been created, zip the executable (`zip conjur-cli-windows.zip conjur`)
+1. Add the zip as an asset in the release
+
+To copy files over from Windows VM to your local machine, use Remote Desktop redirection. In the Remote Desktop app, perform the following:
+
+1. Edit the machine and navigate to *Folders*
+1. Click on *Redirect folders* and enter the path of the shared folder. Note that you will need to establish a new connection to see the changes
+1. Drag the executable/zip to the shared folder. You should now see it on your local machine
+
+The archive files should be called the following:
+
+```
+conjur-cli-linux.tar.gz
+conjur-cli-darwin.tar.gz
+conjur-cli-windows.zip
+```
