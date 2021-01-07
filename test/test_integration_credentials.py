@@ -28,6 +28,11 @@ class CliIntegrationTestCredentials(unittest.TestCase):
 
         return self.cli_auth_params
 
+    @patch('builtins.input', return_value='yes')
+    def init_to_cli(self, mock_input):
+        invoke_cli(self, self.cli_auth_params,
+            ['init', '-u', TEST_HOSTNAME, '-a', "dev"], exit_code=0)
+
     def setUp(self):
         self.setup_cli_params({})
         try:
@@ -36,6 +41,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
             os.remove(DEFAULT_CERTIFICATE_FILE)
         except OSError:
             pass
+        self.init_to_cli()
 
     def validate_netrc(self, machine, login, password):
         with open(DEFAULT_NETRC_FILE, 'r') as netrc:
@@ -64,7 +70,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @integration_test
     @patch('builtins.input', return_value='yes')
     def test_https_netrc_is_created_with_all_parameters_given(self,mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
         invoke_cli(self, self.cli_auth_params,
             ['login', '-n', 'admin', '-p', os.environ['CONJUR_AUTHN_API_KEY']], exit_code=0)
 
@@ -78,7 +83,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
         }
         response = requests.request("POST", f"{TEST_HOSTNAME}/authn/dev/admin/authenticate",
                                     headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'],
-                                    verify="test/test_config/https/ca.crt")
+                                    verify="/root/conjur-server.pem")
         access_token = base64.b64encode(response.content).decode("utf-8")
         headers = {
           'Authorization': f'Token token="{access_token}"'
@@ -87,7 +92,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
         # We want to rotate the API key of the host so we will know the value
         user_api_key = requests.request("PUT", f"{TEST_HOSTNAME}/authn/dev/api_key?role=user:someuser",
                                         headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'],
-                                        verify="test/test_config/https/ca.crt").text
+                                        verify="/root/conjur-server.pem").text
 
         # Creates a password that meets Conjur-specific criteria
         password = string.hexdigits + "$!@"
@@ -98,7 +103,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
         }
         requests.request("PUT", f"{TEST_HOSTNAME}/authn/dev/password",
                          headers=headers, data=password,
-                         verify="/opt/conjur-api-python3/test/test_config/https/ca.crt")
+                         verify="/root/conjur-server.pem")
 
         # Need to remove the netrc because we are attempting to login as a user with their new password
         os.remove(DEFAULT_NETRC_FILE)
@@ -115,8 +120,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value=os.environ['CONJUR_AUTHN_API_KEY'])
     def test_https_netrc_is_created_with_all_parameters_given_interactively(self, mock_pass, mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         output = invoke_cli(self, self.cli_auth_params,
             ['login'], exit_code=0)
 
@@ -131,8 +134,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @patch('builtins.input', return_value='somebaduser')
     @patch('getpass.getpass', return_value=os.environ['CONJUR_AUTHN_API_KEY'])
     def test_https_netrc_raises_error_with_wrong_user(self, mock_pass, mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         output = invoke_cli(self, self.cli_auth_params,
             ['login'], exit_code=1)
 
@@ -146,8 +147,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value='somewrongpass')
     def test_https_netrc_with_wrong_password(self, mock_pass, mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         output = invoke_cli(self, self.cli_auth_params,
             ['login'], exit_code=1)
 
@@ -158,8 +157,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value=os.environ['CONJUR_AUTHN_API_KEY'])
     def test_https_netrc_is_created_when_provided_user_api_key(self, mock_pass, mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         output = invoke_cli(self, self.cli_auth_params,
             ['login'], exit_code=0)
 
@@ -173,8 +170,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     '''
     @integration_test
     def test_https_netrc_was_not_overwritten_when_login_failed_but_already_logged_in(self):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         successful_run = invoke_cli(self, self.cli_auth_params,
             ['login', '-n', 'admin', '-p', os.environ['CONJUR_AUTHN_API_KEY']], exit_code=0)
         self.assertEquals(successful_run.strip(), "Successfully logged in to Conjur")
@@ -194,8 +189,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @integration_test
     def test_https_netrc_is_created_with_host(self):
         # Setup for fetching the API key of a host. To fetch we need to login
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         self.write_to_netrc(f"{TEST_HOSTNAME}/authn", "admin", os.environ['CONJUR_AUTHN_API_KEY'] )
 
         invoke_cli(self, self.cli_auth_params,
@@ -205,7 +198,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
         headers = {
           'Content-Type': 'text/plain'
         }
-        response = requests.request("POST", url, headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'], verify="test/test_config/https/ca.crt")
+        response = requests.request("POST", url, headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'], verify="/root/conjur-server.pem")
         access_token = base64.b64encode(response.content).decode("utf-8")
 
         headers = {
@@ -213,7 +206,7 @@ class CliIntegrationTestCredentials(unittest.TestCase):
         }
         url = f"{TEST_HOSTNAME}/authn/dev/api_key?role=host:somehost"
         # We want to rotate the API key of the host so we will know the value
-        host_api_key = requests.request("PUT", url, headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'], verify="test/test_config/https/ca.crt").text
+        host_api_key = requests.request("PUT", url, headers=headers, data=os.environ['CONJUR_AUTHN_API_KEY'], verify="/root/conjur-server.pem").text
 
         os.remove(DEFAULT_NETRC_FILE)
 
@@ -228,7 +221,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     '''
     @integration_test
     def test_https_logout_successful(self):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
         invoke_cli(self, self.cli_auth_params,
             ['login', '-n', 'admin', '-p', os.environ['CONJUR_AUTHN_API_KEY']], exit_code=0)
         assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
@@ -245,8 +237,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     '''
     @integration_test
     def test_https_logout_twice_returns_could_not_logout_message(self):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         invoke_cli(self, self.cli_auth_params,
             ['login', '-n', 'admin', '-p', os.environ['CONJUR_AUTHN_API_KEY']], exit_code=0)
 
@@ -274,7 +264,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     '''
     @integration_test
     def test_https_netrc_does_not_remove_irrelevant_entry(self):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
             netrc_test.write(f"machine {TEST_HOSTNAME}/authn\n")
             netrc_test.write("login admin\n")
@@ -304,8 +293,6 @@ class CliIntegrationTestCredentials(unittest.TestCase):
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')
     def test_user_runs_list_without_netrc_prompts_user_to_login(self, mock_pass, mock_input):
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
-
         list_attempt = invoke_cli(self, self.cli_auth_params,
             ['list'], exit_code=1)
         self.assertRegex(list_attempt.strip(), "Unable to authenticate with Conjur.")

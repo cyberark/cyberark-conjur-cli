@@ -1,5 +1,5 @@
 ---
 account: dev
 appliance_url: https://conjur-https
-cert_file: /opt/conjur-api-python3/test/test_config/https/ca.crt
+cert_file: /root/conjur-server.pem
 plugins: []
