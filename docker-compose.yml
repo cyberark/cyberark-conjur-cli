@@ -1,5 +1,28 @@
 version: '2'
 services:
+  openssl:
+    image: svagi/openssl:latest
+    container_name: openssl
+    entrypoint:
+      - openssl
+      - req
+      - -newkey
+      - rsa:2048
+      - -days
+      - "365"
+      - -nodes
+      - -x509
+      - -config
+      - /tmp/conf/tls.conf
+      - -extensions
+      - v3_ca
+      - -keyout
+      - /tmp/conf/test_nginx.key
+      - -out
+      - /tmp/conf/test_nginx.crt
+    volumes:
+      - ${PWD}/test/test_config/https/:/tmp/conf
+
   pg:
     image: postgres:9.4
     environment:
@@ -24,12 +47,11 @@ services:
     ports:
       - 443
     volumes:
+      - ${PWD}/test/test_config/https/:/tmp/conf
+      - ${PWD}/test/test_config/https/:/etc/nginx/tls/:ro
       - ${PWD}/test/test_config/https/nginx.conf:/etc/nginx/nginx.conf:ro
       - ${PWD}/test/test_config/https/conjur.conf:/etc/nginx/sites-enabled/conjur.conf:ro
       - ${PWD}/test/test_config/https/dhparams.pem:/etc/nginx/dhparams.pem:ro
-      - ${PWD}/test/test_config/https/conjur.crt:/cert/tls.crt:ro
-      - ${PWD}/test/test_config/https/conjur.key:/cert/tls.key:ro
-      - ${PWD}/test/test_config/https/ca.crt:/ca/tls.crt:ro
     depends_on:
       - conjur
 

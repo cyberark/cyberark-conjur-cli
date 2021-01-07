@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import uuid
 import unittest
+from unittest.mock import patch
 
 from .util.cli_helpers import integration_test, invoke_cli
 
@@ -19,7 +20,6 @@ from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, TEST_HOSTN
 # Not coverage tested since integration tests doesn't run in
 # the same build step
 class CliIntegrationTest(unittest.TestCase): # pragma: no cover
-    shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
     DEFINED_VARIABLE_ID = 'one/password'
 
     # *************** HELPERS ***************
@@ -30,10 +30,15 @@ class CliIntegrationTest(unittest.TestCase): # pragma: no cover
 
         return self.cli_auth_params
 
+    @patch('builtins.input', return_value='yes')
+    def init_to_cli(self, mock_input):
+        invoke_cli(self, self.cli_auth_params,
+            ['init', '-u', TEST_HOSTNAME, '-a', "dev"], exit_code=0)
+
     def setUp(self):
         self.setup_cli_params({})
-        shutil.copy('./test/test_config/conjurrc', f'{DEFAULT_CONFIG_FILE}')
 
+        self.init_to_cli()
         with open(DEFAULT_NETRC_FILE, 'w') as netrc:
             netrc.write(f"machine {TEST_HOSTNAME}\n")
             netrc.write("login admin\n")
