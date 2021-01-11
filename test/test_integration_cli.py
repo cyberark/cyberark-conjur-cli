@@ -8,9 +8,8 @@ This test file handles the main test flows after initialization and configuratio
 import json
 import tempfile
 import uuid
-import unittest
-from unittest.mock import patch
 
+import Utils
 from conjur.constants import *
 from .util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -32,14 +31,9 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         return self.cli_auth_params
 
-    @patch('builtins.input', return_value='yes')
-    def init_to_cli(self, mock_input):
-        self.invoke_cli(self.cli_auth_params,
-                        ['init', '-u', self.client_params.hostname, '-a', self.client_params.account], exit_code=0)
-
     def setUp(self):
         self.setup_cli_params({})
-        self.init_to_cli()
+        Utils.init_to_cli(self)
         with open(DEFAULT_NETRC_FILE, 'w') as netrc:
             netrc.write(f"machine {self.client_params.hostname}\n")
             netrc.write("login admin\n")

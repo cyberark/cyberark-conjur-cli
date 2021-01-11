@@ -26,7 +26,7 @@ setup(
     name="conjur-client",
     version=VERSION_DATA['__version__'],
     python_requires='>=3.5',
-    packages=find_packages(exclude=("test")),
+    packages=find_packages(),
     zip_safe=True,
 
     scripts=['pkg_bin/conjur'],

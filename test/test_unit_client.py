@@ -410,7 +410,7 @@ class ClientTest(unittest.TestCase):
             mock_api_config):
         Client().list({})
 
-        mock_api_instance.return_value.list_resources.assert_called_once_with({})
+        mock_api_instance.return_value.resources_list.assert_called_once_with({})
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)

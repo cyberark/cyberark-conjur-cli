@@ -38,7 +38,5 @@ class ConjurrcData:
 
     # pylint: disable=line-too-long
     def __repr__(self):
-        return "{'appliance_url': %r, 'account': %r, 'cert_file': %r, 'plugins': %r}" % (self.appliance_url,
-                                                                                         self.account,
-                                                                                         self.cert_file,
-                                                                                         self.plugins)
+        return f"{{'appliance_url': '{self.appliance_url}', 'account': '{self.account}', " \
+               f"'cert_file': '{self.cert_file}', 'plugins': {self.plugins}}}"

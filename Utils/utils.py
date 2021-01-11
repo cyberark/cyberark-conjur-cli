@@ -3,7 +3,7 @@
 """
 Utils module
 
-This module is holds the common logic across the codebase
+This module holds the common logic across the codebase
 """
 import logging
 

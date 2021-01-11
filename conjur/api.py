@@ -126,7 +126,7 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
-    def list_resources(self, list_constraints):
+    def resources_list(self, list_constraints):
         """
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
@@ -140,12 +140,17 @@ class Api():
                                         query=list_constraints,
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
-
         resources = json.loads(json_response.decode('utf-8'))
+
+        # Returns the result as a list of resource ids instead of the raw JSON only
+        # when the user does not provide `inspect` as one of their filters
         if 'inspect' not in list_constraints:
+            # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
             return list(resource_list)
 
+        # To see the full resources response see
+        # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
     def get_variable(self, variable_id):

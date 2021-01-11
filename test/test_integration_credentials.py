@@ -15,6 +15,7 @@ from unittest.mock import patch
 
 import requests
 
+import Utils
 from .util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from Utils import py_utils as utils
@@ -41,7 +42,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             utils.remove_file(DEFAULT_CERTIFICATE_FILE)
         except OSError:
             pass
-        self.init_to_cli()
+        Utils.init_to_cli(self)
 
     def validate_netrc(self, machine, login, password):
         with open(DEFAULT_NETRC_FILE, 'r') as netrc:
@@ -55,11 +56,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             netrc_test.write(f"machine {machine}\n")
             netrc_test.write(f"login {login}\n")
             netrc_test.write(f"password {password}\n")
-
-    @patch('builtins.input', return_value='yes')
-    def init_to_cli(self, mock_input):
-        self.invoke_cli(self.cli_auth_params,
-                        ['init', '-u', self.client_params.hostname, '-a', self.client_params.account], exit_code=0)
 
     # *************** INITIAL LOGIN CREDENTIALS TESTS ***************
 

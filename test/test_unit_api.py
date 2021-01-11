@@ -461,7 +461,7 @@ class ApiTest(unittest.TestCase):
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.list_resources({'limit':1})
+        api.resources_list({'limit':1})
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
                               query={'limit':1},

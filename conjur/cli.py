@@ -18,6 +18,8 @@ import sys
 import traceback
 
 # Internals
+import requests
+
 from conjur.argparse_wrapper import ArgparseWrapper
 from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
@@ -288,6 +290,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
             sys.exit(1)
+        except requests.exceptions.HTTPError as client_error:
+            logging.debug(traceback.format_exc())
+            sys.stdout.write(f"Failed to execute command. Reason: {client_error})")
+            sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"{str(error)}\n")
@@ -330,17 +336,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         logout_controller.remove_credentials()
 
     @classmethod
-    # pylint: disable=too-many-arguments
-    def handle_list_logic(cls, ssl_verify=True, kind=None,
-                          inspect=False, search=None,
-                          limit=None, offset=None,
-                          role=None, client=None):
+    def handle_list_logic(cls, ssl_verify=True, list_data=None, client=None):
         """
         Method that wraps the list call logic
         """
-        list_data = ListData(kind=kind, inspect=inspect,
-                             search=search, limit=limit,
-                             offset=offset, acting_as=role)
         list_logic = ListLogic(client)
         list_controller = ListController(ssl_verify=ssl_verify,
                                          list_logic=list_logic,
@@ -385,10 +384,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
-            Cli.handle_list_logic(args.ssl_verify, args.kind,
-                                  args.inspect, args.search,
-                                  args.limit, args.offset,
-                                  args.role, client)
+            list_data = ListData(kind=args.kind, inspect=args.inspect,
+                             search=args.search, limit=args.limit,
+                             offset=args.offset, acting_as=args.role)
+            Cli.handle_list_logic(args.ssl_verify, list_data, client)
+
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
