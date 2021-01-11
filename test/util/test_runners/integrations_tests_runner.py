@@ -24,7 +24,7 @@ import shutil
 from test.test_integration_cli import CliIntegrationTest
 from test.test_integration_configurations import CliIntegrationTestConfigurations
 from test.test_integration_credentials import CliIntegrationTestCredentials
-from conjur.endpoints import ConjurEndpoint
+from test.test_integration_list import CliIntegrationListTest
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
@@ -37,7 +37,10 @@ def main():
 
     runner = TestRunner(args)
     runner.start_env()
-    runner.run_tests(test_modules=[CliIntegrationTest, CliIntegrationTestConfigurations, CliIntegrationTestCredentials])
+    runner.run_tests(test_modules=[CliIntegrationTest,
+                                   CliIntegrationTestConfigurations,
+                                   CliIntegrationTestCredentials,
+                                   CliIntegrationListTest])
 
 
 class TestRunner:  # pragma: no cover
@@ -67,7 +70,7 @@ class TestRunner:  # pragma: no cover
         set up the test environment
         Test environment setup will be in the following order:
         1) Create a netrc file to provide login details
-        2)  Run conjur init to initialize the CLI and get the certificate and conjurrc files
+        2) Run conjur init to initialize the CLI and get the certificate and conjurrc files
         """
 
         # copy netrc from home folder to test folder

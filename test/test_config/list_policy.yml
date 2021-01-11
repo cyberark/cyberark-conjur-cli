@@ -1,0 +1,11 @@
+- !layer somelayer
+- !group somegroup
+- !host anotherhost
+- !user someuser
+- !variable one/password
+- !webservice somewebservice
+
+- !permit
+  resource: !variable one/password
+  privileges: [read,execute]
+  role: !user someuser

@@ -166,11 +166,12 @@ class Client():
         """
         return self._api.whoami()
 
-    def list(self):
+    # Constraints remain an optional parameter for backwards compatibility in the SDK
+    def list(self, list_constraints=None):
         """
         Lists all available resources
         """
-        return self._api.list_resources()
+        return self._api.list_resources(list_constraints)
 
     def get(self, variable_id):
         """

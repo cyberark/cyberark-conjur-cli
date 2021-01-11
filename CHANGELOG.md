@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Added
-- Method `login\logout` to login and out of the CLI
+- Method `list` flag constraints are now available in both CLI and API to filter results
+  [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/91)
+- Method `login\logout` are now available in CLI to login and out of the CLI
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/128)
-- Method `init` to initialize the CLI with the Conjur server is now available in both CLI and API
+- Method `init` is now available in CLI to initialize the CLI with the Conjur server
   [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
 
 ### Changed

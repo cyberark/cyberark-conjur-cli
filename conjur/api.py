@@ -126,7 +126,7 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
-    def list_resources(self):
+    def list_resources(self, list_constraints):
         """
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
@@ -135,16 +135,18 @@ class Api():
             'account': self._account
         }
         params.update(self._default_params)
-
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
                                         params,
+                                        query=list_constraints,
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
 
         resources = json.loads(json_response.decode('utf-8'))
-        resource_list = map(lambda resource: resource['id'], resources)
+        if 'inspect' not in list_constraints:
+            resource_list = map(lambda resource: resource['id'], resources)
+            return list(resource_list)
 
-        return list(resource_list)
+        return resources
 
     def get_variable(self, variable_id):
         """
