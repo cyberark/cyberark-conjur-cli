@@ -44,7 +44,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def set_variable(self, variable_id, value, exit_code=0):
         return self.invoke_cli(self.cli_auth_params,
-                               ['variable', 'set', variable_id, value], exit_code=exit_code)
+                               ['variable', 'set', '-i', variable_id, '-v', value], exit_code=exit_code)
 
     def apply_policy(self, policy_path):
         return self.invoke_cli(self.cli_auth_params,
@@ -52,13 +52,15 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def apply_policy_from_string(self, policy):
         output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
+        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+        with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
             # Run the new apply that should not result in newly created roles
             output = self.apply_policy(temp_policy_file.name)
 
+        os.remove(file_name)
         return output
 
     def replace_policy(self, policy_path):
@@ -67,13 +69,15 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def replace_policy_from_string(self, policy):
         output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
+        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+        with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
             # Run the new replace that should not result in newly created roles
             output = self.replace_policy(temp_policy_file.name)
 
+        os.remove(file_name)
         return output
 
     def delete_policy(self, policy_path):
@@ -82,25 +86,26 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def delete_policy_from_string(self, policy):
         output = None
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
+        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+        with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
             # Run the new delete that should not result in newly created roles
             output = self.delete_policy(temp_policy_file.name)
-
+        os.remove(file_name)
         return output
 
     def get_variable(self, *variable_ids):
         return self.invoke_cli(self.cli_auth_params,
-                               ['variable', 'get', *variable_ids])
+                               ['variable', 'get', '-i', *variable_ids])
 
     def assert_set_and_get(self, variable_id):
         expected_value = uuid.uuid4().hex
 
         self.set_variable(variable_id, expected_value)
         output = self.get_variable(variable_id)
-        self.assertEquals(expected_value, output)
+        self.assertEquals(expected_value, output.strip())
 
     def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
         with self.assertRaises(error_class):
@@ -108,7 +113,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def print_instead_of_raise_error(self, variable_id, error_message_regex):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'set', variable_id, uuid.uuid4().hex], exit_code=1)
+                                 ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
 
         self.assertRegex(output, error_message_regex)
 
@@ -151,7 +156,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_unknown_secret_raises_not_found_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', 'unknown'], exit_code=1)
+                                 ['variable', 'get', '-i', 'unknown'], exit_code=1)
         self.assertRegex(output, "404 Client Error: Not Found for url:")
 
     @integration_test
@@ -170,7 +175,8 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         self.setup_cli_params({})
 
         policy, variables = self.generate_policy_string()
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
+        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+        with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
@@ -187,6 +193,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         for variable_name, variable_value in value_map.items():
             self.assertEquals(variable_value, batch_result[variable_name])
+        os.remove(file_name)
 
     @integration_test
     def test_https_can_apply_policy(self):
@@ -254,7 +261,8 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         orig_policy, old_variables = self.generate_policy_string()
 
-        with tempfile.NamedTemporaryFile() as temp_policy_file:
+        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+        with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(orig_policy.encode('utf-8'))
             temp_policy_file.flush()
 
@@ -268,6 +276,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         for old_variable in old_variables:
             self.print_instead_of_raise_error(old_variable, "404 Client Error: Not Found for url")
+        os.remove(file_name)
 
     @integration_test
     def test_https_replace_policy_can_output_returned_data(self):
@@ -314,7 +323,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_delete_policy(self):
         self.setup_cli_params({})
 
-        policy, variables = self.generate_policy_string()
+        policy, variables = Utils.generate_policy_string(self)
         self.delete_policy_from_string(policy)
 
         for variable in variables:

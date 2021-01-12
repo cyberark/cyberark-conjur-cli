@@ -244,17 +244,35 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
                                                          formatter_class=formatter_class)
-        variable_subparsers = variable_parser.add_subparsers(dest='action')
-        get_variable_parser = variable_subparsers.add_parser('get',
-                                                             help='Get the value of a variable')
-        get_variable_parser.add_argument('variable_id',
-                                 help='ID of a variable', nargs='+')
-        set_variable_parser = variable_subparsers.add_parser('set',
-                                                             help='Set the value of a variable')
-        set_variable_parser.add_argument('variable_id',
-                                         help='ID of the variable')
-        set_variable_parser.add_argument('value',
-                                         help='New value of the variable')
+
+        variable_subparser = variable_parser.add_subparsers(title="Subcommand", dest='action')
+        variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
+        variable_get_subcommand_parser.add_argument('-i', '--id',
+                                                    help='ID of a variable', nargs='+', required=True)
+        variable_set_subcommand_parser = variable_subparser.add_parser(name="set")
+        variable_set_subcommand_parser.add_argument('-i', '--id',
+                                                    help='ID of a variable', required=True)
+        variable_set_subcommand_parser.add_argument('-v', '--value',
+                                                    help='New value of the variable', required=True)
+        # get_variable_parser = variable_parser.add_argument('get',
+        #                                                     help='Get the value of a variable')
+
+        # get_variable_options = list_subparser.add_argument_group(title=self.title("Options"))
+
+        # get_variable_parser = variable_parser.add_parser('get',
+        #                                                      help='Get the value of a variable')
+        # variable_subparsers = get_variable_parser.add_subparsers(dest='action')
+        # get_variable_parser.add_argument('variable_id',
+        #                          help='ID of a variable', nargs='+')
+        #
+        # get_variable_parser.add_argument('-i', '--id',
+        #                          help='ID of a variable', nargs='+')
+        # set_variable_parser = variable_subparsers.add_parser('set',
+        #                                                      help='Set the value of a variable')
+        # set_variable_parser.add_argument('-id', '--id',
+        #                                  help='ID of the variable')
+        # set_variable_parser.add_argument('-v', '--value',
+        #                                  help='New value of the variable')
 
         # *************** WHOAMI COMMAND ***************
 
@@ -367,7 +385,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             return
 
         # Needed for unit tests so that they do not require configuring
-        if os.getenv('TEST_ENV') is None:
+        if os.getenv('TEST_ENV') is None or os.getenv('TEST_ENV') == 'False':
             # If the user runs a command without configuring the CLI or logging in,
             # we request they do so before executing their request
             # pylint: disable=line-too-long
@@ -392,15 +410,18 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             result = client.whoami()
             print(json.dumps(result, indent=4))
         elif resource == 'variable':
-            variable_id = args.variable_id
+            variable_id = args.id
             if args.action == 'get':
                 if len(variable_id) == 1:
                     variable_value = client.get(variable_id[0])
-                    print(variable_value.decode('utf-8'), end='')
+                    print(variable_value.decode('utf-8'), end='\n')
                 else:
                     variable_values = client.get_many(*variable_id)
                     print(json.dumps(variable_values, indent=4))
             else:
+                print(variable_id)
+                print(args.value)
+                print(type(args.value))
                 client.set(variable_id, args.value)
                 print("Value set: '{}'".format(variable_id))
         elif resource == 'policy':

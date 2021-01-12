@@ -48,6 +48,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
     # pylint: disable=arguments-differ
     def parse_args(self, args=None, namespace=None, resource=None):
         args, arg_flags = self.parse_known_args(args, namespace)
+
         resource = args.resource if args else None
         if arg_flags:
             err_msg = (self.ARG_ERROR_FORMAT % ' '.join(arg_flags))

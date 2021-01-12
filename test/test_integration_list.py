@@ -32,7 +32,10 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
         self.setup_cli_params({})
         # Need to configure the CLI and login to perform further commands
         Utils.setup_cli(self)
-        return self.invoke_cli(self.cli_auth_params,
+        self.invoke_cli(self.cli_auth_params,
+                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("initial")])
+
+        self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("list")])
 
     @integration_test
@@ -40,14 +43,14 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list'])
         self.assertEquals(output,
                           f'[\n    "{self.client_params.account}:policy:root",\n'
-                          f'    "{self.client_params.account}:user:someuser",\n'
+                          f'    "{self.client_params.account}:variable:one/password",\n'
                           f'    "{self.client_params.account}:layer:somelayer",\n'
                           f'    "{self.client_params.account}:group:somegroup",\n'
                           f'    "{self.client_params.account}:host:anotherhost",\n'
-                          f'    "{self.client_params.account}:variable:one/password",\n'
+                          f'    "{self.client_params.account}:user:someuser",\n'
                           f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
 
-    # TODO This will need to be changed when UX is finalizeds
+    # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_list_help_returns_help_screen(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-h'])
@@ -231,7 +234,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '-s', 'someuser'])
         self.assertEquals(output,
                   f'[\n    "{self.client_params.account}:user:someuser"\n]\n')
-    test_list_short_search_returns_list_with_param.tester=True
+
     @integration_test
     def test_list_long_search_returns_list_with_param(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '--search=someuser'])
