@@ -24,7 +24,7 @@ class TestEnvironmentParams:
     """
 
     def __init__(self, cli_to_test_path=None, invoke_process=False,
-                 path_provider=TestRunnerPathProvider()):
+                 path_provider=None):
         self.invoke_process = invoke_process
         self.cli_to_test_path = cli_to_test_path
-        self.path_provider = path_provider
+        self.path_provider = path_provider if  path_provider else TestRunnerPathProvider()
