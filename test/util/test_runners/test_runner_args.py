@@ -6,10 +6,11 @@ class TestRunnerArgs:
     DTO to hold the tests environment arguments
     """
 
-    def __init__(self, url, account, login, password, invoke_cli_as_process,
+    def __init__(self, run_oss_tests, url, account, login, password, invoke_cli_as_process,
                  working_cli_path_only_for_init: str,
                  cli_to_test: str, files_folder: str, allow_same_binaries=False,
                  test_name_identifier="integration"):
+        self.run_oss_tests = run_oss_tests
         self.hostname = url
         self.account = account
         self.login = login
@@ -43,6 +44,8 @@ class TestRunnerArgs:
         parser = ArgumentParser(description='Test arguments')
 
         # Add the arguments
+        parser.add_argument('--oss', dest='run_oss_tests', action='store_true',
+                            help='Added to run OSS-specific tests')
         parser.add_argument('-p_invoke', '--invoke_cli_as_process', action='store_true',
                             help='If added, integration tests will run as a process executable. Otherwise it will run '
                                  'as code, requiring Python')

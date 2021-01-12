@@ -1,5 +1,5 @@
 import os
-from test.util.test_path_provider import TestRunnerPathProvider, TestIntegrationPathProvider
+from test.util.test_path_provider import TestRunnerPathProvider
 
 
 class ClientParams:
@@ -24,7 +24,7 @@ class TestEnvironmentParams:
     """
 
     def __init__(self, cli_to_test_path=None, invoke_process=False,
-                 path_provider=TestIntegrationPathProvider()):
+                 path_provider=TestRunnerPathProvider()):
         self.invoke_process = invoke_process
         self.cli_to_test_path = cli_to_test_path
         self.path_provider = path_provider
