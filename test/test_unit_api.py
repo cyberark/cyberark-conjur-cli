@@ -461,9 +461,10 @@ class ApiTest(unittest.TestCase):
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.list_resources()
+        api.resources_list({'limit':1})
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                              query={'limit':1},
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', \

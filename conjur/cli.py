@@ -18,11 +18,15 @@ import sys
 import traceback
 
 # Internals
+import requests
+
 from conjur.argparse_wrapper import ArgparseWrapper
 from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.credentials_data import CredentialsData
 from conjur.credentials_from_file import CredentialsFromFile
+from conjur.list import ListData, ListController
+from conjur.list.list_logic import ListLogic
 from conjur.login import LoginLogic, LoginController
 from conjur.logout import LogoutController, LogoutLogic
 from conjur.version import __version__
@@ -186,8 +190,28 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         # *************** LIST COMMAND ***************
 
         # pylint: disable=line-too-long
-        resource_subparsers.add_parser('list',
-                                       help='List all available resources belonging to this account')
+        list_subparser = resource_subparsers.add_parser('list',
+                                                         help='List all available resources belonging to this account')
+
+        list_options = list_subparser.add_argument_group(title=self.title("Options"))
+        list_options.add_argument('-i', '--inspect',
+                                  action='store_true', dest='inspect',
+                                  help='')
+        list_options.add_argument('-k', '--kind',
+                                  action='store', dest='kind',
+                                  help='')
+        list_options.add_argument('-r', '--role',
+                                  action='store', dest='role',
+                                  help='')
+        list_options.add_argument('-l', '--limit',
+                                  action='store', dest='limit',
+                                  help='')
+        list_options.add_argument('-o', '--offset',
+                                  action='store', dest='offset',
+                                  help='')
+        list_options.add_argument('-s', '--search',
+                                  action='store', dest='search',
+                                  help='')
 
         # *************** POLICY COMMAND ***************
 
@@ -266,6 +290,10 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
             sys.exit(1)
+        except requests.exceptions.HTTPError as client_error:
+            logging.debug(traceback.format_exc())
+            sys.stdout.write(f"Failed to execute command. Reason: {client_error})")
+            sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"{str(error)}\n")
@@ -296,16 +324,27 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         login_controller.load()
 
     @classmethod
-    def handle_logout_logic(cls):
+    def handle_logout_logic(cls, ssl_verify=True):
         """
         Method that wraps the logout call logic
         """
         credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
         logout_logic = LogoutLogic(credentials)
 
-        logout_controller = LogoutController(ssl_verify=None,
+        logout_controller = LogoutController(ssl_verify=ssl_verify,
                                              logout_logic=logout_logic)
         logout_controller.remove_credentials()
+
+    @classmethod
+    def handle_list_logic(cls, ssl_verify=True, list_data=None, client=None):
+        """
+        Method that wraps the list call logic
+        """
+        list_logic = ListLogic(client)
+        list_controller = ListController(ssl_verify=ssl_verify,
+                                         list_logic=list_logic,
+                                         list_data=list_data)
+        list_controller.load()
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -325,7 +364,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             Cli.handle_login_logic(args.name,  args.password, args.ssl_verify)
             return
         elif resource == 'logout':
-            Cli.handle_logout_logic()
+            Cli.handle_logout_logic(args.ssl_verify)
             return
 
         # Needed for unit tests so that they do not require configuring
@@ -345,8 +384,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
-            result = client.list()
-            print(json.dumps(result, indent=4))
+            list_data = ListData(kind=args.kind, inspect=args.inspect,
+                             search=args.search, limit=args.limit,
+                             offset=args.offset, acting_as=args.role)
+            Cli.handle_list_logic(args.ssl_verify, list_data, client)
+
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))

@@ -13,6 +13,7 @@ import logging
 # Internals
 import netrc
 
+from Utils.utils import Utils
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
@@ -29,11 +30,11 @@ class ConfigException(Exception):
     This class is used to wrap a regular exception with a more-descriptive class name
 
     *************** DEVELOPER NOTE ***************
-    For backwards capability purposes, do not change or remove existing
-    functionality in this class, specifically the constructor. Although via
+    For backwards capability purposes, do not remove existing functionality
+    in this class or remove params from the constructor. Although via
     the CLI we do not support commandline arguments, other developers
-    use these parameters defined in this class to initialize our
-    Python SDK in their code.
+    use these parameters defined in this class to initialize our Python
+    SDK in their code.
     """
 class Client():
     """
@@ -60,6 +61,9 @@ class Client():
                  password=None,
                  ssl_verify=True,
                  url=None):
+
+        if ssl_verify is False:
+            Utils.get_insecure_warning()
 
         self.setup_logging(debug)
 
@@ -166,11 +170,12 @@ class Client():
         """
         return self._api.whoami()
 
-    def list(self):
+    # Constraints remain an optional parameter for backwards compatibility in the SDK
+    def list(self, list_constraints=None):
         """
         Lists all available resources
         """
-        return self._api.list_resources()
+        return self._api.resources_list(list_constraints)
 
     def get(self, variable_id):
         """

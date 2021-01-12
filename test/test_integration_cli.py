@@ -8,9 +8,8 @@ This test file handles the main test flows after initialization and configuratio
 import json
 import tempfile
 import uuid
-import unittest
-from unittest.mock import patch
 
+import Utils
 from conjur.constants import *
 from .util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -25,21 +24,16 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         super(CliIntegrationTest, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
-    # Resets the conjurrc for the next run run
+
     def setup_cli_params(self, env_vars, *params):
         self.cli_auth_params = ['--debug']
         self.cli_auth_params += params
 
         return self.cli_auth_params
 
-    @patch('builtins.input', return_value='yes')
-    def init_to_cli(self, mock_input):
-        self.invoke_cli(self.cli_auth_params,
-                        ['init', '-u', self.client_params.hostname, '-a', self.client_params.account], exit_code=0)
-
     def setUp(self):
         self.setup_cli_params({})
-        self.init_to_cli()
+        Utils.init_to_cli(self)
         with open(DEFAULT_NETRC_FILE, 'w') as netrc:
             netrc.write(f"machine {self.client_params.hostname}\n")
             netrc.write("login admin\n")
@@ -193,15 +187,6 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         for variable_name, variable_value in value_map.items():
             self.assertEquals(variable_value, batch_result[variable_name])
-
-    @integration_test
-    def test_https_can_list_resources(self):
-        self.setup_cli_params({})
-
-        output = self.invoke_cli(self.cli_auth_params, ['list'])
-
-        self.assertEquals(output,
-                          f'[\n    "{self.client_params.account}:policy:root",\n    "{self.client_params.account}:variable:one/password"\n]\n')
 
     @integration_test
     def test_https_can_apply_policy(self):

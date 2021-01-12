@@ -119,7 +119,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_invokes_resource_listing_correctly(self, cli_invocation, output, client):
-        client.list.assert_called_once_with()
+        client.list.assert_called_once_with({})
 
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_resource_listing_outputs_formatted_json(self, cli_invocation, output, client):

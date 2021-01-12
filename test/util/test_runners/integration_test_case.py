@@ -61,7 +61,6 @@ def invoke_cli_as_code(test_runner, *args, exit_code=0):
         with redirect_stdout(capture_stream):
             with patch.object(sys, 'argv', ["cli"] + cli_args):
                 Cli().run()
-
     test_runner.assertEqual(sys_exit.exception.code, exit_code,
                             "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
     return capture_stream.getvalue()
