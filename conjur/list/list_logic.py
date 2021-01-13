@@ -35,7 +35,7 @@ class ListLogic:
         if list_constraints:
             # pylint: disable=logging-fstring-interpolation
             logging.debug(f"Executing list command with the following "\
-                          f"constraints: {list_constraints}")
+                          f"constraints: {list_data}")
         else:
             logging.debug("Executing list command with no constraints")
 

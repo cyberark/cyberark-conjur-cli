@@ -87,7 +87,7 @@ class Client():
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
                 # pylint: disable=logging-fstring-interpolation
-                logging.debug("Fetched connection details "
+                logging.debug("Fetched connection details: "
                               f"{{'account': {loaded_config['account']}, "
                               f"'appliance_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")

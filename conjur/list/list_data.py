@@ -18,7 +18,7 @@ class ListData:
         self.search = argParams['search']
         self.limit = argParams['limit']
         self.offset = argParams['offset']
-        self.acting_as = argParams['acting_as']
+        self.role = argParams['role']
 
     def list_dictify(self):
         """
@@ -32,7 +32,12 @@ class ListData:
         return list_dict
 
     def __repr__(self):
-        # pylint: disable=line-too-long
-        return f"{{ 'kind': {self.kind}, 'inspect': {self.inspect}, " \
-               f"'search': {self.search}, 'limit': {self.limit}, " \
-               f"'offset': {self.offset}, 'role': {self.acting_as} }}"
+        result = []
+        # pylint: disable=multiple-statements
+        if self.kind: result.append(f"'kind': '{self.kind}'")
+        if self.limit: result.append(f"'limit': '{self.limit}'")
+        if self.inspect: result.append(f"'inspect': '{self.inspect}'")
+        if self.search: result.append(f"'search': '{self.search}'")
+        if self.offset: result.append(f"'offset': '{self.offset}'")
+        if self.role: result.append(f"'role': '{self.role}'")
+        return '{'+', '.join(result) + '}'

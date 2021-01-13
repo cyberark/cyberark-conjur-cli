@@ -18,5 +18,3 @@ def login_to_cli(self):
 def setup_cli(self):
     init_to_cli(self)
     login_to_cli(self)
-
-
