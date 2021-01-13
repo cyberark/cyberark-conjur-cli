@@ -46,7 +46,7 @@ class TestRunnerArgs:
         # Add the arguments
         parser.add_argument('--oss', dest='run_oss_tests', action='store_true',
                             help='Added to run OSS-specific tests')
-        parser.add_argument('-p_invoke', '--invoke_cli_as_process', action='store_true',
+        parser.add_argument('-p_invoke', '--invoke_cli_as_process', action='store_true', default=True,
                             help='If added, integration tests will run as a process executable. Otherwise it will run '
                                  'as code, requiring Python')
         parser.add_argument('-i', '--identifier', dest='test_name_identifier', action='store', default='integration',
@@ -63,6 +63,6 @@ class TestRunnerArgs:
         parser.add_argument('-f', '--files_folder', dest='files_folder', action='store', default='./test',
                             help='where the test assets are located')
         parser.add_argument('-s', '--same', dest='allow_same_binaries', action='store_true',
-                            help='If added cli_to_test_path and working_cli can address the same path')
+                            help='If added cli_to_test and working_cli can address the same path')
         args = parser.parse_args()
         return TestRunnerArgs(**vars(args))

@@ -83,7 +83,8 @@ def invoke_cli_as_process(test_runner, *args, exit_code=0) -> str:
     child = sp.Popen([run_cli_cmd] + cli_args, stdout=sp.PIPE)
     output = child.communicate()[0]
     process_exit_code = child.returncode
-
+    if process_exit_code != exit_code:
+        print(output.decode('utf-8'))
     test_runner.assertEqual(process_exit_code, exit_code,
-                            "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
+                            "ERROR: CLI returned an unexpected error status code: '{0}'. Output: {1} ".format(cli_args, output.decode('utf-8')))
     return output.decode('utf-8')

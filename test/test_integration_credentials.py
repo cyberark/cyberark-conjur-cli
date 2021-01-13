@@ -235,7 +235,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates when a user can logout successfully
     '''
-
+    # TODO check
     @integration_test
     def test_https_logout_successful(self):
 
@@ -247,7 +247,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                  ['logout'], exit_code=0)
 
         self.assertEquals(output.strip(), 'Logged out of Conjur')
-        assert os.path.getsize(DEFAULT_NETRC_FILE) == 1
+        with open(DEFAULT_NETRC_FILE) as netrc_file:
+            assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
     '''
     Validates when a user attempts to logout after an already 
@@ -267,7 +268,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                               ['logout'], exit_code=1)
 
         self.assertEquals(unsuccessful_logout.strip(), "Failed to log out. Please log in.")
-        assert os.path.getsize(DEFAULT_NETRC_FILE) == 1
+        with open(DEFAULT_NETRC_FILE) as netrc_file:
+            assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
     @integration_test
     def test_no_netrc_and_logout_returns_could_not_logout_message(self):
