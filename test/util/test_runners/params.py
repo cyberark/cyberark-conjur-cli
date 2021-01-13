@@ -16,6 +16,7 @@ class ClientParams:
         # when we run the tests using nose2 script we will use the CONJUR_AUTHN_API_KEY env variable
         self.env_api_key = api_key if api_key else os.environ['CONJUR_AUTHN_API_KEY']
 
+
 class TestEnvironmentParams:
     """
     DTO wrapped the environmentParams params
@@ -27,4 +28,9 @@ class TestEnvironmentParams:
                  path_provider=None):
         self.invoke_process = invoke_process
         self.cli_to_test_path = cli_to_test_path
-        self.path_provider = path_provider if  path_provider else TestRunnerPathProvider()
+        if path_provider:
+            self.path_provider = path_provider
+        elif TestRunnerPathProvider.getInstance():
+            self.path_provider = TestRunnerPathProvider.getInstance()
+        else:
+            self.path_provider = TestRunnerPathProvider()
