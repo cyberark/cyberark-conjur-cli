@@ -16,10 +16,9 @@ import sys
 
 # Third party
 import traceback
-
-# Internals
 import requests
 
+# Internals
 from conjur.argparse_wrapper import ArgparseWrapper
 from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
@@ -386,7 +385,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         if resource == 'list':
             list_data = ListData(kind=args.kind, inspect=args.inspect,
                              search=args.search, limit=args.limit,
-                             offset=args.offset, acting_as=args.role)
+                             offset=args.offset, role=args.role)
             Cli.handle_list_logic(args.ssl_verify, list_data, client)
 
         elif resource == 'whoami':
