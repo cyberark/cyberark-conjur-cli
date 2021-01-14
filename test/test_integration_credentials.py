@@ -77,7 +77,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
 
         # Load in new user
         self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path('conjur')],
+                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path('conjur')],
                         exit_code=0)
 
         # Get admin's access token to be able to use it to change the user's password
@@ -204,7 +204,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.write_to_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
 
         self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path('conjur')],
+                        ['policy', 'replace', '-b', 'root', '-f',self.environment.path_provider.get_policy_path('conjur')],
                         exit_code=0)
 
         url = f"{self.client_params.hostname}/authn/{self.client_params.account}/admin/authenticate"
@@ -247,13 +247,13 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                  ['logout'], exit_code=0)
 
         self.assertEquals(output.strip(), 'Logged out of Conjur')
-        assert os.path.getsize(DEFAULT_NETRC_FILE) == 1
+        with open(DEFAULT_NETRC_FILE) as netrc_file:
+            assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
     '''
     Validates when a user attempts to logout after an already 
     successful logout, will fail
     '''
-
     @integration_test
     def test_https_logout_twice_returns_could_not_logout_message(self):
 
@@ -267,7 +267,9 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                               ['logout'], exit_code=1)
 
         self.assertEquals(unsuccessful_logout.strip(), "Failed to log out. Please log in.")
-        assert os.path.getsize(DEFAULT_NETRC_FILE) == 1
+        with open(DEFAULT_NETRC_FILE) as netrc_file:
+            assert netrc_file.read().strip() == "", 'netrc file is not empty!'
+
 
     @integration_test
     def test_no_netrc_and_logout_returns_could_not_logout_message(self):

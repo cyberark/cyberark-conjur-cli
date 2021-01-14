@@ -261,16 +261,16 @@ class ApiTest(unittest.TestCase):
                               identifier='myvar',
                               ssl_verify='verify')
 
-    # Policy apply
+    # Policy load
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
-    def test_apply_policy_invokes_http_client_correctly(self, mock_http_client):
+    def test_load_policy_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+        api.load_policy_file('mypolicyname', self.POLICY_FILE)
 
         policy_data = None
         with open(self.POLICY_FILE, 'r') as content_file:
@@ -282,23 +282,23 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
-    def test_apply_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
+    def test_load_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        output = api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+        output = api.load_policy_file('mypolicyname', self.POLICY_FILE)
         self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
-    def test_apply_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
+    def test_load_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.apply_policy_file('mypolicyname', self.POLICY_FILE)
+        api.load_policy_file('mypolicyname', self.POLICY_FILE)
 
         policy_data = None
         with open(self.POLICY_FILE, 'r') as content_file:
@@ -357,16 +357,16 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify='ssl_verify')
 
-    # Policy delete
+    # Policy update
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
-    def test_delete_policy_invokes_http_client_correctly(self, mock_http_client):
+    def test_update_policy_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.delete_policy_file('mypolicyname', self.POLICY_FILE)
+        api.update_policy_file('mypolicyname', self.POLICY_FILE)
 
         policy_data = None
         with open(self.POLICY_FILE, 'r') as content_file:
@@ -378,23 +378,23 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
-    def test_delete_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
+    def test_update_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        output = api.delete_policy_file('mypolicyname', self.POLICY_FILE)
+        output = api.update_policy_file('mypolicyname', self.POLICY_FILE)
         self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
-    def test_delete_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
+    def test_update_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
 
-        api.delete_policy_file('mypolicyname', self.POLICY_FILE)
+        api.update_policy_file('mypolicyname', self.POLICY_FILE)
 
         policy_data = None
         with open(self.POLICY_FILE, 'r') as content_file:

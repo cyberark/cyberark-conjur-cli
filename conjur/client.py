@@ -196,11 +196,11 @@ class Client():
         """
         self._api.set_variable(variable_id, value)
 
-    def apply_policy_file(self, policy_name, policy_file):
+    def load_policy_file(self, policy_name, policy_file):
         """
         Applies a file-based policy to the Conjur instance
         """
-        return self._api.apply_policy_file(policy_name, policy_file)
+        return self._api.load_policy_file(policy_name, policy_file)
 
     def replace_policy_file(self, policy_name, policy_file):
         """
@@ -208,8 +208,8 @@ class Client():
         """
         return self._api.replace_policy_file(policy_name, policy_file)
 
-    def delete_policy_file(self, policy_name, policy_file):
+    def update_policy_file(self, policy_name, policy_file):
         """
         Replaces a file-based policy defined in the Conjur instance
         """
-        return self._api.delete_policy_file(policy_name, policy_file)
+        return self._api.update_policy_file(policy_name, policy_file)

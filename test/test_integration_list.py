@@ -33,10 +33,10 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
         # Need to configure the CLI and login to perform further commands
         Utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("initial")])
+                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
         self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("list")])
+                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
 
     @integration_test
     def test_list_returns_resources(self):
@@ -59,7 +59,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_inspect_user_returns_info_on_user(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '--inspect', '--kind', 'user'])
         self.assertIn(f'        "id": "{self.client_params.account}:user:someuser",\n'
                       f'        "owner": "{self.client_params.account}:user:admin",\n'
@@ -267,7 +267,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_combo_limit_and_kind_returns_specified_kind(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'apply', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'load', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '-l', '2', '-k', 'host'])
         self.assertEquals(output,
                           f'[\n    "{self.client_params.account}:host:anotherhost",\n'
@@ -276,7 +276,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_combo_limit_and_offset_returns_specified_list(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'apply', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'load', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '2', '-l', '3'])
         self.assertEquals(output,
                           f'[\n    "{self.client_params.account}:host:somehost",\n'

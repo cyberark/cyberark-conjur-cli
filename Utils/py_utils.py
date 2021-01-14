@@ -1,4 +1,5 @@
 import os
+import tempfile
 import uuid
 from unittest.mock import patch
 
@@ -37,11 +38,20 @@ def assert_set_and_get(self, variable_id):
     output = get_variable(self, variable_id)
     self.assertEquals(expected_value, output.strip())
 
+def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
+    with self.assertRaises(error_class):
+        self.set_variable(variable_id, uuid.uuid4().hex, exit_code)
+
+def print_instead_of_raise_error(self, variable_id, error_message_regex):
+    output = self.invoke_cli(self.cli_auth_params,
+                             ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
+
+    self.assertRegex(output, error_message_regex)
  # *************** POLICY ***************
 
-def apply_policy(self, policy_path):
+def load_policy(self, policy_path):
     return self.invoke_cli(self.cli_auth_params,
-                           ['policy', 'apply', 'root', policy_path])
+                           ['policy', 'load', '-b', 'root', '-f', policy_path])
 
 def generate_policy_string(self):
         variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
@@ -63,3 +73,53 @@ def generate_policy_string(self):
                                        variable_3=variable_3)
 
         return (dynamic_policy, [variable_1, variable_2, variable_3])
+
+def load_policy(self, policy_path):
+    return self.invoke_cli(self.cli_auth_params,
+                           ['policy', 'load', '-b', 'root', '-f', policy_path])
+
+def load_policy_from_string(self, policy):
+    output = None
+    file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+    with open(file_name, 'w+b') as temp_policy_file:
+        temp_policy_file.write(policy.encode('utf-8'))
+        temp_policy_file.flush()
+
+        # Run the new load that should not result in newly created roles
+        output = load_policy(self, temp_policy_file.name)
+
+    os.remove(file_name)
+    return output
+
+def replace_policy(self, policy_path):
+    return self.invoke_cli(self.cli_auth_params,
+                           ['policy', 'replace', '-b', 'root', '-f', policy_path])
+
+def replace_policy_from_string(self, policy):
+    output = None
+    file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+    with open(file_name, 'w+b') as temp_policy_file:
+        temp_policy_file.write(policy.encode('utf-8'))
+        temp_policy_file.flush()
+
+        # Run the new replace that should not result in newly created roles
+        output = replace_policy(self, temp_policy_file.name)
+
+    os.remove(file_name)
+    return output
+
+def update_policy(self, policy_path):
+    return self.invoke_cli(self.cli_auth_params,
+                           ['policy', 'update', '-b', 'root', '-f', policy_path])
+
+def update_policy_from_string(self, policy):
+    output = None
+    file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
+    with open(file_name, 'w+b') as temp_policy_file:
+        temp_policy_file.write(policy.encode('utf-8'))
+        temp_policy_file.flush()
+
+        # Run the new update that should not result in newly created roles
+        output = update_policy(self, temp_policy_file.name)
+    os.remove(file_name)
+    return output

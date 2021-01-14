@@ -33,180 +33,32 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def setUp(self):
         self.setup_cli_params({})
-        Utils.init_to_cli(self)
-        with open(DEFAULT_NETRC_FILE, 'w') as netrc:
-            netrc.write(f"machine {self.client_params.hostname}\n")
-            netrc.write("login admin\n")
-            netrc.write(f"password {self.client_params.env_api_key}\n")
-
+        Utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("initial")])
-
-    def set_variable(self, variable_id, value, exit_code=0):
-        return self.invoke_cli(self.cli_auth_params,
-                               ['variable', 'set', '-i', variable_id, '-v', value], exit_code=exit_code)
-
-    def apply_policy(self, policy_path):
-        return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'apply', 'root', policy_path])
-
-    def apply_policy_from_string(self, policy):
-        output = None
-        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
-        with open(file_name, 'w+b') as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Run the new apply that should not result in newly created roles
-            output = self.apply_policy(temp_policy_file.name)
-
-        os.remove(file_name)
-        return output
-
-    def replace_policy(self, policy_path):
-        return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'replace', 'root', policy_path])
-
-    def replace_policy_from_string(self, policy):
-        output = None
-        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
-        with open(file_name, 'w+b') as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Run the new replace that should not result in newly created roles
-            output = self.replace_policy(temp_policy_file.name)
-
-        os.remove(file_name)
-        return output
-
-    def delete_policy(self, policy_path):
-        return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'delete', 'root', policy_path])
-
-    def delete_policy_from_string(self, policy):
-        output = None
-        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
-        with open(file_name, 'w+b') as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            # Run the new delete that should not result in newly created roles
-            output = self.delete_policy(temp_policy_file.name)
-        os.remove(file_name)
-        return output
-
-    def get_variable(self, *variable_ids):
-        return self.invoke_cli(self.cli_auth_params,
-                               ['variable', 'get', '-i', *variable_ids])
-
-    def assert_set_and_get(self, variable_id):
-        expected_value = uuid.uuid4().hex
-
-        self.set_variable(variable_id, expected_value)
-        output = self.get_variable(variable_id)
-        self.assertEquals(expected_value, output.strip())
-
-    def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
-        with self.assertRaises(error_class):
-            self.set_variable(variable_id, uuid.uuid4().hex, exit_code)
-
-    def print_instead_of_raise_error(self, variable_id, error_message_regex):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
-
-        self.assertRegex(output, error_message_regex)
-
-    def generate_policy_string(self):
-        variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
-        variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
-        variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
-
-        policy = \
-            """
-            - !variable
-              id: {variable_1}
-            - !variable
-              id: {variable_2}
-            - !variable
-              id: {variable_3}
-"""
-
-        dynamic_policy = policy.format(variable_1=variable_1,
-                                       variable_2=variable_2,
-                                       variable_3=variable_3)
-
-        return (dynamic_policy, [variable_1, variable_2, variable_3])
+                               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
     # *************** TESTS ***************
     '''
     A non-existent policy file will return FileNotFound error message
     '''
-
     @integration_test
-    def test_apply_policy_raises_file_not_exists_error(self):
+    def test_load_policy_raises_file_not_exists_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['policy', 'apply', 'root', 'somepolicy.yml'], exit_code=1)
+                                 ['policy', 'load', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
         self.assertRegex(output, "Error: No such file or directory:")
 
-    '''
-    A non-existent variable file will return a 404 Not Found error message
-    '''
-
     @integration_test
-    def test_unknown_secret_raises_not_found_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'unknown'], exit_code=1)
-        self.assertRegex(output, "404 Client Error: Not Found for url:")
-
-    @integration_test
-    def test_https_cli_can_set_and_get_a_defined_variable(self):
+    def test_https_can_load_policy(self):
         self.setup_cli_params({})
 
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
-
-    @integration_test
-    def test_https_cli_can_set_and_get_a_defined_variable_if_cert_not_provided_and_verification_disabled(self):
-        self.setup_cli_params({}, '--insecure')
-        self.assert_set_and_get(CliIntegrationTest.DEFINED_VARIABLE_ID)
-
-    @integration_test
-    def test_https_cli_can_batch_get_multiple_variables(self):
-        self.setup_cli_params({})
-
-        policy, variables = self.generate_policy_string()
-        file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
-        with open(file_name, 'w+b') as temp_policy_file:
-            temp_policy_file.write(policy.encode('utf-8'))
-            temp_policy_file.flush()
-
-            self.apply_policy(temp_policy_file.name)
-
-        value_map = {}
-        for variable in variables:
-            value = uuid.uuid4().hex
-            self.set_variable(variable, value)
-            value_map[variable] = value
-
-        batch_result_string = self.get_variable(*variables)
-        batch_result = json.loads(batch_result_string)
-
-        for variable_name, variable_value in value_map.items():
-            self.assertEquals(variable_value, batch_result[variable_name])
-        os.remove(file_name)
-
-    @integration_test
-    def test_https_can_apply_policy(self):
-        self.setup_cli_params({})
-
-        policy, variables = self.generate_policy_string()
-        self.apply_policy_from_string(policy)
+        policy, variables = Utils.generate_policy_string(self)
+        Utils.load_policy_from_string(self, policy)
 
         for variable in variables:
-            self.assert_set_and_get(variable)
-
+            Utils.assert_set_and_get(self, variable)
+    test_https_can_load_policy.tester=True
     @integration_test
-    def test_https_apply_policy_can_output_returned_data(self):
+    def test_https_load_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
@@ -214,8 +66,8 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
 
-        # Run the new apply that should not result in newly created roles
-        json_result = json.loads(self.apply_policy_from_string(policy))
+        # Run the new load that should not result in newly created roles
+        json_result = json.loads(Utils.load_policy_from_string(self, policy))
 
         account_name = self.client_params.account
         expected_object = {
@@ -235,7 +87,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertDictEqual(json_result, expected_object)
 
     @integration_test
-    def test_https_apply_policy_doesnt_break_if_no_created_roles(self):
+    def test_https_load_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
@@ -243,10 +95,10 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
         # Ensure that the accounts exist
-        self.apply_policy_from_string(policy)
+        Utils.load_policy_from_string(self, policy)
 
-        # Run the new apply that should not result in newly created roles
-        json_result = json.loads(self.apply_policy_from_string(policy))
+        # Run the new load that should not result in newly created roles
+        json_result = json.loads(Utils.load_policy_from_string(self, policy))
 
         expected_object = {
             'version': json_result['version'],
@@ -259,23 +111,23 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_replace_policy(self):
         self.setup_cli_params({})
 
-        orig_policy, old_variables = self.generate_policy_string()
+        orig_policy, old_variables = Utils.generate_policy_string(self)
 
         file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
         with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(orig_policy.encode('utf-8'))
             temp_policy_file.flush()
 
-            self.apply_policy(temp_policy_file.name)
+            Utils.load_policy(self, temp_policy_file.name)
 
-        replacement_policy, new_variables = self.generate_policy_string()
-        self.replace_policy_from_string(replacement_policy)
+        replacement_policy, new_variables = Utils.generate_policy_string(self)
+        Utils.replace_policy_from_string(self, replacement_policy)
 
         for new_variable in new_variables:
-            self.assert_set_and_get(new_variable)
+            Utils.assert_set_and_get(self, new_variable)
 
         for old_variable in old_variables:
-            self.print_instead_of_raise_error(old_variable, "404 Client Error: Not Found for url")
+            Utils.print_instead_of_raise_error(self, old_variable, "404 Client Error: Not Found for url")
         os.remove(file_name)
 
     @integration_test
@@ -286,7 +138,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         user_id2 = uuid.uuid4().hex
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
-        json_result = json.loads(self.replace_policy_from_string(policy))
+        json_result = json.loads(Utils.replace_policy_from_string(self, policy))
         account_name = self.client_params.account
 
         expected_object = {
@@ -310,7 +162,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         self.setup_cli_params({})
 
         policy = "- !policy foo\n"
-        json_result = json.loads(self.replace_policy_from_string(policy))
+        json_result = json.loads(Utils.replace_policy_from_string(self, policy))
 
         expected_object = {
             'version': json_result['version'],
@@ -320,17 +172,17 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertDictEqual(json_result, expected_object)
 
     @integration_test
-    def test_https_can_delete_policy(self):
+    def test_https_can_update_policy(self):
         self.setup_cli_params({})
 
         policy, variables = Utils.generate_policy_string(self)
-        self.delete_policy_from_string(policy)
+        Utils.update_policy_from_string(self, policy)
 
         for variable in variables:
-            self.assert_set_and_get(variable)
+            Utils.assert_set_and_get(self, variable)
 
     @integration_test
-    def test_https_delete_policy_can_output_returned_data(self):
+    def test_https_update_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
@@ -338,8 +190,8 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
 
-        # Run the new delete that should not result in newly created roles
-        json_result = json.loads(self.delete_policy_from_string(policy))
+        # Run the new update that should not result in newly created roles
+        json_result = json.loads(Utils.update_policy_from_string(self, policy))
 
         account_name = self.client_params.account
         expected_object = {
@@ -359,7 +211,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertDictEqual(json_result, expected_object)
 
     @integration_test
-    def test_https_delete_policy_doesnt_break_if_no_created_roles(self):
+    def test_https_update_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
@@ -367,10 +219,10 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
         # Ensure that the accounts exist
-        self.delete_policy_from_string(policy)
+        Utils.update_policy_from_string(self, policy)
 
-        # Run the new apply that should not result in newly created roles
-        json_result = json.loads(self.delete_policy_from_string(policy))
+        # Run the new load that should not result in newly created roles
+        json_result = json.loads(Utils.update_policy_from_string(self, policy))
 
         expected_object = {
             'version': json_result['version'],

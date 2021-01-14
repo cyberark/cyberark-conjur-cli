@@ -222,7 +222,7 @@ class Api():
 
     def _load_policy_file(self, policy_id, policy_file, http_verb):
         """
-        This method is used to load, replace or delete a file-based policy into the desired
+        This method is used to load, replace or update a file-based policy into the desired
         name.
         """
 
@@ -242,7 +242,7 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def apply_policy_file(self, policy_id, policy_file):
+    def load_policy_file(self, policy_id, policy_file):
         """
         This method is used to load a file-based policy into the desired
         name.
@@ -258,9 +258,9 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def delete_policy_file(self, policy_id, policy_file):
+    def update_policy_file(self, policy_id, policy_file):
         """
-        This method is used to delete a file-based policy into the desired
+        This method is used to update a file-based policy into the desired
         policy ID.
         """
 

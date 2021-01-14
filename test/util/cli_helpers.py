@@ -32,9 +32,9 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
             client_instance_mock = MagicMock()
             client_instance_mock.get_many.return_value = get_many_output
             client_instance_mock.list.return_value = list_output
-            client_instance_mock.apply_policy_file.return_value = policy_change_output
+            client_instance_mock.load_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
-            client_instance_mock.delete_policy_file.return_value = policy_change_output
+            client_instance_mock.update_policy_file.return_value = policy_change_output
             client_instance_mock.whoami.return_value = whoami_output
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
@@ -58,7 +58,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
 def cli_arg_test(cli_args=None, **kwargs):
     if cli_args is None:
         cli_args = []
-    cli_args += ['variable', 'get', 'foo']
+    cli_args += ['variable', 'get', "-i", 'foo']
     cli_command = 'cli {}'.format(' '.join(cli_args))
 
     default_args = {'debug': False}

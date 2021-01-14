@@ -40,7 +40,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
         # Need to configure the CLI and login to perform further commands
         Utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("initial")])
+                               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
     # *************** TESTS ***************
 
@@ -90,7 +90,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_variable_get_with_special_chars_returns_special_chars(self):
         self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("variable")])
+                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
         Utils.set_variable(self, 'variablespecialchars', '"[]{}#@^&<>~\/''\/?\;\';\'"')
         output = Utils.get_variable(self, 'variablespecialchars')
         self.assertEquals(output.strip(), '"[]{}#@^&<>~\/''\/?\;\';\'"')
@@ -98,7 +98,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_variable_get_variable_has_spaces_returns_variable_value(self):
         self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("variable")])
+                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
         Utils.assert_set_and_get(self, "some variable with spaces")
 
     @integration_test
@@ -115,7 +115,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
-            Utils.apply_policy(self, temp_policy_file.name)
+            Utils.load_policy(self, temp_policy_file.name)
         value_map = {}
         for variable in variables:
             value = uuid.uuid4().hex
