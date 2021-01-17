@@ -61,9 +61,9 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     def test_cli_variable_parser_doesnt_break_without_action(self, cli_invocation, output, client):
         self.assertIn("Usage", output)
 
-    @cli_test(["variable", "get", "-i", "foo"])
+    @cli_test(["variable", "get", "-i", "foo"], get_output=b'A')
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
-        client.get.assert_called_once_with('foo')
+        client.get.assert_called_once_with("foo")
 
     @cli_test(["variable", "get", "-i", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
     def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output, client):
@@ -80,6 +80,46 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     @cli_test(["policy"])
     def test_cli_policy_parser_doesnt_break_without_action(self, cli_invocation, output, client):
         self.assertIn("Usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "--help"])
+    def test_cli_policy_long_help_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "-h"])
+    def test_cli_policy_short_help_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "load", "--help"])
+    def test_cli_policy_load_long_help_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "load", "-h"])
+    def test_cli_policy_load_short_help_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "replace", "-h"])
+    def test_cli_policy_replace_short_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "replace", "--help"])
+    def test_cli_policy_replace_long_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "update", "-h"])
+    def test_cli_policy_update_short_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["policy", "update", "--help"])
+    def test_cli_policy_update_long_returns_help(self, cli_invocation, output, client):
+        self.assertIn("usage:", output)
 
     @cli_test(["policy", "load", "-b", "foo", "-f", "foopolicy"])
     def test_cli_invokes_policy_load_correctly(self, cli_invocation, output, client):

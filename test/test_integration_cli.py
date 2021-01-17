@@ -38,14 +38,6 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
                                ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
     # *************** TESTS ***************
-    '''
-    A non-existent policy file will return FileNotFound error message
-    '''
-    @integration_test
-    def test_load_policy_raises_file_not_exists_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['policy', 'load', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
-        self.assertRegex(output, "Error: No such file or directory:")
 
     @integration_test
     def test_https_can_load_policy(self):
@@ -56,7 +48,7 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         for variable in variables:
             Utils.assert_set_and_get(self, variable)
-    test_https_can_load_policy.tester=True
+
     @integration_test
     def test_https_load_policy_can_output_returned_data(self):
         self.setup_cli_params({})
@@ -85,6 +77,58 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
         }
 
         self.assertDictEqual(json_result, expected_object)
+
+    '''
+    Validates that a policy command without a subcommand 'load'
+    in this case, will fail and return help screen
+    '''
+    @integration_test
+    def test_policy_load_without_subcommand_returns_help_screen(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                       ['policy', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+        self.assertIn('Error argument action: invalid choice', output)
+
+    '''
+    Validates that a policy command without the policy path
+    will fail and return help screen
+    '''
+    @integration_test
+    def test_policy_load_without_policy_path_returns_help_screen(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                       ['policy', '-b', 'root'], exit_code=1)
+        self.assertIn('Error the following arguments are required:', output)
+
+    '''
+    A non-existent policy file will return FileNotFound error message
+    '''
+    @integration_test
+    def test_policy_load_raises_file_not_exists_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['policy', 'load', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+        self.assertRegex(output, "Error: No such file or directory:")
+
+    '''
+    A non-existent policy file will return FileNotFound error message
+    '''
+    @integration_test
+    def test_policy_bad_syntax_raises_error(self):
+        policy = "- ! user bad syntax"
+        output = Utils.load_policy_from_string(self, policy)
+
+        self.assertIn("422 Client Error", output)
+
+    @integration_test
+    def test_policy_replace_load_combo_returns_help_screen(self):
+        output = self.invoke_cli(self.cli_auth_params,
+               ['policy', 'load', 'replace', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+        self.assertIn('Error unrecognized arguments: replace', output)
+
+    @integration_test
+    def test_policy_replace_bad_syntax_raises_error(self):
+        policy = "- ! user bad syntax"
+        output = Utils.replace_policy_from_string(self, policy)
+
+        self.assertIn("422 Client Error", output)
 
     @integration_test
     def test_https_load_policy_doesnt_break_if_no_created_roles(self):
@@ -231,6 +275,24 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertDictEqual(json_result, expected_object)
 
+    '''
+    Validates that update deletes record
+    '''
+    @integration_test
+    def test_policy_update_policy_removes_user(self):
+        user_id = uuid.uuid4().hex
+
+        load_policy = f"- !user {user_id}"
+        json.loads(Utils.load_policy_from_string(self, load_policy))
+        update_policy = f"- !delete\n record: !user {user_id}"
+        json.loads(Utils.update_policy_from_string(self, update_policy))
+
+        output = self.invoke_cli(self.cli_auth_params, ['list'])
+
+        # Assert that user_id is not in output
+        self.assertTrue(output.find(user_id) == -1)
+
+    # test_policy_update_policy_removes_user.tester=True
     @integration_test
     def test_https_can_get_whoami(self):
         self.setup_cli_params({})
