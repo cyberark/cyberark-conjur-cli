@@ -5,9 +5,11 @@ CLI Integration tests
 
 This test file handles the main test flows after initialization and configuration
 """
+import io
 import json
 import tempfile
 import uuid
+from contextlib import redirect_stderr
 
 import Utils
 from conjur.constants import *
@@ -17,11 +19,10 @@ from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
-class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
-    DEFINED_VARIABLE_ID = 'one/password'
-
+class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
+    capture_stream = io.StringIO()
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationTest, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationPolicy, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
 
@@ -84,9 +85,10 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     '''
     @integration_test
     def test_policy_load_without_subcommand_returns_help_screen(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                       ['policy', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
-        self.assertIn('Error argument action: invalid choice', output)
+        with redirect_stderr(self.capture_stream):
+            self.invoke_cli(self.cli_auth_params,
+                                     ['policy', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+        self.assertIn("Error argument action: invalid choice: 'root' (choose from", self.capture_stream.getvalue())
 
     '''
     Validates that a policy command without the policy path
@@ -94,9 +96,10 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     '''
     @integration_test
     def test_policy_load_without_policy_path_returns_help_screen(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                       ['policy', '-b', 'root'], exit_code=1)
-        self.assertIn('Error the following arguments are required:', output)
+        with redirect_stderr(self.capture_stream):
+            output = self.invoke_cli(self.cli_auth_params,
+                           ['policy', '-b', 'root'], exit_code=1)
+        self.assertIn("Error argument action: invalid choice: 'root' (choose from", self.capture_stream.getvalue())
 
     '''
     A non-existent policy file will return FileNotFound error message
@@ -113,20 +116,21 @@ class CliIntegrationTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_policy_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
-        output = Utils.load_policy_from_string(self, policy)
-
+        with redirect_stderr(self.capture_stream):
+            output = Utils.load_policy_from_string(self, policy, exit_code=1)
         self.assertIn("422 Client Error", output)
 
     @integration_test
     def test_policy_replace_load_combo_returns_help_screen(self):
-        output = self.invoke_cli(self.cli_auth_params,
-               ['policy', 'load', 'replace', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
-        self.assertIn('Error unrecognized arguments: replace', output)
+        with redirect_stderr(self.capture_stream):
+            output = self.invoke_cli(self.cli_auth_params,
+                   ['policy', 'load', 'replace', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+        self.assertIn('Error unrecognized arguments: replace', self.capture_stream.getvalue())
 
     @integration_test
     def test_policy_replace_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
-        output = Utils.replace_policy_from_string(self, policy)
+        output = Utils.replace_policy_from_string(self, policy, exit_code=1)
 
         self.assertIn("422 Client Error", output)
 

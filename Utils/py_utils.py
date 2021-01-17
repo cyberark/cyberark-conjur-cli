@@ -47,6 +47,7 @@ def print_instead_of_raise_error(self, variable_id, error_message_regex):
                              ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
 
     self.assertRegex(output, error_message_regex)
+
  # *************** POLICY ***************
 
 def load_policy(self, policy_path):
@@ -58,6 +59,9 @@ def generate_policy_string(self):
         variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
         variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
 
+# this policy is purposefully not indented because
+# the """ formatter is indentation sensitive and
+# policy should start at the far left of the line
         policy = \
 """
 - !variable
@@ -74,28 +78,26 @@ def generate_policy_string(self):
 
         return (dynamic_policy, [variable_1, variable_2, variable_3])
 
-def load_policy(self, policy_path):
+def load_policy(self, policy_path, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
-                           ['policy', 'load', '-b', 'root', '-f', policy_path])
+                           ['policy', 'load', '-b', 'root', '-f', policy_path], exit_code=exit_code)
 
-def load_policy_from_string(self, policy):
+def load_policy_from_string(self, policy, exit_code=0):
     output = None
     file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
     with open(file_name, 'w+b') as temp_policy_file:
         temp_policy_file.write(policy.encode('utf-8'))
         temp_policy_file.flush()
-
-        # Run the new load that should not result in newly created roles
-        output = load_policy(self, temp_policy_file.name)
+        output = load_policy(self, temp_policy_file.name, exit_code)
 
     os.remove(file_name)
     return output
 
-def replace_policy(self, policy_path):
+def replace_policy(self, policy_path, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
-                           ['policy', 'replace', '-b', 'root', '-f', policy_path])
+                           ['policy', 'replace', '-b', 'root', '-f', policy_path], exit_code=exit_code)
 
-def replace_policy_from_string(self, policy):
+def replace_policy_from_string(self, policy, exit_code=0):
     output = None
     file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
     with open(file_name, 'w+b') as temp_policy_file:
@@ -103,7 +105,7 @@ def replace_policy_from_string(self, policy):
         temp_policy_file.flush()
 
         # Run the new replace that should not result in newly created roles
-        output = replace_policy(self, temp_policy_file.name)
+        output = replace_policy(self, temp_policy_file.name, exit_code)
 
     os.remove(file_name)
     return output

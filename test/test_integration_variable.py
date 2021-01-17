@@ -14,8 +14,7 @@ from unittest.mock import patch
 
 import Utils
 from conjur.constants import DEFAULT_NETRC_FILE
-from .test_integration_cli import CliIntegrationTest
-from .util.cli_helpers import integration_test
+from test.util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from Utils import py_utils as utils
 
@@ -32,12 +31,11 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     def setup_cli_params(self, env_vars, *params):
         self.cli_auth_params = ['--debug']
         self.cli_auth_params += params
-
         return self.cli_auth_params
 
     def setUp(self):
         self.setup_cli_params({})
-        # Need to configure the CLI and login to perform further commands
+        # Used to configure the CLI and login to run tests
         Utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
                                ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
@@ -189,7 +187,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_cli_can_set_and_get_a_defined_variable(self):
-        Utils.assert_set_and_get(self, CliIntegrationTest.DEFINED_VARIABLE_ID)
+        Utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)
 
     @integration_test
     def test_subcommand_set_variable_with_values_returns_help(self):
@@ -224,4 +222,4 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_verification_disabled(self):
         self.setup_cli_params({}, '--insecure')
-        Utils.assert_set_and_get(self, CliIntegrationTest.DEFINED_VARIABLE_ID)
+        Utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)

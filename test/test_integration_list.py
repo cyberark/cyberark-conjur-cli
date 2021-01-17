@@ -30,7 +30,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def setUp(self):
         self.setup_cli_params({})
-        # Need to configure the CLI and login to perform further commands
+        # Used to configure the CLI and login to run tests
         Utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])

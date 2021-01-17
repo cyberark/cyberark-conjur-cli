@@ -8,7 +8,7 @@ required to successfully execute the VARIABLE command
 """
 import sys
 
-
+# pylint: disable=too-few-public-methods
 class VariableController:
     """
     VariableController
@@ -21,12 +21,8 @@ class VariableController:
         self.variable_data = variable_data
 
     def load(self):
+        """
+        Method that facilitates all method calls in this class
+        """
         result = self.variable_logic.run_action(self.variable_data)
-        self.print_json_result(result)
-
-    @classmethod
-    def print_json_result(cls, result):
-        """
-        Method to print the JSON of the returned result
-        """
         sys.stdout.write(result+'\n')

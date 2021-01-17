@@ -288,11 +288,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             sys.exit(0)
         except FileNotFoundError as not_found_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
+            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
             sys.exit(1)
         except requests.exceptions.HTTPError as client_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {client_error})")
+            sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())

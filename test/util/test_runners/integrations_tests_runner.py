@@ -25,7 +25,7 @@ import subprocess as sb
 import shutil
 
 # Internals
-from test.test_integration_cli import CliIntegrationTest
+from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_configurations import CliIntegrationTestConfigurations
 from test.test_integration_credentials import CliIntegrationTestCredentials
 from test.test_integration_list import CliIntegrationListTest
@@ -42,10 +42,10 @@ def main():
 
     runner = TestRunner(args)
 
-    test_to_run_list=[CliIntegrationTest,
-                      CliIntegrationTestConfigurations,
+    test_to_run_list=[CliIntegrationTestConfigurations,
                       CliIntegrationTestCredentials,
-                      CliIntegrationListTest]
+                      CliIntegrationListTest,
+                      CliIntegrationPolicy]
     if args.run_oss_tests:
         test_to_run_list.append(CliIntegrationTestOSS)
     runner.run_tests(test_modules=test_to_run_list)

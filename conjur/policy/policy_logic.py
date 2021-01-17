@@ -7,7 +7,7 @@ This module is the business logic for executing the POLICY command
 """
 import json
 
-
+# pylint: disable=too-few-public-methods
 class PolicyLogic:
     """
     PolicyLogic
