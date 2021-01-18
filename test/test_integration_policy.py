@@ -128,6 +128,15 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn('Error unrecognized arguments: replace', self.capture_stream.getvalue())
 
     @integration_test
+    def test_policy_insecure_prints_warning_in_log(self):
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            self.invoke_cli(self.cli_auth_params,
+                               ['--insecure', 'policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
+
+            self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
+                          str(mock_log.output))
+
+    @integration_test
     def test_policy_replace_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
         output = Utils.replace_policy_from_string(self, policy, exit_code=1)

@@ -43,6 +43,26 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     # *************** TESTS ***************
 
     @integration_test
+    def test_variable_get_insecure_prints_warning_in_log(self):
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            expected_value = uuid.uuid4().hex
+            Utils.set_variable(self, 'one/password', expected_value)
+            self.invoke_cli(self.cli_auth_params,
+                                     ['--insecure', 'variable', 'get', '-i', 'one/password'])
+            self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
+                          str(mock_log.output))
+
+    @integration_test
+    def test_variable_set_insecure_prints_warning_in_log(self):
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            expected_value = uuid.uuid4().hex
+            self.invoke_cli(self.cli_auth_params,
+                       ['--insecure', 'variable', 'set', '-i',  'one/password', '-v', expected_value])
+
+            self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
+                          str(mock_log.output))
+
+    @integration_test
     def test_variable_without_subcommand_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable'])
@@ -133,7 +153,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_batch_existing_and_nonexistent_variable_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'one/password,unknown'], exit_code=1)
+                                 ['variable', 'get', '-i', 'one/password, unknown'], exit_code=1)
         self.assertIn("404 Client Error", output)
 
     # TODO This will need to be changed when UX is finalized

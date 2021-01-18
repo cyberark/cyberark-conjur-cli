@@ -68,8 +68,8 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
         except requests.exceptions.HTTPError as http_error:
             if response.text:
                 logging.debug(requests.exceptions.HTTPError(f'{http_error.response.status_code}' \
-                                                            f'{http_error.response.reason}' \
-                                                            f'{response.text}'))
+                                                            f' {http_error.response.reason}' \
+                                                            f' {response.text}'))
             raise http_error
 
     return response

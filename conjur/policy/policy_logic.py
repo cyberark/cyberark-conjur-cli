@@ -5,7 +5,9 @@ PolicyLogic module
 
 This module is the business logic for executing the POLICY command
 """
+# Builtins
 import json
+import logging
 
 # pylint: disable=too-few-public-methods
 class PolicyLogic:
@@ -22,6 +24,7 @@ class PolicyLogic:
         """
         Method to determine which subcommand action to run {apply, replace, update}
         """
+        logging.debug(f"Running '{policy_data.action}' for file '{policy_data.file}' under '{policy_data.branch}'")
         if policy_data.action == 'replace':
             resources = self.client.replace_policy_file(policy_data.branch, policy_data.file)
         elif policy_data.action == 'update':
