@@ -56,7 +56,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'], exit_code=0)
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
@@ -88,7 +88,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.setup_cli_params({})
         output = self.invoke_cli(self.cli_auth_params,
                                  ['init', '--url', self.client_params.hostname, '--account', self.client_params.login,
-                                  '--force'], exit_code=0)
+                                  '--force'])
 
         assert "Not overwriting" not in output
 

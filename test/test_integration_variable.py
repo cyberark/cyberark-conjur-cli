@@ -20,11 +20,11 @@ from Utils import py_utils as utils
 
 # Not coverage tested since integration tests don't run in
 # the same build step
-class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
+class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     DEFINED_VARIABLE_ID = 'one/password'
     capture_stream = io.StringIO()
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationVariableTest, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationTestVariable, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
 
@@ -45,28 +45,30 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_variable_without_subcommand_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable'], exit_code=0)
+                                 ['variable'])
         self.assertIn("Usage:\n  conjur [global options] <command> <subcommand> [options] [args]", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_variable_short_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', '-h'], exit_code=0)
+                                 ['variable', '-h'])
         self.assertIn("usage:  variable", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_variable_long_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', '--help'], exit_code=0)
+                                 ['variable', '--help'])
         self.assertIn("usage:  variable", output)
 
     @integration_test
     def test_variable_get_variable_without_subcommand_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', '-i', 'somevariable'], exit_code=1)
+        with redirect_stderr(self.capture_stream):
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['variable', '-i', 'somevariable'], exit_code=1)
 
+        self.assertIn("Error argument action: invalid choice: 'somevariable'", self.capture_stream.getvalue())
         self.assertIn("usage:  variable", output)
 
     @integration_test
@@ -74,7 +76,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
         expected_value = uuid.uuid4().hex
         Utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '--id=one/password'], exit_code=0)
+                                 ['variable', 'get', '--id=one/password'])
         self.assertIn(expected_value, output)
 
     @integration_test
@@ -82,7 +84,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
         expected_value = uuid.uuid4().hex
         Utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'one/password'], exit_code=0)
+                                 ['variable', 'get', '-i', 'one/password'])
         self.assertIn(expected_value, output)
 
     @integration_test
@@ -138,14 +140,14 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_subcommand_get_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-h'], exit_code=0)
+                                 ['variable', 'get', '-h'])
         self.assertIn("usage: variable", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_subcommand_get_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '--help'], exit_code=0)
+                                 ['variable', 'get', '--help'])
         self.assertIn("usage: variable", output)
 
     @integration_test
@@ -166,14 +168,14 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_subcommand_set_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'set', '--help'], exit_code=0)
+                                 ['variable', 'set', '--help'])
         self.assertIn("usage: variable set", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_subcommand_set_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'set', '-h'], exit_code=0)
+                                 ['variable', 'set', '-h'])
         self.assertIn("usage: variable set", output)
 
     # TODO This will need to be changed when UX is finalized
@@ -212,7 +214,7 @@ class CliIntegrationVariableTest(IntegrationTestCaseBase):  # pragma: no cover
 
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
             output = self.invoke_cli(self.cli_auth_params,
-                                     ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'], exit_code=0)
+                                     ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'])
 
             self.assertIn("Error: You have not logged in", output)
             self.assertIn("Successfully logged in to Conjur", output)

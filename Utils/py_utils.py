@@ -11,11 +11,11 @@ def remove_file(file_path):
 @patch('builtins.input', return_value='yes')
 def init_to_cli(self, mock_input):
     self.invoke_cli(self.cli_auth_params,
-                    ['init', '-u', self.client_params.hostname, '-a', self.client_params.account], exit_code=0)
+                    ['init', '-u', self.client_params.hostname, '-a', self.client_params.account])
 
 def login_to_cli(self):
     self.invoke_cli(self.cli_auth_params,
-            ['login', '-n', self.client_params.login, '-p', self.client_params.env_api_key], exit_code=0)
+            ['login', '-n', self.client_params.login, '-p', self.client_params.env_api_key])
 
 def setup_cli(self):
     init_to_cli(self)
@@ -27,9 +27,9 @@ def set_variable(self, variable_id, value, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
                        ['variable', 'set', '-i', variable_id, '-v', value], exit_code=exit_code)
 
-def get_variable(self, *variable_ids):
+def get_variable(self, *variable_ids, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
-                           ['variable', 'get', '-i', *variable_ids])
+                           ['variable', 'get', '-i', *variable_ids], exit_code=exit_code)
 
 def assert_set_and_get(self, variable_id):
     expected_value = uuid.uuid4().hex

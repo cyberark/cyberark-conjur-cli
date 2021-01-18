@@ -73,12 +73,11 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     @patch('builtins.input', return_value='yes')
     def test_https_netrc_is_created_with_all_parameters_given(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key], exit_code=0)
+                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
 
         # Load in new user
         self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path('conjur')],
-                        exit_code=0)
+                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path('conjur')])
 
         # Get admin's access token to be able to use it to change the user's password
         headers = {
@@ -113,7 +112,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         # Need to remove the netrc because we are attempting to login as a user with their new password
         os.remove(DEFAULT_NETRC_FILE)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-n', 'someuser', '-p', password], exit_code=0)
+                                 ['login', '-n', 'someuser', '-p', password])
 
         self.assertEquals(output.strip(), "Successfully logged in to Conjur")
         self.validate_netrc(f"{self.client_params.hostname}/authn", "someuser", user_api_key)
@@ -126,7 +125,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     @patch('builtins.input', return_value='admin')
     def test_https_netrc_is_created_with_all_parameters_given_interactively(self, mock_pass):
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
-            output = self.invoke_cli(self.cli_auth_params, ['login'], exit_code=0)
+            output = self.invoke_cli(self.cli_auth_params, ['login'])
 
             assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
             self.assertEquals(output.strip(), "Successfully logged in to Conjur")
@@ -166,7 +165,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_netrc_is_created_when_provided_user_api_key(self, mock_pass):
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
             output = self.invoke_cli(self.cli_auth_params,
-                                     ['login'], exit_code=0)
+                                     ['login'])
 
             assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
             self.assertEquals(output.strip(), "Successfully logged in to Conjur")
@@ -181,8 +180,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_netrc_was_not_overwritten_when_login_failed_but_already_logged_in(self):
 
         successful_run = self.invoke_cli(self.cli_auth_params,
-                                         ['login', '-n', 'admin', '-p', self.client_params.env_api_key],
-                                         exit_code=0)
+                                         ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
         self.assertEquals(successful_run.strip(), "Successfully logged in to Conjur")
 
         unsuccessful_run = self.invoke_cli(self.cli_auth_params,
@@ -204,8 +202,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.write_to_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
 
         self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', '-b', 'root', '-f',self.environment.path_provider.get_policy_path('conjur')],
-                        exit_code=0)
+                        ['policy', 'replace', '-b', 'root', '-f',self.environment.path_provider.get_policy_path('conjur')])
 
         url = f"{self.client_params.hostname}/authn/{self.client_params.account}/admin/authenticate"
         headers = {
@@ -227,7 +224,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         os.remove(DEFAULT_NETRC_FILE)
 
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-n', 'host/somehost', '-p', f'{host_api_key}'], exit_code=0)
+                                 ['login', '-n', 'host/somehost', '-p', f'{host_api_key}'])
 
         self.validate_netrc(f"{self.client_params.hostname}/authn", "host/somehost", host_api_key)
         self.assertEquals(output.strip(), "Successfully logged in to Conjur")
@@ -240,11 +237,11 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_logout_successful(self):
 
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key], exit_code=0)
+                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
         assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
 
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['logout'], exit_code=0)
+                                 ['logout'])
 
         self.assertEquals(output.strip(), 'Logged out of Conjur')
         with open(DEFAULT_NETRC_FILE) as netrc_file:
@@ -258,10 +255,10 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_logout_twice_returns_could_not_logout_message(self):
 
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key], exit_code=0)
+                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
 
         self.invoke_cli(self.cli_auth_params,
-                        ['logout'], exit_code=0)
+                        ['logout'])
 
         unsuccessful_logout = self.invoke_cli(self.cli_auth_params,
                                               ['logout'], exit_code=1)
@@ -298,7 +295,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             netrc_test.write("password somepass\n")
 
         self.invoke_cli(self.cli_auth_params,
-                        ['logout'], exit_code=0)
+                        ['logout'])
 
         with open(DEFAULT_NETRC_FILE, 'r') as netrc:
             entries = netrc.readlines()
