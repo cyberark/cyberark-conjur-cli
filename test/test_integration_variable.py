@@ -153,7 +153,13 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_batch_existing_and_nonexistent_variable_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'one/password unknown'], exit_code=1)
+                                 ['variable', 'get', '-i', 'one/password', 'unknown'], exit_code=1)
+        self.assertIn("404 Client Error", output)
+
+    @integration_test
+    def test_batch_existing_and_nonexistent_variable_with_spaces_raises_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', 'one/password', '"unknown password"'], exit_code=1)
         self.assertIn("404 Client Error", output)
 
     # TODO This will need to be changed when UX is finalized
