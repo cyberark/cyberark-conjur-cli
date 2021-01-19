@@ -24,7 +24,9 @@ class PolicyLogic:
         """
         Method to determine which subcommand action to run {apply, replace, update}
         """
-        logging.debug(f"Running '{policy_data.action}' for file '{policy_data.file}' under '{policy_data.branch}'")
+        # pylint: disable=logging-fstring-interpolation
+        logging.debug(f"Running '{policy_data.action}' for file '{policy_data.file} ' \
+                      f'under '{policy_data.branch}'")
         if policy_data.action == 'replace':
             resources = self.client.replace_policy_file(policy_data.branch, policy_data.file)
         elif policy_data.action == 'update':

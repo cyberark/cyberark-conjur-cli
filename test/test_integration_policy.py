@@ -51,7 +51,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
             Utils.assert_set_and_get(self, variable)
 
     @integration_test
-    def test_https_load_policy_can_output_returned_data(self):
+    def test_load_policy_of_new_resources_returns_new_entry_json_data(self):
         self.setup_cli_params({})
 
         user_id1 = uuid.uuid4().hex
@@ -98,8 +98,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_policy_load_without_policy_path_returns_help_screen(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
-                           ['policy', '-b', 'root'], exit_code=1)
-        self.assertIn("Error argument action: invalid choice: 'root' (choose from", self.capture_stream.getvalue())
+                           ['policy', 'load', '-b', 'root'], exit_code=1)
+        self.assertIn("Error the following arguments are required", self.capture_stream.getvalue())
 
     '''
     A non-existent policy file will return FileNotFound error message
@@ -111,14 +111,17 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         self.assertRegex(output, "Error: No such file or directory:")
 
     '''
-    A non-existent policy file will return FileNotFound error message
+    A policy with invalid syntax will return a Unprocessable entity error
     '''
     @integration_test
     def test_policy_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
-        with redirect_stderr(self.capture_stream):
-            output = Utils.load_policy_from_string(self, policy, exit_code=1)
-        self.assertIn("422 Client Error", output)
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            with redirect_stderr(self.capture_stream):
+                output = Utils.load_policy_from_string(self, policy, exit_code=1)
+            self.assertIn("422 Client Error", output)
+        self.assertIn("422 Unprocessable Entity {\"error\":{\"code\":\"validation_failed\",\"message\":",
+                  str(mock_log.output))
 
     @integration_test
     def test_policy_replace_load_combo_returns_help_screen(self):

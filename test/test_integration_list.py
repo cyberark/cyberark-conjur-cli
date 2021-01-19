@@ -34,6 +34,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
 
+    # *************** TESTS ***************
+
     @integration_test
     def test_list_returns_resources(self):
         output = self.invoke_cli(self.cli_auth_params, ['list'])
@@ -211,18 +213,20 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '-1'], exit_code=1)
         self.assertIn("500 Server Error", output)
 
-    # TODO weird behavior. Instead of [] or failing we get full results
-    @integration_test
-    def test_list_string_offset_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params, ['list', '-o', 'somestring'])
-        self.assertEquals(output,
-                          f'[\n    "{self.client_params.account}:group:somegroup",\n'
-                          f'    "{self.client_params.account}:host:anotherhost",\n'
-                          f'    "{self.client_params.account}:layer:somelayer",\n'
-                          f'    "{self.client_params.account}:policy:root",\n'
-                          f'    "{self.client_params.account}:user:someuser",\n'
-                          f'    "{self.client_params.account}:variable:one/password",\n'
-                          f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
+    # This tests is commented out because of a bug in server (https://github.com/cyberark/conjur/issues/1997)
+    # where a string is considered valid input for offset. For example, when offset=somestring a list
+    # of Conjur resources are returned instead of a 500 internal server error
+    # @integration_test
+    # def test_list_string_offset_raises_error(self):
+    #     output = self.invoke_cli(self.cli_auth_params, ['list', '-o', 'somestring'])
+    #     self.assertEquals(output,
+    #                       f'[\n    "{self.client_params.account}:group:somegroup",\n'
+    #                       f'    "{self.client_params.account}:host:anotherhost",\n'
+    #                       f'    "{self.client_params.account}:layer:somelayer",\n'
+    #                       f'    "{self.client_params.account}:policy:root",\n'
+    #                       f'    "{self.client_params.account}:user:someuser",\n'
+    #                       f'    "{self.client_params.account}:variable:one/password",\n'
+    #                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
 
     @integration_test
     def test_list_short_search_returns_list_with_param(self):

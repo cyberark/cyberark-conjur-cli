@@ -68,7 +68,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     3. Update their password to a randomly generated one
     4. Login with their password
     '''
-
     @integration_test
     @patch('builtins.input', return_value='yes')
     def test_https_netrc_is_created_with_all_parameters_given(self, mock_input):
@@ -120,7 +119,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates interactively provided params create netrc
     '''
-
     @integration_test
     @patch('builtins.input', return_value='admin')
     def test_https_netrc_is_created_with_all_parameters_given_interactively(self, mock_pass):
@@ -134,7 +132,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates a wrong username will raise Unauthorized error
     '''
-
     @integration_test
     @patch('builtins.input', return_value='somebaduser')
     def test_https_netrc_raises_error_with_wrong_user(self, mock_pass):
@@ -148,7 +145,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates a wrong password will raise Unauthorized error
     '''
-
     @integration_test
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value='somewrongpass')
@@ -195,7 +191,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     There is currently no way to fetch a host's API key so this is a work around for the 
     purposes of this test
     '''
-
     @integration_test
     def test_https_netrc_is_created_with_host(self):
         # Setup for fetching the API key of a host. To fetch we need to login
@@ -232,7 +227,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates when a user can logout successfully
     '''
-
     @integration_test
     def test_https_logout_successful(self):
 
@@ -281,7 +275,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates logout doesn't remove another entry not associated with Cyberark
     '''
-
     @integration_test
     def test_https_netrc_does_not_remove_irrelevant_entry(self):
 
@@ -311,7 +304,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     Validates that when the user does not log in and attempt
     to interface with the CLI, they will be prompted to
     '''
-
     @integration_test
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')

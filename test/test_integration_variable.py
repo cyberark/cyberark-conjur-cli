@@ -153,7 +153,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_batch_existing_and_nonexistent_variable_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'one/password, unknown'], exit_code=1)
+                                 ['variable', 'get', '-i', 'one/password unknown'], exit_code=1)
         self.assertIn("404 Client Error", output)
 
     # TODO This will need to be changed when UX is finalized
@@ -171,14 +171,14 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("usage: variable", output)
 
     @integration_test
-    def test_subcommand_get_help_returns_help(self):
+    def test_variable_get_without_id_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['variable', 'get'], exit_code=1)
         self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
 
     @integration_test
-    def test_subcommand_set_help_returns_help(self):
+    def test_variable_set_without_id_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['variable', 'set'], exit_code=1)
@@ -200,16 +200,11 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
-    def test_subcommand_set_variable_with_values_returns_help(self):
+    def test_subcommand_set_variable_without_value_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['variable', 'set', '-i', 'one/password'], exit_code=1)
-        self.assertIn("Error the following arguments are required: value", self.capture_stream.getvalue())
-
-
-    @integration_test
-    def test_cli_can_set_and_get_a_defined_variable(self):
-        Utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)
+        self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
 
     @integration_test
     def test_subcommand_set_variable_with_values_returns_help(self):
