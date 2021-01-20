@@ -347,15 +347,23 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         list_controller.load()
 
     @classmethod
-    def handle_variable_logic(cls, ssl_verify=True, variable_data=None, client=None):
+    def handle_variable_logic(cls, ssl_verify=True, args=None, client=None):
         """
         Method that wraps the variable call logic
         """
         variable_logic = VariableLogic(client)
-        variable_controller = VariableController(ssl_verify=ssl_verify,
-                                                 variable_logic=variable_logic,
-                                                 variable_data=variable_data)
-        variable_controller.load()
+        if args.action == 'get':
+            variable_data = VariableData(action=args.action, id=args.id, value=None)
+            variable_controller = VariableController(ssl_verify=ssl_verify,
+                                                     variable_logic=variable_logic,
+                                                     variable_data=variable_data)
+            variable_controller.get_variable()
+        else:
+            variable_data = VariableData(action=args.action, id=args.id, value=args.value)
+            variable_controller = VariableController(ssl_verify=ssl_verify,
+                                                     variable_logic=variable_logic,
+                                                     variable_data=variable_data)
+            variable_controller.set_variable()
 
     @classmethod
     def handle_policy_logic(cls, ssl_verify=True, policy_data=None, client=None):
@@ -416,10 +424,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             print(json.dumps(result, indent=4))
 
         elif resource == 'variable':
-            variable_data = VariableData(action=args.action, id=args.id, value=None)
-            if hasattr(args, 'value'):
-                variable_data = VariableData(action=args.action, id=args.id, value=args.value)
-            Cli.handle_variable_logic(args.ssl_verify, variable_data, client)
+            Cli.handle_variable_logic(args.ssl_verify, args, client)
 
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)

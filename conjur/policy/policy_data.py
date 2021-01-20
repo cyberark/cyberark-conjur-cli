@@ -12,15 +12,17 @@ class PolicyData:
     """
     Used for organizing the the params the user passed in to execute the policy command
     """
-    def __init__(self, **argParams):
-        self.action = argParams['action']
-        self.branch = argParams['branch']
-        self.file = argParams['file']
+    def __init__(self, **arg_params):
+        self.action = arg_params['action']
+        self.branch = arg_params['branch']
+        self.file = arg_params['file']
 
     def __repr__(self):
         result = []
         # pylint: disable=multiple-statements
-        if self.action: result.append(f"'action': '{self.action}'")
-        if self.branch: result.append(f"'branch': '{self.branch}'")
-        if self.file: result.append(f"'file': '{self.file}'")
-        return '{'+', '.join(result) + '}'
+        if self.action=='load': result.append("Loading ")
+        if self.action=='replace': result.append("Replacing ")
+        if self.action=='update': result.append("Updating ")
+        if self.file: result.append(f"'{self.file}' ")
+        if self.branch: result.append(f"under '{self.branch}'...")
+        return ''.join(result)
