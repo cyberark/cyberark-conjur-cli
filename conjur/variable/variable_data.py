@@ -10,13 +10,12 @@ We use this DTO to build the variable request
 # pylint: disable=too-few-public-methods
 class VariableData:
     """
-    Used for organizing the the params the user passed in to execute the variable command
+    Used for organizing the params the user passed in to execute the variable command
     """
     def __init__(self, **arg_params):
         self.action = arg_params['action']
         self.variable_id = arg_params['id']
-        if arg_params['value']:
-            self.value = arg_params['value']
+        self.value = arg_params['value'] if arg_params['value'] else None
 
     def __repr__(self):
         result = []

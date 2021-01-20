@@ -27,6 +27,7 @@ class VariableLogic:
         Method to handle all get action activity
         """
         logging.debug(f"Getting variable values for: {variable_data.variable_id}")
+        # pylint: disable=no-else-return
         if len(variable_data.variable_id) == 1:
             variable_value = self.client.get(variable_data.variable_id[0])
             return variable_value.decode('utf-8')

@@ -358,7 +358,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                      variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.get_variable()
-        else:
+        elif args.action == 'set':
             variable_data = VariableData(action=args.action, id=args.id, value=args.value)
             variable_controller = VariableController(ssl_verify=ssl_verify,
                                                      variable_logic=variable_logic,

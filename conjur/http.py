@@ -71,6 +71,8 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                                                             f' {http_error.response.reason}' \
                                                             f' {response.text}'))
             raise http_error
+        except Exception as general_error:
+            raise general_error
 
     return response
 
