@@ -57,7 +57,7 @@ class CliIntegrationTestOSS(IntegrationTestCaseBase):
     OSS that doesn't have the /info endpoint
     '''
 
-    @integration_test
+    @integration_test(True)
     def test_https_conjurrc_is_created_with_no_parameters_given(self):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'yes', 'someotheraccount']):
             self.setup_cli_params({})

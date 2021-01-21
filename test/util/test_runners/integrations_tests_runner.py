@@ -42,14 +42,15 @@ def main():
     args = TestRunnerArgs.create_from_args()
 
     runner = TestRunner(args)
-    test_to_run_list=[CliIntegrationTestConfigurations,
-                      CliIntegrationTestVariable,
-                      CliIntegrationTestCredentials,
-                      CliIntegrationTestList,
-                      CliIntegrationPolicy]
+    test_to_run_list = [CliIntegrationTestConfigurations,
+                        CliIntegrationTestVariable,
+                        CliIntegrationTestCredentials,
+                        CliIntegrationTestList,
+                        CliIntegrationPolicy]
     if args.run_oss_tests:
         test_to_run_list.append(CliIntegrationTestOSS)
     runner.run_tests(test_modules=test_to_run_list)
+
 
 class TestRunner:  # pragma: no cover
 
@@ -81,7 +82,8 @@ class TestRunner:  # pragma: no cover
         path_provider = TestRunnerPathProvider(file_helper_dir=self.runner_args.files_folder)
         self.__create_conjurrc_file()
         self.__create_netrc_file()
-        self.env_params = TestEnvironmentParams(self.runner_args.cli_to_test, self.runner_args.invoke_cli_as_process, path_provider)
+        self.env_params = TestEnvironmentParams(self.runner_args.cli_to_test, self.runner_args.invoke_cli_as_process,
+                                                path_provider)
         self.client_params = ClientParams(url=self.runner_args.hostname, account=self.runner_args.account,
                                           login=self.runner_args.login, api_key=self.api_key)
 
@@ -113,11 +115,12 @@ class TestRunner:  # pragma: no cover
             raise RuntimeError(f"Error Login: {output}")
 
         shutil.copy(path_provider.netrc_path,
-            os.path.join(path_provider.helpers_files_path, path_provider.netrc_file_name))
+                    os.path.join(path_provider.helpers_files_path, path_provider.netrc_file_name))
 
     def __get_api_key(self):
         url = f"{self.runner_args.hostname}/authn/{self.runner_args.account}/login"
-        encode = base64.b64encode(f"admin:{self.runner_args.password}".encode('utf-8')).decode('utf-8')
+        encode = base64.b64encode(f"{self.runner_args.login}:{self.runner_args.password}".encode('utf-8')).decode(
+            'utf-8')
         headers = {'Authorization': f'Basic {encode}'}
 
         response = requests.request("GET", url, headers=headers, data={},
@@ -137,6 +140,8 @@ class TestRunner:  # pragma: no cover
             specific_test = test_cases_class(test_name, self.client_params, self.env_params)
             suite.addTest(specific_test)
         result = unittest.TextTestRunner().run(suite)
+        # print("failures: ","\n".join([str(f[0]).split(" ")[0] for f in result.failures]))
+        # print("errors: ", "\n".join([str(f[0]).split(" ")[0] for f in result.errors]))
         return result.wasSuccessful()
 
     def __get_relevant_tests_for_class(self, class_name: IntegrationTestCaseBase) -> list:

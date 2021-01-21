@@ -24,10 +24,10 @@ class TestEnvironmentParams:
     Default params are used for test_integration script
     """
 
-    def __init__(self, cli_to_test_path=None, invoke_process=False,
+    def __init__(self, cli_to_test=None, invoke_process=False,
                  path_provider=None):
         self.invoke_process = invoke_process
-        self.cli_to_test_path = cli_to_test_path
+        self.cli_to_test = cli_to_test
         if path_provider:
             self.path_provider = path_provider
         elif TestRunnerPathProvider.getInstance():

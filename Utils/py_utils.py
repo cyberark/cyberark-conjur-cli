@@ -2,11 +2,23 @@ import os
 import tempfile
 import uuid
 from unittest.mock import patch
-
+import signal
 
 def remove_file(file_path):
     if os.path.isfile(file_path):
         os.remove(file_path)
+
+def run_func_with_timeout(timeout, func,*args):
+    # important! this must raise an exception for the interrupt to work with blocking functions
+    def interrupted(signum, frame):
+        raise RuntimeError("interrupted")
+    signal.signal(signal.SIGALRM, interrupted)
+    # set alarm
+    signal.alarm(timeout)
+    s = func(*args)
+    # disable the alarm after success
+    signal.alarm(0)
+    return s
 
 @patch('builtins.input', return_value='yes')
 def init_to_cli(self, mock_input):
@@ -36,7 +48,8 @@ def assert_set_and_get(self, variable_id):
 
     set_variable(self, variable_id, expected_value)
     output = get_variable(self, variable_id)
-    self.assertEquals(expected_value, output.strip())
+    # using assertin and not AssertEqual as in the process we get the entire conjur stdout
+    self.assertIn(expected_value, output.strip())
 
 def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
     with self.assertRaises(error_class):
@@ -83,7 +96,6 @@ def load_policy(self, policy_path, exit_code=0):
                            ['policy', 'load', '-b', 'root', '-f', policy_path], exit_code=exit_code)
 
 def load_policy_from_string(self, policy, exit_code=0):
-    output = None
     file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
     with open(file_name, 'w+b') as temp_policy_file:
         temp_policy_file.write(policy.encode('utf-8'))

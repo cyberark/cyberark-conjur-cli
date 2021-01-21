@@ -41,8 +41,8 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
     # *************** TESTS ***************
-
-    @integration_test
+    # note: this will not work with a process as the log redirect will not work
+    @integration_test()
     def test_variable_get_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
             expected_value = uuid.uuid4().hex
@@ -51,7 +51,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['--insecure', 'variable', 'get', '-i', 'one/password'])
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
-    @integration_test
+    @integration_test(True)
     def test_variable_short_version_return_latest_value(self):
         policy = "- !variable someversionedsecret"
         Utils.load_policy_from_string(self, policy)
@@ -62,7 +62,8 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                  ['variable', 'get', '-i', 'someversionedsecret', '-v', '1'])
         self.assertIn(expected_value, output)
 
-    @integration_test
+    # TODO why it's not pass when running as a process
+    @integration_test()
     def test_variable_long_version_return_latest_value(self):
         policy = "- !variable someotherversionedsecret"
         Utils.load_policy_from_string(self, policy)
@@ -73,7 +74,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                  ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '1'])
         self.assertIn(expected_value, output)
 
-    @integration_test
+    @integration_test()
     def test_variable_different_version_calls_returns_different_versions(self):
         policy = "- !variable someotherversionedsecret"
         Utils.load_policy_from_string(self, policy)
@@ -90,7 +91,8 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                  ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '2'])
         self.assertIn(second_version, output)
 
-    @integration_test
+    # note: this will not work with a process as the log redirect will not work
+    @integration_test()
     def test_variable_set_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
             expected_value = uuid.uuid4().hex
@@ -100,27 +102,28 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
 
-    @integration_test
+    @integration_test(True)
     def test_variable_without_subcommand_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable'])
         self.assertIn("Usage:\n  conjur [global options] <command> <subcommand> [options] [args]", output)
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test(True)
     def test_variable_short_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', '-h'])
         self.assertIn("usage:  variable", output)
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test(True)
     def test_variable_long_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', '--help'])
         self.assertIn("usage:  variable", output)
 
-    @integration_test
+    # note that the redirect_stderr won't work with process testing, as we redirect err into stdout
+    @integration_test()
     def test_variable_get_variable_without_subcommand_raises_error(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
@@ -129,7 +132,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Error argument action: invalid choice: 'somevariable'", self.capture_stream.getvalue())
         self.assertIn("usage:  variable", output)
 
-    @integration_test
+    @integration_test(True)
     def test_variable_get_long_variable_returns_variable_value(self):
         expected_value = uuid.uuid4().hex
         Utils.set_variable(self, 'one/password', expected_value)
@@ -137,7 +140,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                  ['variable', 'get', '--id=one/password'])
         self.assertIn(expected_value, output)
 
-    @integration_test
+    @integration_test(True)
     def test_variable_get_short_variable_returns_variable_value(self):
         expected_value = uuid.uuid4().hex
         Utils.set_variable(self, 'one/password', expected_value)
@@ -145,27 +148,28 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                  ['variable', 'get', '-i', 'one/password'])
         self.assertIn(expected_value, output)
 
-    @integration_test
+    @integration_test(True)
     def test_variable_get_with_special_chars_returns_special_chars(self):
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
         Utils.set_variable(self, 'variablespecialchars', '"[]{}#@^&<>~\/''\/?\;\';\'"')
         output = Utils.get_variable(self, 'variablespecialchars')
-        self.assertEquals(output.strip(), '"[]{}#@^&<>~\/''\/?\;\';\'"')
+        self.assertIn( '"[]{}#@^&<>~\/''\/?\;\';\'"',output)
 
-    @integration_test
+    @integration_test(True)
     def test_variable_get_variable_has_spaces_returns_variable_value(self):
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
         Utils.assert_set_and_get(self, "some variable with spaces")
 
-    @integration_test
+    @integration_test(True)
     def test_unknown_variable_raises_not_found_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'unknown'], exit_code=1)
         self.assertRegex(output, "404 Client Error: Not Found for url:")
 
-    @integration_test
+    #todo: why can't with process
+    @integration_test()
     def test_cli_can_batch_get_multiple_variables(self):
         policy, variables = Utils.generate_policy_string(self)
         file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
@@ -188,40 +192,42 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
         os.remove(file_name)
 
-    @integration_test
+    @integration_test(True)
     def test_batch_existing_and_nonexistent_variable_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password', 'unknown'], exit_code=1)
         self.assertIn("404 Client Error", output)
 
-    @integration_test
+    @integration_test(True)
     def test_batch_existing_and_nonexistent_variable_with_spaces_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password', '"unknown password"'], exit_code=1)
         self.assertIn("404 Client Error", output)
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test(True)
     def test_subcommand_get_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-h'])
         self.assertIn("usage: variable", output)
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test(True)
     def test_subcommand_get_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '--help'])
         self.assertIn("usage: variable", output)
 
-    @integration_test
+    # note that the redirect_stderr won't work with process testing, as we redirect err into stdout
+    @integration_test()
     def test_variable_get_without_id_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['variable', 'get'], exit_code=1)
         self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
 
-    @integration_test
+    # note that the redirect_stderr won't work with process testing, as we redirect err into stdout
+    @integration_test()
     def test_variable_set_without_id_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
@@ -229,28 +235,31 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    # Todo check why fail with a process
+    @integration_test()
     def test_subcommand_set_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'set', '--help'])
         self.assertIn("usage: variable set", output)
 
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test(True)
     def test_subcommand_set_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'set', '-h'])
         self.assertIn("usage: variable set", output)
 
+    # note that the redirect_stderr won't work with process testing, as we redirect err into stdout
     # TODO This will need to be changed when UX is finalized
-    @integration_test
+    @integration_test()
     def test_subcommand_set_variable_without_value_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['variable', 'set', '-i', 'one/password'], exit_code=1)
         self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
 
-    @integration_test
+    # note that the redirect_stderr won't work with process testing, as we redirect err into stdout
+    @integration_test()
     def test_subcommand_set_variable_with_values_returns_help(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
@@ -261,7 +270,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     Validates that when the user isn't logged in and makes a request,
     they are prompted to login first and then the command is executed
     '''
-    @integration_test
+    @integration_test()
     @patch('builtins.input', return_value='admin')
     def test_variable_get_without_user_logged_in_prompts_login_and_performs_get(self, mock_input):
         # TEST_ENV is set to False so we will purposely be prompted to login
@@ -280,7 +289,8 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
             self.assertIn('Successfully set value for variable \'one/password\'', output)
         os.environ['TEST_ENV'] = 'True'
 
-    @integration_test
+    # todo why --insecure not working with process
+    @integration_test(True)
     def test_https_cli_can_set_and_get_a_defined_variable_if_verification_disabled(self):
         self.setup_cli_params({}, '--insecure')
         Utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)

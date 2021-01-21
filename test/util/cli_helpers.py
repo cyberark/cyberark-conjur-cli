@@ -11,19 +11,25 @@ from unittest.mock import patch, MagicMock
 from conjur.cli import Cli
 
 
-def integration_test(original_function):
-    @wraps(original_function)
-    def test_wrapper_func(self, *inner_args, **inner_kwargs):
-        return original_function(self, *inner_args, **inner_kwargs)
+def integration_test(should_run_as_process=False):
+    def function_decorator(original_function):
+        @wraps(original_function)
+        def test_wrapper_func(self, *inner_args, **inner_kwargs):
+            return original_function(self, *inner_args, **inner_kwargs)
 
-    test_wrapper_func.integration = True
+        if should_run_as_process:
+            test_wrapper_func.test_with_process = True
+        test_wrapper_func.integration = True
 
-    return test_wrapper_func
+        return test_wrapper_func
+
+    return function_decorator
 
 
 def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None,
              policy_change_output={}, whoami_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
+
     def test_cli_decorator(original_function):
         @wraps(original_function)
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
@@ -68,7 +74,7 @@ def cli_arg_test(cli_args=None, **kwargs):
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
             capture_stream = io.StringIO()
             client_instance_mock = MagicMock()
-            client_instance_mock.get.return_value=b'foo'
+            client_instance_mock.get.return_value = b'foo'
 
             client = None
             with self.assertRaises(SystemExit) as sys_exit:
