@@ -251,6 +251,9 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
         variable_get_subcommand_parser.add_argument('-i', '--id',
                                                     help='ID of a variable', nargs='+', required=True)
+        variable_get_subcommand_parser.add_argument('-v', '--version',
+                                                    help='Version of a variable')
+
         variable_set_subcommand_parser = variable_subparser.add_parser(name="set")
         variable_set_subcommand_parser.add_argument('-i', '--id',
                                                     help='ID of a variable', required=True)
@@ -353,13 +356,15 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         """
         variable_logic = VariableLogic(client)
         if args.action == 'get':
-            variable_data = VariableData(action=args.action, id=args.id, value=None)
+            variable_data = VariableData(action=args.action, id=args.id, value=None,
+                                         variable_version=args.version)
             variable_controller = VariableController(ssl_verify=ssl_verify,
                                                      variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.get_variable()
         elif args.action == 'set':
-            variable_data = VariableData(action=args.action, id=args.id, value=args.value)
+            variable_data = VariableData(action=args.action, id=args.id, value=args.value,
+                                         variable_version=None)
             variable_controller = VariableController(ssl_verify=ssl_verify,
                                                      variable_logic=variable_logic,
                                                      variable_data=variable_data)

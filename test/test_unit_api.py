@@ -211,6 +211,23 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.SECRETS,
                               kind='variable',
                               identifier='myvar',
+                              query={},
+                              ssl_verify=True)
+
+    test_get_variable_invokes_http_client_correctly.tester=True
+    @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_get_variable_with_version_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.get_variable('myvar', '1')
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.SECRETS,
+                              kind='variable',
+                              identifier='myvar',
+                              query={'version': '1'},
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
@@ -226,6 +243,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.SECRETS,
                               kind='variable',
                               identifier='myvar',
+                              query={},
                               ssl_verify='verify')
 
     # Set variable
@@ -461,10 +479,24 @@ class ApiTest(unittest.TestCase):
             return 'apitoken'
         api.authenticate = mock_auth
 
+        api.resources_list()
+
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                              query={},
+                              ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
+    def test_get_resources_with_constraints_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
         api.resources_list({'limit':1})
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
-                              query={'limit':1},
+                              query={'limit': 1},
                               ssl_verify=True)
 
     @patch('conjur.api.invoke_endpoint', \

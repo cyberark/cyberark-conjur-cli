@@ -286,7 +286,7 @@ class ClientTest(unittest.TestCase):
             mock_api_config):
         Client().get('variable_id')
 
-        mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id')
+        mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id', None)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)

@@ -33,7 +33,6 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
-
     orig_params = params or {}
 
     # Escape all params

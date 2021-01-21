@@ -177,11 +177,11 @@ class Client():
         """
         return self._api.resources_list(list_constraints)
 
-    def get(self, variable_id):
+    def get(self, variable_id, version=None):
         """
         Gets a variable value based on its ID
         """
-        return self._api.get_variable(variable_id)
+        return self._api.get_variable(variable_id, version)
 
     def get_many(self, *variable_ids):
         """

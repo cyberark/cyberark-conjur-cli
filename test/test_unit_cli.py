@@ -63,7 +63,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["variable", "get", "-i", "foo"], get_output=b'A')
     def test_cli_invokes_variable_get_correctly(self, cli_invocation, output, client):
-        client.get.assert_called_once_with("foo")
+        client.get.assert_called_once_with("foo", None)
 
     @cli_test(["variable", "get", "-i", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
     def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output, client):

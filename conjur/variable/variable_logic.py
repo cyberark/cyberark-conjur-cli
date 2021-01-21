@@ -26,10 +26,11 @@ class VariableLogic:
         """
         Method to handle all get action activity
         """
-        logging.debug(f"Getting variable values for: {variable_data.variable_id}")
+        logging.debug(variable_data)
         # pylint: disable=no-else-return
         if len(variable_data.variable_id) == 1:
-            variable_value = self.client.get(variable_data.variable_id[0])
+            variable_value = self.client.get(variable_data.variable_id[0],
+                                             variable_data.variable_version)
             return variable_value.decode('utf-8')
         else:
             variable_values = self.client.get_many(*variable_data.variable_id)
@@ -40,7 +41,7 @@ class VariableLogic:
         """
         Method to handle all set action activity
         """
-        logging.debug(f"Setting variable value for: '{variable_data.variable_id}'")
+        logging.debug(variable_data)
         self.client.set(variable_data.variable_id, variable_data.value)
 
         logging.debug(f"Successfully set value for variable '{variable_data.variable_id}'")

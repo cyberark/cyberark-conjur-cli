@@ -51,6 +51,44 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['--insecure', 'variable', 'get', '-i', 'one/password'])
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
+    @integration_test
+    def test_variable_short_version_return_latest_value(self):
+        policy = "- !variable someversionedsecret"
+        Utils.load_policy_from_string(self, policy)
+
+        expected_value = "somesecret"
+        Utils.set_variable(self, 'someversionedsecret', expected_value)
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', 'someversionedsecret', '-v', '1'])
+        self.assertIn(expected_value, output.strip())
+
+    @integration_test
+    def test_variable_long_version_return_latest_value(self):
+        policy = "- !variable anotherversionedsecret"
+        Utils.load_policy_from_string(self, policy)
+
+        expected_value = "anothersecret"
+        Utils.set_variable(self, 'anotherversionedsecret', expected_value)
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', 'anotherversionedsecret', '--version', '1'])
+        self.assertEquals(expected_value, output.strip())
+
+    @integration_test
+    def test_variable_different_version_calls_returns_different_versions(self):
+        policy = "- !variable someotherversionedsecret"
+        Utils.load_policy_from_string(self, policy)
+
+        first_version = "first_secret"
+        Utils.set_variable(self, 'someotherversionedsecret', first_version)
+
+        second_version = "second_secret"
+        Utils.set_variable(self, 'someotherversionedsecret', second_version)
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '1'])
+        self.assertEquals(first_version, output.strip())
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '2'])
+        self.assertEquals(second_version, output.strip())
 
     @integration_test
     def test_variable_set_insecure_prints_warning_in_log(self):
