@@ -15,12 +15,13 @@ class VariableData:
     def __init__(self, **arg_params):
         self.action = arg_params['action']
         self.variable_id = arg_params['id']
+        self.variable_version = arg_params['variable_version'] if arg_params['variable_version'] else None
         self.value = arg_params['value'] if arg_params['value'] else None
 
     def __repr__(self):
         result = []
         # pylint: disable=multiple-statements
-        if self.action: result.append(f"'action': '{self.action}'")
-        if self.variable_id: result.append(f"'id': '{self.variable_id}'")
-        if self.action == 'set': result.append("'value': '****'")
-        return '{'+', '.join(result) + '}'
+        if self.action == 'get': result.append(f"Getting variable values for: {self.variable_id} ")
+        if self.variable_version: result.append(f"with version {self.variable_version}")
+        if self.action == 'set': result.append(f"Setting variable value for: '{self.variable_id}'")
+        return ''.join(result)
