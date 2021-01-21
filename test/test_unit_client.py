@@ -286,7 +286,7 @@ class ClientTest(unittest.TestCase):
             mock_api_config):
         Client().get('variable_id')
 
-        mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id')
+        mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id', None)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
@@ -337,11 +337,11 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
-    def test_client_passes_through_api_apply_policy_params(self, mock_api_instance, mock_creds,
+    def test_client_passes_through_api_load_policy_params(self, mock_api_instance, mock_creds,
             mock_api_config):
-        Client().apply_policy_file('name', 'policy')
+        Client().load_policy_file('name', 'policy')
 
-        mock_api_instance.return_value.apply_policy_file.assert_called_once_with(
+        mock_api_instance.return_value.load_policy_file.assert_called_once_with(
             'name',
             'policy',
         )
@@ -349,12 +349,12 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
-    def test_client_returns_apply_policy_result(self, mock_api_instance, mock_creds, mock_api_config):
-        apply_policy_result = uuid.uuid4().hex
-        mock_api_instance.return_value.apply_policy_file.return_value = apply_policy_result
+    def test_client_returns_load_policy_result(self, mock_api_instance, mock_creds, mock_api_config):
+        load_policy_result = uuid.uuid4().hex
+        mock_api_instance.return_value.load_policy_file.return_value = load_policy_result
 
-        return_value = Client().apply_policy_file('name', 'policy')
-        self.assertEquals(return_value, apply_policy_result)
+        return_value = Client().load_policy_file('name', 'policy')
+        self.assertEquals(return_value, load_policy_result)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
@@ -383,11 +383,11 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
-    def test_client_passes_through_api_delete_policy_params(self, mock_api_instance, mock_creds,
+    def test_client_passes_through_api_update_policy_params(self, mock_api_instance, mock_creds,
             mock_api_config):
-        Client().delete_policy_file('name', 'policy')
+        Client().update_policy_file('name', 'policy')
 
-        mock_api_instance.return_value.delete_policy_file.assert_called_once_with(
+        mock_api_instance.return_value.update_policy_file.assert_called_once_with(
             'name',
             'policy'
         )
@@ -395,13 +395,13 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
-    def test_client_returns_delete_policy_result(self, mock_api_instance, mock_creds,
+    def test_client_returns_update_policy_result(self, mock_api_instance, mock_creds,
             mock_api_config):
-        delete_policy_result = uuid.uuid4().hex
-        mock_api_instance.return_value.delete_policy_file.return_value = delete_policy_result
+        update_policy_result = uuid.uuid4().hex
+        mock_api_instance.return_value.update_policy_file.return_value = update_policy_result
 
-        return_value = Client().delete_policy_file('name', 'policy')
-        self.assertEquals(return_value, delete_policy_result)
+        return_value = Client().update_policy_file('name', 'policy')
+        self.assertEquals(return_value, update_policy_result)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)

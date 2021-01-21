@@ -7,7 +7,6 @@ This test file handles the main test flows for the list command
 """
 import io
 from contextlib import redirect_stderr
-from unittest.mock import patch
 
 import Utils
 from .util.cli_helpers import integration_test
@@ -16,9 +15,9 @@ from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
-class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
+class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationListTest, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationTestList, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
 
@@ -30,24 +29,25 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def setUp(self):
         self.setup_cli_params({})
-        # Need to configure the CLI and login to perform further commands
+        # Used to configure the CLI and login to run tests
         Utils.setup_cli(self)
-        return self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("list")])
+        self.invoke_cli(self.cli_auth_params,
+                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
+
+    # *************** TESTS ***************
 
     @integration_test
     def test_list_returns_resources(self):
         output = self.invoke_cli(self.cli_auth_params, ['list'])
-        self.assertEquals(output,
-                          f'[\n    "{self.client_params.account}:policy:root",\n'
-                          f'    "{self.client_params.account}:user:someuser",\n'
-                          f'    "{self.client_params.account}:layer:somelayer",\n'
-                          f'    "{self.client_params.account}:group:somegroup",\n'
-                          f'    "{self.client_params.account}:host:anotherhost",\n'
-                          f'    "{self.client_params.account}:variable:one/password",\n'
-                          f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
+        self.assertEquals(f'[\n    "{self.client_params.account}:policy:root",\n'
+                      f'    "{self.client_params.account}:user:someuser",\n'
+                      f'    "{self.client_params.account}:layer:somelayer",\n'
+                      f'    "{self.client_params.account}:group:somegroup",\n'
+                      f'    "{self.client_params.account}:host:anotherhost",\n'
+                      f'    "{self.client_params.account}:variable:one/password",\n'
+                      f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)
 
-    # TODO This will need to be changed when UX is finalizeds
+    # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_list_help_returns_help_screen(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-h'])
@@ -56,7 +56,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_inspect_user_returns_info_on_user(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'replace', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '--inspect', '--kind', 'user'])
         self.assertIn(f'        "id": "{self.client_params.account}:user:someuser",\n'
                       f'        "owner": "{self.client_params.account}:user:admin",\n'
@@ -213,25 +213,27 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '-1'], exit_code=1)
         self.assertIn("500 Server Error", output)
 
-    # TODO weird behavior. Instead of [] or failing we get full results
-    @integration_test
-    def test_list_string_offset_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params, ['list', '-o', 'somestring'])
-        self.assertEquals(output,
-                          f'[\n    "{self.client_params.account}:group:somegroup",\n'
-                          f'    "{self.client_params.account}:host:anotherhost",\n'
-                          f'    "{self.client_params.account}:layer:somelayer",\n'
-                          f'    "{self.client_params.account}:policy:root",\n'
-                          f'    "{self.client_params.account}:user:someuser",\n'
-                          f'    "{self.client_params.account}:variable:one/password",\n'
-                          f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
+    # This tests is commented out because of a bug in server (https://github.com/cyberark/conjur/issues/1997)
+    # where a string is considered valid input for offset. For example, when offset=somestring a list
+    # of Conjur resources are returned instead of a 500 internal server error
+    # @integration_test
+    # def test_list_string_offset_raises_error(self):
+    #     output = self.invoke_cli(self.cli_auth_params, ['list', '-o', 'somestring'])
+    #     self.assertEquals(output,
+    #                       f'[\n    "{self.client_params.account}:group:somegroup",\n'
+    #                       f'    "{self.client_params.account}:host:anotherhost",\n'
+    #                       f'    "{self.client_params.account}:layer:somelayer",\n'
+    #                       f'    "{self.client_params.account}:policy:root",\n'
+    #                       f'    "{self.client_params.account}:user:someuser",\n'
+    #                       f'    "{self.client_params.account}:variable:one/password",\n'
+    #                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n')
 
     @integration_test
     def test_list_short_search_returns_list_with_param(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-s', 'someuser'])
         self.assertEquals(output,
                   f'[\n    "{self.client_params.account}:user:someuser"\n]\n')
-    test_list_short_search_returns_list_with_param.tester=True
+
     @integration_test
     def test_list_long_search_returns_list_with_param(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '--search=someuser'])
@@ -264,7 +266,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_combo_limit_and_kind_returns_specified_kind(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'apply', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'load', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '-l', '2', '-k', 'host'])
         self.assertEquals(output,
                           f'[\n    "{self.client_params.account}:host:anotherhost",\n'
@@ -273,7 +275,7 @@ class CliIntegrationListTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_combo_limit_and_offset_returns_specified_list(self):
         self.invoke_cli(self.cli_auth_params,
-               ['policy', 'apply', 'root', self.environment.path_provider.get_policy_path("conjur")])
+               ['policy', 'load', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("conjur")])
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '2', '-l', '3'])
         self.assertEquals(output,
                           f'[\n    "{self.client_params.account}:host:somehost",\n'

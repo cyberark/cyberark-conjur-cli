@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Added
+- Add ability to get previous variable/secret versions. This is available in both CLI and API.
 - The `list` flag constraints are now available in both CLI and API to filter resource results
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/91)
 - The `login\logout` methods are now available in CLI to login and out of the CLI

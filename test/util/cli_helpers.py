@@ -21,20 +21,20 @@ def integration_test(original_function):
     return test_wrapper_func
 
 
-def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=None,
+def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None,
              policy_change_output={}, whoami_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
-
     def test_cli_decorator(original_function):
         @wraps(original_function)
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
             capture_stream = io.StringIO()
             client_instance_mock = MagicMock()
+            client_instance_mock.get.return_value = get_output
             client_instance_mock.get_many.return_value = get_many_output
             client_instance_mock.list.return_value = list_output
-            client_instance_mock.apply_policy_file.return_value = policy_change_output
+            client_instance_mock.load_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
-            client_instance_mock.delete_policy_file.return_value = policy_change_output
+            client_instance_mock.update_policy_file.return_value = policy_change_output
             client_instance_mock.whoami.return_value = whoami_output
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
@@ -58,9 +58,8 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, list_output=N
 def cli_arg_test(cli_args=None, **kwargs):
     if cli_args is None:
         cli_args = []
-    cli_args += ['variable', 'get', 'foo']
+    cli_args += ['variable', 'get', '-i', 'foo']
     cli_command = 'cli {}'.format(' '.join(cli_args))
-
     default_args = {'debug': False}
     expected_args = {**default_args, **kwargs}
 
@@ -68,13 +67,15 @@ def cli_arg_test(cli_args=None, **kwargs):
         @wraps(original_function)
         def test_wrapper_func(self, *inner_args, **inner_kwargs):
             capture_stream = io.StringIO()
-            client = None
+            client_instance_mock = MagicMock()
+            client_instance_mock.get.return_value=b'foo'
 
+            client = None
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \
                          patch('conjur.cli.Client') as mock_client:
-                        mock_client.return_value = MagicMock()
+                        mock_client.return_value = client_instance_mock
                         client = mock_client
 
                         Cli().run()

@@ -126,7 +126,7 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
-    def resources_list(self, list_constraints):
+    def resources_list(self, list_constraints=None):
         """
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
@@ -135,16 +135,23 @@ class Api():
             'account': self._account
         }
         params.update(self._default_params)
-        json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
-                                        params,
-                                        query=list_constraints,
-                                        api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).content
+        if list_constraints is not None:
+            json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                                            params,
+                                            query=list_constraints,
+                                            api_token=self.api_token,
+                                            ssl_verify=self._ssl_verify).content
+        else:
+            json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                                params,
+                                api_token=self.api_token,
+                                ssl_verify=self._ssl_verify).content
+
         resources = json.loads(json_response.decode('utf-8'))
 
         # Returns the result as a list of resource ids instead of the raw JSON only
         # when the user does not provide `inspect` as one of their filters
-        if 'inspect' not in list_constraints:
+        if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
             return list(resource_list)
@@ -153,20 +160,32 @@ class Api():
         # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
-    def get_variable(self, variable_id):
+    def get_variable(self, variable_id, version=None):
         """
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
         """
-
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': variable_id,
         }
         params.update(self._default_params)
 
-        return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
-                               api_token=self.api_token, ssl_verify=self._ssl_verify).content
+        query_params = {}
+        if version is not None:
+            query_params = {
+                'version': version
+            }
+
+        # pylint: disable=no-else-return
+        if version is not None:
+            return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
+                                   api_token=self.api_token, query=query_params,
+                                   ssl_verify=self._ssl_verify).content
+        else:
+            return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
+                                   api_token=self.api_token,
+                                   ssl_verify=self._ssl_verify).content
 
     def get_variables(self, *variable_ids):
         """
@@ -222,7 +241,7 @@ class Api():
 
     def _load_policy_file(self, policy_id, policy_file, http_verb):
         """
-        This method is used to load, replace or delete a file-based policy into the desired
+        This method is used to load, replace or update a file-based policy into the desired
         name.
         """
 
@@ -242,7 +261,7 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def apply_policy_file(self, policy_id, policy_file):
+    def load_policy_file(self, policy_id, policy_file):
         """
         This method is used to load a file-based policy into the desired
         name.
@@ -258,9 +277,9 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def delete_policy_file(self, policy_id, policy_file):
+    def update_policy_file(self, policy_id, policy_file):
         """
-        This method is used to delete a file-based policy into the desired
+        This method is used to update a file-based policy into the desired
         policy ID.
         """
 

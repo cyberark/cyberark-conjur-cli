@@ -28,6 +28,8 @@ from conjur.list import ListData, ListController
 from conjur.list.list_logic import ListLogic
 from conjur.login import LoginLogic, LoginController
 from conjur.logout import LogoutController, LogoutLogic
+from conjur.policy import PolicyData, PolicyLogic, PolicyController
+from conjur.variable import VariableLogic, VariableController, VariableData
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements
@@ -218,25 +220,25 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                        help='Manage policies')
         policy_subparsers = policy_parser.add_subparsers(dest='action')
 
-        apply_policy_parser = policy_subparsers.add_parser('apply',
-                                                           help='Apply a policy file')
-        apply_policy_parser.add_argument('name',
-                                         help='Name of the policy (usually "root")')
-        apply_policy_parser.add_argument('policy',
-                                         help='File containing the YAML policy')
+        load_policy_parser = policy_subparsers.add_parser('load',
+                                                           help='Load a policy file')
+        load_policy_parser.add_argument('-b', '--branch', required=True,
+                                         help='Provide the policy branch name (usually root)')
+        load_policy_parser.add_argument('-f', '--file', required=True,
+                                         help='Provide policy file name')
 
         replace_policy_parser = policy_subparsers.add_parser('replace',
                                                              help='Replace a policy file')
-        replace_policy_parser.add_argument('name',
+        replace_policy_parser.add_argument('-b', '--branch', required=True,
                                            help='Name of the policy (usually "root")')
-        replace_policy_parser.add_argument('policy',
+        replace_policy_parser.add_argument('-f', '--file', required=True,
                                            help='File containing the YAML policy')
 
-        delete_policy_parser = policy_subparsers.add_parser('delete',
-                                                            help='Delete a policy file')
-        delete_policy_parser.add_argument('name',
+        update_policy_parser = policy_subparsers.add_parser('update',
+                                                            help='Update a policy file')
+        update_policy_parser.add_argument('-b', '--branch', required=True,
                                           help='Name of the policy (usually "root")')
-        delete_policy_parser.add_argument('policy',
+        update_policy_parser.add_argument('-f', '--file', required=True,
                                           help='File containing the YAML policy')
 
         # *************** VARIABLE COMMAND ***************
@@ -244,17 +246,19 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
                                                          formatter_class=formatter_class)
-        variable_subparsers = variable_parser.add_subparsers(dest='action')
-        get_variable_parser = variable_subparsers.add_parser('get',
-                                                             help='Get the value of a variable')
-        get_variable_parser.add_argument('variable_id',
-                                 help='ID of a variable', nargs='+')
-        set_variable_parser = variable_subparsers.add_parser('set',
-                                                             help='Set the value of a variable')
-        set_variable_parser.add_argument('variable_id',
-                                         help='ID of the variable')
-        set_variable_parser.add_argument('value',
-                                         help='New value of the variable')
+
+        variable_subparser = variable_parser.add_subparsers(title="Subcommand", dest='action')
+        variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
+        variable_get_subcommand_parser.add_argument('-i', '--id',
+                                                    help='ID of a variable', nargs='+', required=True)
+        variable_get_subcommand_parser.add_argument('-v', '--version',
+                                                    help='Version of a variable')
+
+        variable_set_subcommand_parser = variable_subparser.add_parser(name="set")
+        variable_set_subcommand_parser.add_argument('-i', '--id',
+                                                    help='ID of a variable', required=True)
+        variable_set_subcommand_parser.add_argument('-v', '--value',
+                                                    help='New value of the variable', required=True)
 
         # *************** WHOAMI COMMAND ***************
 
@@ -287,11 +291,11 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             sys.exit(0)
         except FileNotFoundError as not_found_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'")
+            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
             sys.exit(1)
         except requests.exceptions.HTTPError as client_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {client_error})")
+            sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
@@ -345,6 +349,38 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                          list_data=list_data)
         list_controller.load()
 
+    @classmethod
+    def handle_variable_logic(cls, ssl_verify=True, args=None, client=None):
+        """
+        Method that wraps the variable call logic
+        """
+        variable_logic = VariableLogic(client)
+        if args.action == 'get':
+            variable_data = VariableData(action=args.action, id=args.id, value=None,
+                                         variable_version=args.version)
+            variable_controller = VariableController(ssl_verify=ssl_verify,
+                                                     variable_logic=variable_logic,
+                                                     variable_data=variable_data)
+            variable_controller.get_variable()
+        elif args.action == 'set':
+            variable_data = VariableData(action=args.action, id=args.id, value=args.value,
+                                         variable_version=None)
+            variable_controller = VariableController(ssl_verify=ssl_verify,
+                                                     variable_logic=variable_logic,
+                                                     variable_data=variable_data)
+            variable_controller.set_variable()
+
+    @classmethod
+    def handle_policy_logic(cls, ssl_verify=True, policy_data=None, client=None):
+        """
+        Method that wraps the variable call logic
+        """
+        policy_logic = PolicyLogic(client)
+        policy_controller = PolicyController(ssl_verify=ssl_verify,
+                                             policy_logic=policy_logic,
+                                             policy_data=policy_data)
+        policy_controller.load()
+
     @staticmethod
     # pylint: disable=too-many-branches
     def run_action(resource, args):
@@ -367,7 +403,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             return
 
         # Needed for unit tests so that they do not require configuring
-        if os.getenv('TEST_ENV') is None:
+        if os.getenv('TEST_ENV') is None or os.getenv('TEST_ENV') == 'False':
             # If the user runs a command without configuring the CLI or logging in,
             # we request they do so before executing their request
             # pylint: disable=line-too-long
@@ -391,28 +427,13 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
+
         elif resource == 'variable':
-            variable_id = args.variable_id
-            if args.action == 'get':
-                if len(variable_id) == 1:
-                    variable_value = client.get(variable_id[0])
-                    print(variable_value.decode('utf-8'), end='')
-                else:
-                    variable_values = client.get_many(*variable_id)
-                    print(json.dumps(variable_values, indent=4))
-            else:
-                client.set(variable_id, args.value)
-                print("Value set: '{}'".format(variable_id))
+            Cli.handle_variable_logic(args.ssl_verify, args, client)
+
         elif resource == 'policy':
-            if args.action == 'replace':
-                resources = client.replace_policy_file(args.name, args.policy)
-                print(json.dumps(resources, indent=4))
-            elif args.action == 'delete':
-                resources = client.delete_policy_file(args.name, args.policy)
-                print(json.dumps(resources, indent=4))
-            else:
-                resources = client.apply_policy_file(args.name, args.policy)
-                print(json.dumps(resources, indent=4))
+            policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)
+            Cli.handle_policy_logic(args.ssl_verify, policy_data, client)
 
     @staticmethod
     def _parse_args(parser):

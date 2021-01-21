@@ -8,6 +8,7 @@ HTTP-based endpoints in a generic way
 """
 
 import base64
+import logging
 from enum import Enum
 from urllib.parse import quote
 
@@ -32,7 +33,6 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
-
     orig_params = params or {}
 
     # Escape all params
@@ -60,7 +60,18 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                               headers=headers)
 
     if check_errors:
-        response.raise_for_status()
+        # takes the "requests" response object and expands the
+        # raise_for_status method to return more helpful errors for debug logs
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as http_error:
+            if response.text:
+                logging.debug(requests.exceptions.HTTPError(f'{http_error.response.status_code}' \
+                                                            f' {http_error.response.reason}' \
+                                                            f' {response.text}'))
+            raise http_error
+        except Exception as general_error:
+            raise general_error
 
     return response
 
@@ -83,7 +94,6 @@ def enable_http_logging(): #pragma: no cover
                        "is removed, the PR should not be approved")
 
     # pylint: disable=unreachable,import-outside-toplevel
-    import logging
     #pylint: disable=import-outside-toplevel
     from http.client import HTTPConnection
     HTTPConnection.debuglevel = 1

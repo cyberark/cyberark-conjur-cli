@@ -62,7 +62,7 @@ class CliIntegrationTestOSS(IntegrationTestCaseBase):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'yes', 'someotheraccount']):
             self.setup_cli_params({})
             self.invoke_cli(self.cli_auth_params,
-                            ['init'], exit_code=0)
+                            ['init'])
 
             with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
                 lines = conjurrc.readlines()
