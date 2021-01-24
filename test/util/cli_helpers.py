@@ -22,7 +22,7 @@ def integration_test(original_function):
 
 
 def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None,
-             policy_change_output={}, whoami_output={}):
+             policy_change_output={}, whoami_output={}, rotate_api_key_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
     def test_cli_decorator(original_function):
         @wraps(original_function)
@@ -31,6 +31,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=No
             client_instance_mock = MagicMock()
             client_instance_mock.get.return_value = get_output
             client_instance_mock.get_many.return_value = get_many_output
+            client_instance_mock.rotate_api_key.return_value = rotate_api_key_output
             client_instance_mock.list.return_value = list_output
             client_instance_mock.load_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
@@ -44,7 +45,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=No
                         Cli().run()
 
             self.assertEqual(sys_exit.exception.code, 0,
-                             "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_command))
+                             f"ERROR: CLI returned an unexpected error status code: '{cli_command}'. Output: {capture_stream.getvalue()}")
             original_function(self, cli_command, capture_stream.getvalue(), client_instance_mock)
 
         # Set integration flag if specified

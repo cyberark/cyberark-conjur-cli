@@ -24,12 +24,16 @@ from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.credentials_data import CredentialsData
 from conjur.credentials_from_file import CredentialsFromFile
+from conjur.host import HostController
+from conjur.host.host_resource_data import HostResourceData
+from conjur.init import ConjurrcData
 from conjur.list import ListData, ListController
 from conjur.list.list_logic import ListLogic
 from conjur.login import LoginLogic, LoginController
 from conjur.logout import LogoutController, LogoutLogic
 from conjur.policy import PolicyData, PolicyLogic, PolicyController
 from conjur.variable import VariableLogic, VariableController, VariableData
+from conjur.user import UserController, UserResourceData, UserLogic
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements
@@ -241,6 +245,30 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         update_policy_parser.add_argument('-f', '--file', required=True,
                                           help='File containing the YAML policy')
 
+        # *************** USER COMMAND ***************
+
+        user_parser = resource_subparsers.add_parser('user',
+                                                     help='Manage users')
+        user_subparsers = user_parser.add_subparsers(dest='action')
+        user_rotate_api_key_parser = user_subparsers.add_parser('rotate-api-key',
+                                                                help='Rotate a resource\'s API key')
+        user_rotate_api_key_parser.add_argument('-i', '--id',
+                                                help='')
+        user_change_password = user_subparsers.add_parser('change-password',
+                                                            help='')
+        user_change_password.add_argument('-p', '--password',
+                                          help='')
+
+        # *************** HOST COMMAND ***************
+
+        host_parser = resource_subparsers.add_parser('host',
+                                                     help='Manage hosts')
+        host_subparsers = host_parser.add_subparsers(dest='action')
+        host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
+                                                                help='Rotate a resource\'s API key')
+        host_rotate_api_key_parser.add_argument('-i', '--id',
+                                                help='')
+
         # *************** VARIABLE COMMAND ***************
 
         variable_parser = resource_subparsers.add_parser('variable',
@@ -313,7 +341,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         Client.initialize(url, name, certificate, force)
 
     @classmethod
-    def handle_login_logic(cls, name=None, password=None, ssl_verify=None):
+    def handle_login_logic(cls, name=None, password=None, ssl_verify=True):
         """
         Method that wraps the login call logic
         """
@@ -339,18 +367,17 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         logout_controller.remove_credentials()
 
     @classmethod
-    def handle_list_logic(cls, ssl_verify=True, list_data=None, client=None):
+    def handle_list_logic(cls, list_data=None, client=None):
         """
         Method that wraps the list call logic
         """
         list_logic = ListLogic(client)
-        list_controller = ListController(ssl_verify=ssl_verify,
-                                         list_logic=list_logic,
+        list_controller = ListController(list_logic=list_logic,
                                          list_data=list_data)
         list_controller.load()
 
     @classmethod
-    def handle_variable_logic(cls, ssl_verify=True, args=None, client=None):
+    def handle_variable_logic(cls, args=None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -358,28 +385,56 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         if args.action == 'get':
             variable_data = VariableData(action=args.action, id=args.id, value=None,
                                          variable_version=args.version)
-            variable_controller = VariableController(ssl_verify=ssl_verify,
-                                                     variable_logic=variable_logic,
+            variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.get_variable()
         elif args.action == 'set':
             variable_data = VariableData(action=args.action, id=args.id, value=args.value,
                                          variable_version=None)
-            variable_controller = VariableController(ssl_verify=ssl_verify,
-                                                     variable_logic=variable_logic,
+            variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.set_variable()
 
     @classmethod
-    def handle_policy_logic(cls, ssl_verify=True, policy_data=None, client=None):
+    def handle_policy_logic(cls, policy_data=None, client=None):
         """
         Method that wraps the variable call logic
         """
         policy_logic = PolicyLogic(client)
-        policy_controller = PolicyController(ssl_verify=ssl_verify,
-                                             policy_logic=policy_logic,
+        policy_controller = PolicyController(policy_logic=policy_logic,
                                              policy_data=policy_data)
         policy_controller.load()
+
+    @classmethod
+    def handle_user_logic(cls, args=None, client=None, resource=None):
+        """
+        Method that wraps the user call logic
+        """
+        credentials = CredentialsFromFile()
+        user_logic = UserLogic(ConjurrcData, credentials, client, resource)
+        if args.action == 'rotate-api-key':
+            user_resource_data = UserResourceData(action=args.action,
+                                                  id=args.id,
+                                                  new_password=None)
+            user_controller = UserController(user_logic=user_logic,
+                                             user_resource_data=user_resource_data)
+            user_controller.rotate_api_key()
+        elif args.action == 'change-password':
+            user_resource_data = UserResourceData(action=args.action,
+                                                  id=None,
+                                                  new_password=args.password)
+            user_controller = UserController(user_logic=user_logic,
+                                             user_resource_data=user_resource_data)
+            user_controller.change_password()
+
+    @classmethod
+    def handle_host_logic(cls, args, client, resource):
+        """
+        Method that wraps the host call logic
+        """
+        host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
+        host_controller = HostController(client=client, host_resource_data=host_resource_data)
+        host_controller.rotate_api_key(resource)
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -422,18 +477,24 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             list_data = ListData(kind=args.kind, inspect=args.inspect,
                              search=args.search, limit=args.limit,
                              offset=args.offset, role=args.role)
-            Cli.handle_list_logic(args.ssl_verify, list_data, client)
+            Cli.handle_list_logic(list_data, client)
 
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
 
         elif resource == 'variable':
-            Cli.handle_variable_logic(args.ssl_verify, args, client)
+            Cli.handle_variable_logic(args, client)
 
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)
-            Cli.handle_policy_logic(args.ssl_verify, policy_data, client)
+            Cli.handle_policy_logic(policy_data, client)
+
+        elif resource == 'user':
+            Cli.handle_user_logic(args, client, resource)
+
+        elif resource == 'host':
+            Cli.handle_host_logic(args, client, resource)
 
     @staticmethod
     def _parse_args(parser):

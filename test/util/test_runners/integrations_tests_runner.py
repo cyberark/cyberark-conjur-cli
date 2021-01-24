@@ -31,6 +31,7 @@ from test.test_integration_configurations import CliIntegrationTestConfiguration
 from test.test_integration_credentials import CliIntegrationTestCredentials
 from test.test_integration_list import CliIntegrationTestList
 from test.test_integration_oss import CliIntegrationTestOSS
+from test.test_integration_resource import CliIntegrationResourceTest
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
@@ -45,6 +46,7 @@ def main():
     test_to_run_list=[CliIntegrationTestConfigurations,
                       CliIntegrationTestVariable,
                       CliIntegrationTestCredentials,
+                      CliIntegrationResourceTest,
                       CliIntegrationTestList,
                       CliIntegrationPolicy]
     if args.run_oss_tests:

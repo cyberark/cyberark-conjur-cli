@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Added
+- The `host` method rotate-api-key are now available in CLI and API to manage hosts
+  [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
+- The `user` methods rotate-api-key and change-password are now available in CLI and API to manage users
+  [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
 - Add ability to get previous variable/secret versions. This is available in both CLI and API.
 - The `list` flag constraints are now available in both CLI and API to filter resource results
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/91)
