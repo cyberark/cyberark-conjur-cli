@@ -35,13 +35,13 @@ class CredentialsFromFile:
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
             hosts[credential_data.machine] = (credential_data.login, None, credential_data.api_key)
-            with open(DEFAULT_NETRC_FILE, "r+") as netrc_file:
+            with open(DEFAULT_NETRC_FILE, "w") as netrc_file:
                 ret = ""
                 for i, entry in enumerate(str(netrc_obj).split('\n')):
                     if entry.strip().startswith('machine') and not i==0:
                         ret += '\n'
                     ret += entry + '\n'
-                netrc_file.write(ret.replace('\t', ''))
+                netrc_file.write(ret)
         else:
             with open(self.netrc_path, "w+") as netrc_file:
                 netrc_file.write(f"machine {credential_data.machine}\n")
@@ -86,7 +86,6 @@ class CredentialsFromFile:
             raise Exception("Please log in")
 
         login_id, _, api_key = netrc_auth
-
         loaded_netrc['machine'] = netrc_host_url
         loaded_netrc['api_key'] = api_key
         loaded_netrc['login_id'] = login_id
