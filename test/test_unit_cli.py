@@ -202,7 +202,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["user", "rotate-api-key", "-i", "someuserid"], rotate_api_key_output="123key")
     def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
-        client.rotate_anothers_api_key.assert_called_once_with('user', 'someuserid')
+        client.rotate_other_api_key.assert_called_once_with('user', 'someuserid')
 
     # TODO will change when UX is finalized
     @cli_test(["host", "-h"])
@@ -226,7 +226,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["host", "rotate-api-key", "-i", "somehostid"])
     def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
-        client.rotate_anothers_api_key.assert_called_once_with('host', 'somehostid')
+        client.rotate_other_api_key.assert_called_once_with('host', 'somehostid')
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
     def test_cli_invokes_whoami_correctly(self, cli_invocation, output, client):

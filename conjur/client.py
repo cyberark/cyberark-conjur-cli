@@ -119,7 +119,7 @@ class Client():
                 credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
                 loaded_netrc = credentials.load(loaded_config['url'])
             except netrc.NetrcParseError as netrc_error:
-                raise Exception("Error: netrc in an invalid format. " \
+                raise Exception("Error: netrc is in an invalid format. " \
                                 f"Reason: {netrc_error}") from netrc_error
             except Exception as exception:
                 # pylint: disable=line-too-long
@@ -214,21 +214,21 @@ class Client():
         """
         return self._api.update_policy_file(policy_name, policy_file)
 
-    def rotate_anothers_api_key(self, resource, resource_to_rotate):
+    def rotate_other_api_key(self, resource, resource_to_rotate):
         """
         Rotates a API keys and returns new API key
         """
-        return self._api.rotate_anothers_api_key(resource, resource_to_rotate)
+        return self._api.rotate_other_api_key(resource, resource_to_rotate)
 
-    def rotate_personal_api_key(self, resource_to_rotate, current_password):
+    def rotate_personal_api_key(self, resource, logged_in_user, current_password):
         """
         Rotates personal API keys and returns new API key
         """
-        return self._api.rotate_personal_api_key(resource_to_rotate, current_password)
+        return self._api.rotate_personal_api_key(resource, logged_in_user, current_password)
 
-    def change_password(self, resource_password_to_change, current_password, new_password):
+    def change_personal_password(self, resource, logged_in_user, current_password, new_password):
         """
         Change personal password of logged-in user
         """
         # pylint: disable=line-too-long
-        return self._api.change_password(resource_password_to_change, current_password, new_password)
+        return self._api.change_personal_password(resource, logged_in_user, current_password, new_password)

@@ -247,27 +247,91 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
 
         # *************** USER COMMAND ***************
 
-        user_parser = resource_subparsers.add_parser('user',
-                                                     help='Manage users')
-        user_subparsers = user_parser.add_subparsers(dest='action')
+        user_name = 'user - Manage users'
+        user_usage = 'conjur [global options] user <subcommand> [options] [args]'
+        user_subparser = resource_subparsers.add_parser('user',
+                                                     help='Manage users',
+                                                     description=self.command_description(user_name, user_usage),
+                                                     epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
+                                                                                'Rotates logged-in API key\n' \
+                                                                                '    conjur user rotate-api-key -i joe\t\t'
+                                                                                'Rotates the API key for user joe\n'
+                                                                                '    conjur user change-password\t\t\t'
+                                                                                'Prompts for password change for the logged-in user\n'
+                                                                                '    conjur user change-password -p Myp@ssw0rd!\t'
+                                                                                'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                     usage=argparse.SUPPRESS,
+                                                     add_help=False,
+                                                     formatter_class=formatter_class)
+
+        user_subparsers = user_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
+        user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
+        user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
         user_rotate_api_key_parser = user_subparsers.add_parser('rotate-api-key',
-                                                                help='Rotate a resource\'s API key')
-        user_rotate_api_key_parser.add_argument('-i', '--id',
-                                                help='')
+                                                                help='Rotate a resource\'s API key',
+                                                                description=self.command_description(user_rotate_api_key_name, user_rotate_api_key_usage),
+                                                                epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
+                                                                                'Rotates logged-in API key\n' \
+                                                                                '    conjur user rotate-api-key -i joe\t\t'
+                                                                                'Rotates the API key for user joe\n'),
+                                                                usage=argparse.SUPPRESS,
+                                                                add_help=False,
+                                                                formatter_class=formatter_class)
+        user_rotate_api_key_options = user_rotate_api_key_parser.add_argument_group(title=self.title("Options"))
+        user_rotate_api_key_options.add_argument('-i', '--id',
+                                                help='Provide the identifier of the user for whom you want to rotate the API key (Default: logged-in user)')
+        user_rotate_api_key_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        user_change_password_name = 'change-password - Change the password for the logged-in user'
+        user_change_password_usage = 'conjur [global options] user change-password [options] [args]'
         user_change_password = user_subparsers.add_parser('change-password',
-                                                            help='')
-        user_change_password.add_argument('-p', '--password',
-                                          help='')
+                                                          help='Change the password for the logged-in user',
+                                                          description=self.command_description(user_change_password_name, user_change_password_usage),
+                                                          epilog=self.command_epilog('conjur user change-password\t\t\t'
+                                                                                     'Prompts for password change for the logged-in user\n'
+                                                                                     '    conjur user change-password -p Myp@ssw0rd!\t'
+                                                                                     'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                          usage=argparse.SUPPRESS,
+                                                          add_help=False,
+                                                          formatter_class=formatter_class)
+
+        user_change_password_options = user_change_password.add_argument_group(title=self.title("Options"))
+        user_change_password_options.add_argument('-p', '--password',
+                                          help='Provide the new password for the logged-in user')
+        user_change_password_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        user_options = user_subparser.add_argument_group(title=self.title("Options"))
+        user_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** HOST COMMAND ***************
-
-        host_parser = resource_subparsers.add_parser('host',
-                                                     help='Manage hosts')
-        host_subparsers = host_parser.add_subparsers(dest='action')
+        host_name = 'host - Manage hosts'
+        host_usage = 'conjur [global options] host <subcommand> [options] [args]'
+        host_subparser = resource_subparsers.add_parser('host',
+                                                     help='Manage hosts',
+                                                     description=self.command_description(host_name, host_usage),
+                                                     epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
+                                                                                'Rotates the API key for host myVM'),
+                                                     usage=argparse.SUPPRESS,
+                                                     add_help=False,
+                                                     formatter_class=formatter_class)
+        host_subparsers = host_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
+        host_rotate_api_key_name = 'rotate-api-key - Rotate a host’s API key'
+        host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
-                                                                help='Rotate a resource\'s API key')
-        host_rotate_api_key_parser.add_argument('-i', '--id',
-                                                help='')
+                                                                help='Rotate a resource\'s API key',
+                                                                description=self.command_description(host_rotate_api_key_name, host_rotate_api_key_usage),
+                                                                epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
+                                                                                        'Rotates the API key for host myVM'),
+                                                                usage=argparse.SUPPRESS,
+                                                                add_help=False,
+                                                                formatter_class=formatter_class)
+        host_rotate_api_key = host_rotate_api_key_parser.add_argument_group(title=self.title("Options"))
+        host_rotate_api_key.add_argument('-i', '--id',
+                                                help='Provide host identifier for which you want to rotate the API key')
+        host_rotate_api_key.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        host_options = host_subparser.add_argument_group(title=self.title("Options"))
+        host_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** VARIABLE COMMAND ***************
 
@@ -425,7 +489,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                   new_password=args.password)
             user_controller = UserController(user_logic=user_logic,
                                              user_resource_data=user_resource_data)
-            user_controller.change_password()
+            user_controller.change_personal_password()
 
     @classmethod
     def handle_host_logic(cls, args, client, resource):

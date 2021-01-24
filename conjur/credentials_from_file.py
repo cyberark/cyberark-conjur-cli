@@ -15,7 +15,6 @@ import stat
 
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.credentials_data import CredentialsData
 
 class CredentialsFromFile:
     """
@@ -35,13 +34,7 @@ class CredentialsFromFile:
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
             hosts[credential_data.machine] = (credential_data.login, None, credential_data.api_key)
-            with open(DEFAULT_NETRC_FILE, "w") as netrc_file:
-                ret = ""
-                for i, entry in enumerate(str(netrc_obj).split('\n')):
-                    if entry.strip().startswith('machine') and not i==0:
-                        ret += '\n'
-                    ret += entry + '\n'
-                netrc_file.write(ret)
+            self.build_netrc(netrc_obj)
         else:
             with open(self.netrc_path, "w+") as netrc_file:
                 netrc_file.write(f"machine {credential_data.machine}\n")
@@ -50,14 +43,6 @@ class CredentialsFromFile:
 
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
-
-    def remove_credentials(self, conjurrc_appliance_url):
-        """
-        Method that removes netrc data from the file.
-        Triggered during a logout
-        """
-        loaded_netrc = self.load(conjurrc_appliance_url)
-        CredentialsData.remove_entry_from_file(loaded_netrc, DEFAULT_NETRC_FILE)
 
     def load(self, conjurrc_appliance_url):
         """
@@ -91,3 +76,41 @@ class CredentialsFromFile:
         loaded_netrc['login_id'] = login_id
 
         return loaded_netrc
+
+    def update_api_key_entry(self, user_to_update, credential_data, new_api_key,
+                             netrc_path=DEFAULT_NETRC_FILE):
+        """
+        Method to update the API key from the described entry in the netrc
+        """
+        netrc_obj = netrc.netrc(netrc_path)
+        hosts = netrc_obj.hosts
+        hosts[credential_data['machine']] = (user_to_update, None, new_api_key)
+        self.build_netrc(netrc_obj)
+
+    def remove(self, conjurrc_appliance_url):
+        """
+        Method that removes the described login entry from netrc
+        """
+        netrc_data = self.load(conjurrc_appliance_url)
+
+        netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
+        hosts = netrc_obj.hosts
+        hosts.pop(netrc_data['machine'], None)
+
+        netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
+        netrc_obj.hosts.pop(netrc_data['machine'], None)
+        self.build_netrc(netrc_obj)
+
+    @classmethod
+    def build_netrc(cls, netrc_obj):
+        """
+        Method to rewrite the netrc with contents from the netrc object
+        """
+        with open(DEFAULT_NETRC_FILE, 'w') as netrc_file:
+            ret = ""
+            for i, entry in enumerate(str(netrc_obj).split('\n')):
+                if entry.strip().startswith('machine') and i != 0:
+                    ret += '\n'
+                ret += entry + '\n'
+
+            netrc_file.write(ret.replace('\t' ,''))

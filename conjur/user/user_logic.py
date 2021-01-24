@@ -10,14 +10,15 @@ This module is the business logic for handling all user-related activity
 import logging
 
 # Internals
-from conjur.credentials_data import CredentialsData
+from conjur.credentials_from_file import CredentialsFromFile
+from conjur.errors import RotateApiKeyProvidedUserIsSameAsLoggedIn
+
 
 class UserLogic:
     """
     UserLogic
 
-    This class holds the business logic for handling
-    user activity
+    This class holds the business logic for handling user activity
     """
     def __init__(self, conjurrc_data, credentials_from_store, client, resource):
         self.conjurrc_data=conjurrc_data
@@ -25,7 +26,7 @@ class UserLogic:
         self.client=client
         self.resource=resource
 
-    # pylint: disable=logging-fstring-interpolation
+    # pylint: disable=logging-fstring-interpolation,line-too-long
     def rotate_api_key(self, resource_to_update):
         """
         Method to trigger two types of API key actions.
@@ -35,14 +36,14 @@ class UserLogic:
         loaded_credentials = self.extract_credentials_from_credential_store()
         user_from_credential_store = loaded_credentials['login_id']
         if resource_to_update == user_from_credential_store:
-            raise Exception("Error: To rotate the API key of the currently logged-in user "\
-                            " use this command without any flags or options")
-
+            raise RotateApiKeyProvidedUserIsSameAsLoggedIn("Error: To rotate the API key of the currently logged-in user "\
+                                                           " use this command without any flags or options")
         if resource_to_update is not None:
             user_from_credential_store = resource_to_update
             logging.debug(f"Rotating API key for '{user_from_credential_store}'")
-            new_api_key = self.rotate_anothers_api_key(user_from_credential_store)
-            logging.debug(f"API key for '{user_from_credential_store}' successfully rotated")
+
+            new_api_key = self.rotate_other_api_key(user_from_credential_store)
+            logging.debug(f"Successfully rotated API key for '{user_from_credential_store}'")
         else:
             # if the user does not provide a user to rotate their API key,
             # their own API key will be rotated
@@ -60,7 +61,7 @@ class UserLogic:
         return user_from_credential_store, new_api_key
 
     # pylint: disable=logging-fstring-interpolation
-    def change_password(self, new_password):
+    def change_personal_password(self, new_password):
         """
         Method to call the client to change the logged in user's password
         """
@@ -68,7 +69,7 @@ class UserLogic:
         resource_to_update = loaded_credentials['login_id']
         logging.debug(f"Changing password for '{resource_to_update}'")
         # pylint: disable=line-too-long
-        return self.client.change_password(resource_to_update, loaded_credentials['api_key'], new_password)
+        return resource_to_update, self.client.change_personal_password(self.resource, resource_to_update, loaded_credentials['api_key'], new_password)
 
     def extract_credentials_from_credential_store(self):
         """
@@ -79,17 +80,17 @@ class UserLogic:
         loaded_conjurrc = self.conjurrc_data.load_from_file()
         return self.credentials_from_store.load(loaded_conjurrc.appliance_url)
 
-    def rotate_anothers_api_key(self, resource_to_rotate):
+    def rotate_other_api_key(self, resource_to_rotate):
         """
         Method to make the call to rotate another user's API key
         """
-        return self.client.rotate_anothers_api_key(self.resource, resource_to_rotate)
+        return self.client.rotate_other_api_key(self.resource, resource_to_rotate)
 
-    def rotate_personal_api_key(self, resource_to_rotate, current_password):
+    def rotate_personal_api_key(self, logged_in_user, current_password):
         """
         Method to call the client to rotate the logged-in user's personal API key
         """
-        return self.client.rotate_personal_api_key(resource_to_rotate, current_password)
+        return self.client.rotate_personal_api_key(self.resource, logged_in_user, current_password)
 
     @classmethod
     # pylint: disable=line-too-long
@@ -97,4 +98,5 @@ class UserLogic:
         """
         Method to update the newly rotated API key in the credential store
         """
-        CredentialsData.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)
+        credentials = CredentialsFromFile()
+        credentials.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)
