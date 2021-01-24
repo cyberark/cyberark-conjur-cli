@@ -15,8 +15,7 @@ class PolicyController:
 
     This class represents the Presentation Layer for the POLICY command
     """
-    def __init__(self, ssl_verify: bool, policy_logic, policy_data):
-        self.ssl_verify = ssl_verify
+    def __init__(self, policy_logic, policy_data):
         self.policy_logic = policy_logic
         self.policy_data = policy_data
 

@@ -15,8 +15,7 @@ class VariableController:
 
     This class represents the Presentation Layer for the VARIABLE command
     """
-    def __init__(self, ssl_verify, variable_logic, variable_data):
-        self.ssl_verify = ssl_verify
+    def __init__(self, variable_logic, variable_data):
         self.variable_logic = variable_logic
         self.variable_data = variable_data
 

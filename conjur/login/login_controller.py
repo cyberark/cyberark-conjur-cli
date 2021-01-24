@@ -25,6 +25,8 @@ class LoginController:
 
     def __init__(self, ssl_verify, user_password, credential_data, login_logic):
         self.ssl_verify = ssl_verify
+        # We check if the user supplied --insecure because
+        # this command does not go through the Client
         if self.ssl_verify is False:
             Utils.get_insecure_warning()
 
