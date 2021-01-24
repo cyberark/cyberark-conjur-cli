@@ -5,7 +5,7 @@ from unittest.mock import call, patch, MagicMock
 
 import urllib3
 
-from conjur.http import HttpVerb
+from conjur.http_wrapper import HttpVerb
 from conjur.endpoints import ConjurEndpoint
 
 from conjur.api import Api

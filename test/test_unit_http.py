@@ -6,7 +6,7 @@ from unittest.mock import patch
 import requests
 
 from conjur.endpoints import ConjurEndpoint
-from conjur.http import HttpVerb, invoke_endpoint
+from conjur.http_wrapper import HttpVerb, invoke_endpoint
 
 
 class HttpVerbTest(unittest.TestCase):

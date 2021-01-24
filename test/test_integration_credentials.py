@@ -16,7 +16,7 @@ from unittest.mock import patch
 import requests
 
 import Utils
-from .util.cli_helpers import integration_test
+from test.util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from Utils import py_utils as utils
 

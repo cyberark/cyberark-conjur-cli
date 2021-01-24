@@ -13,8 +13,8 @@ import logging
 from datetime import datetime, timedelta
 
 # Internals
-from .endpoints import ConjurEndpoint
-from .http import HttpVerb, invoke_endpoint
+from conjur.endpoints import ConjurEndpoint
+from conjur.http_wrapper import HttpVerb, invoke_endpoint
 
 
 # pylint: disable=too-many-instance-attributes
