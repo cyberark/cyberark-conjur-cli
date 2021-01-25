@@ -24,11 +24,13 @@ class LoginController:
     """
 
     def __init__(self, ssl_verify, user_password, credential_data, login_logic):
+        """
+        For init/login commands, the client (client.py) is not initialized
+        because we don't yet have enough user-specific information to
+        successfully initialize one. Therefore, we need to separately
+        check if the user supplied --insecure
+        """
         self.ssl_verify = ssl_verify
-        # For init/login commands, the client (client.py) is not initialized
-        # because we don't yet have enough user-specific information to
-        # successfully initialize one. Therefore, we need to separately
-        # check if the user supplied --insecure
         if self.ssl_verify is False:
             Utils.get_insecure_warning()
 

@@ -34,19 +34,19 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["-v"])
     def test_cli_check_copyright_short_version_flag(self, cli_invocation, output, client):
-        self.assertRegex(str(output), f'''Conjur CLI version {format(__version__)}
+        self.assertIn(f'''Conjur CLI version {format(__version__)}
 
 Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
-''')
+''', str(output))
 
     @cli_test(["--version"])
     def test_cli_check_copyright_long_version_flag(self, cli_invocation, output, client):
-        self.assertRegex(str(output), f'''Conjur CLI version {format(__version__)}
+        self.assertIn(f'''Conjur CLI version {format(__version__)}
 
 Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
-''')
+''', str(output))
 
     # SSL Verify
     @cli_arg_test(["--insecure"], ssl_verify=False)

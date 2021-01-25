@@ -87,7 +87,7 @@ class CredentialsFromFile:
         hosts[credential_data['machine']] = (user_to_update, None, new_api_key)
         self.build_netrc(netrc_obj)
 
-    def remove(self, conjurrc_appliance_url):
+    def remove_credentials(self, conjurrc_appliance_url):
         """
         Method that removes the described login entry from netrc
         """

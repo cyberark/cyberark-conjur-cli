@@ -9,6 +9,10 @@ This module is the controller that facilitates all host actions
 # Builtins
 import sys
 
+# Internals
+from conjur.errors import MissingRequiredParameterException
+
+
 class HostController():
     """
     HostController
@@ -41,4 +45,4 @@ class HostController():
             self.host_resource_data.host_to_update = input("Enter the host id to rotate its API key: ").strip()
             if self.host_resource_data.host_to_update  == '':
                 # pylint: disable=raise-missing-from
-                raise RuntimeError("Error: Host id is required")
+                raise MissingRequiredParameterException("Error: Host id is required")

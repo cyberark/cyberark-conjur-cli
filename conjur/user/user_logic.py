@@ -8,10 +8,11 @@ This module is the business logic for handling all user-related activity
 
 # Builtins
 import logging
+import requests
 
 # Internals
 from conjur.credentials_from_file import CredentialsFromFile
-from conjur.errors import InvalidOperation
+from conjur.errors import InvalidOperationException, OperationNotCompletedSuccessfullyException
 
 
 class UserLogic:
@@ -36,7 +37,8 @@ class UserLogic:
         loaded_credentials = self.extract_credentials_from_credential_store()
         user_from_credential_store = loaded_credentials['login_id']
         if resource_to_update == user_from_credential_store:
-            raise InvalidOperation
+            raise InvalidOperationException("To rotate the API key of the currently logged-in user "\
+                                   "use this command without any flags or options")
         if resource_to_update is not None:
             user_from_credential_store = resource_to_update
             logging.debug(f"Rotating API key for '{user_from_credential_store}'")
@@ -46,16 +48,21 @@ class UserLogic:
         else:
             # if the user does not provide a user to rotate their API key,
             # their own API key will be rotated
-            logging.debug(f"Rotating API key for '{user_from_credential_store}'")
-            new_api_key = self.rotate_personal_api_key(user_from_credential_store,
-                                                       loaded_credentials['api_key'])
+            try:
+                logging.debug(f"Rotating API key for '{user_from_credential_store}'")
+                new_api_key = self.rotate_personal_api_key(user_from_credential_store,
+                                                           loaded_credentials['api_key'])
 
-            # Update the new rotated API for the logged-in user
-            logging.debug("Updating credential store with new API key " \
-                          f"for '{user_from_credential_store}'")
-            self.update_api_key_in_credential_store(user_from_credential_store,
-                                                    loaded_credentials,
-                                                    new_api_key)
+                # Update the new rotated API for the logged-in user
+                logging.debug("Updating credential store with new API key " \
+                              f"for '{user_from_credential_store}'")
+                self.update_api_key_in_credential_store(user_from_credential_store,
+                                                        loaded_credentials,
+                                                        new_api_key)
+            except requests.exceptions.HTTPError:
+                raise
+            except Exception as incomplete_operation:
+                raise OperationNotCompletedSuccessfullyException from incomplete_operation
 
         return user_from_credential_store, new_api_key
 

@@ -13,7 +13,9 @@ import sys
 import requests
 
 # Internals
-from conjur.errors import InvalidPasswordComplexity, InvalidOperation
+from conjur.constants import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
+from conjur.errors import InvalidPasswordComplexityException, InvalidOperationException, \
+    OperationNotCompletedSuccessfullyException
 
 
 class UserController():
@@ -22,9 +24,6 @@ class UserController():
 
     This class represents the Presentation Layer for the User command.
     """
-    password_complexity_constraints = "The password must contain at least 12 characters: " \
-                                      "2 uppercase, 2 lowercase, 1 digit, 1 special character"
-
     def __init__(self, user_logic, user_resource_data):
         self.user_logic=user_logic
         self.user_resource_data=user_resource_data
@@ -38,9 +37,13 @@ class UserController():
             resource_to_update, new_api_key = self.user_logic.rotate_api_key(self.user_resource_data.user_id)
             sys.stdout.write(f"Successfully rotated API key for '{resource_to_update}'. " \
                              f"New API key is: {new_api_key}\n")
-        except InvalidOperation as invalid_operation:
-            raise InvalidOperation("Error: To rotate the API key of the currently logged-in user "\
-                                   "use this command without any flags or options") from invalid_operation
+        except InvalidOperationException as invalid_operation:
+            raise InvalidOperationException(f"Error: {invalid_operation}") from invalid_operation
+        except OperationNotCompletedSuccessfullyException as operation_not_completed:
+            # pylint: disable=line-too-long
+            raise OperationNotCompletedSuccessfullyException("Error: Failed to run command to completion leaving " \
+                                                             "the CLI in an unstable state. Log in again or " \
+                                                             "try again in debug mode.") from operation_not_completed
         except Exception as general_exception:
             raise general_exception
 
@@ -53,10 +56,11 @@ class UserController():
         try:
             self.user_resource_data.user_id, _ = self.user_logic.change_personal_password(self.user_resource_data.new_password)
         except requests.exceptions.HTTPError as http_error:
-            logging.debug(f"Invalid password. {self.password_complexity_constraints}")
+            logging.debug(f"Invalid password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
 
             # pylint: disable=line-too-long
-            raise InvalidPasswordComplexity(f"Invalid password. {self.password_complexity_constraints}.") from http_error
+            raise InvalidPasswordComplexityException("Invalid password. " \
+                                                     f"{PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}.") from http_error
         logging.debug(f"Successfully changed password for '{self.user_resource_data.user_id}'.")
         sys.stdout.write(f"Successfully changed password for '{self.user_resource_data.user_id}'.\n")
 
@@ -66,7 +70,7 @@ class UserController():
         """
         if self.user_resource_data.new_password is None:
             # pylint: disable=line-too-long
-            self.user_resource_data.new_password = getpass.getpass(prompt=f"Enter the new password. {self.password_complexity_constraints}: ")
+            self.user_resource_data.new_password = getpass.getpass(prompt=f"Enter the new password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
             self.check_password_validity()
 
     def check_password_validity(self):
@@ -75,4 +79,4 @@ class UserController():
         """
         # For the future, we can add client-side validations here
         while self.user_resource_data.new_password == '':
-            self.user_resource_data.new_password = getpass.getpass(prompt=f"Invalid format. {self.password_complexity_constraints}: ")
+            self.user_resource_data.new_password = getpass.getpass(prompt=f"Invalid format. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
