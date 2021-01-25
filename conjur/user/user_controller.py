@@ -13,7 +13,7 @@ import sys
 import requests
 
 # Internals
-from conjur.errors import InvalidPasswordComplexity
+from conjur.errors import InvalidPasswordComplexity, InvalidOperation
 
 
 class UserController():
@@ -33,10 +33,16 @@ class UserController():
         """
         Method that calls to rotate api key logic to perform the rotation
         """
-        # pylint: disable=line-too-long
-        resource_to_update, new_api_key = self.user_logic.rotate_api_key(self.user_resource_data.user_id)
-        sys.stdout.write(f"Successfully rotated API key for '{resource_to_update}'. " \
-                         f"New API key is: {new_api_key}\n")
+        try:
+            # pylint: disable=line-too-long
+            resource_to_update, new_api_key = self.user_logic.rotate_api_key(self.user_resource_data.user_id)
+            sys.stdout.write(f"Successfully rotated API key for '{resource_to_update}'. " \
+                             f"New API key is: {new_api_key}\n")
+        except InvalidOperation as invalid_operation:
+            raise InvalidOperation("Error: To rotate the API key of the currently logged-in user "\
+                                   "use this command without any flags or options") from invalid_operation
+        except Exception as general_exception:
+            raise general_exception
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
     def change_personal_password(self):

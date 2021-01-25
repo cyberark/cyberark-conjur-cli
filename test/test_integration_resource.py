@@ -92,7 +92,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                ['user', 'rotate-api-key', '-i', 'someuser'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
-        self.assertIn("API key for 'someuser' was successfully rotated", some_user_api_key)
+        self.assertIn("Successfully rotated API key for 'someuser'", some_user_api_key)
 
         # verify user can login with their new API key
         self.invoke_cli(self.cli_auth_params,
@@ -148,19 +148,19 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
             output = self.invoke_cli(self.cli_auth_params,
                           ['user', 'change-password'])
-        self.assertIn("Password has been successfully changed", output)
+        self.assertIn("Successfully changed password for", output)
 
     @integration_test
     def test_user_change_password_not_complex_enough_prompts_input(self):
         output = self.invoke_cli(self.cli_auth_params,
                       ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
-        self.assertIn("Invalid password. Please verify that it has the correct password complexity", output)
+        self.assertIn("Invalid password. The password must contain at least", output)
 
     @integration_test
     def test_user_change_password_meets_password_complexity(self):
         output = self.invoke_cli(self.cli_auth_params,
                       ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
-        self.assertIn("Password has been successfully changed", output)
+        self.assertIn("Successfully changed password for", output)
 
     @integration_test
     def test_user_change_password_empty_password_provided_prompts_input(self):
@@ -169,21 +169,21 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                 output = self.invoke_cli(self.cli_auth_params,
                                          ['user', 'change-password'], exit_code=1)
 
-        self.assertIn("Invalid password. Please verify that it has the correct password complexity", str(mock_log.output))
-        self.assertIn("Invalid password. Please verify that it has the correct password complexity", output)
+        self.assertIn("Invalid password. The password must contain at least", str(mock_log.output))
+        self.assertIn("Invalid password. The password must contain at least", output)
 
     @integration_test
     def test_host_rotate_api_key_without_host_prompts_input(self):
         with patch('builtins.input', side_effect=['somehost']):
             output = self.invoke_cli(self.cli_auth_params,
                    ['host', 'rotate-api-key'])
-            self.assertIn("API key for 'somehost' was successfully rotated", output)
+            self.assertIn("Successfully rotated API key for 'somehost'", output)
 
     @integration_test
     def test_host_rotate_api_key_with_host_provided_rotates_host_api_key(self):
         output = self.invoke_cli(self.cli_auth_params,
                ['host', 'rotate-api-key', '-i', 'somehost'])
-        self.assertIn("API key for 'somehost' was successfully rotated", output)
+        self.assertIn("Successfully rotated API key for 'somehost'", output)
 
     @integration_test
     def test_host_rotate_api_key_without_flag_returns_error(self):

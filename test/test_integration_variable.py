@@ -51,16 +51,6 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['--insecure', 'variable', 'get', '-i', 'one/password'])
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
-    @integration_test
-    def test_variable_short_version_return_latest_value(self):
-        policy = "- !variable someversionedsecret"
-        Utils.load_policy_from_string(self, policy)
-
-        expected_value = "somesecret"
-        Utils.set_variable(self, 'someversionedsecret', expected_value)
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'someversionedsecret', '-v', '1'])
-        self.assertIn(expected_value, output.strip())
 
     @integration_test
     def test_variable_long_version_return_latest_value(self):

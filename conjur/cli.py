@@ -95,7 +95,7 @@ To get help on a specific command, see `conjur <command> -h`
         This method builds the copyright description
         """
         return '''
-Copyright 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 '''
 
@@ -121,7 +121,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         # *************** INIT COMMAND ***************
 
         init_name = 'init - Initialize Conjur configuration'
-        input_usage = 'conjur [global options] init [options] [args]'
+        input_usage = '\033[1mconjur\033[0m [global options] init [options] [args]'
         # pylint: disable=line-too-long
         init_subparser = resource_subparsers.add_parser('init',
                                                         help='Initialize the Conjur configuration',
@@ -253,7 +253,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                      help='Manage users',
                                                      description=self.command_description(user_name, user_usage),
                                                      epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
-                                                                                'Rotates logged-in API key\n' \
+                                                                                'Rotates logged-in user\'s API key\n' \
                                                                                 '    conjur user rotate-api-key -i joe\t\t'
                                                                                 'Rotates the API key for user joe\n'
                                                                                 '    conjur user change-password\t\t\t'
@@ -271,7 +271,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
                                                                 help='Rotate a resource\'s API key',
                                                                 description=self.command_description(user_rotate_api_key_name, user_rotate_api_key_usage),
                                                                 epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
-                                                                                'Rotates logged-in API key\n' \
+                                                                                'Rotates logged-in user\'s API key\n' \
                                                                                 '    conjur user rotate-api-key -i joe\t\t'
                                                                                 'Rotates the API key for user joe\n'),
                                                                 usage=argparse.SUPPRESS,
@@ -318,7 +318,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         host_rotate_api_key_name = 'rotate-api-key - Rotate a host’s API key'
         host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
-                                                                help='Rotate a resource\'s API key',
+                                                                help='Rotate a host\'s API key',
                                                                 description=self.command_description(host_rotate_api_key_name, host_rotate_api_key_usage),
                                                                 epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
                                                                                         'Rotates the API key for host myVM'),
@@ -343,7 +343,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
         variable_get_subcommand_parser.add_argument('-i', '--id',
                                                     help='ID of a variable', nargs='+', required=True)
-        variable_get_subcommand_parser.add_argument('-v', '--version',
+        variable_get_subcommand_parser.add_argument('--version',
                                                     help='Version of a variable')
 
         variable_set_subcommand_parser = variable_subparser.add_parser(name="set")

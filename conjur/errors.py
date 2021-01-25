@@ -6,10 +6,9 @@ Error module
 This module holds all CLI-specific errors
 """
 # pylint: disable=unnecessary-pass
-class RotateApiKeyProvidedUserIsSameAsLoggedIn(Exception):
+class InvalidOperation(Exception):
     """
-    Error for when the logged-in user supplies their id for the user's API key to rotate
-    This avoids returning a general 401 error from the Conjur server
+    Error for invalid user operations
     """
     pass
 

@@ -11,7 +11,7 @@ import logging
 
 # Internals
 from conjur.credentials_from_file import CredentialsFromFile
-from conjur.errors import RotateApiKeyProvidedUserIsSameAsLoggedIn
+from conjur.errors import InvalidOperation
 
 
 class UserLogic:
@@ -36,8 +36,7 @@ class UserLogic:
         loaded_credentials = self.extract_credentials_from_credential_store()
         user_from_credential_store = loaded_credentials['login_id']
         if resource_to_update == user_from_credential_store:
-            raise RotateApiKeyProvidedUserIsSameAsLoggedIn("Error: To rotate the API key of the currently logged-in user "\
-                                                           " use this command without any flags or options")
+            raise InvalidOperation
         if resource_to_update is not None:
             user_from_credential_store = resource_to_update
             logging.debug(f"Rotating API key for '{user_from_credential_store}'")
