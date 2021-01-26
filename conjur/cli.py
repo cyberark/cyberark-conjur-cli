@@ -24,12 +24,16 @@ from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.credentials_data import CredentialsData
 from conjur.credentials_from_file import CredentialsFromFile
+from conjur.host import HostController
+from conjur.host.host_resource_data import HostResourceData
+from conjur.init import ConjurrcData
 from conjur.list import ListData, ListController
 from conjur.list.list_logic import ListLogic
 from conjur.login import LoginLogic, LoginController
 from conjur.logout import LogoutController, LogoutLogic
 from conjur.policy import PolicyData, PolicyLogic, PolicyController
 from conjur.variable import VariableLogic, VariableController, VariableData
+from conjur.user import UserController, UserResourceData, UserLogic
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements
@@ -91,7 +95,7 @@ To get help on a specific command, see `conjur <command> -h`
         This method builds the copyright description
         """
         return '''
-Copyright 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 '''
 
@@ -117,7 +121,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         # *************** INIT COMMAND ***************
 
         init_name = 'init - Initialize Conjur configuration'
-        input_usage = 'conjur [global options] init [options] [args]'
+        input_usage = '\033[1mconjur\033[0m [global options] init [options] [args]'
         # pylint: disable=line-too-long
         init_subparser = resource_subparsers.add_parser('init',
                                                         help='Initialize the Conjur configuration',
@@ -241,6 +245,94 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         update_policy_parser.add_argument('-f', '--file', required=True,
                                           help='File containing the YAML policy')
 
+        # *************** USER COMMAND ***************
+
+        user_name = 'user - Manage users'
+        user_usage = 'conjur [global options] user <subcommand> [options] [args]'
+        user_subparser = resource_subparsers.add_parser('user',
+                                                     help='Manage users',
+                                                     description=self.command_description(user_name, user_usage),
+                                                     epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
+                                                                                'Rotates logged-in user\'s API key\n' \
+                                                                                '    conjur user rotate-api-key -i joe\t\t'
+                                                                                'Rotates the API key for user joe\n'
+                                                                                '    conjur user change-password\t\t\t'
+                                                                                'Prompts for password change for the logged-in user\n'
+                                                                                '    conjur user change-password -p Myp@ssw0rd!\t'
+                                                                                'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                     usage=argparse.SUPPRESS,
+                                                     add_help=False,
+                                                     formatter_class=formatter_class)
+
+        user_subparsers = user_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
+        user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
+        user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
+        user_rotate_api_key_parser = user_subparsers.add_parser('rotate-api-key',
+                                                                help='Rotate a resource\'s API key',
+                                                                description=self.command_description(user_rotate_api_key_name, user_rotate_api_key_usage),
+                                                                epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
+                                                                                'Rotates logged-in user\'s API key\n' \
+                                                                                '    conjur user rotate-api-key -i joe\t\t'
+                                                                                'Rotates the API key for user joe\n'),
+                                                                usage=argparse.SUPPRESS,
+                                                                add_help=False,
+                                                                formatter_class=formatter_class)
+        user_rotate_api_key_options = user_rotate_api_key_parser.add_argument_group(title=self.title("Options"))
+        user_rotate_api_key_options.add_argument('-i', '--id',
+                                                help='Provide the identifier of the user for whom you want to rotate the API key (Default: logged-in user)')
+        user_rotate_api_key_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        user_change_password_name = 'change-password - Change the password for the logged-in user'
+        user_change_password_usage = 'conjur [global options] user change-password [options] [args]'
+        user_change_password = user_subparsers.add_parser('change-password',
+                                                          help='Change the password for the logged-in user',
+                                                          description=self.command_description(user_change_password_name, user_change_password_usage),
+                                                          epilog=self.command_epilog('conjur user change-password\t\t\t'
+                                                                                     'Prompts for password change for the logged-in user\n'
+                                                                                     '    conjur user change-password -p Myp@ssw0rd!\t'
+                                                                                     'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                          usage=argparse.SUPPRESS,
+                                                          add_help=False,
+                                                          formatter_class=formatter_class)
+
+        user_change_password_options = user_change_password.add_argument_group(title=self.title("Options"))
+        user_change_password_options.add_argument('-p', '--password',
+                                          help='Provide the new password for the logged-in user')
+        user_change_password_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        user_options = user_subparser.add_argument_group(title=self.title("Options"))
+        user_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        # *************** HOST COMMAND ***************
+        host_name = 'host - Manage hosts'
+        host_usage = 'conjur [global options] host <subcommand> [options] [args]'
+        host_subparser = resource_subparsers.add_parser('host',
+                                                     help='Manage hosts',
+                                                     description=self.command_description(host_name, host_usage),
+                                                     epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
+                                                                                'Rotates the API key for host myVM'),
+                                                     usage=argparse.SUPPRESS,
+                                                     add_help=False,
+                                                     formatter_class=formatter_class)
+        host_subparsers = host_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
+        host_rotate_api_key_name = 'rotate-api-key - Rotate a host’s API key'
+        host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
+        host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
+                                                                help='Rotate a host\'s API key',
+                                                                description=self.command_description(host_rotate_api_key_name, host_rotate_api_key_usage),
+                                                                epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
+                                                                                        'Rotates the API key for host myVM'),
+                                                                usage=argparse.SUPPRESS,
+                                                                add_help=False,
+                                                                formatter_class=formatter_class)
+        host_rotate_api_key = host_rotate_api_key_parser.add_argument_group(title=self.title("Options"))
+        host_rotate_api_key.add_argument('-i', '--id',
+                                                help='Provide host identifier for which you want to rotate the API key')
+        host_rotate_api_key.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        host_options = host_subparser.add_argument_group(title=self.title("Options"))
+        host_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
         # *************** VARIABLE COMMAND ***************
 
         variable_parser = resource_subparsers.add_parser('variable',
@@ -251,7 +343,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
         variable_get_subcommand_parser.add_argument('-i', '--id',
                                                     help='ID of a variable', nargs='+', required=True)
-        variable_get_subcommand_parser.add_argument('-v', '--version',
+        variable_get_subcommand_parser.add_argument('--version',
                                                     help='Version of a variable')
 
         variable_set_subcommand_parser = variable_subparser.add_parser(name="set")
@@ -313,7 +405,7 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         Client.initialize(url, name, certificate, force)
 
     @classmethod
-    def handle_login_logic(cls, name=None, password=None, ssl_verify=None):
+    def handle_login_logic(cls, name=None, password=None, ssl_verify=True):
         """
         Method that wraps the login call logic
         """
@@ -339,18 +431,17 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         logout_controller.remove_credentials()
 
     @classmethod
-    def handle_list_logic(cls, ssl_verify=True, list_data=None, client=None):
+    def handle_list_logic(cls, list_data=None, client=None):
         """
         Method that wraps the list call logic
         """
         list_logic = ListLogic(client)
-        list_controller = ListController(ssl_verify=ssl_verify,
-                                         list_logic=list_logic,
+        list_controller = ListController(list_logic=list_logic,
                                          list_data=list_data)
         list_controller.load()
 
     @classmethod
-    def handle_variable_logic(cls, ssl_verify=True, args=None, client=None):
+    def handle_variable_logic(cls, args=None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -358,28 +449,56 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
         if args.action == 'get':
             variable_data = VariableData(action=args.action, id=args.id, value=None,
                                          variable_version=args.version)
-            variable_controller = VariableController(ssl_verify=ssl_verify,
-                                                     variable_logic=variable_logic,
+            variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.get_variable()
         elif args.action == 'set':
             variable_data = VariableData(action=args.action, id=args.id, value=args.value,
                                          variable_version=None)
-            variable_controller = VariableController(ssl_verify=ssl_verify,
-                                                     variable_logic=variable_logic,
+            variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.set_variable()
 
     @classmethod
-    def handle_policy_logic(cls, ssl_verify=True, policy_data=None, client=None):
+    def handle_policy_logic(cls, policy_data=None, client=None):
         """
         Method that wraps the variable call logic
         """
         policy_logic = PolicyLogic(client)
-        policy_controller = PolicyController(ssl_verify=ssl_verify,
-                                             policy_logic=policy_logic,
+        policy_controller = PolicyController(policy_logic=policy_logic,
                                              policy_data=policy_data)
         policy_controller.load()
+
+    @classmethod
+    def handle_user_logic(cls, args=None, client=None, resource=None):
+        """
+        Method that wraps the user call logic
+        """
+        credentials = CredentialsFromFile()
+        user_logic = UserLogic(ConjurrcData, credentials, client, resource)
+        if args.action == 'rotate-api-key':
+            user_resource_data = UserResourceData(action=args.action,
+                                                  id=args.id,
+                                                  new_password=None)
+            user_controller = UserController(user_logic=user_logic,
+                                             user_resource_data=user_resource_data)
+            user_controller.rotate_api_key()
+        elif args.action == 'change-password':
+            user_resource_data = UserResourceData(action=args.action,
+                                                  id=None,
+                                                  new_password=args.password)
+            user_controller = UserController(user_logic=user_logic,
+                                             user_resource_data=user_resource_data)
+            user_controller.change_personal_password()
+
+    @classmethod
+    def handle_host_logic(cls, args, client, resource):
+        """
+        Method that wraps the host call logic
+        """
+        host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
+        host_controller = HostController(client=client, host_resource_data=host_resource_data)
+        host_controller.rotate_api_key(resource)
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -422,18 +541,24 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
             list_data = ListData(kind=args.kind, inspect=args.inspect,
                              search=args.search, limit=args.limit,
                              offset=args.offset, role=args.role)
-            Cli.handle_list_logic(args.ssl_verify, list_data, client)
+            Cli.handle_list_logic(list_data, client)
 
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
 
         elif resource == 'variable':
-            Cli.handle_variable_logic(args.ssl_verify, args, client)
+            Cli.handle_variable_logic(args, client)
 
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)
-            Cli.handle_policy_logic(args.ssl_verify, policy_data, client)
+            Cli.handle_policy_logic(policy_data, client)
+
+        elif resource == 'user':
+            Cli.handle_user_logic(args, client, resource)
+
+        elif resource == 'host':
+            Cli.handle_host_logic(args, client, resource)
 
     @staticmethod
     def _parse_args(parser):

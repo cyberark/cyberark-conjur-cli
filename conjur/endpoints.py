@@ -23,4 +23,6 @@ class ConjurEndpoint(Enum):
     BATCH_SECRETS = "{url}/secrets"
     SECRETS = "{url}/secrets/{account}/{kind}/{identifier}"
     RESOURCES = "{url}/resources/{account}"
+    ROTATE_API_KEY = "{url}/authn/{account}/api_key"
+    CHANGE_PASSWORD = "{url}/authn/{account}/password"
     WHOAMI = "{url}/whoami"

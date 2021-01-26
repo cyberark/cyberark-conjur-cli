@@ -5,7 +5,7 @@ from unittest.mock import call, patch, MagicMock
 
 import urllib3
 
-from conjur.http import HttpVerb
+from conjur.http_wrapper import HttpVerb
 from conjur.endpoints import ConjurEndpoint
 
 from conjur.api import Api
@@ -214,7 +214,6 @@ class ApiTest(unittest.TestCase):
                               query={},
                               ssl_verify=True)
 
-    test_get_variable_invokes_http_client_correctly.tester=True
     @patch('conjur.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_with_version_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')

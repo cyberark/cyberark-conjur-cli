@@ -13,12 +13,11 @@ from unittest.mock import patch
 
 import requests
 
-from .util.cli_helpers import integration_test
+from test.util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from Utils import py_utils as utils
 
-from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, TEST_HOSTNAME, DEFAULT_NETRC_FILE
-from test.util.models.configfile import ConfigFile
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
 
 
 class CliIntegrationTestOSS(IntegrationTestCaseBase):

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from .util.cli_helpers import cli_test, cli_arg_test
+from test.util.cli_helpers import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
 
@@ -34,19 +34,19 @@ class CliTest(unittest.TestCase):
 
     @cli_test(["-v"])
     def test_cli_check_copyright_short_version_flag(self, cli_invocation, output, client):
-        self.assertRegex(str(output), f'''Conjur CLI version {format(__version__)}
+        self.assertIn(f'''Conjur CLI version {format(__version__)}
 
-Copyright 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
-''')
+''', str(output))
 
     @cli_test(["--version"])
     def test_cli_check_copyright_long_version_flag(self, cli_invocation, output, client):
-        self.assertRegex(str(output), f'''Conjur CLI version {format(__version__)}
+        self.assertIn(f'''Conjur CLI version {format(__version__)}
 
-Copyright 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
-''')
+''', str(output))
 
     # SSL Verify
     @cli_arg_test(["--insecure"], ssl_verify=False)
@@ -164,6 +164,69 @@ Copyright 2020 CyberArk Software Ltd. All rights reserved.
     @cli_test(["list"], list_output=RESOURCE_LIST)
     def test_cli_resource_listing_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('[\n    "some_id1",\n    "some_id2"\n]\n', output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user"])
+    def test_cli_user_retuns_main_help(self, cli_invocation, output, client):
+        self.assertIn("Usage:\n", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user", "-h"])
+    def test_cli_user_short_help_returns_user_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  user", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user", "--help"])
+    def test_cli_user_long_help_returns_user_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  user", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user", "rotate-api-key", "-h"])
+    def test_cli_user_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  rotate-api-key", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user",  "rotate-api-key", "--help"])
+    def test_cli_user_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  rotate-api-key", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user", "change-password", "-h"])
+    def test_cli_user_change_password_short_help_returns_change_password_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  change-password", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["user", "change-password", "--help"])
+    def test_cli_user_change_password_long_help_returns_change_password_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  change-password", output)
+
+    @cli_test(["user", "rotate-api-key", "-i", "someuserid"], rotate_api_key_output="123key")
+    def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
+        client.rotate_other_api_key.assert_called_once_with('user', 'someuserid')
+
+    # TODO will change when UX is finalized
+    @cli_test(["host", "-h"])
+    def test_cli_host_short_help_returns_host_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  host", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["host", "--help"])
+    def test_cli_host_long_help_returns_host_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  host", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["host", "rotate-api-key", "-h"])
+    def test_cli_host_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  rotate-api-key", output)
+
+    # TODO will change when UX is finalized
+    @cli_test(["host",  "rotate-api-key", "--help"])
+    def test_cli_host_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+        self.assertIn("Name:\n  rotate-api-key", output)
+
+    @cli_test(["host", "rotate-api-key", "-i", "somehostid"])
+    def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
+        client.rotate_other_api_key.assert_called_once_with('host', 'somehostid')
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
     def test_cli_invokes_whoami_correctly(self, cli_invocation, output, client):

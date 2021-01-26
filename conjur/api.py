@@ -13,8 +13,8 @@ import logging
 from datetime import datetime, timedelta
 
 # Internals
-from .endpoints import ConjurEndpoint
-from .http import HttpVerb, invoke_endpoint
+from conjur.endpoints import ConjurEndpoint
+from conjur.http_wrapper import HttpVerb, invoke_endpoint
 
 
 # pylint: disable=too-many-instance-attributes
@@ -192,7 +192,6 @@ class Api():
         This method is used to fetch multiple secret's (aka "variable") values from
         Conjur vault.
         """
-
         assert variable_ids, 'Variable IDs must not be empty!'
 
         full_variable_ids = []
@@ -284,6 +283,56 @@ class Api():
         """
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
+
+    def rotate_other_api_key(self, resource, resource_to_rotate):
+        """
+        This method is used to rotate a user/host's API key that is not the current user.
+        To rotate API key of current user use rotate_personal_api_key
+        """
+        if resource not in ('user', 'host'):
+            raise Exception("Error: Invalid resource type")
+
+        # Attach the resource type (user or host)
+        full_resource_id=':'.join([resource, resource_to_rotate])
+        query_params = {
+            'role': full_resource_id
+        }
+        response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
+                                   self._default_params,
+                                   api_token=self.api_token,
+                                   ssl_verify=self._ssl_verify,
+                                   query=query_params).text
+        return response
+
+    def rotate_personal_api_key(self, resource, logged_in_user, current_password):
+        """
+        This method is used to rotate a personal API key
+        """
+        if resource != 'user':
+            raise Exception("Error: Invalid resource type")
+
+        response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
+                                   self._default_params,
+                                   api_token=self.api_token,
+                                   auth=(logged_in_user, current_password),
+                                   ssl_verify=self._ssl_verify).text
+        return response
+
+    def change_personal_password(self, resource, logged_in_user, current_password, new_password):
+        """
+        This method is used to change own password
+        """
+        if resource != 'user':
+            raise Exception("Error: Invalid resource type")
+
+        response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
+                                   self._default_params,
+                                   new_password,
+                                   api_token=self.api_token,
+                                   auth=(logged_in_user, current_password),
+                                   ssl_verify=self._ssl_verify
+                                   ).text
+        return response
 
     def whoami(self):
         """

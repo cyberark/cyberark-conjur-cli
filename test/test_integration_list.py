@@ -9,7 +9,7 @@ import io
 from contextlib import redirect_stderr
 
 import Utils
-from .util.cli_helpers import integration_test
+from test.util.cli_helpers import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 
 

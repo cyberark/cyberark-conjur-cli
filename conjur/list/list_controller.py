@@ -18,8 +18,7 @@ class ListController:
     This class represents the Presentation Layer for the LIST command
     """
 
-    def __init__(self, ssl_verify, list_logic, list_data):
-        self.ssl_verify = ssl_verify
+    def __init__(self, list_logic, list_data):
         self.list_logic = list_logic
         self.list_data = list_data
 
