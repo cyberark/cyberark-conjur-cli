@@ -53,11 +53,11 @@ class CredentialsFromFile:
         loaded_netrc = {}
         netrc_auth = ""
         netrc_obj = netrc.netrc(self.netrc_path)
-        # For when the netrc exists but is empty. In the future
+        # For when the netrc exists but is completely empty. In the future
         # we might want to trigger the LOGIN command by creating
         # a custom error
         if netrc_obj.hosts == {}:
-            raise Exception("Please log in")
+            raise Exception("You are already logged out")
 
         logging.debug(f"Retrieving credentials from file: {self.netrc_path}")
         for host in netrc_obj.hosts:
@@ -66,9 +66,9 @@ class CredentialsFromFile:
                 netrc_auth = netrc_obj.authenticators(netrc_host_url)
 
         # The netrc_authn will be empty if the user already logged out
-        # and attempts to logout again
+        # (their entry isn't found) and attempts to logout again
         if netrc_auth == "":
-            raise Exception("Please log in")
+            raise Exception("You are already logged out")
 
         login_id, _, api_key = netrc_auth
         loaded_netrc['machine'] = netrc_host_url

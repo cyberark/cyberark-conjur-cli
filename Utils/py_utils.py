@@ -15,7 +15,7 @@ def init_to_cli(self, mock_input):
 
 def login_to_cli(self):
     self.invoke_cli(self.cli_auth_params,
-            ['login', '-n', self.client_params.login, '-p', self.client_params.env_api_key])
+            ['login', '-i', self.client_params.login, '-p', self.client_params.env_api_key])
 
 def setup_cli(self):
     init_to_cli(self)

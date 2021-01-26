@@ -123,7 +123,7 @@ class Client():
                                 f"Reason: {netrc_error}") from netrc_error
             except Exception as exception:
                 # pylint: disable=line-too-long
-                raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again") from exception
+                raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again.") from exception
 
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,

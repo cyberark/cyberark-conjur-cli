@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Added
-- The `host` method rotate-api-key are now available in CLI and API to manage hosts
+- The `host` method 'rotate-api-key' is now available in CLI and SDK to manage hosts
   [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
-- The `user` methods rotate-api-key and change-password are now available in CLI and API to manage users
+- The `user` methods 'rotate-api-key' and 'change-password' are now available in CLI and SDK to manage users
   [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
-- Add ability to get previous variable/secret versions. This is available in both CLI and API.
-- The `list` flag constraints are now available in both CLI and API to filter resource results
+- Add ability to get previous variable/secret versions. This is available in both CLI and SDK
+  [cyberark/conjur-api-python3#151](https://github.com/cyberark/conjur-api-python3/issues/151)
+- The `list` flag constraints are now available in both CLI and SDK to filter resource results
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/91)
 - The `login\logout` methods are now available in CLI to login and out of the CLI
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/128)
@@ -20,6 +21,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
 
 ### Changed
+- CLI command UX has been improved according to UX guidelines
+  [cyberark/conjur-api-python3#132](https://github.com/cyberark/conjur-api-python3/issues/132)
+  See [design guidelines](https://ljfz3b.axshare.com/#id=x8ktq8&p=conjur_help__init&g=1)
 - Update version from 0.x.x to 7.0.0 to prep for the GA release
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
@@ -32,7 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Removed references to `enum.auto` to support Python3.5
-  [cyberark/conjur-api-python3#43](https://github.com/cyberark/conjur-api-python3/issues/43).
+  [cyberark/conjur-api-python3#43](https://github.com/cyberark/conjur-api-python3/issues/43)
 
 ## [0.1.0] - 2020-01-03
 ### Added

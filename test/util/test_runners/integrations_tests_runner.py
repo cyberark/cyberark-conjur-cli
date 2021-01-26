@@ -105,7 +105,7 @@ class TestRunner:  # pragma: no cover
     def __create_netrc_file(self):
         path_provider = TestRunnerPathProvider.getInstance()
         proc = sb.Popen(
-            [self.runner_args.working_cli_path_only_for_init, "login", "-n", f"{self.runner_args.login}", "-p",
+            [self.runner_args.working_cli_path_only_for_init, "login", "-i", f"{self.runner_args.login}", "-p",
              f"{self.runner_args.password}"],
             stdin=sb.PIPE,
             stdout=sb.PIPE,

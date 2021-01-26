@@ -84,42 +84,42 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
     # TODO will change when UX is finalized
     @cli_test(["policy", "--help"])
     def test_cli_policy_long_help_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  policy", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "-h"])
     def test_cli_policy_short_help_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  policy", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "load", "--help"])
     def test_cli_policy_load_long_help_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  load", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "load", "-h"])
     def test_cli_policy_load_short_help_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  load", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "replace", "-h"])
     def test_cli_policy_replace_short_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  replace", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "replace", "--help"])
     def test_cli_policy_replace_long_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  replace", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "update", "-h"])
     def test_cli_policy_update_short_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  update", output)
 
     # TODO will change when UX is finalized
     @cli_test(["policy", "update", "--help"])
     def test_cli_policy_update_long_returns_help(self, cli_invocation, output, client):
-        self.assertIn("usage:", output)
+        self.assertIn("Name:\n  update", output)
 
     @cli_test(["policy", "load", "-b", "foo", "-f", "foopolicy"])
     def test_cli_invokes_policy_load_correctly(self, cli_invocation, output, client):

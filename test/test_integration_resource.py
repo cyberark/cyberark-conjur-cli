@@ -48,7 +48,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-n', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
 
         with self.assertLogs('', level='DEBUG') as mock_log:
             self.invoke_cli(self.cli_auth_params,
@@ -65,7 +65,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-n', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
 
         with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
             for line in netrc_test.readlines():
@@ -96,7 +96,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         # verify user can login with their new API key
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
 
     '''
     Validates that an unprivileged user cannot rotate another user's API key.
@@ -112,7 +112,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         print(extract_api_key_from_message)
         # verify user can login with their new API key
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'someunprivilegeduser', '-p', extract_api_key_from_message])
+                        ['login', '-i', 'someunprivilegeduser', '-p', extract_api_key_from_message])
 
         # Verify that an unprivileged user cannot rotate an another's API key
         attempt_to_rotate_user_key = self.invoke_cli(self.cli_auth_params,

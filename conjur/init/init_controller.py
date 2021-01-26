@@ -43,8 +43,8 @@ class InitController:
 
         self.write_conjurrc()
 
-        sys.stdout.write("Configuration initialized successfully!\n")
-        sys.stdout.write("To begin using the CLI, log in to the Conjur server by " \
+        sys.stdout.write("Configuration was initialized successfully.\n")
+        sys.stdout.write("To begin using the Conjur CLI, log in to the Conjur server by " \
                          "running `conjur login`\n")
 
     def get_server_certificate(self):
@@ -53,7 +53,7 @@ class InitController:
         """
         # pylint: disable=line-too-long
         if self.conjurrc_data.appliance_url is None:
-            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server: ").strip()
+            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
             if self.conjurrc_data.appliance_url == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
@@ -66,9 +66,8 @@ class InitController:
         # At this time, providing ports is not supported and
         # all urls must start with HTTPS.
         if url.scheme != 'https':
-            raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur url format provided "
-                   f"'{self.conjurrc_data.appliance_url}' is not supported. "
-                   "Consider adding HTTPS as the prefix and remove the port if provided")
+            raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
+                   f"'{self.conjurrc_data.appliance_url}' is not supported.")
 
         if self.conjurrc_data.cert_file is not None:
             # Return None because we do not need to fetch the certificate
@@ -78,7 +77,7 @@ class InitController:
         logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.appliance_url}'")
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
 
-        sys.stdout.write(f"\nThe server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
+        sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
         sys.stdout.write("\nTo verify this certificate, it is recommended to run the following " \
                          "command on the Conjur server:\n" \
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
@@ -100,7 +99,7 @@ class InitController:
                 # pylint: disable=line-too-long,logging-fstring-interpolation
                 logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
                 # If there was a problem fetching the account from the server, we will request one
-                conjurrc_data.account = input("Enter your organization account name: ").strip()
+                conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
 
                 if conjurrc_data.account is None or conjurrc_data.account == '':
                     # pylint: disable=raise-missing-from

@@ -54,7 +54,7 @@ class LoginController:
         # pylint: disable=logging-fstring-interpolation
         logging.debug("Credentials written to " \
                       f"'{DEFAULT_NETRC_FILE}'")
-        sys.stdout.write("Successfully logged in to Conjur\n")
+        sys.stdout.write("Successfully logged in to Conjur.\n")
 
     def get_username(self):
         """
@@ -62,7 +62,7 @@ class LoginController:
         """
         if self.credential_data.login is None:
             # pylint: disable=logging-fstring-interpolation,line-too-long
-            self.credential_data.login = input("To log in to Conjur, enter your login name: ").strip()
+            self.credential_data.login = input("Enter your login name to log into Conjur: ").strip()
             if self.credential_data.login == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: Login name is required")
@@ -73,7 +73,7 @@ class LoginController:
         """
         if self.user_password is None:
             # pylint: disable=line-too-long
-            self.user_password = getpass.getpass(prompt=f"Please enter {self.credential_data.login}'s password (it will not be echoed): ")
+            self.user_password = getpass.getpass(prompt=f"Please enter {self.credential_data.login}'s password or API key (it will not be echoed): ")
             while self.user_password == '':
                 self.user_password = getpass.getpass(prompt=f"Invalid format. Please enter {self.credential_data.login}'s password (it will not be echoed): ")
 
@@ -98,4 +98,4 @@ class LoginController:
                                                            conjurrc)
         except Exception as error:
             raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. " \
-                f"Reason: {error}.") from error
+                f"Reason: {error}. Check your credentials and try again.") from error

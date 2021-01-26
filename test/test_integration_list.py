@@ -51,7 +51,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_list_help_returns_help_screen(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-h'])
-        self.assertIn("usage:  list", output)
+        self.assertIn("Name:\n  list", output)
 
     @integration_test
     def test_list_inspect_user_returns_info_on_user(self):
