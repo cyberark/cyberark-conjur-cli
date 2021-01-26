@@ -54,30 +54,40 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_variable_long_version_return_latest_value(self):
-        policy = "- !variable anotherversionedsecret"
+        """
+        Note about version tests, the Conjur server only keeps a certain number of versions.
+        With each run of the integration tests, version tests are resetting variable values
+        making, after a certain number of runs, version=1 not valid and fail
+        Therefore, the variable name needs to be a random string so that the version
+        will still be accessible
+        """
+        variable_name = "someversionedvar" + uuid.uuid4().hex
+        policy = f"- !variable {variable_name}"
         Utils.load_policy_from_string(self, policy)
 
         expected_value = "anothersecret"
-        Utils.set_variable(self, 'anotherversionedsecret', expected_value)
+        Utils.set_variable(self, variable_name, expected_value)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'anotherversionedsecret', '--version', '1'])
+                                 ['variable', 'get', '-i', variable_name, '--version', '1'])
         self.assertEquals(expected_value, output.strip())
 
     @integration_test
     def test_variable_different_version_calls_returns_different_versions(self):
-        policy = "- !variable someotherversionedsecret"
+        variable_name = "someversionedsecret" + uuid.uuid4().hex
+        policy = f"- !variable {variable_name}"
         Utils.load_policy_from_string(self, policy)
 
         first_version = "first_secret"
-        Utils.set_variable(self, 'someotherversionedsecret', first_version)
+        Utils.set_variable(self, variable_name, first_version)
+
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['variable', 'get', '-i', variable_name, '--version', '1'])
+        self.assertEquals(first_version, output.strip())
 
         second_version = "second_secret"
-        Utils.set_variable(self, 'someotherversionedsecret', second_version)
+        Utils.set_variable(self, variable_name, second_version)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '1'])
-        self.assertEquals(first_version, output.strip())
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['variable', 'get', '-i', 'someotherversionedsecret', '--version', '2'])
+                                 ['variable', 'get', '-i', variable_name, '--version', '2'])
         self.assertEquals(second_version, output.strip())
 
     @integration_test
@@ -101,14 +111,14 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_variable_short_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', '-h'])
-        self.assertIn("usage:  variable", output)
+        self.assertIn("Name:\n  variable", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_variable_long_with_help_returns_variable_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', '--help'])
-        self.assertIn("usage:  variable", output)
+        self.assertIn("Name:\n  variable", output)
 
     @integration_test
     def test_variable_get_variable_without_subcommand_raises_error(self):
@@ -117,7 +127,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['variable', '-i', 'somevariable'], exit_code=1)
 
         self.assertIn("Error argument action: invalid choice: 'somevariable'", self.capture_stream.getvalue())
-        self.assertIn("usage:  variable", output)
+        self.assertIn("Name:\n  variable", output)
 
     @integration_test
     def test_variable_get_long_variable_returns_variable_value(self):
@@ -195,14 +205,14 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_subcommand_get_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-h'])
-        self.assertIn("usage: variable", output)
+        self.assertIn("Name:\n  get", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_subcommand_get_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '--help'])
-        self.assertIn("usage: variable", output)
+        self.assertIn("Name:\n  get", output)
 
     @integration_test
     def test_variable_get_without_id_returns_help(self):
@@ -223,14 +233,14 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_subcommand_set_long_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'set', '--help'])
-        self.assertIn("usage: variable set", output)
+        self.assertIn("Name:\n  set", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_subcommand_set_short_help_returns_help(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'set', '-h'])
-        self.assertIn("usage: variable set", output)
+        self.assertIn("Name:\n  set", output)
 
     # TODO This will need to be changed when UX is finalized
     @integration_test
@@ -266,7 +276,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'])
 
             self.assertIn("Error: You have not logged in", output)
-            self.assertIn("Successfully logged in to Conjur", output)
+            self.assertIn("Successfully logged in to Conjur.", output)
             self.assertIn('Successfully set value for variable \'one/password\'', output)
         os.environ['TEST_ENV'] = 'True'
 

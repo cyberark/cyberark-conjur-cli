@@ -79,7 +79,7 @@ To get help on a specific command, see `conjur <command> -h`
         """
         This method builds the footer for each command help screen.
         """
-        return '''Example:
+        return '''Examples:
     {}'''.format(*args)
 
     @staticmethod
@@ -121,59 +121,61 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         # *************** INIT COMMAND ***************
 
         init_name = 'init - Initialize Conjur configuration'
-        input_usage = '\033[1mconjur\033[0m [global options] init [options] [args]'
+        input_usage = 'conjur [global options] init [options] [args]'
         # pylint: disable=line-too-long
         init_subparser = resource_subparsers.add_parser('init',
-                                                        help='Initialize the Conjur configuration',
+                                                        help='Initialize Conjur configuration',
                                                         description=self.command_description(init_name, input_usage),
-                                                        epilog=self.command_epilog('conjur init -a my_org -u https://localhost\t'
+                                                        epilog=self.command_epilog('conjur init -a my_org -u https://conjur-server\t'
                                                                                    'Initializes Conjur configuration and writes to file (.conjurrc)'),
                                                         usage=argparse.SUPPRESS,
                                                         add_help=False,
                                                         formatter_class=formatter_class)
 
         init_options = init_subparser.add_argument_group(title=self.title("Options"))
-        init_options.add_argument('-a', '--account',
-                                  action='store', dest='name',
-                                  help='Provide Conjur account name ' \
-                                  '(obtained from Conjur server unless provided by this option)')
-        init_options.add_argument('-c', '--certificate',
-                                  action='store', dest='certificate',
-                                  help='Provide Conjur SSL certificate file location ' \
-                                  '(obtained from Conjur server unless provided by this option)')
-        init_options.add_argument('--force',
-                                  action='store_true',
-                                  dest='force', help='Force overwrite of existing files')
         init_options.add_argument('-u', '--url',
                                   action='store', dest='url',
                                   help='Provide URL of Conjur server')
-        init_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
+        init_options.add_argument('-a', '--account',
+                                  action='store', dest='name',
+                                  help='Optional- provide Conjur account name ' \
+                                  '(obtained from Conjur server, for Conjur enterprise only, unless provided by this option)')
+        init_options.add_argument('-c', '--certificate',
+                                  action='store', dest='certificate',
+                                  help='Optional- provide full path to Conjur SSL certificate ' \
+                                  '(obtained from Conjur server unless provided by this option)')
+        init_options.add_argument('--force',
+                                  action='store_true',
+                                  dest='force', help='Optional- force overwrite of existing files')
+        init_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** LOGIN COMMAND ***************
 
         login_name = 'login - Log in to Conjur server'
-        login_usage = 'conjur [global options] login [LOGIN-NAME] [options]'
+        login_usage = 'conjur [global options] login [options] [args]'
         # pylint: disable=line-too-long
         login_subparser = resource_subparsers.add_parser('login',
                                                          help='Log in to Conjur server',
                                                          description=self.command_description(login_name, login_usage),
-                                                         epilog=self.command_epilog('conjur login admin \t\t\t'
-                                                                                   'Prompts for password of the admin user to log in to Conjur server\n'
-                                                                                   '    conjur login admin -p MyP@ss1\t'
-                                                                                   'Logs the admin user in to Conjur server and saves the user and password ' \
-                                                                                   'in the local cache (netrc)'),
+                                                         epilog=self.command_epilog('conjur login \t\t\t\t'
+                                                                                    'Prompts for the login name and password to log in to Conjur server\n'
+                                                                                    '    conjur login -i admin \t\t\t'
+                                                                                    'Prompts for password of the admin user to log in to Conjur server\n'
+                                                                                    '    conjur login -i admin -p Myp@ssw0rd!\t'
+                                                                                    'Logs the admin user in to Conjur server and saves the user and password ' \
+                                                                                    'in the local cache (netrc file)'),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
                                                          formatter_class=formatter_class)
 
         login_options = login_subparser.add_argument_group(title=self.title("Options"))
-        login_options.add_argument('-n', '--name',
-                                  action='store', dest='name',
-                                  help='Name of the user or host to log in as')
+        login_options.add_argument('-i', '--id',
+                                  action='store', dest='identifier',
+                                  help='Provide a login name to log into Conjur server')
         login_options.add_argument('-p', '--password',
                           action='store', dest='password',
-                          help='Provide a password for the specified login name')
-        login_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
+                          help='Provide a password or API key for the specified login name')
+        login_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** LOGOUT COMMAND ***************
 
@@ -184,66 +186,130 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                           help='Log out from Conjur server and clear local cache',
                                                           description=self.command_description(logout_name, logout_usage),
                                                           epilog=self.command_epilog('conjur logout\t'
-                                                                                   'Logs out the user or host from the Conjur server and deletes the local ' \
-                                                                                   'cache (netrc)'),
+                                                                                   'Logs out the user from the Conjur server and deletes the local ' \
+                                                                                   'cache (netrc file)'),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
                                                           formatter_class=formatter_class)
         logout_options = logout_subparser.add_argument_group(title=self.title("Options"))
-        logout_options.add_argument('-h', '--help', action='help', help='Display this help screen and exit')
+        logout_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** LIST COMMAND ***************
 
+        list_name = 'list - List resources within an organization\'s account'
+        list_usage = 'conjur [global options] list [options] [args]'
         # pylint: disable=line-too-long
         list_subparser = resource_subparsers.add_parser('list',
-                                                         help='List all available resources belonging to this account')
+                                                        help='List all available resources belonging to this account',
+                                                        description=self.command_description(list_name, list_usage),
+                                                        epilog=self.command_epilog('conjur list --kind=variable\t\t\t'
+                                                                                   'Filters list by variable\n'
+                                                                                   '    conjur list --limit=20\t\t\t'
+                                                                                   'Lists first 20 resources\n'
+                                                                                   '    conjur list --offset=4\t\t\t'
+                                                                                   'Skips the first 4 resources\n'
+                                                                                   '    conjur list --role=myorg:user:superuser\t'
+                                                                                   'Shows resources that superuser is entitled to see\n'
+                                                                                   '    conjur list --search=superuser\t\t'
+                                                                                   'Searches for resources with superuser\n'),
+                                                        usage=argparse.SUPPRESS,
+                                                        add_help=False,
+                                                        formatter_class=formatter_class)
 
         list_options = list_subparser.add_argument_group(title=self.title("Options"))
         list_options.add_argument('-i', '--inspect',
                                   action='store_true', dest='inspect',
-                                  help='')
+                                  help='Optional- list all resources and their metadata')
         list_options.add_argument('-k', '--kind',
-                                  action='store', dest='kind',
-                                  help='')
-        list_options.add_argument('-r', '--role',
-                                  action='store', dest='role',
-                                  help='')
+                                  action='store', metavar='VALUE', dest='kind',
+                                  help='Optional- narrow results to only resources of that kind (user | host | layer | group | policy | variable | webservice)')
         list_options.add_argument('-l', '--limit',
-                                  action='store', dest='limit',
-                                  help='')
+                                  action='store', metavar='NUM', dest='limit',
+                                  help='Optional- return no more than a number of results')
         list_options.add_argument('-o', '--offset',
-                                  action='store', dest='offset',
-                                  help='')
+                                  action='store', metavar='NUM', dest='offset',
+                                  help='Optional- skip a number of resources before returning the rest')
+        list_options.add_argument('-r', '--role',
+                                  action='store', metavar='VALUE', dest='role',
+                                  help='Optional- retrieve list of resource for a different role (as long as it has access). Role must contain full ID')
         list_options.add_argument('-s', '--search',
-                                  action='store', dest='search',
-                                  help='')
+                                  action='store', metavar='VALUE', dest='search',
+                                  help='Optional- narrow results to those pertaining to the search query')
+        list_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** POLICY COMMAND ***************
 
-        policy_parser = resource_subparsers.add_parser('policy',
-                                                       help='Manage policies')
-        policy_subparsers = policy_parser.add_subparsers(dest='action')
+        policy_name = 'policy - Manage policies'
+        policy_usage = 'conjur [global options] policy <subcommand> [options] [args]'
+        # pylint: disable=line-too-long
+        policy_subparser = resource_subparsers.add_parser('policy',
+                                                       help='Manage policies',
+                                                       description=self.command_description(policy_name, policy_usage),
+                                                       epilog=self.command_epilog('conjur policy load -f /tmp/myPolicy.yml -b backend/dev\t'
+                                                                                  'Creates and loads the policy myPolicy.yml under branch backend/dev\n'
+                                                                                  '    conjur policy replace -f /tmp/myPolicy.yml -b root\t\t'
+                                                                                  'Replaces the existing policy myPolicy.yml under branch root\n'
+                                                                                  '    conjur policy update -f /tmp/myPolicy.yml -b root\t\t'
+                                                                                  'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n'
+                                                                                  ),
+                                                       usage=argparse.SUPPRESS,
+                                                       add_help=False,
+                                                       formatter_class=formatter_class)
+        policy_subparsers = policy_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
+
+        policy_load_name = 'load - Load a policy and create resources'
+        policy_load_usage = 'conjur [global options] policy load [options] [args]'
 
         load_policy_parser = policy_subparsers.add_parser('load',
-                                                           help='Load a policy file')
-        load_policy_parser.add_argument('-b', '--branch', required=True,
-                                         help='Provide the policy branch name (usually root)')
-        load_policy_parser.add_argument('-f', '--file', required=True,
-                                         help='Provide policy file name')
+                                                          help='Load a policy and create resources',
+                                                          description=self.command_description(policy_load_name, policy_load_usage),
+                                                          epilog=self.command_epilog('conjur policy load -f /tmp/myPolicy.yml -b backend/dev\t'
+                                                                                     'Creates and loads the policy myPolicy.yml under branch backend/dev\n'),
+                                                          usage=argparse.SUPPRESS,
+                                                          add_help=False,
+                                                          formatter_class=formatter_class)
 
+        load_options = load_policy_parser.add_argument_group(title=self.title("Options"))
+        load_options.add_argument('-f', '--file', required=True,
+                                 help='Provide policy file name')
+        load_options.add_argument('-b', '--branch', required=True,
+                                         help='Provide the policy branch name')
+        load_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        policy_replace_name = 'replace - Fully replace an existing policy'
+        policy_replace_usage = 'conjur [global options] policy replace [options] [args]'
         replace_policy_parser = policy_subparsers.add_parser('replace',
-                                                             help='Replace a policy file')
-        replace_policy_parser.add_argument('-b', '--branch', required=True,
-                                           help='Name of the policy (usually "root")')
+                                                             help='Fully replace an existing policy',
+                                                             description=self.command_description(policy_replace_name, policy_replace_usage),
+                                                             epilog=self.command_epilog('conjur policy replace -f /tmp/myPolicy.yml -b root\t'
+                                                                                        'Replaces the existing policy myPolicy.yml under branch root\n'),
+                                                             usage=argparse.SUPPRESS,
+                                                             add_help=False,
+                                                             formatter_class=formatter_class)
         replace_policy_parser.add_argument('-f', '--file', required=True,
-                                           help='File containing the YAML policy')
+                                           help='Provide policy file name')
+        replace_policy_parser.add_argument('-b', '--branch', required=True,
+                                           help='Provide the policy branch name')
+        replace_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
+        policy_update_name = 'update - Update existing resources in policy or create new resources'
+        policy_update_usage = 'conjur [global options] policy update [options] [args]'
         update_policy_parser = policy_subparsers.add_parser('update',
-                                                            help='Update a policy file')
-        update_policy_parser.add_argument('-b', '--branch', required=True,
-                                          help='Name of the policy (usually "root")')
+                                                            help='Update existing resources in policy or create new resources',
+                                                            description=self.command_description(policy_update_name, policy_update_usage),
+                                                            epilog=self.command_epilog('conjur policy update -f /tmp/myPolicy.yml -b root\t'
+                                                                                       'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n'),
+                                                            usage=argparse.SUPPRESS,
+                                                            add_help=False,
+                                                            formatter_class=formatter_class)
         update_policy_parser.add_argument('-f', '--file', required=True,
-                                          help='File containing the YAML policy')
+                                          help='Provide policy file name')
+        update_policy_parser.add_argument('-b', '--branch', required=True,
+                                          help='Provide the policy branch name')
+        update_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        policy_options = policy_subparser.add_argument_group(title=self.title("Options"))
+        policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** USER COMMAND ***************
 
@@ -335,28 +401,77 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 
         # *************** VARIABLE COMMAND ***************
 
+        variable_name = 'variable - Manage variables'
+        variable_usage = 'conjur [global options] variable <subcommand> [options] [args]'
+
         variable_parser = resource_subparsers.add_parser('variable',
                                                          help='Manage variables',
+                                                         description=self.command_description(variable_name, variable_usage),
+                                                         epilog=self.command_epilog('conjur variable get -i secrets/mysecret\t\t\t'
+                                                                                   'Gets the value of variable secrets/mysecret\n'
+                                                                                   '    conjur variable get -i secrets/mysecret "secrets/my secret"\t'
+                                                                                   'Gets the values of variables secrets/mysecret and secrets/my secret\n'
+                                                                                   '    conjur variable set -i secrets/mysecret -v my_secret_value\t'
+                                                                                   'Sets the value of variable secrets/mysecret to my_secret_value\n'),
+                                                         usage=argparse.SUPPRESS,
+                                                         add_help=False,
                                                          formatter_class=formatter_class)
 
+        variable_get_name = 'get - Get the value of a variable'
+        variable_get_usage = 'conjur [global options] variable get [options] [args]'
         variable_subparser = variable_parser.add_subparsers(title="Subcommand", dest='action')
-        variable_get_subcommand_parser = variable_subparser.add_parser(name="get")
-        variable_get_subcommand_parser.add_argument('-i', '--id',
-                                                    help='ID of a variable', nargs='+', required=True)
-        variable_get_subcommand_parser.add_argument('--version',
-                                                    help='Version of a variable')
+        variable_get_subcommand_parser = variable_subparser.add_parser(name="get",
+                                                                       help='Get the value of one or more variables',
+                                                                       description=self.command_description(variable_get_name, variable_get_usage),
+                                                                       epilog=self.command_epilog('conjur variable get -i secrets/mysecret\t\t\t'
+                                                                                                  'Gets the value of variable secrets/mysecret\n'
+                                                                                                  '    conjur variable get -i secrets/mysecret "secrets/my secret"\t'
+                                                                                                  'Gets the values of variables secrets/mysecret and secrets/my secret\n'),
+                                                                       usage=argparse.SUPPRESS,
+                                                                       add_help=False,
+                                                                       formatter_class=formatter_class)
+        variable_get_options = variable_get_subcommand_parser.add_argument_group(title=self.title("Options"))
+        variable_get_options.add_argument('-i', '--id', dest='identifier',
+                                          help='Provide variable identifier', nargs='+', required=True)
+        variable_get_options.add_argument('--version',
+                                          metavar='NUM', help='Provide version of variable')
+        variable_get_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
-        variable_set_subcommand_parser = variable_subparser.add_parser(name="set")
-        variable_set_subcommand_parser.add_argument('-i', '--id',
-                                                    help='ID of a variable', required=True)
-        variable_set_subcommand_parser.add_argument('-v', '--value',
-                                                    help='New value of the variable', required=True)
+        variable_set_name = 'set - Set the value of a variable'
+        variable_set_usage = 'conjur [global options] variable set [options] [args]'
+        variable_set_subcommand_parser = variable_subparser.add_parser(name="set",
+                                                                       help='Set the value of a variable',
+                                                                       description=self.command_description(variable_set_name, variable_set_usage),
+                                                                       epilog=self.command_epilog('conjur variable set -i secrets/mysecret -v my_secret_value\t'
+                                                                                                  'Sets the value of variable secrets/mysecret to my_secret_value\n'),
+                                                                       usage=argparse.SUPPRESS,
+                                                                       add_help=False,
+                                                                       formatter_class=formatter_class)
+        variable_set_options = variable_set_subcommand_parser.add_argument_group(title=self.title("Options"))
+
+        variable_set_options.add_argument('-i', '--id', dest='identifier',
+                                          help='Provide variable identifier', required=True)
+        variable_set_options.add_argument('-v', '--value', metavar='NUM',
+                                          help='Set the value of the specified variable', required=True)
+        variable_set_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
+        policy_options = variable_parser.add_argument_group(title=self.title("Options"))
+        policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** WHOAMI COMMAND ***************
 
+        whoami_name = 'whoami - Print information about the current logged-in user'
+        whoami_usage = 'conjur [global options] whoami [options]'
         # pylint: disable=line-too-long
-        resource_subparsers.add_parser('whoami',
-                                       help='Provides information about the current logged-in user')
+        whoami_subparser = resource_subparsers.add_parser('whoami',
+                                       help='Provides information about the current logged-in user',
+                                       description=self.command_description(whoami_name, whoami_usage),
+                                       usage=argparse.SUPPRESS,
+                                       add_help=False,
+                                       formatter_class=formatter_class)
+        whoami_options = whoami_subparser.add_argument_group(title=self.title("Options"))
+
+        whoami_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** MAIN HELP SCREEN OPTIONS ***************
 
@@ -405,11 +520,11 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         Client.initialize(url, name, certificate, force)
 
     @classmethod
-    def handle_login_logic(cls, name=None, password=None, ssl_verify=True):
+    def handle_login_logic(cls, identifier=None, password=None, ssl_verify=True):
         """
         Method that wraps the login call logic
         """
-        credential_data = CredentialsData(login=name)
+        credential_data = CredentialsData(login=identifier)
         credentials = CredentialsFromFile(netrc_path=DEFAULT_NETRC_FILE)
         login_logic = LoginLogic(credentials)
         login_controller = LoginController(ssl_verify=ssl_verify,
@@ -447,13 +562,13 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         """
         variable_logic = VariableLogic(client)
         if args.action == 'get':
-            variable_data = VariableData(action=args.action, id=args.id, value=None,
+            variable_data = VariableData(action=args.action, id=args.identifier, value=None,
                                          variable_version=args.version)
             variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
             variable_controller.get_variable()
         elif args.action == 'set':
-            variable_data = VariableData(action=args.action, id=args.id, value=args.value,
+            variable_data = VariableData(action=args.action, id=args.identifier, value=args.value,
                                          variable_version=None)
             variable_controller = VariableController(variable_logic=variable_logic,
                                                      variable_data=variable_data)
@@ -515,7 +630,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
             # the Client because the init command does not require the Client
             return
         elif resource == 'login':
-            Cli.handle_login_logic(args.name,  args.password, args.ssl_verify)
+            Cli.handle_login_logic(args.identifier,  args.password, args.ssl_verify)
             return
         elif resource == 'logout':
             Cli.handle_logout_logic(args.ssl_verify)

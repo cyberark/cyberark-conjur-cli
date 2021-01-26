@@ -72,7 +72,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     @patch('builtins.input', return_value='yes')
     def test_https_netrc_is_created_with_all_parameters_given(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
+                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
 
         # Load in new user
         self.invoke_cli(self.cli_auth_params,
@@ -111,9 +111,9 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         # Need to remove the netrc because we are attempting to login as a user with their new password
         os.remove(DEFAULT_NETRC_FILE)
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-n', 'someuser', '-p', password])
+                                 ['login', '-i', 'someuser', '-p', password])
 
-        self.assertEquals(output.strip(), "Successfully logged in to Conjur")
+        self.assertIn("Successfully logged in to Conjur", output.strip())
         self.validate_netrc(f"{self.client_params.hostname}/authn", "someuser", user_api_key)
 
     '''
@@ -126,7 +126,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             output = self.invoke_cli(self.cli_auth_params, ['login'])
 
             assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
-            self.assertEquals(output.strip(), "Successfully logged in to Conjur")
+            self.assertIn("Successfully logged in to Conjur", output.strip())
             self.validate_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
 
     '''
@@ -164,7 +164,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                      ['login'])
 
             assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
-            self.assertEquals(output.strip(), "Successfully logged in to Conjur")
+            self.assertIn("Successfully logged in to Conjur", output.strip())
 
             self.validate_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
 
@@ -176,11 +176,11 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_netrc_was_not_overwritten_when_login_failed_but_already_logged_in(self):
 
         successful_run = self.invoke_cli(self.cli_auth_params,
-                                         ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
-        self.assertEquals(successful_run.strip(), "Successfully logged in to Conjur")
+                                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
+        self.assertIn("Successfully logged in to Conjur", successful_run.strip())
 
         unsuccessful_run = self.invoke_cli(self.cli_auth_params,
-                                           ['login', '-n', 'someinvaliduser', '-p', 'somewrongpassword'], exit_code=1)
+                                           ['login', '-i', 'someinvaliduser', '-p', 'somewrongpassword'], exit_code=1)
         self.assertRegex(unsuccessful_run, "Reason: 401 Client Error: Unauthorized for")
         self.validate_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
 
@@ -219,10 +219,10 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         os.remove(DEFAULT_NETRC_FILE)
 
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-n', 'host/somehost', '-p', f'{host_api_key}'])
+                                 ['login', '-i', 'host/somehost', '-p', f'{host_api_key}'])
 
         self.validate_netrc(f"{self.client_params.hostname}/authn", "host/somehost", host_api_key)
-        self.assertEquals(output.strip(), "Successfully logged in to Conjur")
+        self.assertIn("Successfully logged in to Conjur", output.strip())
 
     '''
     Validates when a user can logout successfully
@@ -231,13 +231,13 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_logout_successful(self):
 
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
+                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
         assert os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0
 
         output = self.invoke_cli(self.cli_auth_params,
                                  ['logout'])
 
-        self.assertEquals(output.strip(), 'Logged out of Conjur')
+        self.assertIn('Successfully logged out from Conjur', output.strip())
         with open(DEFAULT_NETRC_FILE) as netrc_file:
             assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
@@ -249,7 +249,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_https_logout_twice_returns_could_not_logout_message(self):
 
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-n', 'admin', '-p', self.client_params.env_api_key])
+                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
 
         self.invoke_cli(self.cli_auth_params,
                         ['logout'])
@@ -257,20 +257,20 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         unsuccessful_logout = self.invoke_cli(self.cli_auth_params,
                                               ['logout'], exit_code=1)
 
-        self.assertEquals(unsuccessful_logout.strip(), "Failed to log out. Please log in.")
+        self.assertEquals(unsuccessful_logout.strip(), "Failed to log out. You are already logged out.")
         with open(DEFAULT_NETRC_FILE) as netrc_file:
             assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
 
     @integration_test
-    def test_no_netrc_and_logout_returns_could_not_logout_message(self):
+    def test_no_netrc_and_logout_returns_successful_logout_message(self):
         try:
             os.remove(DEFAULT_NETRC_FILE)
         except OSError:
             pass
-        unsuccessful_logout = self.invoke_cli(self.cli_auth_params,
-                                              ['logout'], exit_code=1)
-        self.assertEquals(unsuccessful_logout.strip(), "Failed to log out. Please log in.")
+        logout = self.invoke_cli(self.cli_auth_params,
+                                              ['logout'])
+        self.assertIn("Successfully logged out from Conjur", logout.strip())
 
     '''
     Validates logout doesn't remove another entry not associated with Cyberark

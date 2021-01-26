@@ -33,13 +33,15 @@ class LogoutController:
         """
         logging.debug("Attempting to log out of Conjur")
         try:
-            if os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
+            if not os.path.exists(DEFAULT_NETRC_FILE):
+                sys.stdout.write("Successfully logged out from Conjur.\n")
+            elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
                 conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
                 self.logout_logic.remove_credentials(conjurrc.appliance_url)
                 logging.debug("Logout successful")
-                sys.stdout.write("Logged out of Conjur\n")
+                sys.stdout.write("Successfully logged out from Conjur.\n")
             else:
-                raise Exception("Please log in")
+                raise Exception("You are already logged out")
         except Exception as error:
             # pylint: disable=raise-missing-from
             raise Exception(f"Failed to log out. {error}.")
