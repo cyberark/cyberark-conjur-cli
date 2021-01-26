@@ -145,7 +145,14 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_user_change_password_does_not_provide_password_prompts_input(self):
+        # Login as user to avoid changing admin password
         with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
+            some_user_api_key = self.invoke_cli(self.cli_auth_params,
+               ['user', 'rotate-api-key', '-i', 'someuser'])
+
+            extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+            self.invoke_cli(self.cli_auth_params,
+                ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
             output = self.invoke_cli(self.cli_auth_params,
                           ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
@@ -158,6 +165,13 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_user_change_password_meets_password_complexity(self):
+        # Login as user to avoid changing admin password
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+           ['user', 'rotate-api-key', '-i', 'someuser'])
+
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+        self.invoke_cli(self.cli_auth_params,
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
         output = self.invoke_cli(self.cli_auth_params,
                       ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
         self.assertIn("Successfully changed password for", output)

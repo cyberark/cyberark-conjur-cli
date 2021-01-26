@@ -33,7 +33,7 @@ from conjur.login import LoginLogic, LoginController
 from conjur.logout import LogoutController, LogoutLogic
 from conjur.policy import PolicyData, PolicyLogic, PolicyController
 from conjur.variable import VariableLogic, VariableController, VariableData
-from conjur.user import UserController, UserResourceData, UserLogic
+from conjur.user import UserController, UserInputData, UserLogic
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements
@@ -162,7 +162,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                     '    conjur login -i admin \t\t\t'
                                                                                     'Prompts for password of the admin user to log in to Conjur server\n'
                                                                                     '    conjur login -i admin -p Myp@ssw0rd!\t'
-                                                                                    'Logs the admin user in to Conjur server and saves the user and password ' \
+                                                                                    'Logs the admin user in to Conjur server and saves the user and password '
                                                                                     'in the local cache (netrc file)'),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
@@ -186,7 +186,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                           help='Log out from Conjur server and clear local cache',
                                                           description=self.command_description(logout_name, logout_usage),
                                                           epilog=self.command_epilog('conjur logout\t'
-                                                                                   'Logs out the user from the Conjur server and deletes the local ' \
+                                                                                   'Logs out the user from the Conjur server and deletes the local '
                                                                                    'cache (netrc file)'),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
@@ -319,7 +319,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                      help='Manage users',
                                                      description=self.command_description(user_name, user_usage),
                                                      epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
-                                                                                'Rotates logged-in user\'s API key\n' \
+                                                                                'Rotates logged-in user\'s API key\n'
                                                                                 '    conjur user rotate-api-key -i joe\t\t'
                                                                                 'Rotates the API key for user joe\n'
                                                                                 '    conjur user change-password\t\t\t'
@@ -337,7 +337,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                 help='Rotate a resource\'s API key',
                                                                 description=self.command_description(user_rotate_api_key_name, user_rotate_api_key_usage),
                                                                 epilog=self.command_epilog('conjur user rotate-api-key\t\t\t'
-                                                                                'Rotates logged-in user\'s API key\n' \
+                                                                                'Rotates logged-in user\'s API key\n'
                                                                                 '    conjur user rotate-api-key -i joe\t\t'
                                                                                 'Rotates the API key for user joe\n'),
                                                                 usage=argparse.SUPPRESS,
@@ -585,35 +585,35 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         policy_controller.load()
 
     @classmethod
-    def handle_user_logic(cls, args=None, client=None, resource=None):
+    def handle_user_logic(cls, args=None, client=None):
         """
         Method that wraps the user call logic
         """
         credentials = CredentialsFromFile()
-        user_logic = UserLogic(ConjurrcData, credentials, client, resource)
+        user_logic = UserLogic(ConjurrcData, credentials, client)
         if args.action == 'rotate-api-key':
-            user_resource_data = UserResourceData(action=args.action,
-                                                  id=args.id,
-                                                  new_password=None)
+            user_input_data = UserInputData(action=args.action,
+                                            id=args.id,
+                                            new_password=None)
             user_controller = UserController(user_logic=user_logic,
-                                             user_resource_data=user_resource_data)
+                                             user_input_data=user_input_data)
             user_controller.rotate_api_key()
         elif args.action == 'change-password':
-            user_resource_data = UserResourceData(action=args.action,
-                                                  id=None,
-                                                  new_password=args.password)
+            user_input_data = UserInputData(action=args.action,
+                                            id=None,
+                                            new_password=args.password)
             user_controller = UserController(user_logic=user_logic,
-                                             user_resource_data=user_resource_data)
+                                             user_input_data=user_input_data)
             user_controller.change_personal_password()
 
     @classmethod
-    def handle_host_logic(cls, args, client, resource):
+    def handle_host_logic(cls, args, client):
         """
         Method that wraps the host call logic
         """
         host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
         host_controller = HostController(client=client, host_resource_data=host_resource_data)
-        host_controller.rotate_api_key(resource)
+        host_controller.rotate_api_key()
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -670,10 +670,10 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
             Cli.handle_policy_logic(policy_data, client)
 
         elif resource == 'user':
-            Cli.handle_user_logic(args, client, resource)
+            Cli.handle_user_logic(args, client)
 
         elif resource == 'host':
-            Cli.handle_host_logic(args, client, resource)
+            Cli.handle_host_logic(args, client)
 
     @staticmethod
     def _parse_args(parser):

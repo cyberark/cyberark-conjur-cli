@@ -11,6 +11,7 @@ import sys
 
 # Internals
 from conjur.errors import MissingRequiredParameterException
+from conjur.resource import Resource
 
 
 class HostController():
@@ -23,16 +24,18 @@ class HostController():
         self.client=client
         self.host_resource_data=host_resource_data
 
-    def rotate_api_key(self, resource):
+    def rotate_api_key(self):
         """
         Method that distinguishes between the type of actions
         and facilitates the calls accordingly
         """
         self.prompt_for_host_id_if_needed()
-        new_api_key = self.client.rotate_other_api_key(resource,
-                                                          self.host_resource_data.host_to_update)
+
+        resource_obj = Resource(resource_type='host',
+                                resource_name=self.host_resource_data.host_to_update)
+        new_api_key = self.client.rotate_other_api_key(resource_obj)
         # pylint: disable=line-too-long
-        sys.stdout.write(f"Successfully rotated API key for '{self.host_resource_data.host_to_update}' " \
+        sys.stdout.write(f"Successfully rotated API key for '{self.host_resource_data.host_to_update}' "
                         f"New API key is: {new_api_key}\n")
 
     def prompt_for_host_id_if_needed(self):

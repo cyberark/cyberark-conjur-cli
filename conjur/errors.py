@@ -15,11 +15,14 @@ class InvalidPasswordComplexityException(Exception):
     attempting to change their password
     """
 
-class OperationNotCompletedSuccessfullyException(Exception):
+class OperationNotCompletedException(Exception):
     """
     Exception for when an operation was not completed successfully
     and CLI is left in instable state
     """
+    def __init__(self, message="Error: Failed to run command to completion."):
+        self.message = message
+        super().__init__(self.message)
 
 class MissingRequiredParameterException(Exception):
     """ Exception for when user does not input a required paramter """

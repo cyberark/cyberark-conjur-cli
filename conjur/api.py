@@ -284,18 +284,17 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
-    def rotate_other_api_key(self, resource, resource_to_rotate):
+    def rotate_other_api_key(self, resource_obj):
         """
         This method is used to rotate a user/host's API key that is not the current user.
-        To rotate API key of current user use rotate_personal_api_key
+        To rotate API key of the current user use rotate_personal_api_key
         """
-        if resource not in ('user', 'host'):
+        if resource_obj.resource_type not in ('user', 'host'):
             raise Exception("Error: Invalid resource type")
 
         # Attach the resource type (user or host)
-        full_resource_id=':'.join([resource, resource_to_rotate])
         query_params = {
-            'role': full_resource_id
+            'role': resource_obj.full_id()
         }
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
@@ -304,13 +303,10 @@ class Api():
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, resource, logged_in_user, current_password):
+    def rotate_personal_api_key(self, logged_in_user, current_password):
         """
         This method is used to rotate a personal API key
         """
-        if resource != 'user':
-            raise Exception("Error: Invalid resource type")
-
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    api_token=self.api_token,
@@ -318,13 +314,10 @@ class Api():
                                    ssl_verify=self._ssl_verify).text
         return response
 
-    def change_personal_password(self, resource, logged_in_user, current_password, new_password):
+    def change_personal_password(self, logged_in_user, current_password, new_password):
         """
         This method is used to change own password
         """
-        if resource != 'user':
-            raise Exception("Error: Invalid resource type")
-
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
                                    self._default_params,
                                    new_password,

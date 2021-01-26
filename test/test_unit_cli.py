@@ -200,10 +200,6 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
     def test_cli_user_change_password_long_help_returns_change_password_help(self, cli_invocation, output, client):
         self.assertIn("Name:\n  change-password", output)
 
-    @cli_test(["user", "rotate-api-key", "-i", "someuserid"], rotate_api_key_output="123key")
-    def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
-        client.rotate_other_api_key.assert_called_once_with('user', 'someuserid')
-
     # TODO will change when UX is finalized
     @cli_test(["host", "-h"])
     def test_cli_host_short_help_returns_host_help(self, cli_invocation, output, client):
@@ -223,10 +219,6 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
     @cli_test(["host",  "rotate-api-key", "--help"])
     def test_cli_host_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
         self.assertIn("Name:\n  rotate-api-key", output)
-
-    @cli_test(["host", "rotate-api-key", "-i", "somehostid"])
-    def test_cli_host_rotate_api_key_outputs_api_correctly(self, cli_invocation, output, client):
-        client.rotate_other_api_key.assert_called_once_with('host', 'somehostid')
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
     def test_cli_invokes_whoami_correctly(self, cli_invocation, output, client):

@@ -6,4 +6,4 @@ when you install this module
 """
 from conjur.user.user_controller import UserController
 from conjur.user.user_logic import UserLogic
-from conjur.user.user_resource_data import UserResourceData
+from conjur.user.user_input_data import UserInputData

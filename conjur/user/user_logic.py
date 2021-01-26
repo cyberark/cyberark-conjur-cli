@@ -12,7 +12,8 @@ import requests
 
 # Internals
 from conjur.credentials_from_file import CredentialsFromFile
-from conjur.errors import InvalidOperationException, OperationNotCompletedSuccessfullyException
+from conjur.errors import OperationNotCompletedException
+from conjur.resource import Resource
 
 
 class UserLogic:
@@ -21,11 +22,10 @@ class UserLogic:
 
     This class holds the business logic for handling user activity
     """
-    def __init__(self, conjurrc_data, credentials_from_store, client, resource):
+    def __init__(self, conjurrc_data, credentials_from_store, client):
         self.conjurrc_data=conjurrc_data
         self.credentials_from_store=credentials_from_store
         self.client=client
-        self.resource=resource
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
     def rotate_api_key(self, resource_to_update):
@@ -35,36 +35,38 @@ class UserLogic:
         2. Rotate another users API key
         """
         loaded_credentials = self.extract_credentials_from_credential_store()
-        user_from_credential_store = loaded_credentials['login_id']
-        if resource_to_update == user_from_credential_store:
-            raise InvalidOperationException("To rotate the API key of the currently logged-in user "\
-                                   "use this command without any flags or options")
-        if resource_to_update is not None:
-            user_from_credential_store = resource_to_update
-            logging.debug(f"Rotating API key for '{user_from_credential_store}'")
+        current_logged_in_username = loaded_credentials['login_id']
 
-            new_api_key = self.rotate_other_api_key(user_from_credential_store)
-            logging.debug(f"Successfully rotated API key for '{user_from_credential_store}'")
-        else:
-            # if the user does not provide a user to rotate their API key,
-            # their own API key will be rotated
+        # if the user provides their own user id and they are logged in,
+        # then for the sake of a successful outcome, we will ignore the input.
+        # Otherwise, the Conjur server will fail the request
+        if resource_to_update == current_logged_in_username:
+            resource_to_update = None
+        if resource_to_update is None:
             try:
-                logging.debug(f"Rotating API key for '{user_from_credential_store}'")
-                new_api_key = self.rotate_personal_api_key(user_from_credential_store,
+                logging.debug(f"Rotating API key for '{current_logged_in_username}'")
+                new_api_key = self.rotate_personal_api_key(current_logged_in_username,
                                                            loaded_credentials['api_key'])
 
                 # Update the new rotated API for the logged-in user
-                logging.debug("Updating credential store with new API key " \
-                              f"for '{user_from_credential_store}'")
-                self.update_api_key_in_credential_store(user_from_credential_store,
+                logging.debug("Updating credential store with new API key "
+                              f"for '{current_logged_in_username}'")
+                self.update_api_key_in_credential_store(current_logged_in_username,
                                                         loaded_credentials,
                                                         new_api_key)
             except requests.exceptions.HTTPError:
                 raise
             except Exception as incomplete_operation:
-                raise OperationNotCompletedSuccessfullyException from incomplete_operation
+                raise OperationNotCompletedException from incomplete_operation
+        # the user supplied a user to rotate their API key
+        else:
+            current_logged_in_username = resource_to_update
+            logging.debug(f"Rotating API key for '{current_logged_in_username}'")
 
-        return user_from_credential_store, new_api_key
+            resource_obj = Resource(resource_type='user', resource_name=current_logged_in_username)
+            new_api_key = self.rotate_other_api_key(resource_obj)
+            logging.debug(f"Successfully rotated API key for '{current_logged_in_username}'")
+        return current_logged_in_username, new_api_key
 
     # pylint: disable=logging-fstring-interpolation
     def change_personal_password(self, new_password):
@@ -75,7 +77,7 @@ class UserLogic:
         resource_to_update = loaded_credentials['login_id']
         logging.debug(f"Changing password for '{resource_to_update}'")
         # pylint: disable=line-too-long
-        return resource_to_update, self.client.change_personal_password(self.resource, resource_to_update, loaded_credentials['api_key'], new_password)
+        return resource_to_update, self.client.change_personal_password(resource_to_update, loaded_credentials['api_key'], new_password)
 
     def extract_credentials_from_credential_store(self):
         """
@@ -86,17 +88,18 @@ class UserLogic:
         loaded_conjurrc = self.conjurrc_data.load_from_file()
         return self.credentials_from_store.load(loaded_conjurrc.appliance_url)
 
-    def rotate_other_api_key(self, resource_to_rotate):
+    def rotate_other_api_key(self, resource_obj):
         """
         Method to make the call to rotate another user's API key
         """
-        return self.client.rotate_other_api_key(self.resource, resource_to_rotate)
+
+        return self.client.rotate_other_api_key(resource_obj)
 
     def rotate_personal_api_key(self, logged_in_user, current_password):
         """
         Method to call the client to rotate the logged-in user's personal API key
         """
-        return self.client.rotate_personal_api_key(self.resource, logged_in_user, current_password)
+        return self.client.rotate_personal_api_key(logged_in_user, current_password)
 
     @classmethod
     # pylint: disable=line-too-long
