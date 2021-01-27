@@ -48,7 +48,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         with self.assertLogs('', level='DEBUG') as mock_log:
             self.invoke_cli(self.cli_auth_params,
@@ -65,7 +65,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
             for line in netrc_test.readlines():
@@ -96,7 +96,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         # verify user can login with their new API key
         self.invoke_cli(self.cli_auth_params,
-                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message], exit_code=0)
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
     '''
     Validates that an unprivileged user cannot rotate another user's API key.
@@ -106,7 +106,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_unprivileged_user_cannot_rotate_anothers_api_key(self):
         unprivileged_api_key = self.invoke_cli(self.cli_auth_params,
-                                               ['user', 'rotate-api-key', '-i', 'someunprivilegeduser'], exit_code=0)
+                                               ['user', 'rotate-api-key', '-i', 'someunprivilegeduser'])
         # extract the API key we get from the CLI success message
         extract_api_key_from_message = unprivileged_api_key.split(":")[1].strip()
         print(extract_api_key_from_message)
@@ -140,12 +140,19 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_logged_in_user_rotate_api_key_with_their_user_as_flag_returns_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                         ['user', 'rotate-api-key', '-i', 'admin'], exit_code=0)
+                         ['user', 'rotate-api-key', '-i', 'admin'])
         self.assertEquals("Error: To rotate the API key of the currently logged-in user use this command without any flags or options", output)
 
     @integration_test
     def test_user_change_password_does_not_provide_password_prompts_input(self):
+        # Login as user to avoid changing admin password
         with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
+            some_user_api_key = self.invoke_cli(self.cli_auth_params,
+               ['user', 'rotate-api-key', '-i', 'someuser'])
+
+            extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+            self.invoke_cli(self.cli_auth_params,
+                ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
             output = self.invoke_cli(self.cli_auth_params,
                           ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
@@ -158,6 +165,13 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_user_change_password_meets_password_complexity(self):
+        # Login as user to avoid changing admin password
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+           ['user', 'rotate-api-key', '-i', 'someuser'])
+
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+        self.invoke_cli(self.cli_auth_params,
+            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
         output = self.invoke_cli(self.cli_auth_params,
                       ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
         self.assertIn("Successfully changed password for", output)

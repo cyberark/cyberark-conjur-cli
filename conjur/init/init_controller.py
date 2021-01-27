@@ -44,7 +44,7 @@ class InitController:
         self.write_conjurrc()
 
         sys.stdout.write("Configuration was initialized successfully.\n")
-        sys.stdout.write("To begin using the Conjur CLI, log in to the Conjur server by " \
+        sys.stdout.write("To begin using the Conjur CLI, log in to the Conjur server by "
                          "running `conjur login`\n")
 
     def get_server_certificate(self):
@@ -53,7 +53,7 @@ class InitController:
         """
         # pylint: disable=line-too-long
         if self.conjurrc_data.appliance_url is None:
-            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
+            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (using https://): ").strip()
             if self.conjurrc_data.appliance_url == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
@@ -78,10 +78,10 @@ class InitController:
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
-        sys.stdout.write("\nTo verify this certificate, it is recommended to run the following " \
-                         "command on the Conjur server:\n" \
+        sys.stdout.write("\nTo verify this certificate, it is recommended to run the following "
+                         "command on the Conjur server:\n"
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
-        trust_certificate = input("Trust this certificate? [no]: ").strip()
+        trust_certificate = input("Trust this certificate? (Default=no): ").strip()
         if trust_certificate.lower() != 'yes':
             raise RuntimeError("You decided not to trust the certificate")
 
@@ -141,6 +141,6 @@ class InitController:
     @staticmethod
     def __ensure_overwrite_file(config_file):
         force_overwrite = input(f"File {config_file} exists. " \
-                                f"Overwrite? [yes]: ").strip()
+                                f"Overwrite? (Default=yes): ").strip()
         if force_overwrite != '' and force_overwrite.lower() != 'yes':
             raise Exception(f"Not overwriting {config_file}")

@@ -276,7 +276,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
                                      ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'])
 
             self.assertIn("Error: You have not logged in", output)
-            self.assertIn("Successfully logged in to Conjur.", output)
+            self.assertIn("Successfully logged in to Conjur", output)
             self.assertIn('Successfully set value for variable \'one/password\'', output)
         os.environ['TEST_ENV'] = 'True'
 

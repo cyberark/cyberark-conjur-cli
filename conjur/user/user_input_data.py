@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-UserResourceData module
+UserInputData module
 
 This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the user request
 """
 
 # pylint: disable=too-few-public-methods
-class UserResourceData:
+class UserInputData:
     """
     Used for organizing the the params execute the user command
     """
