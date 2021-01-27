@@ -75,12 +75,17 @@ To get help on a specific command, see `conjur <command> -h`
 '''
 
     @staticmethod
-    def command_epilog(*args):
+    def command_epilog(example, has_subcommand=False):
         """
         This method builds the footer for each command help screen.
         """
-        return '''Examples:
-    {}'''.format(*args)
+        refer_to_help = "Refer to the specific subcommand help for more details."
+        if has_subcommand:
+            return f'''Examples:
+{refer_to_help}
+    {example}'''
+        return f'''Examples:
+    {example}'''
 
     @staticmethod
     def title(title):
@@ -138,11 +143,11 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                   help='Provide URL of Conjur server')
         init_options.add_argument('-a', '--account',
                                   action='store', dest='name',
-                                  help='Optional- provide Conjur account name ' \
-                                  '(obtained from Conjur server, for Conjur enterprise only, unless provided by this option)')
+                                  help='Provide Conjur account name ' \
+                                  '(Optional for Conjur Enterprise - overrides the value on the Conjur Enterprise server)')
         init_options.add_argument('-c', '--certificate',
                                   action='store', dest='certificate',
-                                  help='Optional- provide full path to Conjur SSL certificate ' \
+                                  help='Optional- provide path to Conjur SSL certificate ' \
                                   '(obtained from Conjur server unless provided by this option)')
         init_options.add_argument('--force',
                                   action='store_true',
@@ -207,7 +212,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                    '    conjur list --limit=20\t\t\t'
                                                                                    'Lists first 20 resources\n'
                                                                                    '    conjur list --offset=4\t\t\t'
-                                                                                   'Skips the first 4 resources\n'
+                                                                                   'Skips the first 4 resources in the list and displays all the rest\n'
                                                                                    '    conjur list --role=myorg:user:superuser\t'
                                                                                    'Shows resources that superuser is entitled to see\n'
                                                                                    '    conjur list --search=superuser\t\t'
@@ -222,19 +227,19 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                   help='Optional- list all resources and their metadata')
         list_options.add_argument('-k', '--kind',
                                   action='store', metavar='VALUE', dest='kind',
-                                  help='Optional- narrow results to only resources of that kind (user | host | layer | group | policy | variable | webservice)')
+                                  help='Optional- filter resources by specified kind (user | host | layer | group | policy | variable | webservice)')
         list_options.add_argument('-l', '--limit',
                                   action='store', metavar='NUM', dest='limit',
-                                  help='Optional- return no more than a number of results')
+                                  help='Optional- limit list of resources to specified number')
         list_options.add_argument('-o', '--offset',
                                   action='store', metavar='NUM', dest='offset',
-                                  help='Optional- skip a number of resources before returning the rest')
+                                  help='Optional- skip specified number of resources')
         list_options.add_argument('-r', '--role',
                                   action='store', metavar='VALUE', dest='role',
-                                  help='Optional- retrieve list of resource for a different role (as long as it has access). Role must contain full ID')
+                                  help='Optional- retrieve list of resources that specified role is entitled to see (specify role’s full ID)')
         list_options.add_argument('-s', '--search',
                                   action='store', metavar='VALUE', dest='search',
-                                  help='Optional- narrow results to those pertaining to the search query')
+                                  help='Optional- search for resources based on specified query')
         list_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** POLICY COMMAND ***************
@@ -251,7 +256,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                   'Replaces the existing policy myPolicy.yml under branch root\n'
                                                                                   '    conjur policy update -f /tmp/myPolicy.yml -b root\t\t'
                                                                                   'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n'
-                                                                                  ),
+                                                                                  , has_subcommand=True),
                                                        usage=argparse.SUPPRESS,
                                                        add_help=False,
                                                        formatter_class=formatter_class)
@@ -412,7 +417,8 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                    '    conjur variable get -i secrets/mysecret "secrets/my secret"\t'
                                                                                    'Gets the values of variables secrets/mysecret and secrets/my secret\n'
                                                                                    '    conjur variable set -i secrets/mysecret -v my_secret_value\t'
-                                                                                   'Sets the value of variable secrets/mysecret to my_secret_value\n'),
+                                                                                   'Sets the value of variable secrets/mysecret to my_secret_value\n',
+                                                                                   has_subcommand=True),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
                                                          formatter_class=formatter_class)

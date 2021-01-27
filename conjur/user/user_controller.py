@@ -51,8 +51,10 @@ class UserController():
         try:
             self.user_input_data.user_id, _ = self.user_logic.change_personal_password(self.user_input_data.new_password)
         except requests.exceptions.HTTPError as http_error:
-            logging.debug(f"Invalid password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
+            if http_error.response.status_code == 401:
+                raise
 
+            logging.debug(f"Invalid password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
             # pylint: disable=line-too-long
             raise InvalidPasswordComplexityException("Invalid password. "
                                                      f"{PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}.") from http_error

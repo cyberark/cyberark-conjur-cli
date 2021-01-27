@@ -21,6 +21,7 @@ from conjur.init.init_controller import InitController
 from conjur.init.init_logic import InitLogic
 from conjur.init.conjurrc_data import ConjurrcData
 from conjur.credentials_from_file import CredentialsFromFile
+from conjur.resource import Resource
 from conjur.ssl_service import SSLService
 
 class ConfigException(Exception):
@@ -214,11 +215,11 @@ class Client():
         """
         return self._api.update_policy_file(policy_name, policy_file)
 
-    def rotate_other_api_key(self, resource_obj):
+    def rotate_other_api_key(self, resource: Resource):
         """
         Rotates a API keys and returns new API key
         """
-        return self._api.rotate_other_api_key(resource_obj)
+        return self._api.rotate_other_api_key(resource)
 
     def rotate_personal_api_key(self, logged_in_user, current_password):
         """

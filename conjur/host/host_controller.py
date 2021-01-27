@@ -31,12 +31,12 @@ class HostController():
         """
         self.prompt_for_host_id_if_needed()
 
-        resource_obj = Resource(resource_type='host',
-                                resource_name=self.host_resource_data.host_to_update)
-        new_api_key = self.client.rotate_other_api_key(resource_obj)
+        resource = Resource(type_='host',
+                            name=self.host_resource_data.host_to_update)
+        new_api_key = self.client.rotate_other_api_key(resource)
         # pylint: disable=line-too-long
         sys.stdout.write(f"Successfully rotated API key for '{self.host_resource_data.host_to_update}' "
-                        f"New API key is: {new_api_key}\n")
+                         f"New API key is: {new_api_key}\n")
 
     def prompt_for_host_id_if_needed(self):
         """

@@ -18,6 +18,9 @@ from conjur.http_wrapper import HttpVerb, invoke_endpoint
 
 
 # pylint: disable=too-many-instance-attributes
+from conjur.resource import Resource
+
+
 class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
@@ -284,17 +287,17 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
-    def rotate_other_api_key(self, resource_obj):
+    def rotate_other_api_key(self, resource: Resource):
         """
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
         """
-        if resource_obj.resource_type not in ('user', 'host'):
+        if resource.type not in ('user', 'host'):
             raise Exception("Error: Invalid resource type")
 
         # Attach the resource type (user or host)
         query_params = {
-            'role': resource_obj.full_id()
+            'role': resource.full_id()
         }
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
