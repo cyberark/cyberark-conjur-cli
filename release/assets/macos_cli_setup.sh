@@ -59,7 +59,7 @@ EOF
     echo "Error: The Conjur CLI executable was not found in the current directory."
     exit 1
   fi
-  echo "Successfully setup the Conjur CLI. To get started, run 'conjur --help'"
+  echo "Successfully set up the Conjur CLI. To get started, run 'conjur --help'"
 }
 
 main
