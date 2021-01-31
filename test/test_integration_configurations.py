@@ -50,7 +50,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine
     '''
-
     @integration_test
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
@@ -61,10 +60,21 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
+    Validates that the conjurrc was created on the machine when a user mistakenly supplies an extra '/' at the end of the URL
+    '''
+    @integration_test
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname+"/", '--account', 'someaccount'])
+
+        assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
+
+    '''
     Validates that if user does not trust the certificate,
     the conjurrc is not be created on the user's machine
     '''
-
     @integration_test
     def test_https_conjurrc_user_does_not_trust_cert(self):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'no']):
@@ -79,7 +89,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that when the user adds the force flag,
     no confirmation is required
     '''
-
     @integration_test
     # The additional side effects here ('somesideffect') would prompt the CLI to
     # request for confirmation which would fail the test

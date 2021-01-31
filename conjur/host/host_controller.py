@@ -8,6 +8,10 @@ This module is the controller that facilitates all host actions
 
 # Builtins
 import sys
+# Allows users to move left and right when inputting input instead of printing escape characters
+# https://stackoverflow.com/questions/58591423/python-prints-escape-keys-while-entering-input-when-pressing-the-arrow-keys-on-t
+# pylint: disable=unused-import
+import readline
 
 # Internals
 from conjur.errors import MissingRequiredParameterException
