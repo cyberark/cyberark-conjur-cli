@@ -11,11 +11,10 @@ from contextlib import redirect_stderr
 from unittest.mock import patch
 
 # Internals
-import Utils
 from conjur.constants import DEFAULT_NETRC_FILE
-from test.util.cli_helpers import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
-
+from test.util import test_helpers as utils
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
@@ -35,7 +34,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     def setUp(self):
         self.setup_cli_params({})
         # Need to configure the CLI and login to perform further commands
-        Utils.setup_cli(self)
+        utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("resource")])
 
@@ -44,15 +43,15 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_resource_insecure_prints_warning_in_log(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
 
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         with self.assertLogs('', level='DEBUG') as mock_log:
             self.invoke_cli(self.cli_auth_params,
-                               ['--insecure', 'user', 'rotate-api-key'])
+                            ['--insecure', 'user', 'rotate-api-key'])
 
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))

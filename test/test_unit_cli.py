@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from test.util.cli_helpers import cli_test, cli_arg_test
+from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
 
