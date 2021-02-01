@@ -146,3 +146,9 @@ class InitControllerTest(unittest.TestCase):
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite)
             init_controller.get_server_certificate()
         self.assertRegex(str(context.exception), 'Error: undefined behavior')
+
+    @patch('builtins.input', return_value='no')
+    def test_user_does_not_overwrite_raises_error(self, mock_input):
+        init_controller = InitController(ConjurrcData, InitLogic, False)
+        with self.assertRaises(Exception):
+            init_controller.ensure_overwrite_file('someconfig')

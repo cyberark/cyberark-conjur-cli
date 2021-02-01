@@ -93,9 +93,9 @@ class LoginController:
         """
         try:
             self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verify,
-                                                           self.credential_data,
-                                                           self.user_password,
-                                                           conjurrc)
+                                                                        self.credential_data,
+                                                                        self.user_password,
+                                                                        conjurrc)
         except Exception as error:
             raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. "
                 f"Reason: {error}. Check your credentials and try again.") from error

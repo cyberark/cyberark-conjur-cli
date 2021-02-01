@@ -9,7 +9,7 @@ from conjur.http_wrapper import HttpVerb
 from conjur.endpoints import ConjurEndpoint
 
 from conjur.api import Api
-
+from conjur.resource import Resource
 
 MOCK_RESOURCE_LIST = [
     {
@@ -509,4 +509,57 @@ class ApiTest(unittest.TestCase):
         api.whoami()
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.WHOAMI,
+                              ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps({})))
+    def test_rotate_personal_api_key_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.rotate_personal_api_key("mylogin", "somepass")
+
+        self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
+                              auth=('mylogin', 'somepass'),
+                              ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps({})))
+    def test_rotate_other_api_key_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.rotate_other_api_key(Resource(type_='user', name="somename"))
+
+        self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
+                              query={'role': 'user:somename'},
+                              ssl_verify=True)
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps({})))
+    def test_rotate_other_api_key_can_raise_exception_when_resource_is_invalid(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+        with self.assertRaises(Exception):
+            api.rotate_other_api_key(Resource(type_='someinvalidresource', name="somename"))
+
+    @patch('conjur.api.invoke_endpoint', \
+           return_value=MockClientResponse(content=json.dumps({})))
+    def test_change_password_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.change_personal_password("someloggedinuser", "somecurrentpass", "somenewpass")
+
+        self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
+                              "somenewpass",
+                              auth=('someloggedinuser', 'somecurrentpass'),
                               ssl_verify=True)
