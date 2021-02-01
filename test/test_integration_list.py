@@ -8,9 +8,9 @@ This test file handles the main test flows for the list command
 import io
 from contextlib import redirect_stderr
 
-import Utils
-from test.util.cli_helpers import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
+from test.util import test_helpers as utils
 
 
 # Not coverage tested since integration tests doesn't run in
@@ -30,7 +30,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     def setUp(self):
         self.setup_cli_params({})
         # Used to configure the CLI and login to run tests
-        Utils.setup_cli(self)
+        utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
 
@@ -47,7 +47,6 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'    "{self.client_params.account}:variable:one/password",\n'
                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)
 
-    # TODO This will need to be changed when UX is finalized
     @integration_test
     def test_list_help_returns_help_screen(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-h'])

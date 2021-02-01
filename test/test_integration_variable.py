@@ -12,11 +12,11 @@ import uuid
 from contextlib import redirect_stderr
 from unittest.mock import patch
 
-import Utils
 from conjur.constants import DEFAULT_NETRC_FILE
-from test.util.cli_helpers import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
-from Utils import py_utils as utils
+from test.util import test_helpers as utils
+
 
 # Not coverage tested since integration tests don't run in
 # the same build step
@@ -36,7 +36,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def setUp(self):
         self.setup_cli_params({})
         # Used to configure the CLI and login to run tests
-        Utils.setup_cli(self)
+        utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
                                ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
 
@@ -46,7 +46,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_variable_get_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
             expected_value = uuid.uuid4().hex
-            Utils.set_variable(self, 'one/password', expected_value)
+            utils.set_variable(self, 'one/password', expected_value)
             self.invoke_cli(self.cli_auth_params,
                                      ['--insecure', 'variable', 'get', '-i', 'one/password'])
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
@@ -63,10 +63,10 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         """
         variable_name = "someversionedvar" + uuid.uuid4().hex
         policy = f"- !variable {variable_name}"
-        Utils.load_policy_from_string(self, policy)
+        utils.load_policy_from_string(self, policy)
 
         expected_value = "anothersecret"
-        Utils.set_variable(self, variable_name, expected_value)
+        utils.set_variable(self, variable_name, expected_value)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', variable_name, '--version', '1'])
         self.assertEquals(expected_value, output.strip())
@@ -75,17 +75,17 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_variable_different_version_calls_returns_different_versions(self):
         variable_name = "someversionedsecret" + uuid.uuid4().hex
         policy = f"- !variable {variable_name}"
-        Utils.load_policy_from_string(self, policy)
+        utils.load_policy_from_string(self, policy)
 
         first_version = "first_secret"
-        Utils.set_variable(self, variable_name, first_version)
+        utils.set_variable(self, variable_name, first_version)
 
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', variable_name, '--version', '1'])
         self.assertEquals(first_version, output.strip())
 
         second_version = "second_secret"
-        Utils.set_variable(self, variable_name, second_version)
+        utils.set_variable(self, variable_name, second_version)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', variable_name, '--version', '2'])
         self.assertEquals(second_version, output.strip())
@@ -132,7 +132,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_variable_get_long_variable_returns_variable_value(self):
         expected_value = uuid.uuid4().hex
-        Utils.set_variable(self, 'one/password', expected_value)
+        utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '--id=one/password'])
         self.assertIn(expected_value, output)
@@ -140,7 +140,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_variable_get_short_variable_returns_variable_value(self):
         expected_value = uuid.uuid4().hex
-        Utils.set_variable(self, 'one/password', expected_value)
+        utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password'])
         self.assertIn(expected_value, output)
@@ -149,15 +149,15 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_variable_get_with_special_chars_returns_special_chars(self):
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
-        Utils.set_variable(self, 'variablespecialchars', '"[]{}#@^&<>~\/''\/?\;\';\'"')
-        output = Utils.get_variable(self, 'variablespecialchars')
+        utils.set_variable(self, 'variablespecialchars', '"[]{}#@^&<>~\/''\/?\;\';\'"')
+        output = utils.get_variable(self, 'variablespecialchars')
         self.assertEquals(output.strip(), '"[]{}#@^&<>~\/''\/?\;\';\'"')
 
     @integration_test
     def test_variable_get_variable_has_spaces_returns_variable_value(self):
         self.invoke_cli(self.cli_auth_params,
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("variable")])
-        Utils.assert_set_and_get(self, "some variable with spaces")
+        utils.assert_set_and_get(self, "some variable with spaces")
 
     @integration_test
     def test_unknown_variable_raises_not_found_error(self):
@@ -167,20 +167,20 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test
     def test_cli_can_batch_get_multiple_variables(self):
-        policy, variables = Utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string(self)
         file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
         with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
             temp_policy_file.flush()
 
-            Utils.load_policy(self, temp_policy_file.name)
+            utils.load_policy(self, temp_policy_file.name)
         value_map = {}
         for variable in variables:
             value = uuid.uuid4().hex
-            Utils.set_variable(self, variable, value)
+            utils.set_variable(self, variable, value)
             value_map[variable] = value
 
-        batch_result_string = Utils.get_variable(self, *variables)
+        batch_result_string = utils.get_variable(self, *variables)
         batch_result = json.loads(batch_result_string)
 
         for variable_name, variable_value in value_map.items():
@@ -283,4 +283,4 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_https_cli_can_set_and_get_a_defined_variable_if_verification_disabled(self):
         self.setup_cli_params({}, '--insecure')
-        Utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)
+        utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)
