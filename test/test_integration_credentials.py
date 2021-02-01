@@ -8,19 +8,16 @@ This test file handles the login/logout test flows when running
 """
 import base64
 import os
-import shutil
 import string
-import unittest
 from unittest.mock import patch
 
 import requests
 
-import Utils
-from test.util.cli_helpers import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
-from Utils import py_utils as utils
+from test.util import test_helpers as utils
 
-from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, TEST_HOSTNAME
+from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
 
 
 class CliIntegrationTestCredentials(IntegrationTestCaseBase):
@@ -42,7 +39,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             utils.remove_file(DEFAULT_CERTIFICATE_FILE)
         except OSError:
             pass
-        Utils.init_to_cli(self)
+        utils.init_to_cli(self)
 
     def validate_netrc(self, machine, login, password):
         with open(DEFAULT_NETRC_FILE, 'r') as netrc:

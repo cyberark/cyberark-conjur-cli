@@ -11,11 +11,10 @@ from contextlib import redirect_stderr
 from unittest.mock import patch
 
 # Internals
-import Utils
 from conjur.constants import DEFAULT_NETRC_FILE
-from test.util.cli_helpers import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
-
+from test.util import test_helpers as utils
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
@@ -35,24 +34,24 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     def setUp(self):
         self.setup_cli_params({})
         # Need to configure the CLI and login to perform further commands
-        Utils.setup_cli(self)
+        utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
-                       ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("resource")])
+                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("resource")])
 
     # *************** TESTS ***************
 
     @integration_test
     def test_resource_insecure_prints_warning_in_log(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
 
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         with self.assertLogs('', level='DEBUG') as mock_log:
             self.invoke_cli(self.cli_auth_params,
-                               ['--insecure', 'user', 'rotate-api-key'])
+                            ['--insecure', 'user', 'rotate-api-key'])
 
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
@@ -60,12 +59,12 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_user_rotate_api_key_without_param_rotates_logged_in_user(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
         # extract the API key from the returned message
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
             for line in netrc_test.readlines():
@@ -74,14 +73,14 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                     old_api_key = line.split(" ")[1]
 
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key'])
+                                            ['user', 'rotate-api-key'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         assert old_api_key != extract_api_key_from_message, "the API keys are the same!"
 
         with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
             for line in netrc_test.readlines():
-                 if line.strip().find('password') == 0:
+                if line.strip().find('password') == 0:
                     new_api_key = line.split(" ")[1]
 
         assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"
@@ -89,7 +88,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test
     def test_user_rotate_api_key_with_user_provided_rotates_user_api_key(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         self.assertIn("Successfully rotated API key for 'someuser'", some_user_api_key)
@@ -116,12 +115,12 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         # Verify that an unprivileged user cannot rotate an another's API key
         attempt_to_rotate_user_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'], exit_code=1)
+                                                     ['user', 'rotate-api-key', '-i', 'someuser'], exit_code=1)
         self.assertIn("401 Client Error", attempt_to_rotate_user_key)
 
         # Verify that a user cannot rotate an admin's API key
         attempt_to_rotate_admin_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'admin'], exit_code=1)
+                                                      ['user', 'rotate-api-key', '-i', 'admin'], exit_code=1)
         self.assertIn("500 Server Error", attempt_to_rotate_admin_key)
 
     @integration_test
@@ -140,7 +139,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_logged_in_user_rotate_api_key_with_their_user_as_flag_returns_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                         ['user', 'rotate-api-key', '-i', 'admin'])
+                                 ['user', 'rotate-api-key', '-i', 'admin'])
         self.assertEquals("Error: To rotate the API key of the currently logged-in user use this command without any flags or options", output)
 
     @integration_test
@@ -148,32 +147,32 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         # Login as user to avoid changing admin password
         with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
             some_user_api_key = self.invoke_cli(self.cli_auth_params,
-               ['user', 'rotate-api-key', '-i', 'someuser'])
+                                                ['user', 'rotate-api-key', '-i', 'someuser'])
 
             extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
             self.invoke_cli(self.cli_auth_params,
-                ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+                            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
             output = self.invoke_cli(self.cli_auth_params,
-                          ['user', 'change-password'])
+                                     ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
 
     @integration_test
     def test_user_change_password_not_complex_enough_prompts_input(self):
         output = self.invoke_cli(self.cli_auth_params,
-                      ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
+                                 ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
         self.assertIn("Invalid password. The password must contain at least", output)
 
     @integration_test
     def test_user_change_password_meets_password_complexity(self):
         # Login as user to avoid changing admin password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-           ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
 
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
         self.invoke_cli(self.cli_auth_params,
-            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
         output = self.invoke_cli(self.cli_auth_params,
-                      ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
+                                 ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
         self.assertIn("Successfully changed password for", output)
 
     @integration_test
@@ -190,20 +189,20 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     def test_host_rotate_api_key_without_host_prompts_input(self):
         with patch('builtins.input', side_effect=['somehost']):
             output = self.invoke_cli(self.cli_auth_params,
-                   ['host', 'rotate-api-key'])
+                                     ['host', 'rotate-api-key'])
             self.assertIn("Successfully rotated API key for 'somehost'", output)
 
     @integration_test
     def test_host_rotate_api_key_with_host_provided_rotates_host_api_key(self):
         output = self.invoke_cli(self.cli_auth_params,
-               ['host', 'rotate-api-key', '-i', 'somehost'])
+                                 ['host', 'rotate-api-key', '-i', 'somehost'])
         self.assertIn("Successfully rotated API key for 'somehost'", output)
 
     @integration_test
     def test_host_rotate_api_key_without_flag_returns_error(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
-                        ['host', 'rotate-api-key', 'someinput'], exit_code=1)
+                            ['host', 'rotate-api-key', 'someinput'], exit_code=1)
         self.assertIn('Error unrecognized arguments: someinput', self.capture_stream.getvalue())
 
     @integration_test
