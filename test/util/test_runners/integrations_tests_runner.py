@@ -2,10 +2,6 @@
 This is a runner module for all integration tests.
 The purpose of this file is to be a cross platform tests runner
 for all integration tests
-
-Roadmap:
-1) run all integration tests from this file
-2) set up the system env to run the tests
 """
 
 # Builtins
@@ -14,15 +10,18 @@ import sys
 sys.path.append('.')
 sys.path.append('..')
 # Third party
-import uuid
 import unittest.mock
 import unittest
 import base64
 import requests
-from pathlib import Path
 import logging
 import subprocess as sb
 import shutil
+
+# NOTE do not delete this import even though it seems to not be used. This used to
+# run the integration tests as a process. Otherwise this dependency will not be available
+# once the test module is packed
+import uuid
 
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
@@ -90,7 +89,7 @@ class TestRunner:  # pragma: no cover
     def __create_conjurrc_file(self):
         path_provider = TestRunnerPathProvider.getInstance()
         proc = sb.Popen(
-            [self.runner_args.working_cli_path_only_for_init, "init", "-a", f"{self.runner_args.account}", "-u",
+            [self.runner_args.cli_to_test, "init", "-a", f"{self.runner_args.account}", "-u",
              f"{self.runner_args.hostname}",
              "--force"],
             stdin=sb.PIPE,
@@ -105,7 +104,7 @@ class TestRunner:  # pragma: no cover
     def __create_netrc_file(self):
         path_provider = TestRunnerPathProvider.getInstance()
         proc = sb.Popen(
-            [self.runner_args.working_cli_path_only_for_init, "login", "-i", f"{self.runner_args.login}", "-p",
+            [self.runner_args.cli_to_test, "login", "-i", f"{self.runner_args.login}", "-p",
              f"{self.runner_args.password}"],
             stdin=sb.PIPE,
             stdout=sb.PIPE,
@@ -119,7 +118,8 @@ class TestRunner:  # pragma: no cover
 
     def __get_api_key(self):
         url = f"{self.runner_args.hostname}/authn/{self.runner_args.account}/login"
-        encode = base64.b64encode(f"admin:{self.runner_args.password}".encode('utf-8')).decode('utf-8')
+        encode = base64.b64encode(f"{self.runner_args.login}:{self.runner_args.password}".encode('utf-8')).decode(
+            'utf-8')
         headers = {'Authorization': f'Basic {encode}'}
 
         response = requests.request("GET", url, headers=headers, data={},
@@ -139,6 +139,7 @@ class TestRunner:  # pragma: no cover
             specific_test = test_cases_class(test_name, self.client_params, self.env_params)
             suite.addTest(specific_test)
         result = unittest.TextTestRunner().run(suite)
+        print("Failed: ","\n".join([str(f[0]).split(" ")[0] for f in result.failures]))
         return result.wasSuccessful()
 
     def __get_relevant_tests_for_class(self, class_name: IntegrationTestCaseBase) -> list:

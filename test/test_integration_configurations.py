@@ -50,7 +50,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine
     '''
-    @integration_test
+
+    @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
         self.setup_cli_params({})
@@ -62,7 +63,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine when a user mistakenly supplies an extra '/' at the end of the URL
     '''
-    @integration_test
+    @integration_test()
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
         self.setup_cli_params({})
@@ -75,7 +76,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that if user does not trust the certificate,
     the conjurrc is not be created on the user's machine
     '''
-    @integration_test
+
+    @integration_test(True)
     def test_https_conjurrc_user_does_not_trust_cert(self):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'no']):
             self.setup_cli_params({})
@@ -89,7 +91,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that when the user adds the force flag,
     no confirmation is required
     '''
-    @integration_test
+
+    @integration_test(True)
     # The additional side effects here ('somesideffect') would prompt the CLI to
     # request for confirmation which would fail the test
     @patch('builtins.input', side_effect=['yes', 'somesideeffect', 'somesideeffect'])
@@ -101,7 +104,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
         assert "Not overwriting" not in output
 
-    @integration_test
+    @integration_test(True)
     def test_https_cli_fails_if_cert_is_bad(self):
         # bad conjurrc
         conjurrc = ConfigFile(account=self.client_params.login, appliance_url=self.client_params.hostname,
@@ -115,7 +118,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
 
-    @integration_test
+    @integration_test(True)
     def test_https_cli_fails_if_cert_is_not_provided(self):
         conjurrc = ConfigFile(account=self.client_params.login, appliance_url=self.client_params.hostname,
                               cert_file="")

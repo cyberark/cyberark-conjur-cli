@@ -40,7 +40,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** TESTS ***************
 
-    @integration_test
+    @integration_test()
     def test_resource_insecure_prints_warning_in_log(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
                                             ['user', 'rotate-api-key', '-i', 'someuser'])
@@ -56,7 +56,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
 
-    @integration_test
+    @integration_test()
     def test_user_rotate_api_key_without_param_rotates_logged_in_user(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
                                             ['user', 'rotate-api-key', '-i', 'someuser'])
@@ -85,7 +85,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"
 
-    @integration_test
+    @integration_test()
     def test_user_rotate_api_key_with_user_provided_rotates_user_api_key(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
                                             ['user', 'rotate-api-key', '-i', 'someuser'])
@@ -102,7 +102,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     1. Rotate user's API key (using the admin's access token) to be able to login as them
     2. Login as that user and attempt to rotate another's API key
     '''
-    @integration_test
+    @integration_test()
     def test_unprivileged_user_cannot_rotate_anothers_api_key(self):
         unprivileged_api_key = self.invoke_cli(self.cli_auth_params,
                                                ['user', 'rotate-api-key', '-i', 'someunprivilegeduser'])
@@ -123,14 +123,14 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                                                       ['user', 'rotate-api-key', '-i', 'admin'], exit_code=1)
         self.assertIn("500 Server Error", attempt_to_rotate_admin_key)
 
-    @integration_test
+    @integration_test()
     def test_user_rotate_api_key_without_flag_returns_error(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['user', 'rotate-api-key', 'someinput'], exit_code=1)
         self.assertIn('Error unrecognized arguments: someinput', self.capture_stream.getvalue())
 
-    @integration_test
+    @integration_test()
     def test_user_rotate_api_key_flag_without_value_returns_error(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
@@ -140,9 +140,9 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     def test_logged_in_user_rotate_api_key_with_their_user_as_flag_returns_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['user', 'rotate-api-key', '-i', 'admin'])
-        self.assertEquals("Error: To rotate the API key of the currently logged-in user use this command without any flags or options", output)
+        self.assertIn("Error: To rotate the API key of the currently logged-in user use this command without any flags or options", output)
 
-    @integration_test
+    @integration_test()
     def test_user_change_password_does_not_provide_password_prompts_input(self):
         # Login as user to avoid changing admin password
         with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
@@ -156,13 +156,13 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                                      ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
 
-    @integration_test
+    @integration_test(True)
     def test_user_change_password_not_complex_enough_prompts_input(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
         self.assertIn("Invalid password. The password must contain at least", output)
 
-    @integration_test
+    @integration_test()
     def test_user_change_password_meets_password_complexity(self):
         # Login as user to avoid changing admin password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
@@ -175,7 +175,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                                  ['user', 'change-password', '-p', 'Mypassw0rD2\!'])
         self.assertIn("Successfully changed password for", output)
 
-    @integration_test
+    @integration_test()
     def test_user_change_password_empty_password_provided_prompts_input(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
             with patch('getpass.getpass', side_effect=['mypassword']):
@@ -185,27 +185,27 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Invalid password. The password must contain at least", str(mock_log.output))
         self.assertIn("Invalid password. The password must contain at least", output)
 
-    @integration_test
+    @integration_test(True)
     def test_host_rotate_api_key_without_host_prompts_input(self):
         with patch('builtins.input', side_effect=['somehost']):
             output = self.invoke_cli(self.cli_auth_params,
                                      ['host', 'rotate-api-key'])
             self.assertIn("Successfully rotated API key for 'somehost'", output)
 
-    @integration_test
+    @integration_test(True)
     def test_host_rotate_api_key_with_host_provided_rotates_host_api_key(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['host', 'rotate-api-key', '-i', 'somehost'])
         self.assertIn("Successfully rotated API key for 'somehost'", output)
 
-    @integration_test
+    @integration_test()
     def test_host_rotate_api_key_without_flag_returns_error(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
                             ['host', 'rotate-api-key', 'someinput'], exit_code=1)
         self.assertIn('Error unrecognized arguments: someinput', self.capture_stream.getvalue())
 
-    @integration_test
+    @integration_test()
     def test_host_rotate_api_key_flag_without_value_returns_error(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,

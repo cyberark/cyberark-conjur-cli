@@ -39,7 +39,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** TESTS ***************
 
-    @integration_test
+    @integration_test(True)
     def test_https_can_load_policy(self):
         self.setup_cli_params({})
 
@@ -49,7 +49,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         for variable in variables:
             utils.assert_set_and_get(self, variable)
 
-    @integration_test
+    @integration_test()
     def test_load_policy_of_new_resources_returns_new_entry_json_data(self):
         self.setup_cli_params({})
 
@@ -82,7 +82,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     Validates that a policy command without a subcommand 'load'
     in this case, will fail and return help screen
     '''
-    @integration_test
+    @integration_test()
     def test_policy_load_without_subcommand_returns_help_screen(self):
         with redirect_stderr(self.capture_stream):
             self.invoke_cli(self.cli_auth_params,
@@ -93,7 +93,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     Validates that a policy command without the policy path
     will fail and return help screen
     '''
-    @integration_test
+    @integration_test()
     def test_policy_load_without_policy_path_returns_help_screen(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
@@ -103,7 +103,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     '''
     A non-existent policy file will return FileNotFound error message
     '''
-    @integration_test
+    @integration_test(True)
     def test_policy_load_raises_file_not_exists_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['policy', 'load', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
@@ -112,7 +112,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     '''
     A policy with invalid syntax will return a Unprocessable entity error
     '''
-    @integration_test
+    @integration_test()
     def test_policy_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
         with self.assertLogs('', level='DEBUG') as mock_log:
@@ -122,14 +122,14 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("422 Unprocessable Entity {\"error\":{\"code\":\"validation_failed\",\"message\":",
                   str(mock_log.output))
 
-    @integration_test
+    @integration_test()
     def test_policy_replace_load_combo_returns_help_screen(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
                    ['policy', 'load', 'replace', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
         self.assertIn('Error unrecognized arguments: replace', self.capture_stream.getvalue())
 
-    @integration_test
+    @integration_test()
     def test_policy_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
             self.invoke_cli(self.cli_auth_params,
@@ -138,14 +138,14 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
             self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
                           str(mock_log.output))
 
-    @integration_test
+    @integration_test(True)
     def test_policy_replace_bad_syntax_raises_error(self):
         policy = "- ! user bad syntax"
         output = utils.replace_policy_from_string(self, policy, exit_code=1)
 
         self.assertIn("422 Client Error", output)
 
-    @integration_test
+    @integration_test()
     def test_https_load_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
@@ -166,7 +166,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertDictEqual(json_result, expected_object)
 
-    @integration_test
+    @integration_test(True)
     def test_https_can_replace_policy(self):
         self.setup_cli_params({})
 
@@ -189,7 +189,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
             utils.print_instead_of_raise_error(self, old_variable, "404 Client Error: Not Found for url")
         os.remove(file_name)
 
-    @integration_test
+    @integration_test()
     def test_https_replace_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
@@ -216,7 +216,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertDictEqual(json_result, expected_object)
 
-    @integration_test
+    @integration_test()
     def test_https_replace_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
@@ -230,7 +230,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertDictEqual(json_result, expected_object)
 
-    @integration_test
+    @integration_test(True)
     def test_https_can_update_policy(self):
         self.setup_cli_params({})
 
@@ -240,7 +240,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         for variable in variables:
             utils.assert_set_and_get(self, variable)
 
-    @integration_test
+    @integration_test()
     def test_https_update_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
@@ -269,7 +269,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertDictEqual(json_result, expected_object)
 
-    @integration_test
+    @integration_test()
     def test_https_update_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
@@ -293,7 +293,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     '''
     Validates that update deletes record
     '''
-    @integration_test
+    @integration_test()
     def test_policy_update_policy_removes_user(self):
         user_id = uuid.uuid4().hex
 
@@ -307,12 +307,12 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         # Assert that user_id is not in output
         self.assertTrue(output.find(user_id) == -1)
 
-    # test_policy_update_policy_removes_user.tester=True
-    @integration_test
+
+    @integration_test()
     def test_https_can_get_whoami(self):
         self.setup_cli_params({})
 
         output = self.invoke_cli(self.cli_auth_params, ['whoami'])
         response = json.loads(output)
-        self.assertEquals(response.get('account'), f'{self.client_params.account}')
-        self.assertEquals(response.get('username'), 'admin')
+        self.assertIn(f'{self.client_params.account}', response.get('account'))
+        self.assertIn('admin', response.get('username'))

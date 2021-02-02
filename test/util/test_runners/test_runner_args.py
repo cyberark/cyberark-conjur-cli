@@ -1,5 +1,18 @@
 from argparse import ArgumentParser
 
+# *************** DEVELOPER NOTE ***************
+# We have the ability to run our tests as a process which means we can run our tests as a user would,
+# without Python on the machine, using the Conjur CLI exec a customer would. Currently, some tests still
+# cannot run as a process. Tests that meet the following criteria cannot be run as a process and are given
+# the integration_test() decorator:
+# 1. any test that contains of error/stderr
+# 2. any test that runs a command that uses getpass (login and user commands)
+# 3. any test that has assertEquals. All new tests should use assertIn
+# 4. any test that uses a tmp file (policy command)
+# 5. any test that uses contents returned from invoke_cli
+#
+# The main reason for these limitations is that we run in debug mode and all items that are printed to the
+# screen are captured.
 
 class TestRunnerArgs:
     """
@@ -7,8 +20,7 @@ class TestRunnerArgs:
     """
 
     def __init__(self, run_oss_tests, url, account, login, password, invoke_cli_as_process,
-                 working_cli_path_only_for_init: str,
-                 cli_to_test: str, files_folder: str, allow_same_binaries=False,
+                 cli_to_test: str, files_folder: str,
                  test_name_identifier="integration"):
         self.run_oss_tests = run_oss_tests
         self.hostname = url
@@ -16,30 +28,30 @@ class TestRunnerArgs:
         self.login = login
         self.password = password
         self.test_name_identifier = test_name_identifier
+        # Tests
+        if invoke_cli_as_process and test_name_identifier == 'integration':
+            self.test_name_identifier = "test_with_process"
         self.invoke_cli_as_process = invoke_cli_as_process
-        self.working_cli_path_only_for_init = working_cli_path_only_for_init
         self.cli_to_test = cli_to_test
         self.files_folder = files_folder
-        # will throw if the user test the same known working binaries
-        if cli_to_test is not None and not allow_same_binaries and working_cli_path_only_for_init.lower() == cli_to_test.lower():
-            raise RuntimeError("cli to start enviroment and tested cli are on the same path")
 
     @staticmethod
     def create_from_args():
         """
-        --invoke_cli_as_process , required to run the CLI as a process
-        --working_cli_path the path to a working CLI executable.
-        This path is needed for initial configuration of the CLI.
-        You can find this executable under /test/test_config/binaries/config
-        in the repo. Copy this executable into every OS you wish to run the
-        CLI integration tests.
-        Parameters like -u, -a, -l, -p, will configure the conjurrc and netrc
-        needed to run the integration tests successfully.
-        --cli_to_test path to the CLI executable to test against.
+        --invoke_cli_as_process, required to run the CLI as a process
+
+        Parameters like --url, --account, --login, --password, will used to configure the CLI. These values
+        are used before each test profile is run to configure the CLI and run the
+        integration tests successfully
+
+        --cli_to_test, path to the packed CLI executable to test against.
+
         --files_folder path to test assets (policy files, etc).
         You can find this folder under /test/test_config in the repo.
         Copy this executable into every OS you wish to run the CLI integration tests.
-        --identifier the test method with this identifier will be run (integration by default).
+
+        --identifier the test method with this identifier will be run (`integration` by default).
+        To run as a process, the identifier should be `test_with_process`
         """
         parser = ArgumentParser(description='Test arguments')
 
@@ -56,13 +68,9 @@ class TestRunnerArgs:
         parser.add_argument('-a', '--account', dest='account', action='store', default='dev', help='account name')
         parser.add_argument('-l', '--login', dest='login', action='store', default='admin', help='user name')
         parser.add_argument('-p', '--password', dest='password', action='store', help='the user password')
-        parser.add_argument('-w', '--working_cli', dest='working_cli_path_only_for_init', action='store',
-                            help='the cli path using to set up the enviorment')
         parser.add_argument('-c', '--cli_to_test', dest='cli_to_test', action='store',
                             help='the cli binaries to test')
         parser.add_argument('-f', '--files_folder', dest='files_folder', action='store', default='./test',
                             help='where the test assets are located')
-        parser.add_argument('-s', '--same', dest='allow_same_binaries', action='store_true',
-                            help='If added cli_to_test_path and working_cli can address the same path')
         args = parser.parse_args()
         return TestRunnerArgs(**vars(args))
