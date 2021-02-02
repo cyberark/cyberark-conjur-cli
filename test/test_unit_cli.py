@@ -36,7 +36,7 @@ class CliTest(unittest.TestCase):
     def test_cli_check_copyright_short_version_flag(self, cli_invocation, output, client):
         self.assertIn(f'''Conjur CLI version {format(__version__)}
 
-Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 ''', str(output))
 
@@ -44,7 +44,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
     def test_cli_check_copyright_long_version_flag(self, cli_invocation, output, client):
         self.assertIn(f'''Conjur CLI version {format(__version__)}
 
-Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 ''', str(output))
 

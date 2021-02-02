@@ -10,6 +10,10 @@ required to successfully configure the conjurrc
 # Builtins
 import logging
 import sys
+# Allows users to move left and right when inputting input instead of printing escape characters
+# https://stackoverflow.com/questions/58591423/python-prints-escape-keys-while-entering-input-when-pressing-the-arrow-keys-on-t
+# pylint: disable=unused-import
+import readline
 
 # Third party
 from urllib.parse import urlparse
@@ -58,6 +62,9 @@ class InitController:
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
 
+        # Chops off the '/ if supplied by the user to avoid a server error
+        if self.conjurrc_data.appliance_url.endswith('/'):
+            self.conjurrc_data.appliance_url=self.conjurrc_data.appliance_url[:-1]
 
         url = urlparse(self.conjurrc_data.appliance_url)
 
@@ -140,7 +147,7 @@ class InitController:
 
     @staticmethod
     def __ensure_overwrite_file(config_file):
-        force_overwrite = input(f"File {config_file} exists. " \
+        force_overwrite = input(f"File {config_file} exists. "
                                 f"Overwrite? (Default=yes): ").strip()
         if force_overwrite != '' and force_overwrite.lower() != 'yes':
             raise Exception(f"Not overwriting {config_file}")

@@ -11,6 +11,10 @@ required to successfully configure the Credentials
 import getpass
 import logging
 import sys
+# pylint: disable=unused-import
+# Allows users to move left and right when inputting input instead of printing escape characters
+# https://stackoverflow.com/questions/58591423/python-prints-escape-keys-while-entering-input-when-pressing-the-arrow-keys-on-t
+import readline
 
 from Utils.utils import Utils
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
@@ -52,7 +56,7 @@ class LoginController:
         logging.debug(f"Saving credentials to '{DEFAULT_NETRC_FILE}'")
         self.login_logic.save(self.credential_data)
         # pylint: disable=logging-fstring-interpolation
-        logging.debug("Credentials written to " \
+        logging.debug("Credentials written to "
                       f"'{DEFAULT_NETRC_FILE}'")
         sys.stdout.write("Successfully logged in to Conjur.\n")
 
@@ -97,5 +101,5 @@ class LoginController:
                                                            self.user_password,
                                                            conjurrc)
         except Exception as error:
-            raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. " \
+            raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. "
                 f"Reason: {error}. Check your credentials and try again.") from error

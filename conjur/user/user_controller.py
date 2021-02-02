@@ -56,7 +56,7 @@ class UserController():
 
             logging.debug(f"Invalid password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
             # pylint: disable=line-too-long
-            raise InvalidPasswordComplexityException("Invalid password. "
+            raise InvalidPasswordComplexityException("Error: Invalid password. "
                                                      f"{PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}.") from http_error
         logging.debug(f"Successfully changed password for '{self.user_input_data.user_id}'.")
         sys.stdout.write(f"Successfully changed password for '{self.user_input_data.user_id}'.\n")

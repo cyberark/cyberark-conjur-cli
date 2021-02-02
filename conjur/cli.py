@@ -71,19 +71,22 @@ Usage:
         This method builds the footer for the main help screen.
         """
         return '''
-To get help on a specific command, see `conjur <command> -h`
+To get help on a specific command, see `conjur <command> -h | --help`
+
+To start using Conjur with your environment, you must first initialize the configuration. See `conjur init -h` for more help.
 '''
 
     @staticmethod
-    def command_epilog(example, has_subcommand=False):
+    def command_epilog(example, command=None, subcommands=None):
         """
         This method builds the footer for each command help screen.
         """
-        refer_to_help = "Refer to the specific subcommand help for more details."
-        if has_subcommand:
-            return f'''Examples:
-{refer_to_help}
-    {example}'''
+        refer_to_help = "See more details in each subcommand’s help:"
+        if subcommands:
+            res = ""
+            for subcommand in subcommands:
+                res += "conjur " + command + " " + subcommand + " -h\n"
+            return f'''{refer_to_help}\n{res}'''
         return f'''Examples:
     {example}'''
 
@@ -100,7 +103,7 @@ To get help on a specific command, see `conjur <command> -h`
         This method builds the copyright description
         """
         return '''
-Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
+Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 '''
 
@@ -138,14 +141,14 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                         formatter_class=formatter_class)
 
         init_options = init_subparser.add_argument_group(title=self.title("Options"))
-        init_options.add_argument('-u', '--url',
+        init_options.add_argument('-u', '--url', metavar='VALUE',
                                   action='store', dest='url',
                                   help='Provide URL of Conjur server')
-        init_options.add_argument('-a', '--account',
+        init_options.add_argument('-a', '--account', metavar='VALUE',
                                   action='store', dest='name',
-                                  help='Provide Conjur account name ' \
-                                  '(Optional for Conjur Enterprise - overrides the value on the Conjur Enterprise server)')
-        init_options.add_argument('-c', '--certificate',
+                                  help='Provide Conjur account name. ' \
+                                  'Optional for Conjur Enterprise - overrides the value on the Conjur Enterprise server')
+        init_options.add_argument('-c', '--certificate', metavar='VALUE',
                                   action='store', dest='certificate',
                                   help='Optional- provide path to Conjur SSL certificate ' \
                                   '(obtained from Conjur server unless provided by this option)')
@@ -174,10 +177,10 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                          formatter_class=formatter_class)
 
         login_options = login_subparser.add_argument_group(title=self.title("Options"))
-        login_options.add_argument('-i', '--id',
+        login_options.add_argument('-i', '--id', metavar='VALUE',
                                   action='store', dest='identifier',
                                   help='Provide a login name to log into Conjur server')
-        login_options.add_argument('-p', '--password',
+        login_options.add_argument('-p', '--password', metavar='VALUE',
                           action='store', dest='password',
                           help='Provide a password or API key for the specified login name')
         login_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
@@ -224,19 +227,19 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         list_options = list_subparser.add_argument_group(title=self.title("Options"))
         list_options.add_argument('-i', '--inspect',
                                   action='store_true', dest='inspect',
-                                  help='Optional- list all resources and their metadata')
+                                  help='Optional- list the metadata for resources')
         list_options.add_argument('-k', '--kind',
                                   action='store', metavar='VALUE', dest='kind',
                                   help='Optional- filter resources by specified kind (user | host | layer | group | policy | variable | webservice)')
         list_options.add_argument('-l', '--limit',
-                                  action='store', metavar='NUM', dest='limit',
+                                  action='store', metavar='VALUE', dest='limit',
                                   help='Optional- limit list of resources to specified number')
         list_options.add_argument('-o', '--offset',
-                                  action='store', metavar='NUM', dest='offset',
+                                  action='store', metavar='VALUE', dest='offset',
                                   help='Optional- skip specified number of resources')
         list_options.add_argument('-r', '--role',
                                   action='store', metavar='VALUE', dest='role',
-                                  help='Optional- retrieve list of resources that specified role is entitled to see (specify role’s full ID)')
+                                  help='Optional- retrieve list of resources that specified role is entitled to see (must specify role’s full ID)')
         list_options.add_argument('-s', '--search',
                                   action='store', metavar='VALUE', dest='search',
                                   help='Optional- search for resources based on specified query')
@@ -255,8 +258,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                   '    conjur policy replace -f /tmp/myPolicy.yml -b root\t\t'
                                                                                   'Replaces the existing policy myPolicy.yml under branch root\n'
                                                                                   '    conjur policy update -f /tmp/myPolicy.yml -b root\t\t'
-                                                                                  'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n'
-                                                                                  , has_subcommand=True),
+                                                                                  'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n',
+                                                                                  command='policy',
+                                                                                  subcommands=['load', 'replace', 'apply']),
                                                        usage=argparse.SUPPRESS,
                                                        add_help=False,
                                                        formatter_class=formatter_class)
@@ -275,9 +279,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                           formatter_class=formatter_class)
 
         load_options = load_policy_parser.add_argument_group(title=self.title("Options"))
-        load_options.add_argument('-f', '--file', required=True,
+        load_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                  help='Provide policy file name')
-        load_options.add_argument('-b', '--branch', required=True,
+        load_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                          help='Provide the policy branch name')
         load_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
@@ -291,9 +295,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
                                                              formatter_class=formatter_class)
-        replace_policy_parser.add_argument('-f', '--file', required=True,
+        replace_policy_parser.add_argument('-f', '--file', required=True, metavar='VALUE',
                                            help='Provide policy file name')
-        replace_policy_parser.add_argument('-b', '--branch', required=True,
+        replace_policy_parser.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                            help='Provide the policy branch name')
         replace_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
@@ -307,9 +311,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                             usage=argparse.SUPPRESS,
                                                             add_help=False,
                                                             formatter_class=formatter_class)
-        update_policy_parser.add_argument('-f', '--file', required=True,
+        update_policy_parser.add_argument('-f', '--file', required=True, metavar='VALUE',
                                           help='Provide policy file name')
-        update_policy_parser.add_argument('-b', '--branch', required=True,
+        update_policy_parser.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                           help='Provide the policy branch name')
         update_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
@@ -329,8 +333,10 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                 'Rotates the API key for user joe\n'
                                                                                 '    conjur user change-password\t\t\t'
                                                                                 'Prompts for password change for the logged-in user\n'
-                                                                                '    conjur user change-password -p Myp@ssw0rd!\t'
-                                                                                'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                                                '    conjur user change-password -p Myp@SSw0rd1!\t'
+                                                                                'Changes the password for the logged-in user to Myp@SSw0rd1!',
+                                                                                command='user',
+                                                                                subcommands=['rotate-api-key', 'change-password']),
                                                      usage=argparse.SUPPRESS,
                                                      add_help=False,
                                                      formatter_class=formatter_class)
@@ -359,7 +365,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                           help='Change the password for the logged-in user',
                                                           description=self.command_description(user_change_password_name, user_change_password_usage),
                                                           epilog=self.command_epilog('conjur user change-password\t\t\t'
-                                                                                     'Prompts for password change for the logged-in user\n'
+                                                                                     'Prompts for a new password for the logged-in user\n'
                                                                                      '    conjur user change-password -p Myp@ssw0rd!\t'
                                                                                      'Changes the password for the logged-in user to Myp@ssw0rd!'),
                                                           usage=argparse.SUPPRESS,
@@ -381,7 +387,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                      help='Manage hosts',
                                                      description=self.command_description(host_name, host_usage),
                                                      epilog=self.command_epilog('conjur host rotate-api-key -i my_apps/myVM\t\t'
-                                                                                'Rotates the API key for host myVM'),
+                                                                                'Rotates the API key for host myVM',
+                                                                                command='host',
+                                                                                subcommands=['change-password']),
                                                      usage=argparse.SUPPRESS,
                                                      add_help=False,
                                                      formatter_class=formatter_class)
@@ -418,7 +426,8 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                                    'Gets the values of variables secrets/mysecret and secrets/my secret\n'
                                                                                    '    conjur variable set -i secrets/mysecret -v my_secret_value\t'
                                                                                    'Sets the value of variable secrets/mysecret to my_secret_value\n',
-                                                                                   has_subcommand=True),
+                                                                                   command='variable',
+                                                                                   subcommands=['get', 'set']),
                                                          usage=argparse.SUPPRESS,
                                                          add_help=False,
                                                          formatter_class=formatter_class)
@@ -430,17 +439,18 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
                                                                        help='Get the value of one or more variables',
                                                                        description=self.command_description(variable_get_name, variable_get_usage),
                                                                        epilog=self.command_epilog('conjur variable get -i secrets/mysecret\t\t\t'
-                                                                                                  'Gets the value of variable secrets/mysecret\n'
+                                                                                                  'Gets the most recent value of variable secrets/mysecret\n'
                                                                                                   '    conjur variable get -i secrets/mysecret "secrets/my secret"\t'
-                                                                                                  'Gets the values of variables secrets/mysecret and secrets/my secret\n'),
+                                                                                                  'Gets the values of variables secrets/mysecret and secrets/my secret\n'
+                                                                                                  '    conjur variable get -i secrets/mysecret --version 2\t\t'
+                                                                                                  'Gets the second version of variable secrets/mysecret\n'),
                                                                        usage=argparse.SUPPRESS,
                                                                        add_help=False,
                                                                        formatter_class=formatter_class)
         variable_get_options = variable_get_subcommand_parser.add_argument_group(title=self.title("Options"))
-        variable_get_options.add_argument('-i', '--id', dest='identifier',
-                                          help='Provide variable identifier', nargs='+', required=True)
-        variable_get_options.add_argument('--version',
-                                          metavar='NUM', help='Provide version of variable')
+        variable_get_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
+                                          help='Provide variable identifier', nargs='*', required=True)
+        variable_get_options.add_argument('--version', metavar='VALUE', help='Optional- specify desired version of variable value')
         variable_get_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         variable_set_name = 'set - Set the value of a variable'
@@ -457,7 +467,7 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
 
         variable_set_options.add_argument('-i', '--id', dest='identifier',
                                           help='Provide variable identifier', required=True)
-        variable_set_options.add_argument('-v', '--value', metavar='NUM',
+        variable_set_options.add_argument('-v', '--value', metavar='VALUE',
                                           help='Set the value of the specified variable', required=True)
         variable_set_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
@@ -501,6 +511,9 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         try:
             Cli.run_action(resource, args)
         except KeyboardInterrupt:
+            # A new line required so when the CLI is packaged as an exec,
+            # it won't erase the previous line
+            sys.stdout.write("\n")
             sys.exit(0)
         except FileNotFoundError as not_found_error:
             logging.debug(traceback.format_exc())
@@ -509,10 +522,14 @@ Copyright (c) 2020 CyberArk Software Ltd. All rights reserved.
         except requests.exceptions.HTTPError as client_error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
+            if args.debug is False:
+                sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"{str(error)}\n")
+            if args.debug is False:
+                sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
         else:
             # Explicit exit (required for tests)
