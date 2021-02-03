@@ -10,10 +10,6 @@ required to successfully configure the conjurrc
 # Builtins
 import logging
 import sys
-# Allows users to move left and right when inputting input instead of printing escape characters
-# https://stackoverflow.com/questions/58591423/python-prints-escape-keys-while-entering-input-when-pressing-the-arrow-keys-on-t
-# pylint: disable=unused-import
-import readline
 
 # Third party
 from urllib.parse import urlparse
@@ -57,7 +53,7 @@ class InitController:
         """
         # pylint: disable=line-too-long
         if self.conjurrc_data.appliance_url is None:
-            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (using https://): ").strip()
+            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
             if self.conjurrc_data.appliance_url == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
