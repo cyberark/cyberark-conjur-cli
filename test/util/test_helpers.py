@@ -16,10 +16,10 @@ def run_func_with_timeout(timeout, func,*args):
     signal.signal(signal.SIGALRM, interrupted)
     # set alarm
     signal.alarm(timeout)
-    s = func(*args)
+    function_output = func(*args)
     # disable the alarm after success
     signal.alarm(0)
-    return s
+    return function_output
 
 @patch('builtins.input', return_value='yes')
 def init_to_cli(self, mock_input):

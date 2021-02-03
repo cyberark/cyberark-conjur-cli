@@ -34,7 +34,7 @@ $ ./bin/build
 
 To setup a development environment follow the instructions in this section. Once you have done so, you will be able to see live changes made to the CLI.
 
-1. Create a directory that will hold all the virtualenv packages and files. Note that you will only need to run this command once.
+1. Create a directory that will hold all the `virtualenv` packages and files. Note that you will only need to run this command once.
 
 macOS:
 
@@ -45,10 +45,10 @@ $ python3 -m venv venv
 Windows:
 
 ```
-py -m venv venv
+$ py -m venv venv
 ```
 
-2. Enable your terminal to use those files with this command. Note that this command will need to run each time you want to return to your virtual environment.
+1. Enable your terminal to use those files with this command. Note that this command will need to run each time you want to return to your virtual environment.
 
 macOS:
 
@@ -59,16 +59,16 @@ $ source venv/bin/activate
 Windows:
 
 ```
-venv\Scripts\activate.bat
+$ venv\Scripts\activate.bat
 ```
 
-3. Install requirements
+1. Install requirements
 
 ```
 $ pip3 install -r requirements.txt
 ```
 
-4. You can now run the tests and the CLI with modifiable files.
+1. You can now run the tests and the CLI with modifiable files.
 
 Check it out! Run the following prefix to start seeing changes
 
@@ -106,19 +106,19 @@ To run specific tests, perform the following:
 $ ./bin/test_integration -d
 ```
 
-1. Under the individual test add the following:
+1. Under the individual test add an identifier of your choosing
+
+For example:
 
 ```
-<name-of-test-function>.<identifier>=True
-
-## Example
-def my-integration-test-function()
+# Example test function
+def my-integration-test()
   ...
 
-my-integration-test-function.someidentifier=True
+my-integration-test.someidentifier=True
 ```
 
-1. Add the identifier of choice to the following command:
+1. Add the identifier to the following command:
 
 ```
 root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A '<identifier>' $@
@@ -133,7 +133,7 @@ do *not* need to rebuild before running these tests again.
 #### Running as a process
 
 We provide the option to run the integration tests as a process. This means integration tests can run in the same way
-a user would use our CLI; without Python installed on the machine, using the Conjur CLI exec.
+a user would use our CLI- without Python installed on the machine, using the Conjur CLI exec.
 
 The integration tests are wrapped in an integration_test_runner Python module to run in a Python-free environment.
 That way, tests can be run cross-platform.
@@ -155,24 +155,30 @@ That way, tests can be run cross-platform.
 
 ###### Required parameters
 
-`--invoke_cli_as_process`, required to run the CLI as a process.
+`--invoke-cli-as-process` - required to run the CLI as a process.
 
-`--cli_to_test`, path to the packed CLI executable to test against.
+`--cli-to-test` - path to the packed CLI executable to test against.
 
-Parameters like --url, --account, --login, --password, will used to configure the CLI. These values are used
+Parameters like --url, --account, --login, --password, will used be to configure the CLI. These values are used
 before each test profile is run to configure the CLI and run the integration tests successfully.
 
-`--identifier`, the test method with this identifier will be run (`integration` by default).
+`--identifier`- the test method with this identifier will be run (`integration` by default).
 To run as a process, the identifier should be `test_with_process`.
 
-`--files_folder` path to test assets (policy files, etc). This folder is located under `/test/test_config` in the
+`--files-folder` - path to test assets (policy files, etc). This folder is located under `/test/test_config` in the
 repo. Copy this executable into every OS you wish to run the CLI integration tests.
-
 
 ###### Example
 ```
-./integrations_tests_runner -i test_with_process -u https://conjur-server -a someaccount -l somelogin -p Myp@ssw0rd1!
--f /test -c /dist/conjur --invoke_cli_as_process
+./integrations_tests_runner \
+  --identifier test-with-process \
+  --url https://conjur-server \
+  --account someaccount \
+  --login somelogin \
+  --password Myp@ssw0rd1! \
+  --files-folder /test \
+  --cli-to-test /dist/conjur \
+  --invoke-cli-as-process
 ```
 
 ### Linting
@@ -210,11 +216,12 @@ To create a tag and release follow the instructions in this section.
 
 1. Before creating a release, ensure that all documentation that needs to be written has been written by TW, approved by PO/Engineer, and pushed to the forward-facing documentation
 
-1. Commit these changes to the branch. Bump version to x.y.z is an acceptable commit message and open a PR for review
+1. Commit these changes to the branch. "Bump version to x.y.z" is an acceptable commit message and open a PR for review
 
-Add a git tag
+### Add a git tag
 
-1. Once your changes have been reviewed and merged into master, tag the version using `git tag -s v0.1.1`. Note this requires you to be able to sign releases. Consult the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification) on how to set this up vx.y.z is an acceptable tag message
+1. Once your changes have been reviewed and merged into master, tag the version using `git tag -s v0.1.1`. Note this requires you to be able to sign releases. Consult the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification)
+on how to set this up. "vx.y.z" is an acceptable tag message
 1. Push the tag: `git push vx.y.z` (or `git push origin vx.y.z` if you are working from your local machine)
 
 ### Add release artifacts
@@ -229,15 +236,15 @@ Currently, packing the client into an executable is a manual process. For Linux 
 
 #### Linux
 
-1. Run `./bin/build_binary -l`. Once this is run, a `dist` folder will be created with the executable in it
-2. Once an executable has been created, run `tar -cvf conjur-cli-linux.tar conjur` to archive the file in a tar.gz format
-3. Add the archive file as an asset in the release
+1. Run `./bin/build_binary --local`. Once this is run, a `dist` folder will be created with the executable in it
+1. Once an executable has been created, run `tar -cvf conjur-cli-linux.tar conjur` to archive the file in a `tar.gz` format
+1. Add the archive file as an asset in the release
 
 #### macOS
 
-1. Run `./bin/build_binary -l`. Once this is run, a `dist` folder will be created with the executable in it
-2. Once an executable has been created, run `tar -cvf conjur-cli-darwin.tar conjur` to archive the file in a tar.gz format
-3. Add the archive file as an asset in the release
+1. Run `./bin/build_binary --local`. Once this is run, a `dist` folder will be created with the executable in it
+1. Once an executable has been created, run `tar -cvf conjur-cli-darwin.tar conjur` to archive the file in a `tar.gz` format
+1. Add the archive file as an asset in the release
 
 #### Windows
 
