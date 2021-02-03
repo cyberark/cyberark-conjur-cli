@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 import OpenSSL
 from OpenSSL import SSL
 
-from conjur.init.init_logic import InitLogic as InitLogic
+from conjur.logics.init_logic import InitLogic as InitLogic
 from conjur.init.init_controller import InitController as InitController
 from conjur.init.conjurrc_data import ConjurrcData
 from conjur.ssl_service import SSLService

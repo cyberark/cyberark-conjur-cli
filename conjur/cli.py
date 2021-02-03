@@ -28,12 +28,17 @@ from conjur.host import HostController
 from conjur.host.host_resource_data import HostResourceData
 from conjur.init import ConjurrcData
 from conjur.list import ListData, ListController
-from conjur.list.list_logic import ListLogic
-from conjur.login import LoginLogic, LoginController
-from conjur.logout import LogoutController, LogoutLogic
-from conjur.policy import PolicyData, PolicyLogic, PolicyController
-from conjur.variable import VariableLogic, VariableController, VariableData
-from conjur.user import UserController, UserInputData, UserLogic
+from conjur.logics.list_logic import ListLogic
+from conjur.logics.login_logic import LoginLogic
+from conjur.logics.logout_logic import LogoutLogic
+from conjur.logics.policy_logic import PolicyLogic
+from conjur.logics.variable_logic import VariableLogic
+from conjur.logics.user_logic import UserLogic
+from conjur.login import LoginController
+from conjur.logout import LogoutController
+from conjur.policy import PolicyData, PolicyController
+from conjur.variable import VariableController, VariableData
+from conjur.user import UserController, UserInputData
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements

@@ -1,12 +1,10 @@
 import io
-import os
 import unittest
 
-from contextlib import redirect_stdout
 from unittest import mock
-from unittest.mock import patch, mock_open, Mock
+from unittest.mock import patch, mock_open
 
-from conjur.init.init_logic import InitLogic
+from conjur.logics.init_logic import InitLogic
 from conjur.init.conjurrc_data import ConjurrcData
 from conjur.ssl_service import SSLService
 
