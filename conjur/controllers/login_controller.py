@@ -14,7 +14,7 @@ import sys
 
 from Utils.utils import Utils
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
-from conjur.init import ConjurrcData
+from conjur.data_objects.conjurrc_data import ConjurrcData
 
 class LoginController:
     """

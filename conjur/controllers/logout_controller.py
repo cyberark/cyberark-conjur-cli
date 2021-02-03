@@ -14,7 +14,7 @@ import sys
 
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
-from conjur.init import ConjurrcData
+from conjur.data_objects.conjurrc_data import ConjurrcData
 
 # pylint: disable=too-few-public-methods
 class LogoutController:

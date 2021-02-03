@@ -8,7 +8,7 @@ from OpenSSL import SSL
 
 from conjur.logics.init_logic import InitLogic as InitLogic
 from conjur.controllers.init_controller import InitController as InitController
-from conjur.init.conjurrc_data import ConjurrcData
+from conjur.data_objects.conjurrc_data import ConjurrcData
 from conjur.ssl_service import SSLService
 
 class InitControllerTest(unittest.TestCase):

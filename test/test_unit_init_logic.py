@@ -5,7 +5,7 @@ from unittest import mock
 from unittest.mock import patch, mock_open
 
 from conjur.logics.init_logic import InitLogic
-from conjur.init.conjurrc_data import ConjurrcData
+from conjur.data_objects.conjurrc_data import ConjurrcData
 from conjur.ssl_service import SSLService
 
 MOCK_CERT='''

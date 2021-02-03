@@ -19,7 +19,7 @@ from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controllers.init_controller import InitController
 from conjur.logics.init_logic import InitLogic
-from conjur.init.conjurrc_data import ConjurrcData
+from conjur.data_objects.conjurrc_data import ConjurrcData
 from conjur.credentials_from_file import CredentialsFromFile
 from conjur.resource import Resource
 from conjur.ssl_service import SSLService
