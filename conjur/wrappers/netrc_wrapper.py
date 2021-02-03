@@ -16,7 +16,7 @@ import stat
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE
 
-class CredentialsFromFile:
+class NetrcWrapper:
     """
     CredentialsFromFile
 

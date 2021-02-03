@@ -19,7 +19,7 @@ import traceback
 import requests
 
 # Internals
-from conjur.argparse_wrapper import ArgparseWrapper
+from conjur.wrappers.argparse_wrapper import ArgparseWrapper
 from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.controllers.host_controller import HostController
@@ -29,7 +29,7 @@ from conjur.controllers.logout_controller import LogoutController
 from conjur.controllers.policy_controller import PolicyController
 from conjur.controllers.user_controller import UserController
 from conjur.controllers.variable_controller import VariableController
-from conjur.credentials_from_file import CredentialsFromFile
+from conjur.wrappers.netrc_wrapper import NetrcWrapper
 from conjur.data_objects.conjurrc_data import ConjurrcData
 from conjur.data_objects.credentials_data import CredentialsData
 from conjur.data_objects.host_resource_data import HostResourceData
@@ -562,7 +562,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Method that wraps the login call logic
         """
         credential_data = CredentialsData(login=identifier)
-        credentials = CredentialsFromFile(netrc_path=DEFAULT_NETRC_FILE)
+        credentials = NetrcWrapper(netrc_path=DEFAULT_NETRC_FILE)
         login_logic = LoginLogic(credentials)
         login_controller = LoginController(ssl_verify=ssl_verify,
                                            user_password=password,
@@ -575,7 +575,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Method that wraps the logout call logic
         """
-        credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
+        credentials = NetrcWrapper(DEFAULT_NETRC_FILE)
         logout_logic = LogoutLogic(credentials)
 
         logout_controller = LogoutController(ssl_verify=ssl_verify,
@@ -626,7 +626,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Method that wraps the user call logic
         """
-        credentials = CredentialsFromFile()
+        credentials = NetrcWrapper()
         user_logic = UserLogic(ConjurrcData, credentials, client)
         if args.action == 'rotate-api-key':
             user_input_data = UserInputData(action=args.action,

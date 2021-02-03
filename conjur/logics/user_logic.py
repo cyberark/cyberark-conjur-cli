@@ -11,7 +11,7 @@ import logging
 import requests
 
 # Internals
-from conjur.credentials_from_file import CredentialsFromFile
+from conjur.wrappers.netrc_wrapper import NetrcWrapper
 from conjur.errors import OperationNotCompletedException
 from conjur.resource import Resource
 
@@ -106,5 +106,5 @@ class UserLogic:
         """
         Method to update the newly rotated API key in the credential store
         """
-        credentials = CredentialsFromFile()
+        credentials = NetrcWrapper()
         credentials.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)

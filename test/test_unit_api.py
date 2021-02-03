@@ -1,11 +1,9 @@
 import json
 import unittest
 from datetime import datetime
-from unittest.mock import call, patch, MagicMock
+from unittest.mock import patch, MagicMock
 
-import urllib3
-
-from conjur.http_wrapper import HttpVerb
+from conjur.wrappers.http_wrapper import HttpVerb
 from conjur.endpoints import ConjurEndpoint
 
 from conjur.api import Api

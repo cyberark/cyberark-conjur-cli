@@ -20,7 +20,7 @@ from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controllers.init_controller import InitController
 from conjur.logics.init_logic import InitLogic
 from conjur.data_objects.conjurrc_data import ConjurrcData
-from conjur.credentials_from_file import CredentialsFromFile
+from conjur.wrappers.netrc_wrapper import NetrcWrapper
 from conjur.resource import Resource
 from conjur.ssl_service import SSLService
 
@@ -117,7 +117,7 @@ class Client():
             self._api.login(login_id, password)
         else:
             try:
-                credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
+                credentials = NetrcWrapper(DEFAULT_NETRC_FILE)
                 loaded_netrc = credentials.load(loaded_config['url'])
             except netrc.NetrcParseError as netrc_error:
                 raise Exception("Error: netrc is in an invalid format. "

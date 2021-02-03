@@ -12,7 +12,7 @@ import logging
 
 # Internals
 from conjur.endpoints import ConjurEndpoint
-from conjur.http_wrapper import invoke_endpoint, HttpVerb
+from conjur.wrappers.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:
     """

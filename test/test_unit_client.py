@@ -140,7 +140,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_performs_no_api_login_if_password_is_not_provided(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -149,7 +149,7 @@ class ClientTest(unittest.TestCase):
         mock_api_instance.return_value.login.assert_not_called()
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_config_from_apiconfig_if_url_is_not_provided(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -181,7 +181,7 @@ class ClientTest(unittest.TestCase):
         mock_api_instance.return_value.login.assert_called_once_with('mylogin', 'mypass')
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_config_from_apiconfig_if_login_id_is_not_provided(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -198,7 +198,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -217,7 +217,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -237,7 +237,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_does_not_override_apiconfig_values_with_empty_values(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -258,7 +258,7 @@ class ClientTest(unittest.TestCase):
     ### API passthrough tests ###
 
     @patch('conjur.client.Api')
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('logging.basicConfig')
     def test_client_increases_logging_with_debug_flag(self, mock_logging, mock_creds, mock_api):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
@@ -280,7 +280,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_get_variable_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -289,7 +289,7 @@ class ClientTest(unittest.TestCase):
         mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id', None)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_returns_get_variable_result(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -300,7 +300,7 @@ class ClientTest(unittest.TestCase):
         self.assertEquals(return_value, variable_value)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_get_many_variables_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -312,7 +312,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_returns_get_variables_result(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -323,7 +323,7 @@ class ClientTest(unittest.TestCase):
         self.assertEquals(return_value, variable_values)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_set_variable_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -335,7 +335,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_load_policy_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -347,7 +347,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_returns_load_policy_result(self, mock_api_instance, mock_creds, mock_api_config):
         load_policy_result = uuid.uuid4().hex
@@ -357,7 +357,7 @@ class ClientTest(unittest.TestCase):
         self.assertEquals(return_value, load_policy_result)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_replace_policy_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -369,7 +369,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_returns_replace_policy_result(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -381,7 +381,7 @@ class ClientTest(unittest.TestCase):
 
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_api_update_policy_params(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -393,7 +393,7 @@ class ClientTest(unittest.TestCase):
         )
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_returns_update_policy_result(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -404,7 +404,7 @@ class ClientTest(unittest.TestCase):
         self.assertEquals(return_value, update_policy_result)
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_resource_list_method(self, mock_api_instance, mock_creds,
             mock_api_config):
@@ -413,7 +413,7 @@ class ClientTest(unittest.TestCase):
         mock_api_instance.return_value.resources_list.assert_called_once_with({})
 
     @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.wrappers.netrc_wrapper.NetrcWrapper.load', return_value=MockCredentials)
     @patch('conjur.client.Api')
     def test_client_passes_through_whoami_method(self, mock_api_instance, mock_creds,
             mock_api_config):

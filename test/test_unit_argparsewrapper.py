@@ -4,10 +4,9 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 
 # Internals
-from unittest import mock
 from unittest.mock import patch
 
-from conjur.argparse_wrapper import ArgparseWrapper
+from conjur.wrappers.argparse_wrapper import ArgparseWrapper
 
 class ArgparserWrapperTest(unittest.TestCase):
     capture_stream = io.StringIO()
