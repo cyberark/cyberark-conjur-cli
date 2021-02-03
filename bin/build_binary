@@ -4,7 +4,7 @@ BIN_BUILD_CMD="pyinstaller --onefile pkg_bin/conjur"
 
 rm -rf dist/
 
-if [[ "$1" == "-l" ]]; then
+if [[ "$1" = "--local" || "$1" = "-l" ]]; then
   $BIN_BUILD_CMD
   exit 0
 fi

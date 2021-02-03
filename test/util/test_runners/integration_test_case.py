@@ -16,8 +16,9 @@ from unittest.mock import patch, MagicMock
 # Internals
 from conjur.cli import Cli
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
+from test.util import test_helpers as utils
 
-
+MAX_INTERACTIONS_ALLOWED = 5
 class IntegrationTestCaseBase(TestCase):
 
     def __init__(self, testname, client_params: ClientParams = None,
@@ -65,13 +66,23 @@ def invoke_cli_as_code(test_runner, *args, exit_code=0):
                             f"ERROR: CLI returned an unexpected error status code: '{cli_args}'. Output: {capture_stream.getvalue()}")
     return capture_stream.getvalue()
 
-
 def invoke_cli_as_process(test_runner, *args, exit_code=0) -> str:
     """
-    Invoke cli command using cli executable.
-    The usecase of this is when we run the tests
-    on tests environment. will help tests integration
-    on Windows, macOS, RHEL
+    Invoke cli command using CLI executable. This flow is used for when
+    we run our tests in a test environment and will help run our integration
+    tests on Windows, macOS, RHEL.
+    This function raises a Conjur CLI process with test arguments supplied
+    by the user. These inputs are passed to the Conjur process using the
+    process.stdin.write method. Interactive input is provided by
+    "unittest.patch" module defined in the integration tests code. This
+    is not a straightforward operation. Notice two arguments below:
+    1) max_interactions - > we limit the number of interactive command
+    as the "patch" module can sometimes interact infinite number of
+    times example:
+        @patch('builtins.input', return_value='yes')
+    2) interactive_input - raise a prompt with a timeout to initiate
+    interaction with "patch" and retrieve the desired value. Note that
+    the timeout is important in case no input will come from "patch".
     @param test_runner:
     @param args: the cli args input
     @param exit_code:
@@ -79,11 +90,41 @@ def invoke_cli_as_process(test_runner, *args, exit_code=0) -> str:
     """
     cli_args = list(itertools.chain(*args))
     run_cli_cmd = f"{test_runner.environment.cli_to_test}"
-
-    child = sp.Popen([run_cli_cmd] + cli_args, stdout=sp.PIPE)
-    output = child.communicate()[0]
-    process_exit_code = child.returncode
-
-    test_runner.assertEqual(process_exit_code, exit_code,
-                            "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
+    with sp.Popen([run_cli_cmd] + cli_args, stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT) as process:
+        try:
+            # number of max interactions allowed
+            max_interactions = MAX_INTERACTIONS_ALLOWED
+            while process.poll() is None and max_interactions > 0:
+                max_interactions -= 1
+                # timeout must be integer and should be the maximum seconds
+                # waiting for the conjurCli to process an input
+                interactive_input = get_input_if_exist(timeout=1)
+                if interactive_input:
+                    # pass the interactive input into conjurCli process
+                    process.stdin.write(interactive_input)
+                else:
+                    break
+        except Exception as e:
+            print(e)
+        output = process.communicate(timeout=30)[0]
+        process_exit_code = process.returncode
+        test_runner.assertEqual(process_exit_code, exit_code,
+                                "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
     return output.decode('utf-8')
+
+def get_input_if_exist(timeout=0.1):
+    # get the input from the "unittest.patch"
+    def get_input():
+        try:
+            data = input()
+            return data
+        except:
+            # timeout
+            return
+    try:
+        sys_in = utils.run_func_with_timeout(timeout, get_input)
+        if sys_in:
+            return (sys_in + "\n").encode('utf-8')
+        return None
+    except:
+        return None

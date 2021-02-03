@@ -11,15 +11,19 @@ from unittest.mock import patch, MagicMock
 from conjur.cli import Cli
 
 
-def integration_test(original_function):
-    @wraps(original_function)
-    def test_wrapper_func(self, *inner_args, **inner_kwargs):
-        return original_function(self, *inner_args, **inner_kwargs)
+def integration_test(should_run_as_process=False):
+    def function_decorator(original_function):
+        @wraps(original_function)
+        def test_wrapper_func(self, *inner_args, **inner_kwargs):
+            return original_function(self, *inner_args, **inner_kwargs)
 
-    test_wrapper_func.integration = True
+        # supports tests running as a process
+        if should_run_as_process:
+            test_wrapper_func.test_with_process = True
 
-    return test_wrapper_func
-
+        test_wrapper_func.integration = True
+        return test_wrapper_func
+    return function_decorator
 
 def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None,
              policy_change_output={}, whoami_output={}, rotate_api_key_output={}):
