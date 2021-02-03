@@ -24,21 +24,25 @@ from conjur.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.credentials_data import CredentialsData
 from conjur.credentials_from_file import CredentialsFromFile
-from conjur.host import HostController
+from conjur.controllers.host_controller import HostController
+from conjur.controllers.list_controller import ListController
 from conjur.host.host_resource_data import HostResourceData
 from conjur.init import ConjurrcData
-from conjur.list import ListData, ListController
+from conjur.list import ListData
 from conjur.logics.list_logic import ListLogic
 from conjur.logics.login_logic import LoginLogic
 from conjur.logics.logout_logic import LogoutLogic
 from conjur.logics.policy_logic import PolicyLogic
 from conjur.logics.variable_logic import VariableLogic
 from conjur.logics.user_logic import UserLogic
-from conjur.login import LoginController
-from conjur.logout import LogoutController
-from conjur.policy import PolicyData, PolicyController
-from conjur.variable import VariableController, VariableData
-from conjur.user import UserController, UserInputData
+from conjur.controllers.login_controller import LoginController
+from conjur.controllers.logout_controller import LogoutController
+from conjur.controllers.policy_controller import PolicyController
+from conjur.controllers.variable_controller import VariableController
+from conjur.controllers.user_controller import UserController
+from conjur.policy import PolicyData
+from conjur.variable import VariableData
+from conjur.user import UserInputData
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements

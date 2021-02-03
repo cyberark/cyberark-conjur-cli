@@ -17,7 +17,7 @@ from Utils.utils import Utils
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.init.init_controller import InitController
+from conjur.controllers.init_controller import InitController
 from conjur.logics.init_logic import InitLogic
 from conjur.init.conjurrc_data import ConjurrcData
 from conjur.credentials_from_file import CredentialsFromFile
