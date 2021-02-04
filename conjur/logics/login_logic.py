@@ -11,7 +11,7 @@ information to the user's machine
 import logging
 
 # Internals
-from conjur.conjur_api.endpoints import ConjurEndpoint
+from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrappers.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:

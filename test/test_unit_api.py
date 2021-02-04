@@ -4,9 +4,9 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 from conjur.wrappers.http_wrapper import HttpVerb
-from conjur.conjur_api.endpoints import ConjurEndpoint
+from conjur.api.endpoints import ConjurEndpoint
 
-from conjur.conjur_api.conjur_api import ConjurApi
+from conjur.api.api import Api
 
 
 MOCK_RESOURCE_LIST = [
@@ -70,19 +70,19 @@ class ApiTest(unittest.TestCase):
 
     def test_new_client_throws_error_when_no_url(self):
         with self.assertRaises(Exception):
-            ConjurApi(login_id='mylogin', api_key='apikey', ssl_verify=False)
+            Api(login_id='mylogin', api_key='apikey', ssl_verify=False)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_new_client_delegates_ssl_verify_flag(self, mock_http_client):
-        ConjurApi(url='http://localhost', ssl_verify=True).login('myuser', 'mypass')
+        Api(url='http://localhost', ssl_verify=True).login('myuser', 'mypass')
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
                               api_token=False,
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_new_client_overrides_ssl_verify_flag_with_ca_bundle_if_provided(self, mock_http_client):
-        ConjurApi(url='http://localhost', ssl_verify=True,
+        Api(url='http://localhost', ssl_verify=True,
                   ca_bundle='cabundle').login('myuser', 'mypass')
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
@@ -90,9 +90,9 @@ class ApiTest(unittest.TestCase):
                               ssl_verify='cabundle')
 
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_invokes_http_client_correctly(self, mock_http_client):
-        ConjurApi(url='http://localhost').login('myuser', 'mypass')
+        Api(url='http://localhost').login('myuser', 'mypass')
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
                               api_token=False,
@@ -100,39 +100,39 @@ class ApiTest(unittest.TestCase):
 
     def test_login_throws_error_when_username_not_provided(self):
         with self.assertRaises(RuntimeError):
-            ConjurApi(url='http://localhost').login(None, 'mypass')
+            Api(url='http://localhost').login(None, 'mypass')
 
     def test_login_throws_error_when_password_not_provided(self):
         with self.assertRaises(RuntimeError):
-            ConjurApi(url='http://localhost').login('myuser', None)
+            Api(url='http://localhost').login('myuser', None)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_saves_login_id(self, _):
-        api = ConjurApi(url='http://localhost')
+        api = Api(url='http://localhost')
 
         api.login('myuser', 'mypass')
 
         self.assertEquals(api.login_id, 'myuser')
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_missing_fetch_a_new_one(self, mock_http_client):
-        api = ConjurApi(url='http://localhost')
+        api = Api(url='http://localhost')
         api.authenticate = MagicMock(return_value='mytoken')
 
         self.assertEquals(api.api_token, 'mytoken')
         api.authenticate.assert_called_once_with()
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_account_is_empty_throw_an_error(self, mock_http_client):
         empty_values = [ None, "" ]
         for empty_value in empty_values:
             with self.subTest(account=empty_value):
                 with self.assertRaises(RuntimeError):
-                    api = ConjurApi(url='http://localhost', account=empty_value)
+                    api = Api(url='http://localhost', account=empty_value)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_not_expired_dont_fetch_new_one(self, mock_http_client):
-        api = ConjurApi(url='http://localhost')
+        api = Api(url='http://localhost')
         api.authenticate = MagicMock(return_value='mytoken')
 
         token = api.api_token
@@ -140,9 +140,9 @@ class ApiTest(unittest.TestCase):
 
         self.assertEquals(api.api_token, 'mytoken')
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_if_api_token_is_expired_fetch_new_one(self, mock_http_client):
-        api = ConjurApi(url='http://localhost')
+        api = Api(url='http://localhost')
         api.authenticate = MagicMock(return_value='mytoken')
 
         api.api_token
@@ -152,9 +152,9 @@ class ApiTest(unittest.TestCase):
 
         self.assertEquals(api.api_token, 'newtoken')
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_authenticate_invokes_http_client_correctly(self, mock_http_client):
-        ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey').authenticate()
+        Api(url='http://localhost', login_id='mylogin', api_key='apikey').authenticate()
 
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
                               'apikey',
@@ -164,15 +164,15 @@ class ApiTest(unittest.TestCase):
 
     def test_authenticate_throws_error_without_login_id_specified(self):
         with self.assertRaises(RuntimeError):
-            ConjurApi(url='http://localhost', api_key='apikey').authenticate()
+            Api(url='http://localhost', api_key='apikey').authenticate()
 
     def test_authenticate_throws_error_without_api_key_specified(self):
         with self.assertRaises(RuntimeError):
-            ConjurApi(url='http://localhost', login_id='mylogin').authenticate()
+            Api(url='http://localhost', login_id='mylogin').authenticate()
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_account_info_is_passed_down_to_http_call(self, mock_http_client):
-        ConjurApi(url='http://localhost',
+        Api(url='http://localhost',
                   account='myacct',
                   login_id='mylogin',
                   api_key='apikey').authenticate()
@@ -184,9 +184,9 @@ class ApiTest(unittest.TestCase):
                               api_token=False,
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_authenticate_passes_down_ssl_verify_param(self, mock_http_client):
-        ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey',
+        Api(url='http://localhost', login_id='mylogin', api_key='apikey',
                   ssl_verify='verify').authenticate()
 
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.AUTHENTICATE,
@@ -197,9 +197,9 @@ class ApiTest(unittest.TestCase):
 
     # Get variable
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -212,9 +212,9 @@ class ApiTest(unittest.TestCase):
                               query={},
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_with_version_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -227,9 +227,9 @@ class ApiTest(unittest.TestCase):
                               query={'version': '1'},
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_passes_down_ssl_verify_param(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey',
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey',
                         ssl_verify='verify')
         def mock_auth():
             return 'apitoken'
@@ -245,9 +245,9 @@ class ApiTest(unittest.TestCase):
 
     # Set variable
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_set_variable_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -260,9 +260,9 @@ class ApiTest(unittest.TestCase):
                               identifier='myvar',
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_set_variable_passes_down_ssl_verify_param(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey',
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey',
                         ssl_verify='verify')
         def mock_auth():
             return 'apitoken'
@@ -278,9 +278,9 @@ class ApiTest(unittest.TestCase):
 
     # Policy load
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_load_policy_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -296,9 +296,9 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
     def test_load_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -306,9 +306,9 @@ class ApiTest(unittest.TestCase):
         output = api.load_policy_file('mypolicyname', self.POLICY_FILE)
         self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_load_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -326,9 +326,9 @@ class ApiTest(unittest.TestCase):
 
     # Policy replace
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_replace_policy_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -344,9 +344,9 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
     def test_replace_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -354,9 +354,9 @@ class ApiTest(unittest.TestCase):
         output = api.replace_policy_file('mypolicyname', self.POLICY_FILE)
         self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_replace_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -374,9 +374,9 @@ class ApiTest(unittest.TestCase):
 
     # Policy update
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_update_policy_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -392,9 +392,9 @@ class ApiTest(unittest.TestCase):
                               identifier='mypolicyname',
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
     def test_update_policy_converts_returned_data_to_expected_objects(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -402,9 +402,9 @@ class ApiTest(unittest.TestCase):
         output = api.update_policy_file('mypolicyname', self.POLICY_FILE)
         self.assertEqual(output, MOCK_POLICY_CHANGE_OBJECT)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_update_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='ssl_verify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -422,9 +422,9 @@ class ApiTest(unittest.TestCase):
 
     # Get variables
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
     def test_get_variables_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -437,9 +437,9 @@ class ApiTest(unittest.TestCase):
                               },
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(content=MOCK_BATCH_GET_RESPONSE))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(content=MOCK_BATCH_GET_RESPONSE))
     def test_get_variables_converts_returned_data_to_expected_objects(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey', account='myaccount')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', account='myaccount')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -451,9 +451,9 @@ class ApiTest(unittest.TestCase):
                              'bar': 'b',
                          })
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
     def test_get_variables_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='sslverify')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey', ssl_verify='sslverify')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -468,10 +468,10 @@ class ApiTest(unittest.TestCase):
 
     # List resources
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', \
+    @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
     def test_get_resources_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -482,10 +482,10 @@ class ApiTest(unittest.TestCase):
                               query={},
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', \
+    @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
     def test_get_resources_with_constraints_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth
@@ -496,10 +496,10 @@ class ApiTest(unittest.TestCase):
                               query={'limit': 1},
                               ssl_verify=True)
 
-    @patch('conjur.conjur_api.conjur_api.invoke_endpoint', \
+    @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps({})))
     def test_whoami_invokes_http_client_correctly(self, mock_http_client):
-        api = ConjurApi(url='http://localhost', login_id='mylogin', api_key='apikey')
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
         def mock_auth():
             return 'apitoken'
         api.authenticate = mock_auth

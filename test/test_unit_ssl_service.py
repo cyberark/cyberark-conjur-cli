@@ -1,7 +1,7 @@
 import unittest
 from types import SimpleNamespace
 
-from conjur.conjur_api.ssl_client import SSLClient
+from conjur.api.ssl_client import SSLClient
 
 GITHUB_FINGERPRINT = "5F:3F:7A:C2:56:9F:50:A4:66:76:47:C6:A1:8C:A0:07:AA:ED:BB:8E"
 GITHUB_CERT = \

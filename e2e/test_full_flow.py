@@ -31,10 +31,10 @@ def run():
     client = None
     if USE_CONJURRC is True:
         print("Using conjurrc to log in...")
-        client = conjur.ConjurClient(**CONJUR_INFO)
+        client = conjur.Client(**CONJUR_INFO)
     else:
         print("Using username/password combo to log in...")
-        client = conjur.ConjurClient(**CONJUR_INFO, **ACCOUNT_INFO)
+        client = conjur.Client(**CONJUR_INFO, **ACCOUNT_INFO)
 
     expected_value = str(time.time()).encode('utf-8')
     print("Setting var '{}' to '{}'...".format(VARIABLE_PATH, expected_value))

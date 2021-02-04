@@ -13,7 +13,7 @@ import logging
 from datetime import datetime, timedelta
 
 # Internals
-from conjur.conjur_api.endpoints import ConjurEndpoint
+from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrappers.http_wrapper import HttpVerb, invoke_endpoint
 
 
@@ -21,7 +21,7 @@ from conjur.wrappers.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.resource import Resource
 
 
-class ConjurApi():
+class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
     when all the needed arguments and parameters are well-known
