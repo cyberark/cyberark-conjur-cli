@@ -37,7 +37,7 @@ class ConfigException(Exception):
     use these parameters defined in this class to initialize our Python
     SDK in their code.
     """
-class Client():
+class ConjurClient():
     """
     Client
 

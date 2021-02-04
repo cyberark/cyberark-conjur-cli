@@ -20,7 +20,7 @@ import requests
 
 # Internals
 from conjur.wrappers.argparse_wrapper import ArgparseWrapper
-from conjur.client import Client
+from conjur.conjur_api.conjur_client import ConjurClient
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
 from conjur.controllers.host_controller import HostController
 from conjur.controllers.list_controller import ListController
@@ -554,7 +554,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Method that wraps the init call logic
         """
-        Client.initialize(url, name, certificate, force)
+        ConjurClient.initialize(url, name, certificate, force)
 
     @classmethod
     def handle_login_logic(cls, identifier=None, password=None, ssl_verify=True):
@@ -659,7 +659,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
         """
-        Client.setup_logging(Client, args.debug)
+        ConjurClient.setup_logging(ConjurClient, args.debug)
         # pylint: disable=no-else-return
         if resource == 'init':
             Cli.handle_init_logic(args.url, args.name, args.certificate, args.force)
@@ -687,7 +687,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                 sys.stdout.write("Error: You have not logged in\n")
                 Cli.handle_login_logic(ssl_verify=args.ssl_verify)
 
-        client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
+        client = ConjurClient(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
             list_data = ListData(kind=args.kind, inspect=args.inspect,
