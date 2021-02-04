@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 from conjur.wrappers.http_wrapper import HttpVerb
-from conjur.endpoints import ConjurEndpoint
+from conjur.conjur_api.endpoints import ConjurEndpoint
 
 from conjur.api import Api
 

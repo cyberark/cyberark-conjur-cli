@@ -13,7 +13,7 @@ import logging
 from datetime import datetime, timedelta
 
 # Internals
-from conjur.endpoints import ConjurEndpoint
+from conjur.conjur_api.endpoints import ConjurEndpoint
 from conjur.wrappers.http_wrapper import HttpVerb, invoke_endpoint
 
 
