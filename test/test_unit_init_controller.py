@@ -9,12 +9,12 @@ from OpenSSL import SSL
 from conjur.logics.init_logic import InitLogic as InitLogic
 from conjur.controllers.init_controller import InitController as InitController
 from conjur.data_objects.conjurrc_data import ConjurrcData
-from conjur.ssl_service import SSLService
+from conjur.conjur_api.ssl_client import SSLClient
 
 class InitControllerTest(unittest.TestCase):
     capture_stream = io.StringIO()
     conjurrc_data = ConjurrcData()
-    ssl_service = SSLService
+    ssl_service = SSLClient
     init_logic = InitLogic(ssl_service)
     force_overwrite = False
 

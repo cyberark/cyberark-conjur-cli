@@ -1,9 +1,7 @@
-import io
 import unittest
-from contextlib import redirect_stderr
 from types import SimpleNamespace
 
-from conjur.ssl_service import SSLService
+from conjur.conjur_api.ssl_client import SSLClient
 
 GITHUB_FINGERPRINT = "5F:3F:7A:C2:56:9F:50:A4:66:76:47:C6:A1:8C:A0:07:AA:ED:BB:8E"
 GITHUB_CERT = \
@@ -81,7 +79,7 @@ Validates that a socket can be opened with an endpoint
 and a certificate and its fingerprint is returned
 '''
 class SSLServiceTest(unittest.TestCase):
-    ssl_service = SSLService()
+    ssl_service = SSLClient()
 
     def test_service_gets_and_returns_fingerprint_and_certificate(self):
         url = {'hostname': 'github.com', 'port': 443}

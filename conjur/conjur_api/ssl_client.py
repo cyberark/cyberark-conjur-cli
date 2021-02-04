@@ -20,7 +20,7 @@ _conjur_tls_methods = {
 }
 
 # pylint: disable=too-few-public-methods
-class SSLService:
+class SSLClient:
     """
     SSLService
 

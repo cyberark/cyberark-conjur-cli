@@ -22,7 +22,7 @@ from conjur.logics.init_logic import InitLogic
 from conjur.data_objects.conjurrc_data import ConjurrcData
 from conjur.wrappers.netrc_wrapper import NetrcWrapper
 from conjur.resource import Resource
-from conjur.ssl_service import SSLService
+from conjur.conjur_api.ssl_client import SSLClient
 
 class ConfigException(Exception):
     """
@@ -150,7 +150,7 @@ class Client():
         """
         Initializes the client, creating the .conjurrc file
         """
-        ssl_service = SSLService()
+        ssl_service = SSLClient()
 
         conjurrc_data = ConjurrcData(url,
                                      account,
