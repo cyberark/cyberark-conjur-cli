@@ -21,7 +21,7 @@ from conjur.wrappers.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.resource import Resource
 
 
-class Api():
+class ConjurApi():
     """
     This module provides a high-level programmatic access to the HTTP API
     when all the needed arguments and parameters are well-known
