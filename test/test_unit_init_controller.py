@@ -6,9 +6,9 @@ from unittest.mock import patch, MagicMock
 import OpenSSL
 from OpenSSL import SSL
 
-from conjur.logics.init_logic import InitLogic as InitLogic
-from conjur.controllers.init_controller import InitController as InitController
-from conjur.data_objects.conjurrc_data import ConjurrcData
+from conjur.logic.init_logic import InitLogic as InitLogic
+from conjur.controller.init_controller import InitController as InitController
+from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.api.ssl_client import SSLClient
 
 class InitControllerTest(unittest.TestCase):
@@ -82,7 +82,7 @@ class InitControllerTest(unittest.TestCase):
         assert self.conjurrc_data.cert_file == "/some/path/somepem.pem"
         self.assertEquals(fetched_certificate, None)
 
-    @patch('conjur.logics.init_logic')
+    @patch('conjur.logic.init_logic')
     def test_user_supplies_cert_writes_to_file_not_called(self, mock_init_logic):
         InitController.write_certificate(self, "https://some/cert/path")
         mock_init_logic.write_certificate_to_file.assert_not_called()
@@ -94,7 +94,7 @@ class InitControllerTest(unittest.TestCase):
     '''
     # The certificate file exists and the CLI prompts
     # if the user wants to overwrite
-    @patch('conjur.logics.init_logic')
+    @patch('conjur.logic.init_logic')
     @patch('builtins.input', return_value='yes')
     def test_user_confirms_force_overwrites_writes_cert_to_file(self, mock_input, mock_init_logic):
         with redirect_stdout(self.capture_stream):
@@ -116,7 +116,7 @@ class InitControllerTest(unittest.TestCase):
     '''
     # The conjurrc file exists and the CLI prompts
     # if the user wants to overwrite
-    @patch('conjur.logics.init_logic')
+    @patch('conjur.logic.init_logic')
     @patch('builtins.input', return_value='yes')
     def test_user_confirms_force_overwrites_writes_conjurrc_to_file(self, mock_input, mock_init_logic):
         with redirect_stdout(self.capture_stream):

@@ -17,12 +17,13 @@ from Utils.utils import Utils
 from conjur.api.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.controllers.init_controller import InitController
-from conjur.logics.init_logic import InitLogic
-from conjur.data_objects.conjurrc_data import ConjurrcData
+from conjur.controller.init_controller import InitController
+from conjur.logic.init_logic import InitLogic
+from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.wrappers.netrc_wrapper import NetrcWrapper
 from conjur.resource import Resource
 from conjur.api.ssl_client import SSLClient
+
 
 class ConfigException(Exception):
     """
@@ -37,6 +38,8 @@ class ConfigException(Exception):
     use these parameters defined in this class to initialize our Python
     SDK in their code.
     """
+
+
 class Client():
     """
     Client
@@ -105,15 +108,15 @@ class Client():
         if api_key:
             logging.debug("Using API key from parameters...")
             self._api = Api(api_key=api_key,
-                                  http_debug=http_debug,
-                                  login_id=login_id,
-                                  ssl_verify=ssl_verify,
-                                  **loaded_config)
+                            http_debug=http_debug,
+                            login_id=login_id,
+                            ssl_verify=ssl_verify,
+                            **loaded_config)
         elif password:
             logging.debug("Creating API key with login ID/password combo...")
             self._api = Api(http_debug=http_debug,
-                                  ssl_verify=ssl_verify,
-                                  **loaded_config)
+                            ssl_verify=ssl_verify,
+                            **loaded_config)
             self._api.login(login_id, password)
         else:
             try:
@@ -127,10 +130,10 @@ class Client():
                 raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again.") from exception
 
             self._api = Api(http_debug=http_debug,
-                                  ssl_verify=ssl_verify,
-                                  login_id=loaded_netrc['login_id'],
-                                  api_key=loaded_netrc['api_key'],
-                                  **loaded_config)
+                            ssl_verify=ssl_verify,
+                            login_id=loaded_netrc['login_id'],
+                            api_key=loaded_netrc['api_key'],
+                            **loaded_config)
 
         logging.debug("Client initialized")
 

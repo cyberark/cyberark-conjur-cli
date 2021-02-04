@@ -27,7 +27,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Update version from 0.x.x to 7.0.0 to prep for the GA release
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
-- Directory Structure Changed [dir changes](https://github.com/cyberark/conjur-api-python3/blob/design/general-refactorings/design/general_refactorings.md#organize-directory-structure)
+- Directory structure has been changed. See [design document](https://github.com/cyberark/conjur-api-python3/blob/design/general-refactorings/design/general_refactorings.md#organize-directory-structure) for more details.
+  Users that import `Api` and `Client` should change their import statement to  api dir now to the import.
+  For example someone who import `conjur.client import Client` will change it to `from conjur.api.client import Client`
+  [cyberark/conjur-api-python3#121](https://github.com/cyberark/conjur-api-python3/issues/121)
 
 ## [0.1.1] - 2020-11-05
 

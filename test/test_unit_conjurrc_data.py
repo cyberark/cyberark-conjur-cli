@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.data_objects.conjurrc_data import ConjurrcData
+from conjur.data_object.conjurrc_data import ConjurrcData
 
 EXPECTED_REP_OBJECT={'appliance_url': 'https://someurl', 'account': 'someaccount', 'cert_file': "/some/cert/path", 'plugins': []}
 

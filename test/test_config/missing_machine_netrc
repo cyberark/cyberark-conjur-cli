@@ -4,4 +4,4 @@ machine https://randommachine/
 
 machine https://anotherrandommachine
   login someadmin
-  password Apikey
+  password conjurapikey

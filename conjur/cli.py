@@ -22,27 +22,27 @@ import requests
 from conjur.wrappers.argparse_wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
-from conjur.controllers.host_controller import HostController
-from conjur.controllers.list_controller import ListController
-from conjur.controllers.login_controller import LoginController
-from conjur.controllers.logout_controller import LogoutController
-from conjur.controllers.policy_controller import PolicyController
-from conjur.controllers.user_controller import UserController
-from conjur.controllers.variable_controller import VariableController
+from conjur.controller.host_controller import HostController
+from conjur.controller.list_controller import ListController
+from conjur.controller.login_controller import LoginController
+from conjur.controller.logout_controller import LogoutController
+from conjur.controller.policy_controller import PolicyController
+from conjur.controller.user_controller import UserController
+from conjur.controller.variable_controller import VariableController
 from conjur.wrappers.netrc_wrapper import NetrcWrapper
-from conjur.data_objects.conjurrc_data import ConjurrcData
-from conjur.data_objects.credentials_data import CredentialsData
-from conjur.data_objects.host_resource_data import HostResourceData
-from conjur.data_objects.list_data import ListData
-from conjur.data_objects.policy_data import PolicyData
-from conjur.data_objects.user_input_data import UserInputData
-from conjur.data_objects.variable_data import VariableData
-from conjur.logics.list_logic import ListLogic
-from conjur.logics.login_logic import LoginLogic
-from conjur.logics.logout_logic import LogoutLogic
-from conjur.logics.policy_logic import PolicyLogic
-from conjur.logics.user_logic import UserLogic
-from conjur.logics.variable_logic import VariableLogic
+from conjur.data_object.conjurrc_data import ConjurrcData
+from conjur.data_object.credentials_data import CredentialsData
+from conjur.data_object.host_resource_data import HostResourceData
+from conjur.data_object.list_data import ListData
+from conjur.data_object.policy_data import PolicyData
+from conjur.data_object.user_input_data import UserInputData
+from conjur.data_object.variable_data import VariableData
+from conjur.logic.list_logic import ListLogic
+from conjur.logic.login_logic import LoginLogic
+from conjur.logic.logout_logic import LogoutLogic
+from conjur.logic.policy_logic import PolicyLogic
+from conjur.logic.user_logic import UserLogic
+from conjur.logic.variable_logic import VariableLogic
 from conjur.version import __version__
 
 # pylint: disable=too-many-statements
