@@ -52,11 +52,11 @@ I recommend that we organize the files by their types and not by the commands th
 
 | Directory Name | Purpose                                                      |
 | :------------- | :----------------------------------------------------------- |
-| utils          | wrappers and utils of diffrent python libs :  arg_parse_wrapper, http_wrapper |
-| api            | files that talk directly with conjur. For Example   `conjur_client.py (conjur.py) , conjur_api.py (api.py), ssl_client.py (ssl_service)` |
-| logics         | all logic classes                                            |
-| controllers    | all controller classes                                       |
-| logics         | all logic classes                                            |
+| wrappers       | wrappers and utils of diffrent python libs :  arg_parse_wrapper, http_wrapper |
+| conjur_api     | files that talk directly with conjur. For Example   `conjur_client.py (conjur.py) , conjur_api.py (api.py), ssl_client.py (ssl_service)` |
+| logic          | all logic classes                                            |
+| controller     | all controller classes                                       |
+| logic          | all logic classes                                            |
 | data_objects   | all data objects classes                                     |
 
 
