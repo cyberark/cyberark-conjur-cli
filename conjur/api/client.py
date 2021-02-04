@@ -20,7 +20,7 @@ from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controller.init_controller import InitController
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.wrappers.netrc_wrapper import NetrcWrapper
+from conjur.logic.credentials_from_file import CredentialsFromFile
 from conjur.resource import Resource
 from conjur.api.ssl_client import SSLClient
 
@@ -38,8 +38,6 @@ class ConfigException(Exception):
     use these parameters defined in this class to initialize our Python
     SDK in their code.
     """
-
-
 class Client():
     """
     Client
@@ -120,7 +118,7 @@ class Client():
             self._api.login(login_id, password)
         else:
             try:
-                credentials = NetrcWrapper(DEFAULT_NETRC_FILE)
+                credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
                 loaded_netrc = credentials.load(loaded_config['url'])
             except netrc.NetrcParseError as netrc_error:
                 raise Exception("Error: netrc is in an invalid format. "

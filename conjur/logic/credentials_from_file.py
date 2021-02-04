@@ -16,12 +16,15 @@ import stat
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE
 
-class NetrcWrapper:
+
+# TODO: Break this class to reader and writer classes and divide each one to generic class for read/write and  class for netrc that inherits it.
+class CredentialsFromFile:
     """
     CredentialsFromFile
 
     This class holds logic when credentials are kept in the netrc
     """
+
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
         self.netrc_path = netrc_path
 
@@ -113,4 +116,4 @@ class NetrcWrapper:
                     ret += '\n'
                 ret += entry + '\n'
 
-            netrc_file.write(ret.replace('\t' ,''))
+            netrc_file.write(ret.replace('\t', ''))

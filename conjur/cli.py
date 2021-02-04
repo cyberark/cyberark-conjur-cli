@@ -29,7 +29,7 @@ from conjur.controller.logout_controller import LogoutController
 from conjur.controller.policy_controller import PolicyController
 from conjur.controller.user_controller import UserController
 from conjur.controller.variable_controller import VariableController
-from conjur.wrappers.netrc_wrapper import NetrcWrapper
+from conjur.logic.credentials_from_file import CredentialsFromFile
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.data_object.credentials_data import CredentialsData
 from conjur.data_object.host_resource_data import HostResourceData
@@ -562,7 +562,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Method that wraps the login call logic
         """
         credential_data = CredentialsData(login=identifier)
-        credentials = NetrcWrapper(netrc_path=DEFAULT_NETRC_FILE)
+        credentials = CredentialsFromFile(netrc_path=DEFAULT_NETRC_FILE)
         login_logic = LoginLogic(credentials)
         login_controller = LoginController(ssl_verify=ssl_verify,
                                            user_password=password,
@@ -575,7 +575,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Method that wraps the logout call logic
         """
-        credentials = NetrcWrapper(DEFAULT_NETRC_FILE)
+        credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
         logout_logic = LogoutLogic(credentials)
 
         logout_controller = LogoutController(ssl_verify=ssl_verify,
@@ -626,7 +626,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Method that wraps the user call logic
         """
-        credentials = NetrcWrapper()
+        credentials = CredentialsFromFile()
         user_logic = UserLogic(ConjurrcData, credentials, client)
         if args.action == 'rotate-api-key':
             user_input_data = UserInputData(action=args.action,
