@@ -81,7 +81,7 @@ To start using Conjur with your environment, you must first initialize the confi
         """
         This method builds the footer for each command help screen.
         """
-        refer_to_help = "See more details in each subcommand’s help:"
+        refer_to_help = "See more details in each subcommand's help:"
         if subcommands:
             res = ""
             for subcommand in subcommands:
@@ -295,11 +295,14 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
                                                              formatter_class=formatter_class)
-        replace_policy_parser.add_argument('-f', '--file', required=True, metavar='VALUE',
+
+        replace_options = replace_policy_parser.add_argument_group(title=self.title("Options"))
+
+        replace_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                            help='Provide policy file name')
-        replace_policy_parser.add_argument('-b', '--branch', required=True, metavar='VALUE',
+        replace_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                            help='Provide the policy branch name')
-        replace_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+        replace_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         policy_update_name = 'update - Update existing resources in policy or create new resources'
         policy_update_usage = 'conjur [global options] policy update [options] [args]'
@@ -311,11 +314,13 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                             usage=argparse.SUPPRESS,
                                                             add_help=False,
                                                             formatter_class=formatter_class)
-        update_policy_parser.add_argument('-f', '--file', required=True, metavar='VALUE',
+        replace_options = update_policy_parser.add_argument_group(title=self.title("Options"))
+
+        replace_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                           help='Provide policy file name')
-        update_policy_parser.add_argument('-b', '--branch', required=True, metavar='VALUE',
+        replace_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                           help='Provide the policy branch name')
-        update_policy_parser.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+        replace_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         policy_options = policy_subparser.add_argument_group(title=self.title("Options"))
         policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
@@ -373,7 +378,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                           formatter_class=formatter_class)
 
         user_change_password_options = user_change_password.add_argument_group(title=self.title("Options"))
-        user_change_password_options.add_argument('-p', '--password',
+        user_change_password_options.add_argument('-p', '--password', metavar='VALUE',
                                           help='Provide the new password for the logged-in user')
         user_change_password_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
@@ -394,7 +399,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                      add_help=False,
                                                      formatter_class=formatter_class)
         host_subparsers = host_subparser.add_subparsers(dest='action', title=self.title("Subcommands"))
-        host_rotate_api_key_name = 'rotate-api-key - Rotate a host’s API key'
+        host_rotate_api_key_name = 'rotate-api-key - Rotate a host\'s API key'
         host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
                                                                 help='Rotate a host\'s API key',

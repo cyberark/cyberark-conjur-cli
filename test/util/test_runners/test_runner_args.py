@@ -30,7 +30,7 @@ class TestRunnerArgs:
         self.test_name_identifier = test_name_identifier
         # Tests
         if invoke_cli_as_process and test_name_identifier == 'integration':
-            self.test_name_identifier = "test_with_process"
+            self.test_name_identifier = "test-with-process"
         self.invoke_cli_as_process = invoke_cli_as_process
         self.cli_to_test = cli_to_test
         self.files_folder = files_folder
