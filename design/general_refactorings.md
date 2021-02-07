@@ -80,8 +80,8 @@ Improve our error handling to catch our own Conjur-CLI/SDK specific objects and 
 
 ##### Current state
 
-In the codebase, there are general errors that are not representative of the actual error that took place. The exceptions are not documented in the function documentation in the code.
-For example, in the following `get_certificate` function, general Exception is being raised if anything goes wrong during the certificate retrieval operation.
+In the codebase, there are general errors that are not representative of the actual error that took place. The exceptions are not in doctoring of the function  in the code.
+For example of not representative exception without the docstring please take a look  in the following `get_certificate` function, where general Exception  is being raised if anything goes wrong during the certificate retrieval operation.
 
 ```python
 def get_certificate(self, hostname, port):
@@ -102,7 +102,7 @@ def get_certificate(self, hostname, port):
 
 ##### Recommendation
 
-Map current error and exception handling and create Conjur-specific exceptions. In addition to add the new Exception object to the function documentation. The code block above should be:
+Map current error and exception handling and create Conjur-specific exceptions. In addition to add the new Exception object to the function docstring. The code block above should be:
 
 ```python
     def get_certificate(self, hostname, port):
@@ -130,7 +130,7 @@ Map current error and exception handling and create Conjur-specific exceptions. 
 
 ##### Proposal
 
-Strong-type all parameters and function return types as per Python3 best practices
+Strong-type all parameters and function return types as per Python3 best practices.
 
 ##### Current state
 
@@ -178,9 +178,9 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
 * api.py
 
-  * `def __init__()` - There are a few places that raise similar exceptions. `RuntimeError` can be replaced with `MissingParameterException`
+  * `def __init__()` 
 
-    * Missing Account Name
+    * `RuntimeError` can be replaced with `MissingParameterException`
 
       ```python
       self._account = account
@@ -188,7 +188,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
           raise RuntimeError("Account cannot be empty!")
       ```
 
-    * Missing Url
+    * `RuntimeError` can be replaced with `MissingParameterException`
 
       * ```python
         self._account = account
@@ -196,9 +196,9 @@ The following is a mapping of builtin and third-party exceptions that are curren
             raise RuntimeError("Account cannot be empty!")
         ```
 
-  * `def login()` - `RuntimeError` can be replaced with `MissingParameterException`
+  * `def login()`
 
-    * login id or password are missing 
+    * `RuntimeError` can be replaced with `MissingParameterException`
 
       ```python
       if not login_id or not password:
@@ -208,7 +208,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
   * `def authenticate()`
 
-    * login id or password are missing 
+    * RuntimeError` can be replaced with `MissingParameterException`
 
       * ```python
         if not self.login_id or not self.api_key:
@@ -326,8 +326,13 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     * `Exception` should be replaced with `FailedToRetrieveCertificateException` 
 
-    * Errors that can be thrown in `get_certificate` should be evaluated and addressed.
+    *  These error can be thrown from `ssl_service.get_certificate` :
     
+      * TIMEOUT_ERROR when connection to server fails
+      * `socket.gaierror` when there is no such dns address.
+      
+      
+      
       ```python
       try:
           fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
