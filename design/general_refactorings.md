@@ -1,25 +1,34 @@
 ## CLI Refactor
 
-
-The purpose of this document is to outline the parts of the Python CLI/SDK code that we would like to refactor as well as provide a design for each point. Through this refactor, we hope that the code will be more readable, and easier to contribute to and maintain.
-
+The purpose of this document is to outline the parts of the Python CLI/SDK code that we would like to refactor as well as provide a design for each point. Through this refactor, for each item we hope that the code will be more readable and easier to contribute to and maintain.
 
 
-### Improve Naming
+
+### TOC
 
 ------
 
-##### Proposal
+- [CLI Refactor](#cli-refactor)
+  * [Organize directory structure](#organize-directory-structure)
+      - [Proposal](#proposal)
+      - [Current State](#current-state)
+      - [Recommendation](#recommendation)
+  * [Improve Error Handling](#improve-error-handling)
+      - [Proposal](#proposal-1)
+      - [Current state](#current-state)
+      - [Recommendation](#recommendation-1)
+  * [Strong-type function parameters and return types](#strong-type-function-parameters-and-return-types)
+      - [Proposal](#proposal-2)
+      - [Current state](#current-state-1)
+      - [Recommendation](#recommendation-2)
+  * [Explicit Import Statements](#explicit-import-statements)
+      - [Proposal](#proposal-3)
+      - [Current state](#current-state-2)
+      - [Recommendation](#recommendation-3)
+- [APPENDIX](#appendix)
+  * [APPENDIX 1: Error Handling](#appendix-1--error-handling)
 
-Review the names of files, functions.. and rename them to more readable names.
-
-##### Current State
-
-Not all the names are clear now. For example with `class Resource` it is hard to understand which resource we mean.
-
-##### Recommendation
-
-Go over all naming in the code and rename when need. If we rename  `class Resource` to `class ConjurResource` developer who is reading the code will understand we are referencing a specific resource, a Conjur resource. The same applies for the names of files in the repository.
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ### Organize directory structure
 
@@ -44,20 +53,20 @@ Currently, the directory structure resembles the following
 | user           | files related to user command     |
 | variable       | files related to variable command |
 
-The following files are without parent directory : api.py, client.py, argparse_wrapper.py, cli.py , client.py, config.py, constants.py, credentials_data.py, credentials_form_file.py, endpoint.py, errors.py, http_wrapper.py, resource.py, ssl_service.py, version.py
+The following files are without parent directories: api.py, client.py, argparse_wrapper.py, cli.py , client.py, config.py, constants.py, credentials_data.py, credentials_form_file.py, endpoint.py, errors.py, http_wrapper.py, resource.py, ssl_service.py, version.py
 
 ##### Recommendation
 
-I recommend that we organize the files by their types and not by the commands they represent.
+The files need to be organized by their types and not by the commands they represent.
 
 | Directory Name | Purpose                                                      |
 | :------------- | :----------------------------------------------------------- |
-| wrappers       | wrappers and utils of diffrent python libs :  arg_parse_wrapper, http_wrapper |
-| conjur_api     | files that talk directly with conjur. For Example   `conjur_client.py (conjur.py) , conjur_api.py (api.py), ssl_client.py (ssl_service)` |
-| logic          | all logic classes                                            |
-| controller     | all controller classes                                       |
-| logic          | all logic classes                                            |
-| data_objects   | all data objects classes                                     |
+| wrappers       | Wrappers and utils of different Python libraries:  arg_parse_wrapper, http_wrapper |
+| conjur_api     | Files that communicate directly with Conjur. For example,   `client.py , api.py, ssl_client.py (ssl_service)` |
+| logic          | All logic classes                                            |
+| controller     | All controller classes                                       |
+| logic          | All logic classes                                            |
+| data_objects   | All data objects classes                                     |
 
 
 
@@ -67,12 +76,12 @@ I recommend that we organize the files by their types and not by the commands th
 
 ##### Proposal
 
-This will help to better under the error handling flow. This will allow us to catch our own object and not general exceptions that do not proper helpful information to the end user. All Conjur CLI/SDK-specific exceptions should be documented in the funtions that call them.
+Improve our error handling to catch our own Conjur-CLI/SDK specific objects and not general exceptions that do not proper helpful information to the end user.
 
 ##### Current state
 
-Through the codebase, we have general errors that are not representative of the actual error that took place. The exception is not documented in the fucntion documentation in the code.
-For example, in the following `get_certificate` function, we raise a general exception if anything goes wrong during the certificate retrieval operation.
+In the codebase, there are general errors that are not representative of the actual error that took place. The exceptions are not documented in the function documentation in the code.
+For example, in the following `get_certificate` function, general Exception is being raised if anything goes wrong during the certificate retrieval operation.
 
 ```python
 def get_certificate(self, hostname, port):
@@ -91,17 +100,15 @@ def get_certificate(self, hostname, port):
     return fingerprint, readable_certificate
 ```
 
-We raise Exception if anything happens in certificate retrivial.
-
 ##### Recommendation
 
-Map current error and exception handling and create Conjur-specific exceptions. The code block above should be:
+Map current error and exception handling and create Conjur-specific exceptions. In addition to add the new Exception object to the function documentation. The code block above should be:
 
 ```python
     def get_certificate(self, hostname, port):
         """
         Method for connecting to Conjur to fetch the certificate chain
-        :raises CertificateRetrivialFailed when certificate retrivial failes
+        :raises CertificateRetrievalFails when certificate retrivial failes
         """
         if port is None:
             port = DEFAULT_PORT
@@ -115,7 +122,7 @@ Map current error and exception handling and create Conjur-specific exceptions. 
         return fingerprint, readable_certificate
 ```
 
-Appendinx 1 lists the error handling cases where fixes need to be done.
+[APPENDIX 1](#appendix) lists the error handling cases where fixes need to be done.
 
 ------
 
@@ -133,7 +140,7 @@ For example, `def get_variable(self, variable_data):`
 
 ##### Recommendation
 
-Strongly Type the function so it will resemble `def get_variable(self, variable_data : VariableData) -> str:`"
+Strong type functions so they will resemble `def get_variable(self, variable_data : VariableData) -> str:`"
 
 ------
 
@@ -141,11 +148,11 @@ Strongly Type the function so it will resemble `def get_variable(self, variable_
 
 ##### Proposal
 
-Make sure all import statement is explicit and contains full path. Explicit paths makes it easier to tell exactly what the imported resource is and where it is. Additionally, absolute imports remain valid even if the location of the imported resources changes.
+Make sure all import statements are explicit and contains full path. Explicit paths make it easier to tell exactly what the imported resource is and which module it is apart of. Additionally, absolute imports remain valid even if the location of the imported resources changes.
 
 ##### Current state
 
-The codebase contains implicit import statements
+The codebase contains implicit import statements.
 
 ```python
 from .client import Client
@@ -167,7 +174,7 @@ from conjur.client import Client
 
 ------
 
-The following is a mapping of builtin and third-party exceptions that are currently raised in Conjur. In this document, I will provide suggestions for Conjur CLI/SDK-specific exceptions we should use instead.
+The following is a mapping of builtin and third-party exceptions that are currently raised in Conjur CLI. In this document, We will provide suggestions for Conjur CLI/SDK-specific exceptions  should being used instead.
 
 * api.py
 
@@ -234,7 +241,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
         raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again.") from exception
     ```
 
-    * `raise Exception` should be replaced with `raise CredentialsParseException`
+    * `raise Exception` should be replaced with `raise ParsingCredentialsException`
     * `raise RuntimeError` should be replaced with `raise AuthenticationFailedException`
 
     
@@ -267,7 +274,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
           raise RuntimeError("Error: URL is required")
       ```
 
-    * `RuntimeError` should be replaced with `InvalidURLException`
+    * `RuntimeError` should be replaced with `InvalidURLFormatException`
 
       ```python
       if url.scheme != 'https':
@@ -319,6 +326,8 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     * `Exception` should be replaced with `FailedToRetrieveCertificateException` 
 
+    * Errors that can be thrown in `get_certificate` should be evaluated and addressed.
+    
       ```python
       try:
           fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
@@ -343,7 +352,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
   * `def get_api_key()`
 
-    * `RuntimeError` should be replaced with `AuthenticationException`
+    * `RuntimeError` should be replaced with `AuthenticationFailedException`
 
       ```python
       try:
