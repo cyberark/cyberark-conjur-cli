@@ -29,7 +29,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
 - Directory structure has been changed. See [design document](https://github.com/cyberark/conjur-api-python3/blob/design/general-refactorings/design/general_refactorings.md#organize-directory-structure) for more details.
   Users that import `Api` and `Client` should change their import statement to  api dir now to the import.
-  For example someone who import `conjur.client import Client` will change it to `from conjur.api.client import Client`
+  This is a breaking change. Users who import the SDK in their projects should change their import statement from 
+  `conjur.client import Client` will change it to `from conjur.api.client import Client`
   [cyberark/conjur-api-python3#121](https://github.com/cyberark/conjur-api-python3/issues/121)
 
 ## [0.1.1] - 2020-11-05

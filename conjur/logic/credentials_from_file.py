@@ -17,7 +17,6 @@ import stat
 from conjur.constants import DEFAULT_NETRC_FILE
 
 
-# TODO: Break this class to reader and writer classes and divide each one to generic class for read/write and  class for netrc that inherits it.
 class CredentialsFromFile:
     """
     CredentialsFromFile
