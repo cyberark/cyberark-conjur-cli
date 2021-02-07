@@ -30,10 +30,9 @@ class UserLogicTest(unittest.TestCase):
         mock_credentials_from_store = None
         mock_client = None
         user_logic = UserLogic(mock_conjurrc_data, mock_credentials_from_store, mock_client)
-
-        assert user_logic.conjurrc_data == mock_conjurrc_data
-        assert user_logic.credentials_from_store == mock_credentials_from_store
-        assert user_logic.client == mock_client
+        self.assertEquals(user_logic.conjurrc_data, mock_conjurrc_data)
+        self.assertEquals(user_logic.credentials_from_store, mock_credentials_from_store)
+        self.assertEquals(user_logic.client, mock_client)
 
     '''
     Validate that if user doesn't provide username, rotate_other_api_key will be called once with proper params
@@ -63,15 +62,14 @@ class UserLogicTest(unittest.TestCase):
             mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
             mock_user_logic.client.change_personal_password = MagicMock(return_value='success!')
             resource_to_update, _ = mock_user_logic.change_personal_password('someNewPassword')
-            assert resource_to_update == 'someuser'
+            self.assertEquals(resource_to_update, 'someuser')
 
     @patch('conjur.init.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_extract_credentials_from_store_returns_netrc_store(self, mock_conjurrc):
         mock_user_logic = UserLogic(self.conjurrc_data, self.credentials_from_store, self.client)
         mock_user_logic.credentials_from_store.load=MagicMock(return_value=CONJURRC_DICT)
         mock_user_logic.extract_credentials_from_credential_store()
-
-        assert mock_user_logic.extract_credentials_from_credential_store() == CONJURRC_DICT
+        self.assertEquals(mock_user_logic.extract_credentials_from_credential_store(), CONJURRC_DICT)
 
     '''
     Validates that a rotated API key for another user can be returned
@@ -81,8 +79,7 @@ class UserLogicTest(unittest.TestCase):
         client = MagicMock(return_value=None)
         mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
         mock_user_logic.client.rotate_other_api_key = MagicMock(return_value=new_api_key)
-
-        assert mock_user_logic.rotate_other_api_key('someuser') == new_api_key
+        self.assertEquals(mock_user_logic.rotate_other_api_key('someuser'), new_api_key)
 
     '''
     Validates that a new personal API key can be returned
@@ -93,8 +90,7 @@ class UserLogicTest(unittest.TestCase):
         mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
         mock_user_logic.client.rotate_personal_api_key = MagicMock(return_value=new_api_key)
         mock_user_logic.update_api_key_in_credential_store = MagicMock(return_value='someupdatedstore!')
-
-        assert mock_user_logic.rotate_personal_api_key('someuser', 'somecreds', 'somepass') == new_api_key
+        self.assertEquals(mock_user_logic.rotate_personal_api_key('someuser', 'somecreds', 'somepass'), new_api_key)
 
     '''
     Raises exception when HTTPError was raised
@@ -122,6 +118,5 @@ class UserLogicTest(unittest.TestCase):
     def test_update_entry_was_called(self):
         CredentialsFromFile.update_api_key_entry = MagicMock()
         mock_user_logic = UserLogic(self.conjurrc_data, self.credentials_from_store, self.client)
-
         mock_user_logic.update_api_key_in_credential_store('some_user_to_update', 'loaded_creds', 'someapikey')
         CredentialsFromFile.update_api_key_entry.assert_called_once_with('some_user_to_update', 'loaded_creds', 'someapikey')

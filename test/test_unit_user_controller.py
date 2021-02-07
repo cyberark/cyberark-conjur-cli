@@ -28,8 +28,7 @@ class UserControllerTest(unittest.TestCase):
     def test_change_password_can_raise_authn_error(self):
         # mock the status code of the error received
         mock_response = MagicMock()
-        mock_response.status_code=401
-
+        mock_response.status_code = 401
         mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
@@ -40,8 +39,7 @@ class UserControllerTest(unittest.TestCase):
     def test_change_password_can_raise_invalid_complexity_error(self):
         # mock the status code of the error received
         mock_response = MagicMock()
-        mock_response.status_code=422
-
+        mock_response.status_code = 422
         mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
@@ -59,7 +57,6 @@ class UserControllerTest(unittest.TestCase):
         with patch('getpass.getpass', return_value='somepass'):
             user_controller.check_password_validity = MagicMock()
             user_controller.prompt_for_password()
-
             self.assertEquals(mock_user_data.new_password, 'somepass')
             user_controller.check_password_validity.assert_called_once()
 

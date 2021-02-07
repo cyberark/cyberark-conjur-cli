@@ -16,9 +16,8 @@ class LogoutControllerTest(unittest.TestCase):
         mock_ssl_verify = True
         mock_logout_logic = None
         mock_logout_controller = LogoutController(mock_ssl_verify, mock_logout_logic)
-
-        assert mock_logout_controller.ssl_verify == mock_ssl_verify
-        assert mock_logout_controller.logout_logic == mock_logout_logic
+        self.assertEquals(mock_logout_controller.ssl_verify, mock_ssl_verify)
+        self.assertEquals(mock_logout_controller.logout_logic, mock_logout_logic)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)

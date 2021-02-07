@@ -16,7 +16,6 @@ class PolicyControllerTest(unittest.TestCase):
         mock_policy_logic = PolicyLogic(client)
         mock_policy_controller = PolicyController(mock_policy_logic, "somedata")
         mock_policy_logic.run_action = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
-
         with self.assertRaises(conjur.errors.InvalidFormatException):
             mock_policy_controller.load()
 
@@ -27,6 +26,5 @@ class PolicyControllerTest(unittest.TestCase):
         mock_policy_logic = PolicyLogic(client)
         mock_policy_controller = PolicyController(mock_policy_logic, "somedata")
         mock_policy_logic.run_action = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
-
         with self.assertRaises(requests.exceptions.HTTPError):
             mock_policy_controller.load()

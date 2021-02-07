@@ -23,7 +23,6 @@ class InitControllerTest(unittest.TestCase):
         mock_init_logic = None
         mock_force = False
         InitController(mock_conjurrc_data, mock_init_logic, mock_force)
-
         assert InitController.conjurrc_data == mock_conjurrc_data
         assert InitController.init_logic == mock_init_logic
         assert InitController.force_overwrite == mock_force
@@ -51,7 +50,6 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', side_effect=['no'])
     def test_init_not_trusting_cert_raises_error(self, mock_input):
         self.conjurrc_data.appliance_url = 'https://someurl'
-
         ctx = SSL.Context(method=SSL.TLSv1_2_METHOD)
         sock = OpenSSL.SSL.Connection(ctx)
         self.init_logic.connect = MagicMock(return_value = sock)
@@ -78,7 +76,6 @@ class InitControllerTest(unittest.TestCase):
         self.conjurrc_data.cert_file = "/some/path/somepem.pem"
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite)
         fetched_certificate = init_controller.get_server_certificate()
-
         assert self.conjurrc_data.cert_file == "/some/path/somepem.pem"
         self.assertEquals(fetched_certificate, None)
 
@@ -100,7 +97,6 @@ class InitControllerTest(unittest.TestCase):
         with redirect_stdout(self.capture_stream):
             self.conjurrc_data.appliance_url = "https://someurl"
             init_controller = InitController(self.conjurrc_data, mock_init_logic, False)
-
             # Mock that a certificate file already exists
             mock_init_logic.write_certificate_to_file.return_value = False
             init_controller.write_certificate('some_cert')
@@ -122,11 +118,9 @@ class InitControllerTest(unittest.TestCase):
         with redirect_stdout(self.capture_stream):
             self.conjurrc_data.appliance_url = "https://someurl"
             init_controller = InitController(self.conjurrc_data, mock_init_logic, False)
-
             # Mock that a conjurrc file already exists
             mock_init_logic.write_conjurrc.return_value = False
             init_controller.write_conjurrc()
-
             self.assertRegex(self.capture_stream.getvalue(), "Configuration written to")
             mock_init_logic.write_conjurrc.assert_called_with('/root/.conjurrc',self.conjurrc_data, True)
             self.assertEquals(mock_init_logic.write_conjurrc.call_count, 2)

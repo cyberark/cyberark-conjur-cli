@@ -25,11 +25,10 @@ class LoginControllerTest(unittest.TestCase):
         mock_credential_data = None
         mock_login_logic = None
         mock_login_controller = LoginController(mock_ssl_verify, mock_user_password, mock_credential_data, mock_login_logic)
-
-        assert mock_login_controller.ssl_verify == mock_ssl_verify
-        assert mock_login_controller.user_password == mock_user_password
-        assert mock_login_controller.credential_data == mock_credential_data
-        assert mock_login_controller.login_logic == mock_login_logic
+        self.assertEquals(mock_login_controller.ssl_verify, mock_ssl_verify)
+        self.assertEquals(mock_login_controller.user_password, mock_user_password)
+        self.assertEquals(mock_login_controller.credential_data, mock_credential_data)
+        self.assertEquals(mock_login_controller.login_logic, mock_login_logic)
 
     def test_login_controller_constructor_with_ssl_verify_false_calls_warning_message(self):
         mock_ssl_verify = False
@@ -46,7 +45,6 @@ class LoginControllerTest(unittest.TestCase):
         mock_login_controller.get_api_key = MagicMock()
         mock_login_controller.load_conjurrc_data = MagicMock()
         mock_login_logic.save = MagicMock()
-
         mock_login_controller.load()
         mock_login_controller.get_username.assert_called_once()
         mock_login_controller.get_password.assert_called_once()
@@ -67,9 +65,8 @@ class LoginControllerTest(unittest.TestCase):
 
     @patch('conjur.init.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_login_conjurrc_is_loaded(self, mock_conjurrc_data):
-        mock_credential_data = CredentialsData('somemachine', None, 'somepass')
         mock_login_controller = LoginController(True, None, MockCredentialsData, LoginLogic)
-        assert MockConjurrc == mock_login_controller.load_conjurrc_data()
+        self.assertEquals(MockConjurrc, mock_login_controller.load_conjurrc_data())
 
     def test_login_get_api_key_is_called(self):
         with patch('conjur.login.login_logic') as mock_logic:
@@ -77,7 +74,6 @@ class LoginControllerTest(unittest.TestCase):
             mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
             mock_login_controller.ssl_verify = True
             mock_login_controller.user_password = 'somepass'
-
             mock_login_controller.get_api_key(MockConjurrc)
             mock_logic.get_api_key.assert_called_once_with(mock_login_controller.ssl_verify,
                                                            MockCredentialsData,

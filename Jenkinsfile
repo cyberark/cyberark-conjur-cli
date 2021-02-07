@@ -22,8 +22,8 @@ pipeline {
         stage('Changelog') {
           steps { sh './bin/test_changelog' }
         }
+      }
     }
-  }
 
     stage('Unit tests') {
       steps {
@@ -41,7 +41,7 @@ pipeline {
     stage('Integration tests') {
       steps {
         sh './bin/test_integration'
-     }
+      }
 
       post {
         always {

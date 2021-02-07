@@ -15,9 +15,7 @@ class HostControllerTest(unittest.TestCase):
     def test_host_controller_constructor(self):
         mock_client = None
         mock_host_resource_data = None
-
         host_controller = HostController(mock_client, mock_host_resource_data)
-
         assert host_controller.client == mock_client
         assert host_controller.host_resource_data == mock_host_resource_data
 
@@ -25,7 +23,6 @@ class HostControllerTest(unittest.TestCase):
     def test_rotate_api_key_calls_necessary_functions(self, mock_client):
         mock_host_resource_data = HostResourceData(action='someaction', host_to_update='somehost')
         mock_host_controller = HostController(mock_client, mock_host_resource_data)
-
         mock_host_controller.prompt_for_host_id_if_needed = MagicMock()
         mock_host_controller.client.rotate_other_api_key = MagicMock()
         mock_host_controller.rotate_api_key()

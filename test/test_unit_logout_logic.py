@@ -9,7 +9,7 @@ class LogoutLogicTest(unittest.TestCase):
         mock_credentials = CredentialsFromFile
         mock_logout_logic = LogoutLogic(mock_credentials)
 
-        assert mock_logout_logic.credentials == mock_credentials
+        self.assertEquals(mock_logout_logic.credentials, mock_credentials)
 
     def test_logout_remove_credentials_calls_remove_credentials(self):
         mock_credentials = CredentialsFromFile

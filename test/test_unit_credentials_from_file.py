@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import MagicMock, patch, mock_open
 
 from conjur.credentials_from_file import CredentialsFromFile
-
+from test.util import test_helpers as utils
 
 class MockCredentialsData:
     machine = 'https://someurl/authn'
@@ -32,7 +32,6 @@ password somepass
 '''
 
 class CredentialsFromFileTest(unittest.TestCase):
-
     @patch('os.path.exists', return_value=True)
     @patch('os.chmod')
     def test_credentials_load_calls_build_netrc(self, mock_exists, mock_chmod):
@@ -48,11 +47,7 @@ class CredentialsFromFileTest(unittest.TestCase):
         with patch("builtins.open", mock_open(read_data=EXPECTED_NETRC)):
             credentials = CredentialsFromFile()
             credentials.save(MockCredentialsData)
-            with open('path/to/netrc', 'r') as netrc:
-                lines = netrc.readlines()
-                assert lines[0].strip() == "machine https://someurl/authn"
-                assert lines[1].strip() == "login somelogin"
-                assert lines[2].strip() == "password somepass"
+            utils.validate_netrc_contents(self)
 
     def test_credentials_netrc_exists_but_is_empty_raises_exception(self):
         netrc.netrc = MagicMock(return_value=MockEmptyNetrc)
@@ -65,9 +60,9 @@ class CredentialsFromFileTest(unittest.TestCase):
         netrc.netrc.hosts = MagicMock()
         netrc.netrc.return_value.authenticators = MagicMock(return_value=('somelogin', None, 'somepass'))
         credentials = CredentialsFromFile()
-        assert credentials.load("https://someurl") == {'machine': 'https://someurl/authn',
-                                                       'api_key': 'somepass',
-                                                       'login_id': 'somelogin'}
+        self.assertEquals(credentials.load("https://someurl"), {'machine': 'https://someurl/authn',
+                                                                'api_key': 'somepass',
+                                                                'login_id': 'somelogin'})
 
     def test_credentials_netrc_exists_but_no_entry_is_found_raises_exception(self):
         with self.assertRaises(Exception):
@@ -79,8 +74,5 @@ class CredentialsFromFileTest(unittest.TestCase):
         with patch("builtins.open", mock_open(read_data=EXPECTED_NETRC)):
             credentials = CredentialsFromFile()
             credentials.build_netrc(MockCredentialsData)
-            with open('path/to/netrc', 'r') as netrc:
-                lines = netrc.readlines()
-                assert lines[0].strip() == "machine https://someurl/authn"
-                assert lines[1].strip() == "login somelogin"
-                assert lines[2].strip() == "password somepass"
+            utils.validate_netrc_contents(self)
+

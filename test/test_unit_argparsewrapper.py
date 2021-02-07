@@ -95,7 +95,7 @@ class ArgparserWrapperTest(unittest.TestCase):
 
     def test_no_resource_namespace(self):
         with patch.object(self.arg_parse, '_get_resource_namespace', return_value=None):
-            assert self.arg_parse._get_resource_namespace('will return None') == None
+            self.assertEquals(self.arg_parse._get_resource_namespace('will return None'), None)
 
     '''
     Subcommand error will write and exit

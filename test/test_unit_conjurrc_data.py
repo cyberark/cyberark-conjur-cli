@@ -26,4 +26,4 @@ class ConjurrcDataTest(unittest.TestCase):
     def test_conjurrc_object_is_filled_correctly(self, mock_yaml_load):
          with patch("builtins.open", mock_open(read_data=EXPECTED_CONJURRC)):
             mock_conjurrc_data = ConjurrcData.load_from_file()
-            assert mock_conjurrc_data.__dict__ == CONJURRC_DICT
+            self.assertEquals(mock_conjurrc_data.__dict__, CONJURRC_DICT)
