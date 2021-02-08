@@ -1,38 +1,32 @@
-## CLI Refactor
+# CLI Refactor
 
-The purpose of this document is to outline the parts of the Python CLI/SDK code that we would like to refactor as well as provide a design for each point. Through this refactor, for each item we hope that the code will be more readable and easier to contribute to and maintain.
+The purpose of this document is to outline the parts of the Python CLI/SDK code that we would like to refactor as well as provide a design for each. After this, we hope that the code will be more readable and easier to contribute to and maintain.
 
+### Table of Contents
 
+* [Organize directory structure](#organize-directory-structure)
+    - [Proposal](#proposal)
+    - [Current State](#current-state)
+    - [Recommendation](#recommendation)
+* [Improve Error Handling](#improve-error-handling)
+    - [Proposal](#proposal-1)
+    - [Current state](#current-state)
+    - [Recommendation](#recommendation-1)
+* [Strong-type function parameters and return types](#strong-type-function-parameters-and-return-types)
+    - [Proposal](#proposal-2)
+    - [Current state](#current-state-1)
+    - [Recommendation](#recommendation-2)
+* [Explicit Import Statements](#explicit-import-statements)
+    - [Proposal](#proposal-3)
+    - [Current state](#current-state-2)
+    - [Recommendation](#recommendation-3)
 
-### TOC
-
-------
-
-- [CLI Refactor](#cli-refactor)
-  * [Organize directory structure](#organize-directory-structure)
-      - [Proposal](#proposal)
-      - [Current State](#current-state)
-      - [Recommendation](#recommendation)
-  * [Improve Error Handling](#improve-error-handling)
-      - [Proposal](#proposal-1)
-      - [Current state](#current-state)
-      - [Recommendation](#recommendation-1)
-  * [Strong-type function parameters and return types](#strong-type-function-parameters-and-return-types)
-      - [Proposal](#proposal-2)
-      - [Current state](#current-state-1)
-      - [Recommendation](#recommendation-2)
-  * [Explicit Import Statements](#explicit-import-statements)
-      - [Proposal](#proposal-3)
-      - [Current state](#current-state-2)
-      - [Recommendation](#recommendation-3)
 - [APPENDIX](#appendix)
   * [APPENDIX 1: Error Handling](#appendix-1--error-handling)
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 ### Organize directory structure
-
-------
 
 ##### Proposal
 
@@ -40,20 +34,20 @@ Update the new current directory structure so that it is divided by the types of
 
 ##### Current State
 
-Currently, the directory structure resembles the following
+Currently, the directory structure resembles the following:
 
 | Directory Name | Purpose                           |
 | :------------- | :-------------------------------- |
-| host           | files related to host command     |
-| init           | files related to init command     |
-| list           | files related to list command     |
-| login          | files related to login command    |
-| logout         | files related to logout command   |
-| policy         | files related to policy command   |
-| user           | files related to user command     |
-| variable       | files related to variable command |
+| host           | Files related to host command     |
+| init           | Files related to init command     |
+| list           | Files related to list command     |
+| login          | Files related to login command    |
+| logout         | Files related to logout command   |
+| policy         | Files related to policy command   |
+| user           | Files related to user command     |
+| variable       | Files related to variable command |
 
-The following files are without parent directories: api.py, client.py, argparse_wrapper.py, cli.py , client.py, config.py, constants.py, credentials_data.py, credentials_form_file.py, endpoint.py, errors.py, http_wrapper.py, resource.py, ssl_service.py, version.py
+The following files are without parent directories: api.py, client.py, argparse_wrapper.py, cli.py , client.py, config.py, constants.py, credentials_data.py, credentials_from_file.py, endpoint.py, errors.py, http_wrapper.py, resource.py, ssl_service.py, version.py
 
 ##### Recommendation
 
@@ -61,8 +55,8 @@ The files need to be organized by their types and not by the commands they repre
 
 | Directory Name | Purpose                                                      |
 | :------------- | :----------------------------------------------------------- |
-| wrappers       | Wrappers and utils of different Python libraries:  arg_parse_wrapper, http_wrapper |
-| conjur_api     | Files that communicate directly with Conjur. For example,   `client.py , api.py, ssl_client.py (ssl_service)` |
+| wrappers       | Wrappers and utils of different Python libraries:  `arg_parse_wrapper`, `http_wrapper` |
+| conjur_api     | Files that communicate directly to Conjur. For example,  `client.py , api.py, ssl_client.py (ssl_service)` |
 | logic          | All logic classes                                            |
 | controller     | All controller classes                                       |
 | logic          | All logic classes                                            |
@@ -72,16 +66,15 @@ The files need to be organized by their types and not by the commands they repre
 
 ### Improve Error Handling
 
-------
-
 ##### Proposal
 
-Improve our error handling to catch our own Conjur-CLI/SDK specific objects and not general exceptions that do not proper helpful information to the end user.
+Improve our error handling to catch our own Conjur-CLI/SDK specific objects and not general exceptions that do not provide troubleshooting information to the end user.
 
 ##### Current state
 
-In the codebase, there are general errors that are not representative of the actual error that took place. The exceptions are not in doctoring of the function  in the code.
-For example of not representative exception without the docstring please take a look  in the following `get_certificate` function, where general Exception  is being raised if anything goes wrong during the certificate retrieval operation.
+In the codebase, there are general errors that are not representative of the actual error that took place. For example, in the following `get_certificate` function a general Exception is being raised if anything goes wrong during the certificate retrieval operation. We should evaluate the types of exceptions that can be returned and create our own exception objects.
+
+Additionally, raised exceptions are not documented in the docstring of functions.
 
 ```python
 def get_certificate(self, hostname, port):
@@ -102,7 +95,7 @@ def get_certificate(self, hostname, port):
 
 ##### Recommendation
 
-Map current error and exception handling and create Conjur-specific exceptions. In addition to add the new Exception object to the function docstring. The code block above should be:
+Map current error and exception handling and create Conjur CLI/SDK-specific exceptions and add the types of exceptions that can be raised in the function's docstring. The code block above should be:
 
 ```python
     def get_certificate(self, hostname, port):
@@ -116,15 +109,15 @@ Map current error and exception handling and create Conjur-specific exceptions. 
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
         except Exception as error:
-            raise CertificateRetrievalFailedException(f"Unable to retrieve certificate from {hostname}:{port}. " \
+            raise CertificateRetrievalFailedException(f"Unable to retrieve certificate from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
 
         return fingerprint, readable_certificate
 ```
 
-[APPENDIX 1](#appendix) lists the error handling cases where fixes need to be done.
+See [APPENDIX 1](#appendix) for a full list for all raised exceptions that we can plan on changing.
 
-------
+
 
 ### Strong-type function parameters and return types
 
@@ -134,21 +127,19 @@ Strong-type all parameters and function return types as per Python3 best practic
 
 ##### Current state
 
-Functions are not strongly typed.
-
-For example, `def get_variable(self, variable_data):`
+Functions are not strongly typed. For example, `def get_variable(self, variable_data):` in `api.py`
 
 ##### Recommendation
 
-Strong type functions so they will resemble `def get_variable(self, variable_data : VariableData) -> str:`"
+Strong type functions so they will resemble `def get_variable(self, variable_data : VariableData) -> str:`
 
-------
+
 
 ### Explicit Import Statements
 
 ##### Proposal
 
-Make sure all import statements are explicit and contains full path. Explicit paths make it easier to tell exactly what the imported resource is and which module it is apart of. Additionally, absolute imports remain valid even if the location of the imported resources changes.
+Ensure all import statements are explicit and contain full path. Explicit paths make it easier to tell exactly what the imported resource is and which module it is a part of. Additionally, absolute imports remain valid even if the location of the imported resources changes.
 
 ##### Current state
 
@@ -172,13 +163,11 @@ from conjur.client import Client
 
 ### APPENDIX 1: Error Handling
 
-------
-
-The following is a mapping of builtin and third-party exceptions that are currently raised in Conjur CLI. In this document, We will provide suggestions for Conjur CLI/SDK-specific exceptions  should being used instead.
+The following is a mapping of builtin and third-party exceptions that are currently raised in Conjur CLI. In this section, we will provide suggestions for Conjur CLI/SDK-specific exceptions that should be raised instead of the current, general ones.
 
 * api.py
 
-  * `def __init__()` 
+  * `def __init__()`
 
     * `RuntimeError` can be replaced with `MissingParameterException`
 
@@ -208,26 +197,25 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
   * `def authenticate()`
 
-    * RuntimeError` can be replaced with `MissingParameterException`
+    * `RuntimeError` can be replaced with `MissingParameterException`
 
       * ```python
         if not self.login_id or not self.api_key:
-            # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
         ```
 
-  * `def rotate_other_api_key()` 
+* `def rotate_other_api_key()`
 
-    * `Exception` should be replaced with `InvalidResourceException`
+  * `Exception` should be replaced with `InvalidResourceException`
 
-      ```python
+    ```python
       if resource.type not in ('user', 'host'):
           raise Exception("Error: Invalid resource type")
       ```
 
 * client.py
 
-  * `def __init__()` 
+  * `def __init__()`
 
     ```python
     try:
@@ -237,14 +225,12 @@ The following is a mapping of builtin and third-party exceptions that are curren
         raise Exception("Error: netrc is in an invalid format. "
                         f"Reason: {netrc_error}") from netrc_error
     except Exception as exception:
-        # pylint: disable=line-too-long
         raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again.") from exception
     ```
 
-    * `raise Exception` should be replaced with `raise ParsingCredentialsException`
+* `raise Exception` should be replaced with `raise ParsingCredentialsException`
     * `raise RuntimeError` should be replaced with `raise AuthenticationFailedException`
 
-    
 
 * credentials_from_file.py
 
@@ -264,48 +250,43 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
 * init_controller.py
 
-  * `def get_server_certificate()` function
+  * `def get_server_certificate()`
 
     * `RuntimeError` should be replaced with `MissingParameterException`
 
       ```python
       if self.conjurrc_data.appliance_url == '':
-          # pylint: disable=raise-missing-from
           raise RuntimeError("Error: URL is required")
       ```
 
-    * `RuntimeError` should be replaced with `InvalidURLFormatException`
+* `RuntimeError` should be replaced with `InvalidURLFormatException`
 
-      ```python
+  ```python
       if url.scheme != 'https':
           raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
                  f"'{self.conjurrc_data.appliance_url}' is not supported.")
       ```
 
-    * `RuntimeError` should be replaced with `ConfirmationException` 
+* `RuntimeError` should be replaced with `ConfirmationException`
 
-      ```python
+  ```python
       trust_certificate = input("Trust this certificate? (Default=no): ").strip()
       if trust_certificate.lower() != 'yes':
           raise RuntimeError("You decided not to trust the certificate")
       ```
 
-  * `def get_account_info()`
+* `def get_account_info()`
 
-    * `RuntimeError` should be replaced with `MissingParameterException`
+  * `RuntimeError` should be replaced with `MissingParameterException`
 
-      ```python
+    ```python
       try:
           self.init_logic.fetch_account_from_server(self.conjurrc_data)
-      # pylint: disable=broad-except,logging-fstring-interpolation
       except Exception as error:
-          # pylint: disable=line-too-long,logging-fstring-interpolation
           logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
-          # If there was a problem fetching the account from the server, we will request one
           conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
-      
+
           if conjurrc_data.account is None or conjurrc_data.account == '':
-              # pylint: disable=raise-missing-from
               raise RuntimeError("Error: account is required")
       ```
 
@@ -313,26 +294,24 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     * `Exception` should be replaced with `ConfirmationException`
 
-      ```python
+    ```python
       force_overwrite = input(f"File {config_file} exists. " \
-                              f"Overwrite? (Default=yes): ").strip()
+                            f"Overwrite? (Default=yes): ").strip()
       if force_overwrite != '' and force_overwrite.lower() != 'yes':
-          raise Exception(f"Not overwriting {config_file}")
+        raise Exception(f"Not overwriting {config_file}")
       ```
 
 * init_logic.py
 
   * `def get_certificate()`
 
-    * `Exception` should be replaced with `FailedToRetrieveCertificateException` 
+    * `Exception` should be replaced with `FailedToRetrieveCertificateException`
 
-    *  These error can be thrown from `ssl_service.get_certificate` :
-    
-      * TIMEOUT_ERROR when connection to server fails
-      * `socket.gaierror` when there is no such dns address.
-      
-      
-      
+    *  The following are error can be thrown from `ssl_service.get_certificate` :
+
+      * `TIMEOUT_ERROR` when connection to server fails
+      * `socket.gaierror` when there is no such DNS address
+
       ```python
       try:
           fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
