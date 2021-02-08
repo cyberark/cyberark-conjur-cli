@@ -20,7 +20,9 @@ pipeline {
           agent { label 'executor-v2-rhel-ee' }
 
           steps {
-            sh "./release/ci/pack-cli-rhel.sh"
+            sh '''
+            ./release/ci/pack-cli-rhel.sh
+            '''
             archiveArtifacts artifacts: 'dist/', fingerprint: true
           }
         }
@@ -28,7 +30,7 @@ pipeline {
           agent { label 'executor-windows-2016' }
 
           steps {
-            powerShell('''
+            powershell('''
             # Create new folder
             $fso = new-object -ComObject scripting.filesystemobject
             $fso.CreateFolder("C:\temp")
