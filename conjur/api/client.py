@@ -14,7 +14,7 @@ import logging
 import netrc
 
 from Utils.utils import Utils
-from conjur.api.api import Api
+from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controller.init_controller import InitController

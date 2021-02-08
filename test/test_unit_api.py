@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 from conjur.wrappers.http_wrapper import HttpVerb
 from conjur.api.endpoints import ConjurEndpoint
 
-from conjur.api.api import Api
+from conjur.api import Api
 
 
 MOCK_RESOURCE_LIST = [
