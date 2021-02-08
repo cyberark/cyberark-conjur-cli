@@ -211,7 +211,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
     ```python
       if resource.type not in ('user', 'host'):
           raise Exception("Error: Invalid resource type")
-      ```
+    ```
 
 * client.py
 
@@ -229,6 +229,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
     ```
 
 * `raise Exception` should be replaced with `raise ParsingCredentialsException`
+    
     * `raise RuntimeError` should be replaced with `raise AuthenticationFailedException`
 
 
@@ -265,7 +266,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
       if url.scheme != 'https':
           raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
                  f"'{self.conjurrc_data.appliance_url}' is not supported.")
-      ```
+  ```
 
 * `RuntimeError` should be replaced with `ConfirmationException`
 
@@ -273,7 +274,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
       trust_certificate = input("Trust this certificate? (Default=no): ").strip()
       if trust_certificate.lower() != 'yes':
           raise RuntimeError("You decided not to trust the certificate")
-      ```
+  ```
 
 * `def get_account_info()`
 
@@ -288,7 +289,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
           if conjurrc_data.account is None or conjurrc_data.account == '':
               raise RuntimeError("Error: account is required")
-      ```
+    ```
 
   * `def __ensure_overwrite_file()`
 
@@ -299,7 +300,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
                             f"Overwrite? (Default=yes): ").strip()
       if force_overwrite != '' and force_overwrite.lower() != 'yes':
         raise Exception(f"Not overwriting {config_file}")
-      ```
+    ```
 
 * init_logic.py
 
@@ -307,10 +308,10 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     * `Exception` should be replaced with `FailedToRetrieveCertificateException`
 
-    *  The following are error can be thrown from `ssl_service.get_certificate` :
+    *  The following are errors that can be thrown from `ssl_service.get_certificate` :
 
-      * `TIMEOUT_ERROR` when connection to server fails
-      * `socket.gaierror` when there is no such DNS address
+      * `TIMEOUT_ERROR` when connection to server fails. We wiil add `except` to it and will raise `ConnectionToConjurFailedException` with  error message indicating that there was no response from the server.
+      * `socket.gaierror` when there is no such DNS address. We will add `except` to it and will raise `ConnectionToConjurFailedException` with error message indicating that there is no such DNS address.
 
       ```python
       try:
