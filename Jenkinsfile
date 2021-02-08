@@ -13,42 +13,60 @@ pipeline {
   }
 
   stages {
-    stage('Linting') {
-      parallel {
-        stage('Code') {
-          steps { sh './bin/test_linting' }
-        }
+    stage('RHEL 8 Node') {
+      // Node used to deploy RHEL 8 machines and pack the CLI executable
+      agent { label 'executor-v2-rhel-ee' }
 
-        stage('Changelog') {
-          steps { sh './bin/test_changelog' }
-        }
-      }
-    }
-
-    stage('Unit tests') {
       steps {
-        sh './bin/test_unit'
-      }
-      post {
-        always {
-          junit 'output/**/*.xml'
-          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-          ccCoverage("coverage.py")
-        }
+        sh '''
+        sudo yum install python38 -y && \
+          sudo yum install binutils -y && \
+          sudo pip3 install pyinstaller
+        python3 -m venv venv
+        source venv/bin/activate
+        pip3 install -r requirements.txt
+        pyinstaller -F ./pkg_bin/conjur
+        '''
+        archiveArtifacts artifacts: 'dist/', fingerprint: true
       }
     }
 
-    stage('Integration tests') {
-      steps {
-        sh './bin/test_integration'
-      }
+//    stage('Linting') {
+//      parallel {
+//        stage('Code') {
+//          steps { sh './bin/test_linting' }
+//        }
 
-      post {
-        always {
-          junit 'output/**/*.xml'
-        }
-      }
-    }
+//        stage('Changelog') {
+//          steps { sh './bin/test_changelog' }
+//        }
+//      }
+//    }
+
+//    stage('Unit tests') {
+//      steps {
+//        sh './bin/test_unit'
+//      }
+//      post {
+//        always {
+//          junit 'output/**/*.xml'
+//          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+//          ccCoverage("coverage.py")
+//        }
+//      }
+//    }
+
+//    stage('Integration tests') {
+//      steps {
+//        sh './bin/test_integration'
+//      }
+
+//      post {
+//        always {
+//          junit 'output/**/*.xml'
+//        }
+//      }
+//    }
 
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
