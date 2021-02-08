@@ -13,23 +13,14 @@ pipeline {
   }
 
   stages {
-    stage('Create CLI executable') {
+    stage('Pack CLI') {
       parallel {
         stage('RHEL 8 Node') {
           // Node used to deploy RHEL 8 machines and pack the CLI executable
           agent { label 'executor-v2-rhel-ee' }
 
           steps {
-            sh '''
-            sudo yum install python38 -y && \
-              sudo yum install binutils -y && \
-              sudo pip3 install pyinstaller
-            python3 -m venv venv
-            source venv/bin/activate
-            pip3 install -r requirements.txt
-            pyinstaller -F ./pkg_bin/conjur
-            cd dist && tar -czvf conjur-cli-darwin.tar.gz conjur
-            '''
+            sh "./release/ci/pack-cli-rhel.sh"
             archiveArtifacts artifacts: 'dist/', fingerprint: true
           }
         }
