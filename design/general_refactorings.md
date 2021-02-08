@@ -310,7 +310,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     *  The following are errors that can be thrown from `ssl_service.get_certificate` :
 
-      * `TIMEOUT_ERROR` when connection to server fails. We wiil add `except` to it and will raise `ConnectionToConjurFailedException` with  error message indicating that there was no response from the server.
+      * `TIMEOUT_ERROR` when connection to server fails. We will add an `except` clause and raise `ConnectionToConjurFailedException` with an error message indicating that there was no response from the server.
       * `socket.gaierror` when there is no such DNS address. We will add `except` to it and will raise `ConnectionToConjurFailedException` with error message indicating that there is no such DNS address.
 
       ```python
