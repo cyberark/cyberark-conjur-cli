@@ -12,7 +12,7 @@ import uuid
 from contextlib import redirect_stderr
 
 from conjur.constants import *
-from .util.test_infrastructure import integration_test
+from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 

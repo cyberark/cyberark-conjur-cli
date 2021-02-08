@@ -6,6 +6,6 @@ __main__ module
 This module makes this package egg-invokable
 """
 
-from .cli import Cli
+from conjur.cli import Cli
 
 Cli.launch()
