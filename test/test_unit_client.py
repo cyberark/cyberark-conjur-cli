@@ -447,7 +447,7 @@ class ClientTest(unittest.TestCase):
 
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
-    @patch('conjur.api.api.Api')
+    @patch('conjur.api.client.Api')
     def test_client_passes_through_api_rotate_other_api_key_params(self, mock_api_instance, mock_creds,
                                                                    mock_api_config):
         Client().rotate_other_api_key(MOCK_RESOURCE)
@@ -456,7 +456,7 @@ class ClientTest(unittest.TestCase):
 
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
-    @patch('conjur.api.api.Api')
+    @patch('conjur.api.client.Api')
     def test_client_passes_through_api_rotate_personal_api_key_params(self, mock_api_instance, mock_creds,
                                                                       mock_api_config):
         Client().rotate_personal_api_key("someloggedinuser", "somecurrentpassword")
@@ -466,7 +466,7 @@ class ClientTest(unittest.TestCase):
 
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
-    @patch('conjur.api.Api')
+    @patch('conjur.api.client.Api')
     def test_client_passes_through_api_change_password_params(self, mock_api_instance, mock_creds,
                                                               mock_api_config):
         Client().change_personal_password("someloggedinuser", "somecurrentpassword", "somenewpassword")
