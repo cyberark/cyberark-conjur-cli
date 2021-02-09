@@ -10,8 +10,16 @@ if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
   shift
 fi
 
+PROCESS="false"
+if [[ "$1" = "--process" || "$1" = "-p" ]]; then
+  PROCESS="true"
+  shift
+fi
+
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
-trap 'cleanup' EXIT
+if [[ "$PROCESS" != "true" ]]; then
+  trap 'cleanup' EXIT
+fi
 cleanup
 
 echo "Building API container..."
@@ -27,6 +35,7 @@ docker-compose exec -T conjur conjurctl wait
 echo "Configuring Conjur..."
 admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
 export CONJUR_AUTHN_API_KEY=$admin_api_key
+echo $CONJUR_AUTHN_API_KEY
 
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
@@ -37,18 +46,23 @@ cat <<ENV > .env
 CONJUR_AUTHN_API_KEY=$admin_api_key
 ENV
 
-echo "Starting test env..."
-docker-compose up -d test
+# Flag set when running the tests as a process as part of our pipeline
+if [[ "$PROCESS" != "true" ]]; then
+  echo "Starting test env..."
+  docker-compose up -d test
 
-rm -rf $CURRENT_DIR/output/*
+  rm -rf $CURRENT_DIR/output/*
 
-if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec test bash
-  exit
+  if [[ "$DEBUG" == "true" ]]; then
+    docker-compose exec test bash
+    exit
+  fi
+
+  docker-compose run \
+    --rm \
+    --no-deps \
+    test \
+    nose2 -v -X --config integration_test.cfg -A 'integration' $@
+else
+  docker-compose up -d conjur-https
 fi
-
-docker-compose run \
-  --rm \
-  --no-deps \
-  test \
-  nose2 -v -X --config integration_test.cfg -A 'integration' $@

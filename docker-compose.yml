@@ -45,7 +45,7 @@ services:
   conjur-https:
     image: nginx:alpine
     ports:
-      - 443
+      - 8443:443
     volumes:
       - ${PWD}/test/test_config/https/:/tmp/conf
       - ${PWD}/test/test_config/https/:/etc/nginx/tls/:ro

@@ -13,41 +13,42 @@ pipeline {
   }
 
   stages {
-    stage('Pack CLI') {
+    stage('Pack CLI and run Integration tests') {
       parallel {
         stage('RHEL 8 Node') {
           // Node used to deploy RHEL 8 machines and pack the CLI executable
           agent { label 'executor-v2-rhel-ee' }
 
           steps {
-            sh '''
+            sh'''
             ./release/ci/pack-cli-rhel.sh
+            ./release/ci/run-cli-as-process-rhel.sh
             '''
             archiveArtifacts artifacts: 'dist/', fingerprint: true
           }
         }
-        stage('Windows machine Node') {
-          agent { label 'executor-windows-2016' }
+       // stage('Windows machine Node') {
+       //   agent { label 'executor-windows-2016' }
 
-          steps {
-            powershell('''
-            # Create new folder
-            $fso = new-object -ComObject scripting.filesystemobject
-            $fso.CreateFolder("C:\temp")
+        //  steps {
+        //    powershell('''
+            // Create new folder
+        //    $fso = new-object -ComObject scripting.filesystemobject
+        //    $fso.CreateFolder("C:\temp")
 
-            # Install Python38
-            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-            Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.8.0/python-3.8.0.exe" -OutFile "c:/temp/python-3.8.0.exe"
+        //    # Install Python38
+         //   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+         //   Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.8.0/python-3.8.0.exe" -OutFile "c:/temp/python-3.8.0.exe"
 
-            pip install PyInstaller
+         //   pip install PyInstaller
 
-            py -m venv venv
-            venv\\Scripts\\activate.bat
-            pip3 install -r requirements.txt
-            pyinstaller -F ./pkg_bin/conjur
-            ''')
-          }
-        }
+         //   py -m venv venv
+         //   venv\\Scripts\\activate.bat
+         //   pip3 install -r requirements.txt
+        //    pyinstaller -F ./pkg_bin/conjur
+         //   ''')
+         // }
+        //}
       }
     }
 //    stage('Linting') {
