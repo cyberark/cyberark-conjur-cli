@@ -1,4 +1,5 @@
 import logging
+import netrc
 import unittest
 import uuid
 from unittest.mock import patch, MagicMock
@@ -6,6 +7,8 @@ from unittest.mock import patch, MagicMock
 from conjur.client import ConfigException, Client
 
 # CredentialsFromFile mocked class
+from conjur.init import InitController
+
 MockCredentials = {
     'login_id': 'apiconfigloginid',
     'api_key': 'apiconfigapikey',
@@ -24,6 +27,11 @@ class MockApiConfig(object):
 
     def __iter__(self):
         return iter(self.CONFIG.items())
+
+
+class MOCK_RESOURCE:
+    type= "sometype"
+    name = "somename"
 
 class MissingMockApiConfig(object):
     def __init__(self):
@@ -70,6 +78,13 @@ class ClientTest(unittest.TestCase):
         Client.initialize(None, None, None, False)
         client.initialize.assert_called_once_with(None, None, None, False)
 
+    def test_client_init_initialize_calls_load_properly(self):
+        client = Client
+        mock_init_controller = InitController
+        mock_init_controller.load = MagicMock()
+        Client.initialize('someurl', 'someaccount', '/some/path/to/pem', False)
+        mock_init_controller.load.assert_called_once()
+
     @patch('conjur.client.ApiConfig', new=MissingMockApiConfig)
     def test_client_throws_error_when_no_config(self):
         with self.assertRaises(ConfigException):
@@ -103,6 +118,18 @@ class ClientTest(unittest.TestCase):
             ssl_verify=False,
             url='http://myurl',
         )
+
+    @patch('conjur.client.Api')
+    @patch('conjur.credentials_from_file.CredentialsFromFile.load', side_effect=netrc.NetrcParseError(''))
+    def test_client_can_raise_netrc_exception_error(self, mock_cred, mock_api_instance):
+        with self.assertRaises(Exception):
+            Client(url='https://myurl', account='myacct', login_id='mylogin', ca_bundle="mybundle", ssl_verify=False)
+
+    @patch('conjur.client.Api')
+    @patch('conjur.credentials_from_file.CredentialsFromFile.load', side_effect=Exception)
+    def test_client_can_raise_general_exception_error(self, mock_cred, mock_api_instance):
+        with self.assertRaises(Exception):
+            Client(url='https://myurl', account='myacct', login_id='mylogin', ca_bundle="mybundle", ssl_verify=False)
 
     @patch('conjur.client.Api')
     def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self, mock_api_instance):
@@ -420,3 +447,31 @@ class ClientTest(unittest.TestCase):
         Client().whoami()
 
         mock_api_instance.return_value.whoami.assert_called_once_with()
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_rotate_other_api_key_params(self, mock_api_instance, mock_creds,
+            mock_api_config):
+        Client().rotate_other_api_key(MOCK_RESOURCE)
+
+        mock_api_instance.return_value.rotate_other_api_key.assert_called_once_with(MOCK_RESOURCE)
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_rotate_personal_api_key_params(self, mock_api_instance, mock_creds,
+            mock_api_config):
+        Client().rotate_personal_api_key("someloggedinuser", "somecurrentpassword")
+
+        mock_api_instance.return_value.rotate_personal_api_key.assert_called_once_with("someloggedinuser", "somecurrentpassword")
+
+    @patch('conjur.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.client.Api')
+    def test_client_passes_through_api_change_password_params(self, mock_api_instance, mock_creds,
+            mock_api_config):
+        Client().change_personal_password("someloggedinuser", "somecurrentpassword", "somenewpassword")
+
+        mock_api_instance.return_value.change_personal_password.assert_called_once_with("someloggedinuser", "somecurrentpassword", "somenewpassword")
+

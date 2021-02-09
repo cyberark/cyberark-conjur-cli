@@ -12,7 +12,7 @@ import logging
 from yaml import load, dump
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
+except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
 
 # Internals

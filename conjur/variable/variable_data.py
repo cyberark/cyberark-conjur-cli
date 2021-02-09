@@ -22,7 +22,7 @@ class VariableData:
     def __repr__(self):
         result = []
         # pylint: disable=multiple-statements
-        if self.action == 'get': result.append(f"Getting variable values for: {self.variable_id} ")
-        if self.variable_version: result.append(f"with version {self.variable_version}")
+        if self.action == 'get': result.append(f"Getting variable values for: '{self.variable_id}'")
+        if self.variable_version: result.append(f" with version '{self.variable_version}'")
         if self.action == 'set': result.append(f"Setting variable value for: '{self.variable_id}'")
         return ''.join(result)

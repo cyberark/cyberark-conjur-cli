@@ -66,8 +66,6 @@ class InitController:
 
         # TODO: Factor out the following URL validation to ConjurrcData class
         # and add integration tests
-        # At this time, providing ports is not supported and
-        # all urls must start with HTTPS.
         if url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
                    f"'{self.conjurrc_data.appliance_url}' is not supported.")
@@ -120,7 +118,7 @@ class InitController:
                                                                        self.conjurrc_data.cert_file,
                                                                        self.force_overwrite)
             if not is_file_written:
-                self.__ensure_overwrite_file(self.conjurrc_data.cert_file)
+                self.ensure_overwrite_file(self.conjurrc_data.cert_file)
                 self.init_logic.write_certificate_to_file(fetched_certificate,
                                                           self.conjurrc_data.cert_file,
                                                           True)
@@ -135,14 +133,17 @@ class InitController:
                                                          self.conjurrc_data,
                                                          self.force_overwrite)
         if not is_file_written:
-            self.__ensure_overwrite_file(DEFAULT_CONFIG_FILE)
+            self.ensure_overwrite_file(DEFAULT_CONFIG_FILE)
             self.init_logic.write_conjurrc(DEFAULT_CONFIG_FILE,
                                            self.conjurrc_data,
                                            True)
         sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
 
-    @staticmethod
-    def __ensure_overwrite_file(config_file):
+    @classmethod
+    def ensure_overwrite_file(cls, config_file):
+        """
+        Method to handle user overwriting logic
+        """
         force_overwrite = input(f"File {config_file} exists. "
                                 f"Overwrite? (Default=yes): ").strip()
         if force_overwrite != '' and force_overwrite.lower() != 'yes':

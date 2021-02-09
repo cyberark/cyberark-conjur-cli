@@ -19,5 +19,11 @@ class Resource:
         """
         return f"{self.type}:{self.name}"
 
+    def __eq__(self, other):
+        """
+        Method for comparing resources by their values and not by reference
+        """
+        return self.type == other.type and self.name == other.name
+
     def __repr__(self):
         return f"'type': '{self.type}', 'name': '{self.name}'"

@@ -24,4 +24,4 @@ class CredentialsData:
 
     # pylint: disable=line-too-long
     def __repr__(self):
-        return f"{{'machine': {self.machine}, 'login': {self.login}, 'password': ****}}"
+        return f"{{'machine': '{self.machine}', 'login': '{self.login}', 'password': '****'}}"

@@ -79,17 +79,16 @@ class InitLogicTest(unittest.TestCase):
                 self.init_logic.write_conjurrc("path/to/conjurrc", self.conjurrc_data, False)
                 with open('path/to/conjurrc', 'r') as conjurrc:
                     lines = conjurrc.readlines()
-                    assert lines[0].strip() == "---"
-                    assert lines[1].strip() == "account: someaccount"
-                    assert lines[3].strip() == "cert_file: /path/to/conjur-someaccount.pem"
-                    assert lines[4].strip() == "plugins: [foo, bar]"
+                    self.assertEquals(lines[0].strip(), "---")
+                    self.assertEquals(lines[1].strip(), "account: someaccount")
+                    self.assertEquals(lines[3].strip(), "cert_file: /path/to/conjur-someaccount.pem")
+                    self.assertEquals(lines[4].strip(), "plugins: [foo, bar]")
 
     def test_cert_error_will_raise_exception(self):
         with patch.object(SSLService, 'get_certificate', side_effect=Exception) as mock_get_cert:
             with self.assertRaises(Exception) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
-
             self.assertRegex(str(context.exception), 'Unable to retrieve certificate from')
 
     '''
@@ -100,6 +99,5 @@ class InitLogicTest(unittest.TestCase):
         with patch.object(SSLService, 'get_certificate', return_value=["12:AB", "cert"]) as mock_ssl:
             mock_init_command = InitLogic(self.ssl_service)
             fingerprint, readable_certificate = mock_init_command.get_certificate("https://someurl", 443)
-
             self.assertEquals(fingerprint, "12:AB")
             self.assertEquals(readable_certificate, "cert")
