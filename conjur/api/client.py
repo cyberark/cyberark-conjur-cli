@@ -15,14 +15,13 @@ import netrc
 
 from Utils.utils import Utils
 from conjur.api import Api
+from conjur.api.ssl_client import SSLClient
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.controller.init_controller import InitController
-from conjur.logic.init_logic import InitLogic
-from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.controller import InitController
+from conjur.logic import InitLogic, CredentialsFromFile
+from conjur.data_object import ConjurrcData
 from conjur.resource import Resource
-from conjur.api.ssl_client import SSLClient
 
 
 class ConfigException(Exception):
@@ -38,6 +37,8 @@ class ConfigException(Exception):
     use these parameters defined in this class to initialize our Python
     SDK in their code.
     """
+
+
 class Client():
     """
     Client

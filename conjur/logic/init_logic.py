@@ -16,7 +16,7 @@ import yaml
 
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrappers.http_wrapper import invoke_endpoint, HttpVerb
+from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
 DEFAULT_PORT = 443
 

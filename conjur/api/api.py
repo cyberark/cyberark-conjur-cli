@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrappers.http_wrapper import HttpVerb, invoke_endpoint
+from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 
 
 # pylint: disable=too-many-instance-attributes

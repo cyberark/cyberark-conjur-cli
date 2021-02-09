@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import conjur
 from conjur.logic.credentials_from_file import CredentialsFromFile
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrappers.http_wrapper import HttpVerb
+from conjur.wrapper.http_wrapper import HttpVerb
 from conjur.logic.login_logic import LoginLogic
 
 class MockCredentialsData:

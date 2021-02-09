@@ -6,7 +6,7 @@ from contextlib import redirect_stderr, redirect_stdout
 # Internals
 from unittest.mock import patch
 
-from conjur.wrappers.argparse_wrapper import ArgparseWrapper
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 class ArgparserWrapperTest(unittest.TestCase):
     capture_stream = io.StringIO()

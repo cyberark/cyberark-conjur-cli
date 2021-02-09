@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SSLService module
+SSLClient module
 
 This module is for all SSL operations
 """
@@ -22,7 +22,7 @@ _conjur_tls_methods = {
 # pylint: disable=too-few-public-methods
 class SSLClient:
     """
-    SSLService
+    SSLClient
 
     This class is a service for connecting to the Conjur socket
     and fetching the certificate
