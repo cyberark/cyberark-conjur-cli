@@ -74,7 +74,7 @@ client = Client(url='https://conjur.myorg.com',
                 account='default',
                 login_id='admin',
                 password='mypassword',
-                ca_bundle='/path/to/my/ca/bundle')
+                ca_bundle='/path/to/my/ca/bundle.pem')
 
 print("Setting variable...")
 client.set('conjur/my/variable', 'new value')
@@ -94,7 +94,7 @@ client = Client(url='https://conjur.myorg.com',
                 account='default',
                 login_id='admin',
                 api_key='myapikey',
-                ca_bundle='/path/to/my/ca/bundle')
+                ca_bundle='/path/to/my/ca/bundle.pem')
 ```
 
 #### With `.netrc` and `.conjurrc` settings
