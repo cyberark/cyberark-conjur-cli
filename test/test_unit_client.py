@@ -1,4 +1,5 @@
 import logging
+import netrc
 import unittest
 import uuid
 from unittest.mock import patch, MagicMock
@@ -6,10 +7,13 @@ from unittest.mock import patch, MagicMock
 from conjur.api.client import ConfigException, Client
 
 # CredentialsFromFile mocked class
+from conjur.controller.init_controller import InitController
+
 MockCredentials = {
     'login_id': 'apiconfigloginid',
     'api_key': 'apiconfigapikey',
 }
+
 
 # ApiConfig mocking class
 class MockApiConfig(object):
@@ -25,6 +29,12 @@ class MockApiConfig(object):
     def __iter__(self):
         return iter(self.CONFIG.items())
 
+
+class MOCK_RESOURCE:
+    type = "sometype"
+    name = "somename"
+
+
 class MissingMockApiConfig(object):
     def __init__(self):
         raise FileNotFoundError("oops!")
@@ -34,6 +44,7 @@ class ConfigErrorTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):
         with self.assertRaises(ConfigException):
             raise ConfigException('abc')
+
 
 class ClientTest(unittest.TestCase):
     # To run properly, we need to configure the loaded conjurrc
@@ -71,6 +82,14 @@ class ClientTest(unittest.TestCase):
         client.initialize.assert_called_once_with(None, None, None, False)
 
     @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)
+    def test_client_init_initialize_calls_load_properly(self):
+        client = Client
+        mock_init_controller = InitController
+        mock_init_controller.load = MagicMock()
+        Client.initialize('someurl', 'someaccount', '/some/path/to/pem', False)
+        mock_init_controller.load.assert_called_once()
+
+    @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)
     def test_client_throws_error_when_no_config(self):
         with self.assertRaises(ConfigException):
             Client()
@@ -79,7 +98,7 @@ class ClientTest(unittest.TestCase):
     @patch('logging.basicConfig')
     def test_client_initializes_logging(self, mock_logging, mock_api):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
-                     password='mypass')
+               password='mypass')
 
         mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.WARNING)
 
@@ -87,14 +106,14 @@ class ClientTest(unittest.TestCase):
     @patch('logging.basicConfig')
     def test_client_increases_logging_with_debug_flag(self, mock_logging, mock_api):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
-                     password='mypass', debug=True)
+               password='mypass', debug=True)
 
         mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
 
     @patch('conjur.api.client.Api')
     def test_client_passes_init_config_params_to_api_initializer(self, mock_api_instance):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
-                     password='mypass', ca_bundle="mybundle", ssl_verify=False)
+               password='mypass', ca_bundle="mybundle", ssl_verify=False)
 
         mock_api_instance.assert_called_with(
             account='myacct',
@@ -104,10 +123,16 @@ class ClientTest(unittest.TestCase):
             url='http://myurl',
         )
 
-    @patch('conjur.api.client.Api')
+    @patch('conjur.api.Api')
+    @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', side_effect=netrc.NetrcParseError(''))
+    def test_client_can_raise_netrc_exception_error(self, mock_cred, mock_api_instance):
+        with self.assertRaises(Exception):
+            Client(url='https://myurl', account='myacct', login_id='mylogin', ca_bundle="mybundle", ssl_verify=False)
+
+    @patch('conjur.api.Api')
     def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self, mock_api_instance):
         Client(url='http://myurl', login_id='mylogin', password='mypass',
-                     ca_bundle="mybundle")
+               ca_bundle="mybundle")
 
         mock_api_instance.assert_called_with(
             account='default',
@@ -120,14 +145,14 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.api.client.Api')
     def test_client_performs_password_api_login_if_password_is_provided(self, mock_api_instance):
         Client(url='http://foo', account='myacct', login_id='mylogin',
-                     password='mypass')
+               password='mypass')
 
         mock_api_instance.return_value.login.assert_called_once_with('mylogin', 'mypass')
 
     @patch('conjur.api.client.Api')
     def test_client_initializes_client_with_api_key_if_its_provided(self, mock_api_instance):
         Client(url='http://foo', account='myacct', login_id='mylogin',
-                     api_key='someapikey')
+               api_key='someapikey')
 
         mock_api_instance.assert_called_with(
             account='myacct',
@@ -143,7 +168,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_performs_no_api_login_if_password_is_not_provided(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                      mock_api_config):
         Client(url='http://foo', account='myacct', login_id='mylogin')
 
         mock_api_instance.return_value.login.assert_not_called()
@@ -152,7 +177,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_config_from_apiconfig_if_url_is_not_provided(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                        mock_api_config):
         Client(account='myacct', login_id='mylogin', password="mypass")
 
         mock_api_instance.assert_called_with(
@@ -184,7 +209,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_config_from_apiconfig_if_login_id_is_not_provided(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                             mock_api_config):
         Client(url='http://foo', account='myacct', password="mypass")
 
         mock_api_instance.assert_called_with(
@@ -201,7 +226,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                             mock_api_config):
         Client(url='http://foo', account='myacct', login_id='mylogin')
 
         mock_api_instance.assert_called_with(
@@ -220,9 +245,9 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                            mock_api_config):
         Client(url='http://foo', account='myacct', login_id='mylogin',
-                     ca_bundle='mybundle')
+               ca_bundle='mybundle')
 
         mock_api_instance.assert_called_with(
             account='myacct',
@@ -240,7 +265,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_does_not_override_apiconfig_values_with_empty_values(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                         mock_api_config):
         Client(url=None, account=None, login_id=None, ca_bundle=None)
 
         mock_api_instance.assert_called_with(
@@ -262,14 +287,14 @@ class ClientTest(unittest.TestCase):
     @patch('logging.basicConfig')
     def test_client_increases_logging_with_debug_flag(self, mock_logging, mock_creds, mock_api):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
-                     password='mypass', debug=True)
+               password='mypass', debug=True)
 
         mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
 
     @patch('conjur.api.client.Api')
     def test_client_passes_default_account_to_api_initializer_if_none_is_provided(self, mock_api_instance):
         Client(url='http://myurl', login_id='mylogin', password='mypass',
-                     ca_bundle="mybundle")
+               ca_bundle="mybundle")
 
         mock_api_instance.assert_called_with(
             account='default',
@@ -283,7 +308,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_get_variable_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                           mock_api_config):
         Client().get('variable_id')
 
         mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id', None)
@@ -292,7 +317,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_get_variable_result(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                mock_api_config):
         variable_value = uuid.uuid4().hex
         mock_api_instance.return_value.get_variable.return_value = variable_value
 
@@ -303,7 +328,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_get_many_variables_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                                 mock_api_config):
         Client().get_many('variable_id', 'variable_id2')
 
         mock_api_instance.return_value.get_variables.assert_called_once_with(
@@ -315,7 +340,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_get_variables_result(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                 mock_api_config):
         variable_values = uuid.uuid4().hex
         mock_api_instance.return_value.get_variables.return_value = variable_values
 
@@ -326,7 +351,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_set_variable_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                           mock_api_config):
         Client().set('variable_id', 'variable_value')
 
         mock_api_instance.return_value.set_variable.assert_called_once_with(
@@ -338,7 +363,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_load_policy_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                          mock_api_config):
         Client().load_policy_file('name', 'policy')
 
         mock_api_instance.return_value.load_policy_file.assert_called_once_with(
@@ -360,7 +385,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_replace_policy_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                             mock_api_config):
         Client().replace_policy_file('name', 'policy')
 
         mock_api_instance.return_value.replace_policy_file.assert_called_once_with(
@@ -372,19 +397,18 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_replace_policy_result(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                  mock_api_config):
         replace_policy_result = uuid.uuid4().hex
         mock_api_instance.return_value.replace_policy_file.return_value = replace_policy_result
 
         return_value = Client().replace_policy_file('name', 'policy')
         self.assertEquals(return_value, replace_policy_result)
 
-
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_update_policy_params(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                            mock_api_config):
         Client().update_policy_file('name', 'policy')
 
         mock_api_instance.return_value.update_policy_file.assert_called_once_with(
@@ -396,7 +420,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_update_policy_result(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                 mock_api_config):
         update_policy_result = uuid.uuid4().hex
         mock_api_instance.return_value.update_policy_file.return_value = update_policy_result
 
@@ -407,7 +431,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_resource_list_method(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                        mock_api_config):
         Client().list({})
 
         mock_api_instance.return_value.resources_list.assert_called_once_with({})
@@ -416,7 +440,37 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_whoami_method(self, mock_api_instance, mock_creds,
-            mock_api_config):
+                                                 mock_api_config):
         Client().whoami()
 
         mock_api_instance.return_value.whoami.assert_called_once_with()
+
+    @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.api.api.Api')
+    def test_client_passes_through_api_rotate_other_api_key_params(self, mock_api_instance, mock_creds,
+                                                                   mock_api_config):
+        Client().rotate_other_api_key(MOCK_RESOURCE)
+
+        mock_api_instance.return_value.rotate_other_api_key.assert_called_once_with(MOCK_RESOURCE)
+
+    @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.api.api.Api')
+    def test_client_passes_through_api_rotate_personal_api_key_params(self, mock_api_instance, mock_creds,
+                                                                      mock_api_config):
+        Client().rotate_personal_api_key("someloggedinuser", "somecurrentpassword")
+
+        mock_api_instance.return_value.rotate_personal_api_key.assert_called_once_with("someloggedinuser",
+                                                                                       "somecurrentpassword")
+
+    @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.logic.credentials_from_file.CredentialsFromFile.load', return_value=MockCredentials)
+    @patch('conjur.api.Api')
+    def test_client_passes_through_api_change_password_params(self, mock_api_instance, mock_creds,
+                                                              mock_api_config):
+        Client().change_personal_password("someloggedinuser", "somecurrentpassword", "somenewpassword")
+
+        mock_api_instance.return_value.change_personal_password.assert_called_once_with("someloggedinuser",
+                                                                                        "somecurrentpassword",
+                                                                                        "somenewpassword")

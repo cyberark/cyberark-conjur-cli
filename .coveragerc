@@ -4,4 +4,4 @@ omit =
         *__main__*
         *cli_helpers.py
         setup.py
-        /test/*
+        test/*

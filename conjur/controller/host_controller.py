@@ -46,6 +46,6 @@ class HostController():
         if self.host_resource_data.host_to_update is None:
             # pylint: disable=line-too-long
             self.host_resource_data.host_to_update = input("Enter the host id to rotate its API key: ").strip()
-            if self.host_resource_data.host_to_update  == '':
+            if self.host_resource_data.host_to_update == '':
                 # pylint: disable=raise-missing-from
                 raise MissingRequiredParameterException("Error: Host id is required")
