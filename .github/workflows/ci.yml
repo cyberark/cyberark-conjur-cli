@@ -1,0 +1,46 @@
+
+name: CI
+
+on: [push, workflow_dispatch]
+
+
+jobs:
+  build:
+    runs-on : macOS-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+    - name: Pack CLI
+      run: |
+        pyinstaller -D ./pkg_bin/conjur
+
+    - name: Setup test containers
+      run: |
+        brew install docker docker-machine docker-compose
+        sudo /etc/init.d/docker start
+        sudo docker --version
+        pyinstaller -F ${PWD}/test/util/test_runners/integrations_tests_runner.py
+        ./bin/test_integration --process
+
+        ./dist/integrations_tests_runner \
+          --identifier integration \
+          --url https://localhost:8443 \
+          --account dev \
+          --login admin \
+          --password $CONJUR_AUTHN_API_KEY \
+          --files-folder /test \
+          --cli-to-test dist/conjur/conjur
