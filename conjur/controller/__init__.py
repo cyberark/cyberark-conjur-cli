@@ -1,7 +1,7 @@
 """
 controller
 
-This package contain the controller classes
+This package contains the controller classes
 """
 
 from conjur.controller.host_controller import HostController

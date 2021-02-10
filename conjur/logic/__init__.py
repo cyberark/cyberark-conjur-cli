@@ -1,7 +1,7 @@
 """
 logic
 
-This package contain the logic classes
+This package contains the logic classes
 """
 
 from conjur.logic.user_logic import UserLogic
