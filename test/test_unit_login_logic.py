@@ -1,8 +1,7 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import conjur
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb
 from conjur.logic.login_logic import LoginLogic

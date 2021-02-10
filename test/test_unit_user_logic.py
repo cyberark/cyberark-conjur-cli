@@ -5,7 +5,7 @@ import requests
 from conjur import Client
 from conjur.errors import OperationNotCompletedException
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.logic.user_logic import UserLogic
 
 

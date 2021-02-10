@@ -2,7 +2,7 @@ import netrc
 import unittest
 from unittest.mock import MagicMock, patch, mock_open
 
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.util.credentials_from_file import CredentialsFromFile
 from test.util import test_helpers as utils
 
 class MockCredentialsData:

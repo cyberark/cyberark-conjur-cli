@@ -20,7 +20,7 @@ from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controller import InitController
 from conjur.logic import InitLogic
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.data_object import ConjurrcData
 from conjur.resource import Resource
 

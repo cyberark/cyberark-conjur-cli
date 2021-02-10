@@ -1,7 +1,6 @@
 import unittest
-from unittest.mock import MagicMock
 
-from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.logic.logout_logic import LogoutLogic
 
 
