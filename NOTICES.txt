@@ -7,21 +7,21 @@ the full text of the license associated with each component.
 
 
 Section 1: Apache-2.0
->>>> github.com/psf/requests - 2.25.0
->>>> github.com/pyca/cryptography - 3.3.2
->>>> github.com/pyca/pyopenssl - 20.0.0
->>>> github.com/pypa/twine - 3.2.0
+>>> github.com/pyca/cryptography - 3.3.2
+>>> github.com/psf/requests - 2.25.0
+>>> github.com/pyca/pyopenssl - 20.0.0
+>>> github.com/pypa/twine - 3.2.0
 
 Section 2: BSD
->>>> github.com/nose-devs/nose2 - 0.9.2
->>>> github.com/nose-devs/nose2[coverage_plugin] - 0.6.5
+>>> github.com/nose-devs/nose2 - 0.9.2
+>>> github.com/nose-devs/nose2[coverage_plugin] - 0.6.5
 
 Section 3: GPLv2.0 with exception
->>>> pyinstaller.readthedocs.io - 4.0
+>>> pyinstaller.readthedocs.io - 4.0
 
 Section 4: MIT
->>>> github.com/urllib3/urllib3 - 1.25.9
->>>> github.com/yaml/pyyaml - 5.3.1
+>>> github.com/urllib3/urllib3 - 1.25.9
+>>> github.com/yaml/pyyaml - 5.3.1
 
 
 APPENDIX: Standard License Files and Templates
@@ -35,23 +35,7 @@ APPENDIX: Standard License Files and Templates
 
 Apache-2.0 License is applicable to the following component(s).
 
->>>> github.com/psf/requests - 2.25.0
-
-Copyright 2015 Kenneth Reitz
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
->>>> github.com/pyca/cryptography - 3.3.2
+>>> github.com/pyca/cryptography - 3.3.2
 
 Copyright 2013-2021, Individual Contributors Revision 048f7c6c.
 
@@ -67,7 +51,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
->>>> github.com/pyca/pyopenssl - 20.0.0
+>>> github.com/psf/requests - 2.25.0
+
+Copyright 2015 Kenneth Reitz
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+>>> github.com/pyca/pyopenssl - 20.0.0
 
 Copyright 2001 The pyOpenSSL developers
 
@@ -83,7 +83,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
->>>> github.com/pypa/twine - 3.2.0
+>>> github.com/pypa/twine - 3.2.0
 
 Copyright 2019, Donald Stufft and individual contributors
 
@@ -104,7 +104,7 @@ limitations under the License.
 
 BSD 3-Clause License is applicable to the following component(s).
 
->>>> github.com/nose-devs/nose2 - 0.9.2
+>>> github.com/nose-devs/nose2 - 0.9.2
 
 Copyright (c) 2012, Jason Pellerin
 All rights reserved.
@@ -139,7 +139,7 @@ Portions derived from unittest2. unittest2 is Copyright (c) 2001-2012
 Python Software Foundation; All Rights Reserved. See:
 http://docs.python.org/license.html
 
->>>> github.com/nose-devs/nose2[coverage_plugin] - 0.6.5
+>>> github.com/nose-devs/nose2[coverage_plugin] - 0.6.5
 
 Copyright (c) 2012, Jason Pellerin
 All rights reserved.
@@ -176,7 +176,7 @@ http://docs.python.org/license.html
 
 --------------- SECTION 3: GPLv2 with exception ----------
 
->>>> pyinstaller.readthedocs.io - 4.0
+>>> pyinstaller.readthedocs.io - 4.0
 
 Copyright 2005–2019, PyInstaller Development Team
 
@@ -205,7 +205,7 @@ it will have to comply with the GPL license. See also our
 
 --------------- SECTION 4: MIT ----------
 
->>>> github.com/urllib3/urllib3 - 1.25.9
+>>> github.com/urllib3/urllib3 - 1.25.9
 
 Copyright (c) 2008-2020 Andrey Petrov and contributors (see CONTRIBUTORS.txt)
 
@@ -227,7 +227,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
->>>> github.com/yaml/pyyaml - 5.3.1
+>>> github.com/yaml/pyyaml - 5.3.1
 
 Copyright (c) 2017-2021 Ingy döt Net
 Copyright (c) 2006-2016 Kirill Simonov

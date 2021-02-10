@@ -212,7 +212,7 @@ To create a tag and release follow the instructions in this section.
 
 1. Review the git log and ensure the changelog contains all relevant recent changes with references to GitHub issues or PRs, if possible
 
-1. Review the changes since the last tag, and if the dependencies have changed revise the [NOTICES](NOTICES.md) file to correctly capture the added dependencies and their licenses / copyrights
+1. Review the changes since the last tag, and if the dependencies have changed revise the [NOTICES](NOTICES.txt) file to correctly capture the added dependencies and their licenses / copyrights
 
 1. Before creating a release, ensure that all documentation that needs to be written has been written by TW, approved by PO/Engineer, and pushed to the forward-facing documentation
 
