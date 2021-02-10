@@ -12,7 +12,7 @@ Section 1: Apache-2.0
 >>> github.com/pyca/pyopenssl - 20.0.0
 >>> github.com/pypa/twine - 3.2.0
 
-Section 2: BSD
+Section 2: BSD 3-Clause
 >>> github.com/nose-devs/nose2 - 0.9.2
 >>> github.com/nose-devs/nose2[coverage_plugin] - 0.6.5
 
@@ -28,7 +28,7 @@ APPENDIX: Standard License Files and Templates
 
 >>> Apache-2.0
 >>> BSD 3-Clause
->>> GPL
+>>> GPLv2
 >>> MIT
 
 --------------- SECTION 1: Apache-2.0 ----------
@@ -37,7 +37,7 @@ Apache-2.0 License is applicable to the following component(s).
 
 >>> github.com/pyca/cryptography - 3.3.2
 
-Copyright 2013-2021, Individual Contributors Revision 048f7c6c.
+Copyright 2013-2021 Individual Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
