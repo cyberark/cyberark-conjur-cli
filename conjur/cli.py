@@ -20,13 +20,14 @@ import requests
 
 # Internals
 from conjur.wrapper.argparse_wrapper import ArgparseWrapper
-from conjur.api import Client
+from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
-from conjur.controller import HostController, ListController, LogoutController, LoginController, PolicyController, \
-    UserController, VariableController
-from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, VariableLogic, CredentialsFromFile
-from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData, PolicyData, UserInputData, \
-    VariableData
+from conjur.controller import HostController, ListController, LogoutController
+from conjur.controller import LoginController, PolicyController, UserController, VariableController
+from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, VariableLogic
+from conjur.logic.credentials_from_file import CredentialsFromFile
+from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData
+from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
 
 
