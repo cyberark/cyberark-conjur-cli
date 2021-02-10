@@ -1,5 +1,5 @@
 """
-logic package
+logic
 
 This package contain the logic classes
 """

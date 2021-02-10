@@ -1,5 +1,5 @@
 """
-controller package
+controller
 
 This package contain the controller classes
 """

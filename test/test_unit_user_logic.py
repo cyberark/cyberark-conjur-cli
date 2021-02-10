@@ -42,7 +42,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Validate that if user doesn't provide username, rotate_other_api_key will be called once with proper params
     '''
-
     def test_user_does_not_provide_username_can_rotate_own_key(self):
         self.user_logic.extract_credentials_from_credential_store = MagicMock(return_value={'login_id': 'someuser',
                                                                                             'api_key': 'someAPIKey'})
@@ -87,7 +86,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Validates that a rotated API key for another user can be returned
     '''
-
     def test_rotate_other_api_key_returns_new_key(self):
         new_api_key = 'someAPIKey'
         client = MagicMock(return_value=None)
@@ -98,7 +96,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Validates that a new personal API key can be returned
     '''
-
     def test_rotate_personal_api_key_returns_api_key(self):
         new_api_key = 'someAPIKey'
         client = MagicMock(return_value=None)
@@ -110,7 +107,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Raises exception when HTTPError was raised
     '''
-
     def test_rotate_personal_api_key_raises_exception_when_unauthorized(self):
         client = MagicMock(return_value=None)
         mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
@@ -121,7 +117,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Raises exception when operation was not able to be completed successfully
     '''
-
     def test_rotate_personal_api_key_raises_exception_when_incomplete_operation(self):
         client = MagicMock(return_value=None)
         mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
@@ -132,7 +127,6 @@ class UserLogicTest(unittest.TestCase):
     '''
     Validates that update_api_key_entry was called
     '''
-
     def test_update_entry_was_called(self):
         CredentialsFromFile.update_api_key_entry = MagicMock()
         mock_user_logic = UserLogic(self.conjurrc_data, self.credentials_from_store, self.client)

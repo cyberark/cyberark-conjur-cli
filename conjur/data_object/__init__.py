@@ -1,7 +1,7 @@
 """
-data_object package
+data_object
 
-This package contain the data objects of the cli.
+This module contains the data objects of the client
 """
 
 from conjur.data_object.conjurrc_data import ConjurrcData

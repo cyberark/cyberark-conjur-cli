@@ -1,5 +1,5 @@
 """
-wrapper package
+wrapper
 
-This package contain classes that are wrapping third party libraries
+This module contains wrapper classes for third party libraries
 """

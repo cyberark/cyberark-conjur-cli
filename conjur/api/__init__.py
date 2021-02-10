@@ -1,5 +1,5 @@
 """
-api package
+api
 
 Package containing classes that responsible to communicate with conjur server.
 """
