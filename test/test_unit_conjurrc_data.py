@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import mock_open, patch
 
-from conjur.init.conjurrc_data import ConjurrcData
+from conjur.data_object.conjurrc_data import ConjurrcData
 
 EXPECTED_REP_OBJECT={'appliance_url': 'https://someurl', 'account': 'someaccount', 'cert_file': "/some/cert/path", 'plugins': []}
 EXPECTED_CONJURRC = \

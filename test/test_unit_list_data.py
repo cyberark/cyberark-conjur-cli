@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.list import ListData
+from conjur.data_object.list_data import ListData
 
 
 class ListDataTest(unittest.TestCase):

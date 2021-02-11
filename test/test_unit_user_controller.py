@@ -3,8 +3,10 @@ from unittest.mock import MagicMock, patch
 import requests
 
 from conjur.errors import OperationNotCompletedException, InvalidPasswordComplexityException
-from conjur.user import UserController, UserInputData
-from conjur.user.user_logic import UserLogic
+from conjur.controller.user_controller import UserController
+from conjur.logic.user_logic import UserLogic
+from conjur.data_object.user_input_data import UserInputData
+
 
 class UserControllerTest(unittest.TestCase):
     user_logic = UserLogic
@@ -32,7 +34,8 @@ class UserControllerTest(unittest.TestCase):
         mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
-        mock_user_logic.change_personal_password = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
+        mock_user_logic.change_personal_password = MagicMock(
+            side_effect=requests.exceptions.HTTPError(response=mock_response))
         with self.assertRaises(requests.exceptions.HTTPError):
             user_controller.change_personal_password()
 
@@ -43,7 +46,8 @@ class UserControllerTest(unittest.TestCase):
         mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
-        mock_user_logic.change_personal_password = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
+        mock_user_logic.change_personal_password = MagicMock(
+            side_effect=requests.exceptions.HTTPError(response=mock_response))
         with self.assertRaises(InvalidPasswordComplexityException):
             user_controller.change_personal_password()
 

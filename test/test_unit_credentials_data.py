@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.credentials_data import CredentialsData
+from conjur.data_object.credentials_data import CredentialsData
 
 EXPECTED_REP_OBJECT={'machine': 'https://someurl', 'login': 'someid', 'password': "****"}
 

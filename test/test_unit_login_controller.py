@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from Utils import Utils
-from conjur.credentials_data import CredentialsData
-from conjur.init import ConjurrcData
-from conjur.login import LoginController, LoginLogic
+from conjur.util import util_functions
+from conjur.data_object.credentials_data import CredentialsData
+from conjur.controller.login_controller import LoginController
+from conjur.logic.login_logic import LoginLogic
 
 
 class MockConjurrc:
@@ -13,10 +13,12 @@ class MockConjurrc:
     cert_file = 'some/path/to/pem'
     plugins: []
 
+
 class MockCredentialsData:
     machine = 'https://someurl'
     login = 'somelogin'
     api_key = 'somepass'
+
 
 class LoginControllerTest(unittest.TestCase):
     def test_login_controller_constructor(self):
@@ -24,7 +26,8 @@ class LoginControllerTest(unittest.TestCase):
         mock_user_password = None
         mock_credential_data = None
         mock_login_logic = None
-        mock_login_controller = LoginController(mock_ssl_verify, mock_user_password, mock_credential_data, mock_login_logic)
+        mock_login_controller = LoginController(mock_ssl_verify, mock_user_password, mock_credential_data,
+                                                mock_login_logic)
         self.assertEquals(mock_login_controller.ssl_verify, mock_ssl_verify)
         self.assertEquals(mock_login_controller.user_password, mock_user_password)
         self.assertEquals(mock_login_controller.credential_data, mock_credential_data)
@@ -32,9 +35,9 @@ class LoginControllerTest(unittest.TestCase):
 
     def test_login_controller_constructor_with_ssl_verify_false_calls_warning_message(self):
         mock_ssl_verify = False
-        Utils.get_insecure_warning = MagicMock()
+        util_functions.get_insecure_warning = MagicMock()
         LoginController(mock_ssl_verify, None, None, None)
-        Utils.get_insecure_warning.assert_called_once()
+        util_functions.get_insecure_warning.assert_called_once()
 
     def test_login_load_calls_all_functions_correctly(self):
         mock_credential_data = CredentialsData
@@ -63,13 +66,13 @@ class LoginControllerTest(unittest.TestCase):
         mock_login_controller = LoginController(True, None, mock_credential_data, LoginLogic)
         mock_login_controller.get_password()
 
-    @patch('conjur.init.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_login_conjurrc_is_loaded(self, mock_conjurrc_data):
         mock_login_controller = LoginController(True, None, MockCredentialsData, LoginLogic)
         self.assertEquals(MockConjurrc, mock_login_controller.load_conjurrc_data())
 
     def test_login_get_api_key_is_called(self):
-        with patch('conjur.login.login_logic') as mock_logic:
+        with patch('conjur.logic.login_logic') as mock_logic:
             mock_logic.get_api_key = MagicMock()
             mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
             mock_login_controller.ssl_verify = True
@@ -81,7 +84,7 @@ class LoginControllerTest(unittest.TestCase):
                                                            MockConjurrc)
 
     def test_login_raises_error_when_error_occurred_while_getting_api_key(self):
-        with patch('conjur.login.login_logic') as mock_logic:
+        with patch('conjur.logic.login_logic') as mock_logic:
             mock_logic.get_api_key = MagicMock(side_effect=RuntimeError)
             mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
             with self.assertRaises(RuntimeError):

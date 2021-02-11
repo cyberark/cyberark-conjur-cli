@@ -1,8 +1,9 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur.init import ConjurrcData
-from conjur.logout import LogoutController, LogoutLogic
+from conjur.data_object.conjurrc_data import ConjurrcData
+from conjur.controller.logout_controller import LogoutController
+from conjur.logic.logout_logic import LogoutLogic
 
 
 class MockConjurrc:
@@ -10,6 +11,7 @@ class MockConjurrc:
     account = 'someacc'
     cert_file = 'some/path/to/pem'
     plugins: []
+
 
 class LogoutControllerTest(unittest.TestCase):
     def test_logout_controller_constructor(self):
@@ -21,7 +23,7 @@ class LogoutControllerTest(unittest.TestCase):
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)
-    @patch('conjur.init.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_logout_removes_credentials(self, mock_exists, mock_size, mock_conjurrc):
         mock_logout_logic = LogoutLogic
         mock_logout_logic.remove_credentials = MagicMock()
@@ -39,10 +41,10 @@ class LogoutControllerTest(unittest.TestCase):
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)
-    @patch('conjur.init.ConjurrcData.load_from_file', return_value=MagicMock(side_effect=Exception))
-    def test_logout_remove_credentials_operation_fails_raises_exception(self,  mock_exists, mock_size, mock_conjurrc):
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
+           return_value=MagicMock(side_effect=Exception))
+    def test_logout_remove_credentials_operation_fails_raises_exception(self, mock_exists, mock_size, mock_conjurrc):
         mock_logout_logic = LogoutLogic
         mock_logout_controller = LogoutController(True, mock_logout_logic)
         with self.assertRaises(Exception):
             mock_logout_controller.remove_credentials()
-

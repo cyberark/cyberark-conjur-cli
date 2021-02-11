@@ -13,16 +13,17 @@ import logging
 # Internals
 import netrc
 
-from Utils.utils import Utils
+from conjur.util import util_functions
 from conjur.api import Api
+from conjur.api.ssl_client import SSLClient
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.init.init_controller import InitController
-from conjur.init.init_logic import InitLogic
-from conjur.init.conjurrc_data import ConjurrcData
-from conjur.credentials_from_file import CredentialsFromFile
+from conjur.controller import InitController
+from conjur.logic import InitLogic
+from conjur.util import CredentialsFromFile
+from conjur.data_object import ConjurrcData
 from conjur.resource import Resource
-from conjur.ssl_service import SSLService
+
 
 class ConfigException(Exception):
     """
@@ -37,6 +38,8 @@ class ConfigException(Exception):
     use these parameters defined in this class to initialize our Python
     SDK in their code.
     """
+
+
 class Client():
     """
     Client
@@ -64,7 +67,7 @@ class Client():
                  url=None):
 
         if ssl_verify is False:
-            Utils.get_insecure_warning()
+            util_functions.get_insecure_warning()
 
         self.setup_logging(debug)
 
@@ -150,7 +153,7 @@ class Client():
         """
         Initializes the client, creating the .conjurrc file
         """
-        ssl_service = SSLService()
+        ssl_service = SSLClient()
 
         conjurrc_data = ConjurrcData(url,
                                      account,

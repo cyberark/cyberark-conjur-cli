@@ -26,6 +26,7 @@ Your choices:
 """)
 
 #pylint: disable=wrong-import-position
-from conjur.client import Client
+from conjur.api.client import Client
 #pylint: disable=wrong-import-position
 from conjur.cli import Cli
+from conjur.api.api import Api

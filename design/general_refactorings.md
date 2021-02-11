@@ -61,6 +61,7 @@ The files need to be organized by their types and not by the commands they repre
 | controller     | All controller classes                                       |
 | logic          | All logic classes                                            |
 | data_objects   | All data objects classes                                     |
+| util           | All util modules                                             |
 
 
 

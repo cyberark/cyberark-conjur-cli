@@ -1,11 +1,10 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import conjur
-from conjur.credentials_from_file import CredentialsFromFile
-from conjur.endpoints import ConjurEndpoint
-from conjur.http_wrapper import HttpVerb
-from conjur.login import LoginLogic
+from conjur.util.credentials_from_file import CredentialsFromFile
+from conjur.api.endpoints import ConjurEndpoint
+from conjur.wrapper.http_wrapper import HttpVerb
+from conjur.logic.login_logic import LoginLogic
 
 class MockCredentialsData:
     machine = 'https://someurl'
@@ -33,7 +32,7 @@ class LoginLogicTest(unittest.TestCase):
         self.assertEquals(login_logic.credentials_storage, mock_credential_store)
 
     def test_verify_false_invoke_endpoint_and_passes_false(self):
-        with patch('conjur.login.login_logic.invoke_endpoint', return_value=MockClientResponse()) as mock_endpoint:
+        with patch('conjur.logic.login_logic.invoke_endpoint', return_value=MockClientResponse()) as mock_endpoint:
             LoginLogic.get_api_key(False, MockCredentialsData, 'somepass', MockConjurrc)
             params={'url':'https://someurl','account':'someacc'}
             mock_endpoint.assert_called_once_with(HttpVerb.GET,
@@ -42,7 +41,7 @@ class LoginLogicTest(unittest.TestCase):
                                                          auth=('somelogin', 'somepass'),
                                                          ssl_verify=False)
 
-    @patch('conjur.login.login_logic.invoke_endpoint', return_value=MockClientResponse())
+    @patch('conjur.logic.login_logic.invoke_endpoint', return_value=MockClientResponse())
     def test_verify_true_invoke_endpoint_and_passes_cert_path(self, mock_invoke_endpoint):
         mock_credential_store = CredentialsFromFile
         mock_login_logic = LoginLogic(mock_credential_store)

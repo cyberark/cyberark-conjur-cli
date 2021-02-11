@@ -2,10 +2,10 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from conjur import Client
-from conjur.host import HostController
-from conjur.login import LoginController
-from conjur.logout import LogoutController
-from conjur.user import UserController
+from conjur.controller.host_controller import HostController
+from conjur.controller.login_controller import LoginController
+from conjur.controller.logout_controller import LogoutController
+from conjur.controller.user_controller import UserController
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli

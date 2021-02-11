@@ -1,14 +1,12 @@
 import io
-import os
 import unittest
 
-from contextlib import redirect_stdout
 from unittest import mock
-from unittest.mock import patch, mock_open, Mock
+from unittest.mock import patch, mock_open
 
-from conjur.init.init_logic import InitLogic
-from conjur.init.conjurrc_data import ConjurrcData
-from conjur.ssl_service import SSLService
+from conjur.logic.init_logic import InitLogic
+from conjur.data_object.conjurrc_data import ConjurrcData
+from conjur.api.ssl_client import SSLClient
 
 MOCK_CERT='''
 -----BEGIN CERTIFICATE-----
@@ -26,7 +24,7 @@ plugins: [foo, bar]
 
 class InitLogicTest(unittest.TestCase):
     conjurrc_data = ConjurrcData("my_url", "myorg", None)
-    ssl_service = SSLService
+    ssl_service = SSLClient
     capture_stream = io.StringIO()
     init_logic = InitLogic(ssl_service)
 
@@ -85,7 +83,7 @@ class InitLogicTest(unittest.TestCase):
                     self.assertEquals(lines[4].strip(), "plugins: [foo, bar]")
 
     def test_cert_error_will_raise_exception(self):
-        with patch.object(SSLService, 'get_certificate', side_effect=Exception) as mock_get_cert:
+        with patch.object(SSLClient, 'get_certificate', side_effect=Exception) as mock_get_cert:
             with self.assertRaises(Exception) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
@@ -96,7 +94,7 @@ class InitLogicTest(unittest.TestCase):
     from the inner called service are also returned by the caller
     '''
     def test_fingerprint_and_certificate_are_properly_returned(self):
-        with patch.object(SSLService, 'get_certificate', return_value=["12:AB", "cert"]) as mock_ssl:
+        with patch.object(SSLClient, 'get_certificate', return_value=["12:AB", "cert"]) as mock_ssl:
             mock_init_command = InitLogic(self.ssl_service)
             fingerprint, readable_certificate = mock_init_command.get_certificate("https://someurl", 443)
             self.assertEquals(fingerprint, "12:AB")

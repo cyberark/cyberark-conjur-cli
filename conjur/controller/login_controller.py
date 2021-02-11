@@ -12,9 +12,9 @@ import getpass
 import logging
 import sys
 
-from Utils.utils import Utils
+from conjur.util import util_functions
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
-from conjur.init import ConjurrcData
+from conjur.data_object.conjurrc_data import ConjurrcData
 
 class LoginController:
     """
@@ -32,7 +32,7 @@ class LoginController:
         """
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
-            Utils.get_insecure_warning()
+            util_functions.get_insecure_warning()
 
         self.user_password = user_password
         self.credential_data = credential_data

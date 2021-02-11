@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.host import HostResourceData
+from conjur.data_object.host_resource_data import HostResourceData
 
 class HostResourceDataTest(unittest.TestCase):
 

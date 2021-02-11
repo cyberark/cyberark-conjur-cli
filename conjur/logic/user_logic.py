@@ -11,8 +11,8 @@ import logging
 import requests
 
 # Internals
-from conjur.credentials_from_file import CredentialsFromFile
 from conjur.errors import OperationNotCompletedException
+from conjur.util import CredentialsFromFile
 from conjur.resource import Resource
 
 

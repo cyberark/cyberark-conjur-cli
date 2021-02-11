@@ -3,7 +3,8 @@ from unittest.mock import MagicMock, patch
 
 from conjur import Client
 from conjur.errors import MissingRequiredParameterException
-from conjur.host import HostController, HostResourceData
+from conjur.controller.host_controller import HostController
+from conjur.data_object.host_resource_data import HostResourceData
 from conjur.resource import Resource
 
 
@@ -19,7 +20,7 @@ class HostControllerTest(unittest.TestCase):
         assert host_controller.client == mock_client
         assert host_controller.host_resource_data == mock_host_resource_data
 
-    @patch('conjur.client')
+    @patch('conjur.api.client')
     def test_rotate_api_key_calls_necessary_functions(self, mock_client):
         mock_host_resource_data = HostResourceData(action='someaction', host_to_update='somehost')
         mock_host_controller = HostController(mock_client, mock_host_resource_data)

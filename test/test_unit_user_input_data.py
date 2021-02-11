@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.user import UserInputData
+from conjur.data_object.user_input_data import UserInputData
 
 
 class UserInputDataTest(unittest.TestCase):
