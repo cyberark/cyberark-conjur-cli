@@ -45,12 +45,36 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         return self.invoke_cli(self.cli_auth_params,
                                ['list'], exit_code=exit_code)
 
-    # *************** INITIAL INIT CONFIGURATION TESTS ***************
+    # *************** INIT CONFIGURATION TESTS ***************
+
+    '''
+    Validates that the conjurrc cert_file entry is blank when run in --insecure mode
+    '''
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_in_insecure_mode_leaves_cert_file_empty(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, '')
+
+    '''
+    Validates that certificate flag is overwritten when running in --insecure mode
+    '''
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_provided_cert_file_path_is_overwritten_in_insecure_mode(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account', 'someaccount',
+                         '--certificate', self.environment.path_provider.certificate_path])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, '')
 
     '''
     Validates that the conjurrc was created on the machine
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
@@ -58,6 +82,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
@@ -65,11 +90,12 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     @integration_test()
     @patch('builtins.input', return_value='yes')
-    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
+    def test_https_conjurrc_is_created_successfully_with_extra_slash_in_url(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname+"/", '--account', 'someaccount'])
 
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''

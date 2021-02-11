@@ -86,7 +86,7 @@ class ClientTest(unittest.TestCase):
         client = Client
         mock_init_controller = InitController
         mock_init_controller.load = MagicMock()
-        Client.initialize('someurl', 'someaccount', '/some/path/to/pem', False)
+        Client.initialize('someurl', 'someaccount', '/some/path/to/pem', False, True)
         mock_init_controller.load.assert_called_once()
 
     @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)

@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 
 # Internals
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
+from conjur.util import util_functions
 
 class InitController:
     """
@@ -27,7 +28,11 @@ class InitController:
     conjurrc_data = None
     init_logic = None
 
-    def __init__(self, conjurrc_data, init_logic, force):
+    def __init__(self, conjurrc_data, init_logic, force, ssl_verify):
+        self.ssl_verify = ssl_verify
+        if self.ssl_verify is False:
+            util_functions.get_insecure_warning()
+
         self.conjurrc_data = conjurrc_data
         self.init_logic = init_logic
         self.force_overwrite = force
@@ -36,11 +41,13 @@ class InitController:
         """
         Method that facilitates all method calls in this class
         """
-        fetched_certificate = self.get_server_certificate()
-        self.write_certificate(fetched_certificate)
+        if self.ssl_verify is True:
+            fetched_certificate = self.get_server_certificate()
+            self.write_certificate(fetched_certificate)
+        else:
+            self.conjurrc_data.cert_file=""
 
         self.get_account_info(self.conjurrc_data)
-
         self.write_conjurrc()
 
         sys.stdout.write("Configuration was initialized successfully.\n")

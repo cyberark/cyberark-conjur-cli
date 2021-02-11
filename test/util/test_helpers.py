@@ -7,6 +7,8 @@ from unittest.mock import patch
 # *************************************************
 # *********** INTEGRATION TESTS HELPERS ***********
 # *************************************************
+from conjur.constants import DEFAULT_CONFIG_FILE
+
 
 def remove_file(file_path):
     if os.path.isfile(file_path):
@@ -36,6 +38,17 @@ def login_to_cli(self):
 def setup_cli(self):
     init_to_cli(self)
     login_to_cli(self)
+
+ # *************** INIT ***************
+
+def verify_conjurrc_contents(account, hostname, cert):
+    with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
+        lines = conjurrc.readlines()
+        assert "---" in lines[0]
+        assert f"account: {account}" in lines[1]
+        assert f"appliance_url: {hostname}" in lines[2]
+        assert f"cert_file: {cert}" in lines[3]
+        assert f"plugins: []" in lines[4]
 
  # *************** VARIABLE ***************
 
