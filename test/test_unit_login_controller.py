@@ -1,9 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from Utils import Utils
+from conjur.util import util_functions
 from conjur.data_object.credentials_data import CredentialsData
-from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.controller.login_controller import LoginController
 from conjur.logic.login_logic import LoginLogic
 
@@ -36,9 +35,9 @@ class LoginControllerTest(unittest.TestCase):
 
     def test_login_controller_constructor_with_ssl_verify_false_calls_warning_message(self):
         mock_ssl_verify = False
-        Utils.get_insecure_warning = MagicMock()
+        util_functions.get_insecure_warning = MagicMock()
         LoginController(mock_ssl_verify, None, None, None)
-        Utils.get_insecure_warning.assert_called_once()
+        util_functions.get_insecure_warning.assert_called_once()
 
     def test_login_load_calls_all_functions_correctly(self):
         mock_credential_data = CredentialsData

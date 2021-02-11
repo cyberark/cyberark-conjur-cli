@@ -13,7 +13,7 @@ import logging
 # Internals
 import netrc
 
-from Utils.utils import Utils
+from conjur.util import util_functions
 from conjur.api import Api
 from conjur.api.ssl_client import SSLClient
 from conjur.config import Config as ApiConfig
@@ -67,7 +67,7 @@ class Client():
                  url=None):
 
         if ssl_verify is False:
-            Utils.get_insecure_warning()
+            util_functions.get_insecure_warning()
 
         self.setup_logging(debug)
 
