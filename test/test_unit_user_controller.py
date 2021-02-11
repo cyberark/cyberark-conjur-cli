@@ -54,7 +54,6 @@ class UserControllerTest(unittest.TestCase):
     '''
     Verifies that the user is prompted to input their password and check_password_validity is called once
     '''
-
     def test_user_does_not_provide_password_prompts_for_one_and_is_verified(self):
         mock_user_logic = UserLogic
         mock_user_data = UserInputData(action='someaction', id='someuser', new_password=None)

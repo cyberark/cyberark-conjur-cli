@@ -12,7 +12,7 @@ import requests
 
 # Internals
 from conjur.errors import OperationNotCompletedException
-from conjur.util.credentials_from_file import CredentialsFromFile
+from conjur.util import CredentialsFromFile
 from conjur.resource import Resource
 
 
