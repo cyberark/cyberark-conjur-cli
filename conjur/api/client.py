@@ -17,7 +17,7 @@ from conjur.util import util_functions
 from conjur.api import Api
 from conjur.api.ssl_client import SSLClient
 from conjur.config import Config as ApiConfig
-from conjur.constants import DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CERTIFICATE_BUNDLE_FILE
 from conjur.controller import InitController
 from conjur.logic import InitLogic
 from conjur.util import CredentialsFromFile
@@ -83,7 +83,8 @@ class Client():
         if not url or not login_id or (not password and not api_key):
             try:
                 on_disk_config = dict(ApiConfig())
-
+                # We want to keep this abstraction hidden from the user
+                on_disk_config['ca_bundle'] = DEFAULT_CERTIFICATE_BUNDLE_FILE
                 # We want to retain any overrides that the user provided from params
                 # but only if those values are valid
                 for field_name, field_value in loaded_config.items():

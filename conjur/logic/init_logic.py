@@ -12,9 +12,12 @@ import logging
 import os.path
 
 # Third party
+import shutil
+
+import requests
 import yaml
 
-from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_BUNDLE_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
@@ -60,14 +63,27 @@ class InitLogic:
         if conjurrc_data.cert_file is None and conjurrc_data.appliance_url.startswith("https"):
             certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
                                           "conjur-server.pem")
+
         else:
             certificate_path = conjurrc_data.cert_file
 
         logging.debug("Attempting to fetch the account from the Conjur server")
+
+        store = requests.certs.where()
+        with open(certificate_path) as certificate_file:
+                loaded_certificate = certificate_file.read()
+
+        # We copy the contents of the CA bundle on the machine and append to it the certificate
+        # that was fetched from the server so that certificate validation can take place.
+        # We make a duplicate of the ca bundles to avoid changing the file system of the user.
+        shutil.copy(store, DEFAULT_CERTIFICATE_BUNDLE_FILE)
+        with open(DEFAULT_CERTIFICATE_BUNDLE_FILE, 'a') as bundle:
+            bundle.write('\n'+loaded_certificate)
+
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,
                                    params,
-                                   ssl_verify=certificate_path).json()
+                                   ssl_verify=DEFAULT_CERTIFICATE_BUNDLE_FILE).json()
         conjurrc_data.account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation

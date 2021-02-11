@@ -16,7 +16,8 @@ except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
 
 # Internals
-from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_BUNDLE_FILE
+
 
 class Config():
     """
@@ -47,7 +48,10 @@ class Config():
             if mandatory:
                 assert config_field_name in config
 
-            setattr(self, attribute_name, config[config_field_name])
+            if config_field_name == 'cert_file' and config[config_field_name] is not None:
+                setattr(self, attribute_name, DEFAULT_CERTIFICATE_BUNDLE_FILE)
+            else:
+                setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
 
     def __repr__(self):

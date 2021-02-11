@@ -11,6 +11,7 @@ information to the user's machine
 import logging
 
 # Internals
+from conjur.constants import DEFAULT_CERTIFICATE_BUNDLE_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
@@ -39,7 +40,7 @@ class LoginLogic:
         if ssl_verify is False:
             certificate_path = False
         elif credential_data.machine.startswith("https"):
-            certificate_path = conjurrc.cert_file
+            certificate_path = DEFAULT_CERTIFICATE_BUNDLE_FILE
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur")

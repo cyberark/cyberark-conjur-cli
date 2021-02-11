@@ -24,6 +24,11 @@ DEFAULT_NETRC_FILE_NAME = INTERNAL_FILE_PREFIX + "netrc"
 DEFAULT_CONFIG_FILE = os.path.expanduser(os.path.join('~', '.conjurrc'))
 DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', DEFAULT_NETRC_FILE_NAME))
 DEFAULT_CERTIFICATE_FILE = os.path.expanduser(os.path.join('~', "conjur-server.pem"))
+
+# Bundle where both the CA bundles and certificate fetched from the server will sit
+# This concatenation is necessary so that the certificate can be validated against its issued CA
+DEFAULT_CERTIFICATE_BUNDLE_FILE = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
+                                              "conjur-bundle.pem")
 CREDENTIAL_HOST_PATH = "/authn"
 
 PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE = "The password must contain at least 12 characters: " \
