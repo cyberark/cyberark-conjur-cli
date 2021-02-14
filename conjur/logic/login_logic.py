@@ -38,8 +38,13 @@ class LoginLogic:
 
         if ssl_verify is False:
             certificate_path = False
-        elif credential_data.machine.startswith("https"):
-            certificate_path = conjurrc.cert_file
+        elif ssl_verify and credential_data.machine.startswith("https"):
+            # Catches the case where a user does not run in insecure mode but the
+            # .conjurrc cert_file entry is empty
+            if conjurrc.cert_file == '':
+                certificate_path = True
+            else:
+                certificate_path = conjurrc.cert_file
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur")
