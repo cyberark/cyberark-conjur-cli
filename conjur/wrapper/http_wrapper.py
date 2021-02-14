@@ -28,6 +28,8 @@ class HttpVerb(Enum):
 
 
 #pylint: disable=too-many-locals
+# ssl_verify can accept Boolean or String as per requests docs
+# https://requests.readthedocs.io/en/master/api/#main-interface
 def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                     ssl_verify=True, auth=None, api_token=None, query=None):
     """
