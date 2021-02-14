@@ -564,11 +564,12 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             sys.exit(0)
 
     @classmethod
-    def handle_init_logic(cls, url=None, name=None, certificate=None, force=None):
+    # pylint: disable=too-many-arguments
+    def handle_init_logic(cls, url=None, name=None, certificate='', force=None, ssl_verify=True):
         """
         Method that wraps the init call logic
         """
-        Client.initialize(url, name, certificate, force)
+        Client.initialize(url, name, certificate, force, ssl_verify=ssl_verify)
 
     @classmethod
     def handle_login_logic(cls, identifier=None, password=None, ssl_verify=True):
@@ -674,9 +675,9 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         api class method with the specified parameters.
         """
         Client.setup_logging(Client, args.debug)
-        # pylint: disable=no-else-return
+        # pylint: disable=no-else-return,line-too-long
         if resource == 'init':
-            Cli.handle_init_logic(args.url, args.name, args.certificate, args.force)
+            Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             return

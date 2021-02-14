@@ -149,7 +149,7 @@ class Client():
     # Technical debt: refactor when time permits because this function
     # doesn't belong here
     @staticmethod
-    def initialize(url, account, cert, force):
+    def initialize(url, account, cert, force, ssl_verify):
         """
         Initializes the client, creating the .conjurrc file
         """
@@ -163,7 +163,8 @@ class Client():
 
         input_controller = InitController(conjurrc_data,
                                           init_logic,
-                                          force)
+                                          force,
+                                          ssl_verify)
         input_controller.load()
 
     ### API passthrough

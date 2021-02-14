@@ -264,13 +264,14 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     def test_run_action_runs_init_logic(self, mock_setup_logging, mock_handle_init):
         mock_obj = MockArgs()
         mock_obj.url = 'https://someurl'
+        mock_obj.ssl_verify = True
         mock_obj.name = 'somename'
         mock_obj.certificate = 'somecert'
         mock_obj.force = 'force'
         mock_obj.debug = 'somedebug'
 
         Cli().run_action('init', mock_obj)
-        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force')
+        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force', True)
 
     @patch.object(Cli, 'handle_login_logic')
     @patch.object(Client, 'setup_logging')

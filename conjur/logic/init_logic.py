@@ -104,8 +104,7 @@ class InitLogic:
 
             # Ensures that there are no None fields written to conjurrc
             for attr,value in conjurrc_data.__dict__.items():
-                if value is not None:
-                    _pretty_print_object[str(attr)]=value
+                _pretty_print_object[str(attr)]=value
 
             config_fp.write("---\n")
             yaml.dump(_pretty_print_object, config_fp)

@@ -106,7 +106,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_policy_load_raises_file_not_exists_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['policy', 'load', '-b', 'root', '-f', 'somepolicy.yml'], exit_code=1)
+                                 ['policy', 'load', '-b', 'root', '-f', 'somenonexistantpolicy.yml'], exit_code=1)
         self.assertRegex(output, "Error: No such file or directory:")
 
     '''
