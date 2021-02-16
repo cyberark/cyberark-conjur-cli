@@ -11,7 +11,6 @@ import base64
 import logging
 from enum import Enum
 from urllib.parse import quote
-
 import requests
 
 
@@ -36,7 +35,6 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     This method flexibly invokes HTTP calls from 'requests' module
     """
     orig_params = params or {}
-
     # Escape all params
     params = {}
     for key, value in orig_params.items():
@@ -55,11 +53,19 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     request_method = getattr(requests, http_verb.name.lower())
 
     #pylint: disable=not-callable
-    response = request_method(url, *args,
-                              params=query,
-                              verify=ssl_verify,
-                              auth=auth,
-                              headers=headers)
+    try:
+        response = request_method(url, *args,
+                                  params=query,
+                                  verify=True,
+                                  auth=auth,
+                                  headers=headers)
+    except requests.exceptions.SSLError:
+        response = request_method(url, *args,
+                                  params=query,
+                                  verify=ssl_verify,
+                                  auth=auth,
+                                  headers=headers)
+
 
     if check_errors:
         # takes the "requests" response object and expands the
@@ -68,8 +74,8 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
             response.raise_for_status()
         except requests.exceptions.HTTPError as http_error:
             if response.text:
-                logging.debug(requests.exceptions.HTTPError(f'{http_error.response.status_code}' \
-                                                            f' {http_error.response.reason}' \
+                logging.debug(requests.exceptions.HTTPError(f'{http_error.response.status_code}'
+                                                            f' {http_error.response.reason}'
                                                             f' {response.text}'))
             raise http_error
         except Exception as general_error:

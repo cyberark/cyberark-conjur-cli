@@ -222,7 +222,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Cli().handle_login_logic(identifier='someidentifier', password='somepassword', ssl_verify=True)
         mock_load.assert_called_once()
 
-    @patch.object(Client, 'initialize')
+    @patch.object(Cli, 'handle_init_logic')
     def test_cli_init_functions_are_properly_called(self, mock_init):
         Cli().handle_init_logic(url="https://someurl", name="somename", certificate="/path/to/pem", force=False)
         mock_init.assert_called_once()

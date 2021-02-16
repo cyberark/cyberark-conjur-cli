@@ -12,6 +12,7 @@ import getpass
 import logging
 import sys
 
+from conjur.errors import OperationNotCompletedException
 from conjur.util import util_functions
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -96,6 +97,8 @@ class LoginController:
                                                                         self.credential_data,
                                                                         self.user_password,
                                                                         conjurrc)
+        except OperationNotCompletedException:
+            raise
         except Exception as error:
             raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. "
                 f"Reason: {error}. Check your credentials and try again.") from error

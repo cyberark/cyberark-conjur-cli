@@ -41,7 +41,7 @@ class InitLogic:
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
         except Exception as error:
-            raise Exception(f"Unable to retrieve certificate from {hostname}:{port}. " \
+            raise Exception(f"Unable to retrieve certificate from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
 
         return fingerprint, readable_certificate
@@ -71,7 +71,7 @@ class InitLogic:
         conjurrc_data.account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Account '{conjurrc_data.account}' "\
+        logging.debug(f"Account '{conjurrc_data.account}' "
                       "successfully fetched from the Conjur server")
 
     @classmethod
@@ -104,7 +104,7 @@ class InitLogic:
 
             # Ensures that there are no None fields written to conjurrc
             for attr,value in conjurrc_data.__dict__.items():
-                _pretty_print_object[str(attr)]=value
+                _pretty_print_object[str(attr)] = value
 
             config_fp.write("---\n")
             yaml.dump(_pretty_print_object, config_fp)
