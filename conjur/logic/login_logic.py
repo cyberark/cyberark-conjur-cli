@@ -45,7 +45,7 @@ class LoginLogic:
             # .conjurrc cert_file entry is empty
             if conjurrc.cert_file == '' and ssl_verify:
                 raise OperationNotCompletedException(cause="The client was initialized without certificate verification, "
-                                    "even though the command was ran with certificate verification turned on. ",
+                                    "even though the command was ran with certificate verification enabled. ",
                                     solution="To continue communicating with the server insecurely, run the command "
                                     "again with the --insecure flag. Otherwise, reinitialize the client.")
 

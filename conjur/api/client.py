@@ -51,7 +51,7 @@ class Client():
 
     # The method signature is long but we want to explicitly control
     # what parameters are allowed
-    # pylint: disable=too-many-arguments,too-many-locals
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
     def __init__(self,
                  account=None,
                  api_key=None,
@@ -87,12 +87,11 @@ class Client():
                     if field_value:
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
-
                 # Raise exception if the client was initialized in insecure mode
                 # but a follow-up request is run without the insecure flag
                 if ssl_verify is True and loaded_config['ca_bundle'] == '':
                     raise OperationNotCompletedException(cause="The client was initialized without certificate verification, "
-                                        "even though the command was ran with certificate verification turned on. ",
+                                        "even though the command was ran with certificate verification enabled. ",
                                         solution="To continue communicating with the server insecurely, run the command "
                                         "again with the --insecure flag. Otherwise, reinitialize the client.")
 
@@ -100,7 +99,8 @@ class Client():
                               f"{{'account': {loaded_config['account']}, "
                               f"'appliance_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
-
+            except OperationNotCompletedException:
+                raise
             # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:
                 raise ConfigException(exc) from exc

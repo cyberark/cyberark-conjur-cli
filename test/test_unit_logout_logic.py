@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 
 from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.logic.logout_logic import LogoutLogic
@@ -11,8 +12,6 @@ class LogoutLogicTest(unittest.TestCase):
 
         self.assertEquals(mock_logout_logic.credentials, mock_credentials)
 
-    #TODO: Fix test broke during refactor
-    """
     def test_logout_remove_credentials_calls_remove_credentials(self):
         mock_credentials = CredentialsFromFile
         mock_logout_logic = LogoutLogic(mock_credentials)
@@ -20,4 +19,3 @@ class LogoutLogicTest(unittest.TestCase):
 
         mock_logout_logic.remove_credentials("someurl")
         mock_credentials.remove_credentials.assert_called_once_with("someurl")
-    """

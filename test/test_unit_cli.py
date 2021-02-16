@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 from conjur import Client
+from conjur.controller import InitController
 from conjur.controller.host_controller import HostController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
@@ -217,15 +218,20 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     def test_cli_invokes_whoami_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "account": "myaccount"\n}\n', output)
 
+    @patch.object(Cli, 'handle_init_logic')
+    def test_cli_init_functions_are_properly_called(self, mock_init):
+        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False)
+        mock_init.assert_called_once()
+
+    @patch.object(InitController, 'load')
+    def test_cli_init_load_function_is_properly_called(self, mock_load):
+        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False, ssl_verify=True)
+        mock_load.assert_called_once()
+
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
         Cli().handle_login_logic(identifier='someidentifier', password='somepassword', ssl_verify=True)
         mock_load.assert_called_once()
-
-    @patch.object(Cli, 'handle_init_logic')
-    def test_cli_init_functions_are_properly_called(self, mock_init):
-        Cli().handle_init_logic(url="https://someurl", name="somename", certificate="/path/to/pem", force=False)
-        mock_init.assert_called_once()
 
     @patch.object(LogoutController, 'remove_credentials')
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):

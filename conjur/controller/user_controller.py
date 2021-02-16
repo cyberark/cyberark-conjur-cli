@@ -40,7 +40,6 @@ class UserController():
         except OperationNotCompletedException:
             sys.stdout.write("An error occurred. Log in again or try again in debug mode.\n")
             raise
-            # pylint: disable=line-too-long
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
     def change_personal_password(self):
