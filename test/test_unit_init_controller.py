@@ -4,8 +4,10 @@ from contextlib import redirect_stdout
 from unittest.mock import patch, MagicMock
 
 import OpenSSL
+import requests
 from OpenSSL import SSL
 
+from conjur.errors import CertificateHostnameMismatchException
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -33,17 +35,27 @@ class InitControllerTest(unittest.TestCase):
     When user does not supply an account a Runtime error should be raised
     '''
     @patch('builtins.input', return_value='')
-    def test_init_without_host_raises_error(self, mock_input):
+    @patch('conjur.logic.init_logic')
+    def test_init_without_host_raises_error(self, mock_init_logic, mock_input):
+        mock_response = MagicMock()
+        mock_response.status_code = 401
+        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
         mock_conjurrc_data = ConjurrcData()
         with self.assertRaises(RuntimeError):
             mock_conjurrc_data.appliance_url = 'https://someurl'
-            InitController.get_account_info(self, mock_conjurrc_data)
+            mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
+            mock_init_controller.get_account_info(mock_conjurrc_data)
 
     @patch('builtins.input', return_value='someaccount')
-    def test_init_host_is_added_to_conjurrc_object(self, mock_input):
+    @patch('conjur.logic.init_logic')
+    def test_init_host_is_added_to_conjurrc_object(self, mock_init_logic, mock_input):
+        mock_response = MagicMock()
+        mock_response.status_code = 401
+        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
         mock_conjurrc_data = ConjurrcData()
         mock_conjurrc_data.appliance_url="https://someaccount"
-        InitController.get_account_info(self, mock_conjurrc_data)
+        mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
+        mock_init_controller.get_account_info(mock_conjurrc_data)
         self.assertEquals(mock_conjurrc_data.account, 'someaccount')
 
     '''
@@ -148,3 +160,10 @@ class InitControllerTest(unittest.TestCase):
         init_controller = InitController(ConjurrcData, InitLogic, False, True)
         with self.assertRaises(Exception):
             init_controller.ensure_overwrite_file('someconfig')
+
+    @patch('conjur.logic.init_logic')
+    def test_user_raises_certificate_hostname_mismatch_error(self, mock_init_logic):
+        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError)
+        init_controller = InitController(ConjurrcData, mock_init_logic, False, True)
+        with self.assertRaises(CertificateHostnameMismatchException):
+            init_controller.get_account_info(ConjurrcData(account=None))

@@ -102,7 +102,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that if user does not trust the certificate,
     the conjurrc is not be created on the user's machine
     '''
-
     @integration_test(True)
     def test_https_conjurrc_user_does_not_trust_cert(self):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'no']):
@@ -117,7 +116,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that when the user adds the force flag,
     no confirmation is required
     '''
-
     @integration_test(True)
     # The additional side effects here ('somesideffect') would prompt the CLI to
     # request for confirmation which would fail the test

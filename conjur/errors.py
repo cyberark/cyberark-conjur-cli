@@ -46,8 +46,8 @@ class InvalidFormatException(Exception):
 
 class CertificateHostnameMismatchException(Exception):
     """ Exception when hostname on the certificate does not match the user does not input a required parameter """
-    def __init__(self, cause="The machine’s hostname does not match the hostname expected on the certificate. ",
-                 solution="Ensure the common name on the certificate matches the machine's DNS name. "):
+    def __init__(self, cause="The machine's hostname did not match any names on the certificate. ",
+                 solution="Ensure the names on the certificate (common name or SANs) match the machine's hostname. "):
         self.message = cause + solution
         super().__init__(self.message)
 

@@ -2,7 +2,7 @@ version: '2'
 services:
   openssl:
     image: svagi/openssl:latest
-    container_name: openssl
+    container_name: openssl_test
     entrypoint:
       - openssl
       - req

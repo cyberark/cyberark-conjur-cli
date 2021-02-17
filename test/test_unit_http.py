@@ -1,7 +1,7 @@
 import unittest
 
 from enum import Enum
-from unittest.mock import patch, call
+from unittest.mock import patch, call, MagicMock
 
 import requests
 
@@ -85,10 +85,18 @@ class HttpInvokeEndpointTest(unittest.TestCase):
         mock_get.assert_called_once_with('no/params', auth=None, verify=True, headers={}, params=None)
 
     @patch.object(requests, 'get', side_effect=[requests.exceptions.SSLError(), None])
-    def test_invoke_endpoint_passes_ssl_verify_param_to_http_client(self, mock_get):
+    def test_invoke_endpoint_passes_ssl_verify_param_and_tries_verify_true_first_to_http_client(self, mock_get):
         invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, ssl_verify='foo', check_errors=False)
         calls = [call('no/params', auth=None, verify=True, headers={}, params=None), call('no/params', auth=None, verify='foo', headers={}, params=None)]
         mock_get.assert_has_calls(calls)
+
+    @patch.object(requests, 'get')
+    def test_invoke_endpoint_raises_hostname_mismatch_error(self, mock_get):
+        mock = MagicMock()
+        mock.response="hostname"
+        mock_get.side_effect=requests.exceptions.SSLError(response=mock.response)
+        with self.assertRaises(requests.exceptions.SSLError):
+            invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, ssl_verify='foo', check_errors=False)
 
     @patch.object(requests, 'get')
     def test_invoke_endpoint_passes_auth_param_to_hettp_client_if_provided(self, mock_get):

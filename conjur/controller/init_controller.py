@@ -87,7 +87,6 @@ class InitController:
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.appliance_url}'")
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
-
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
         sys.stdout.write("\nTo verify this certificate, it is recommended to run the following "
                          "command on the Conjur server:\n"
@@ -107,8 +106,9 @@ class InitController:
                 self.init_logic.fetch_account_from_server(self.conjurrc_data)
             # pylint: disable=broad-except,logging-fstring-interpolation
             except Exception as error:
-                # Check for catching if the endpoint is exists.
-                if error.response and error.response.status_code == 401:
+                # Check for catching if the endpoint is exists. If the endpoint does not exist,
+                # a 401 status code will be returned
+                if hasattr(error.response, 'status_code') and error.response.status_code == 401:
                     # pylint: disable=line-too-long,logging-fstring-interpolation
                     logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
                     # If there was a problem fetching the account from the server, we will request one
