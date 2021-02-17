@@ -9,6 +9,7 @@ HTTP-based endpoints in a generic way
 
 import base64
 import logging
+import re
 from enum import Enum
 from urllib.parse import quote
 import requests
@@ -62,12 +63,17 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                                   verify=True,
                                   auth=auth,
                                   headers=headers)
-    except requests.exceptions.SSLError:
-        response = request_method(url, *args,
-                                  params=query,
-                                  verify=ssl_verify,
-                                  auth=auth,
-                                  headers=headers)
+    except requests.exceptions.SSLError as e:
+        host_mismatch_message = re.search("(?:doesn't match either of)", str(e))
+        if host_mismatch_message:
+            raise e
+        else:
+            response = request_method(url, *args,
+                                      params=query,
+                                      verify=ssl_verify,
+                                      auth=auth,
+                                      headers=headers)
+
 
 
     if check_errors:

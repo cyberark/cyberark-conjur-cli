@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 
 # Internals
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
+from conjur.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
 
 class InitController:
@@ -106,14 +107,18 @@ class InitController:
                 self.init_logic.fetch_account_from_server(self.conjurrc_data)
             # pylint: disable=broad-except,logging-fstring-interpolation
             except Exception as error:
-                # pylint: disable=line-too-long,logging-fstring-interpolation
-                logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
-                # If there was a problem fetching the account from the server, we will request one
-                conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
+                # Check for catching if the endpoint is exists.
+                if error.response and error.response.status_code == 401:
+                    # pylint: disable=line-too-long,logging-fstring-interpolation
+                    logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
+                    # If there was a problem fetching the account from the server, we will request one
+                    conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
 
-                if conjurrc_data.account is None or conjurrc_data.account == '':
-                    # pylint: disable=raise-missing-from
-                    raise RuntimeError("Error: account is required")
+                    if conjurrc_data.account is None or conjurrc_data.account == '':
+                        # pylint: disable=raise-missing-from
+                        raise RuntimeError("Error: account is required")
+                else:
+                    raise CertificateHostnameMismatchException
 
     def write_certificate(self, fetched_certificate):
         """

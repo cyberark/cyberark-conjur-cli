@@ -43,3 +43,11 @@ class InvalidFormatException(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__("Failed to execute command. Reason: " + self.message)
+
+class CertificateHostnameMismatchException(Exception):
+    """ Exception when hostname on the certificate does not match the user does not input a required parameter """
+    def __init__(self, cause="The machine’s hostname does not match the hostname expected on the certificate. ",
+                 solution="Ensure the common name on the certificate matches the machine's DNS name. "):
+        self.message = cause + solution
+        super().__init__(self.message)
+

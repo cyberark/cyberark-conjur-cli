@@ -93,7 +93,7 @@ class Client():
                     raise InvalidOperationException(cause="The client was initialized without certificate verification, "
                                         "even though the command was ran with certificate verification enabled.",
                                         solution="To continue communicating with the server insecurely, run the command "
-                                        "again with the --insecure flag. Otherwise, reinitialize the client`")
+                                        "again with the --insecure flag. Otherwise, reinitialize the client.")
 
                 logging.debug("Fetched connection details: "
                               f"{{'account': {loaded_config['account']}, "
