@@ -43,6 +43,8 @@ class InitController:
         """
         if self.ssl_verify is True:
             fetched_certificate = self.get_server_certificate()
+            # For a uniform experience, regardless if the certificate is self-signed
+            # or CA-signed, we will write the certificate on the machine
             self.write_certificate(fetched_certificate)
         else:
             self.conjurrc_data.cert_file=""

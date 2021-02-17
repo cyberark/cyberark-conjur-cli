@@ -21,7 +21,15 @@ class OperationNotCompletedException(Exception):
     and CLI is left in instable state
     """
     def __init__(self, cause="", solution=""):
-        self.message = "Error: Failed to run command to completion. " + cause + solution
+        self.message = f"Error: Failed to run command to completion. Reason: {cause} {solution}"
+        super().__init__(self.message)
+
+class InvalidOperationException(Exception):
+    """
+    Exception for when the operation performed was invalid
+    """
+    def __init__(self, cause="", solution=""):
+        self.message = f"Error: Invalid operation. Reason: {cause} {solution}"
         super().__init__(self.message)
 
 class MissingRequiredParameterException(Exception):

@@ -13,7 +13,6 @@ import shutil
 import string
 from contextlib import redirect_stderr
 from unittest.mock import patch
-
 import requests
 
 from test.util.test_infrastructure import integration_test
@@ -66,8 +65,9 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     @integration_test(True)
     def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
         shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
-        self.invoke_cli(self.cli_auth_params,
-                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
+        output = self.invoke_cli(self.cli_auth_params,
+                            ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
+        self.assertIn("Error: Invalid operation. Reason: The client was initialized without", output)
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 

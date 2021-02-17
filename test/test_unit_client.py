@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from conjur.api.client import ConfigException, Client
 
 # CredentialsFromFile mocked class
-from conjur.errors import OperationNotCompletedException
+from conjur.errors import InvalidOperationException
 
 MockCredentials = {
     'login_id': 'apiconfigloginid',
@@ -106,7 +106,7 @@ class ClientTest(unittest.TestCase):
 
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfigNoCert())
     def test_client_can_raise_incomplete_operation_error_if_ssl_modes_are_conflicting(self, mock_config):
-        with self.assertRaises(OperationNotCompletedException):
+        with self.assertRaises(InvalidOperationException):
             Client(ssl_verify=True)
 
     @patch('conjur.api.client.Api')
