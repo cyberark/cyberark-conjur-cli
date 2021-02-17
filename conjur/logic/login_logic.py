@@ -12,7 +12,7 @@ import logging
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.errors import OperationNotCompletedException
+from conjur.errors import InvalidOperationException
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:
@@ -44,10 +44,7 @@ class LoginLogic:
             # Catches the case where a user does not run in insecure mode but the
             # .conjurrc cert_file entry is empty
             if conjurrc.cert_file == '' and ssl_verify:
-                raise OperationNotCompletedException(cause="The client was initialized without certificate verification, "
-                                    "even though the command was ran with certificate verification enabled. ",
-                                    solution="To continue communicating with the server insecurely, run the command "
-                                    "again with the --insecure flag. Otherwise, reinitialize the client.")
+                raise InvalidOperationException
 
             certificate_path = conjurrc.cert_file
 

@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from conjur.errors import OperationNotCompletedException
+from conjur.errors import InvalidOperationException
 from conjur.util.credentials_from_file import CredentialsFromFile
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb
@@ -61,6 +61,6 @@ class LoginLogicTest(unittest.TestCase):
                                                      ssl_verify='some/path/to/pem')
 
     def test_empty_cert_file_entry_and_ssl_verify_enabled(self):
-        with self.assertRaises(OperationNotCompletedException):
+        with self.assertRaises(InvalidOperationException):
             mock_login_logic = LoginLogic(MockCredentialsData)
             mock_login_logic.get_api_key(True, MockCredentialsData, 'somepass', MockConjurrcEmptyCertEntry)

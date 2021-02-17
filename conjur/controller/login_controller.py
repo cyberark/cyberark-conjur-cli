@@ -12,7 +12,7 @@ import getpass
 import logging
 import sys
 
-from conjur.errors import OperationNotCompletedException
+from conjur.errors import InvalidOperationException
 from conjur.util import util_functions
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -88,6 +88,7 @@ class LoginController:
 
         return conjurrc
 
+    # pylint: disable=line-too-long
     def get_api_key(self, conjurrc):
         """
         Method to fetch the user/host's API key from Conjur which is to be added to the netrc
@@ -97,8 +98,11 @@ class LoginController:
                                                                         self.credential_data,
                                                                         self.user_password,
                                                                         conjurrc)
-        except OperationNotCompletedException:
-            raise
+        except InvalidOperationException as invalid_operation:
+            raise InvalidOperationException(cause="The client was initialized without certificate verification, "
+                                                  "even though the command was ran with certificate verification enabled.",
+                                            solution="To continue communicating with the server insecurely, run the command "
+                                                     "again with the --insecure flag. Otherwise, reinitialize the client.") from invalid_operation
         except Exception as error:
             raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. "
                 f"Reason: {error}. Check your credentials and try again.") from error
