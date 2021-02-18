@@ -37,8 +37,6 @@ class UserLogicTest(unittest.TestCase):
         self.assertEquals(user_logic.credentials_from_store, mock_credentials_from_store)
         self.assertEquals(user_logic.client, mock_client)
 
-    # TODO: Fix test broken during refactor
-    """
     '''
     Validate that if user doesn't provide username, rotate_other_api_key will be called once with proper params
     '''
@@ -48,10 +46,7 @@ class UserLogicTest(unittest.TestCase):
         self.user_logic.rotate_other_api_key = MagicMock(return_value='someAPIKey')
         self.user_logic.rotate_api_key('someUserToRotate')
         self.user_logic.rotate_other_api_key.assert_called_once_with('someUserToRotate')
-    """
 
-    # TODO: Fix test broken during refactor
-    """
     '''
     Validate that if user doesn't provide username, rotate_personal_api_key will be called once with proper params
     '''
@@ -63,10 +58,7 @@ class UserLogicTest(unittest.TestCase):
         self.user_logic.rotate_personal_api_key.assert_called_once_with('someuser',
                                                                         {'login_id': 'someuser', 'api_key':'someAPIKey'},
                                                                         'someAPIKey')
-    """
 
-    # TODO: Fix the test broken during refactoring
-    """
     def test_change_password_returns_user(self):
         with patch.object(UserLogic, 'extract_credentials_from_credential_store', return_value={'login_id': 'someuser', 'api_key':'someAPIKey'}):
             client = MagicMock(return_value=None)
@@ -74,7 +66,6 @@ class UserLogicTest(unittest.TestCase):
             mock_user_logic.client.change_personal_password = MagicMock(return_value='success!')
             resource_to_update, _ = mock_user_logic.change_personal_password('someNewPassword')
             self.assertEquals(resource_to_update, 'someuser')
-    """
 
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_extract_credentials_from_store_returns_netrc_store(self, mock_conjurrc):

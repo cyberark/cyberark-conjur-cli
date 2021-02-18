@@ -81,10 +81,6 @@ def print_instead_of_raise_error(self, variable_id, error_message_regex):
 
  # *************** POLICY ***************
 
-def load_policy(self, policy_path):
-    return self.invoke_cli(self.cli_auth_params,
-                           ['policy', 'load', '-b', 'root', '-f', policy_path])
-
 def generate_policy_string(self):
         variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
         variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)

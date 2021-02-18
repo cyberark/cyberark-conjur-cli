@@ -7,10 +7,12 @@ This test file handles the login/logout test flows when running
 `conjur login`/`conjur logout`
 """
 import base64
+import io
 import os
+import shutil
 import string
+from contextlib import redirect_stderr
 from unittest.mock import patch
-
 import requests
 
 from test.util.test_infrastructure import integration_test
@@ -54,7 +56,32 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             netrc_test.write(f"login {login}\n")
             netrc_test.write(f"password {password}\n")
 
-    # *************** INITIAL LOGIN CREDENTIALS TESTS ***************
+    # *************** LOGIN CREDENTIALS TESTS ***************
+
+    '''
+    Validates that if a user configures the CLI in insecure mode and runs the command not in 
+    insecure mode, then they will fail
+    '''
+    @integration_test(True)
+    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
+        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
+        output = self.invoke_cli(self.cli_auth_params,
+                            ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
+        self.assertIn("Error: Invalid operation. Reason: The client was initialized without", output)
+
+    '''
+    Validates that if a user configures the CLI in insecure mode and runs a command in 
+    insecure mode, then they will succeed
+    '''
+    @integration_test()
+    def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes(self):
+        capture_stream = io.StringIO()
+        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
+
+        with redirect_stderr(capture_stream):
+            self.invoke_cli(self.cli_auth_params,
+                            ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
+        self.assertIn('InsecureRequestWarning', capture_stream.getvalue())
 
     '''
     Validates a user can log in with a password, instead of their API key

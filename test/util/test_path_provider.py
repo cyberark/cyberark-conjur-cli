@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 # Internals
@@ -48,6 +47,10 @@ class TestRunnerPathProvider():  # pragma: no cover
         return os.path.join(self.ROOT_DIR, self.conjurrc_file_name)
 
     @property
+    def test_insecure_conjurrc_file_path(self):
+        return os.path.join(self.HELPERS_FILES_DIR, "test_config", "no_cert_conjurrc")
+
+    @property
     def netrc_path(self):
         return os.path.join(self.ROOT_DIR, self.netrc_file_name)
 
@@ -85,8 +88,3 @@ class TestRunnerPathProvider():  # pragma: no cover
 
     def get_policy_path(self, type: str):
         return os.path.join(self.HELPERS_FILES_DIR, "test_config", f"{type}_policy.yml")
-
-    @property
-    def test_conjurrc_file_path(self):
-        return os.path.join(self.HELPERS_FILES_DIR, "test_config", "conjurrc")
-

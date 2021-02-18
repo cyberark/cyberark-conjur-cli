@@ -19,12 +19,14 @@ import traceback
 import requests
 
 # Internals
+from conjur.api import SSLClient
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
-from conjur.controller import HostController, ListController, LogoutController
+from conjur.controller import HostController, ListController, LogoutController, InitController
 from conjur.controller import LoginController, PolicyController, UserController, VariableController
-from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, VariableLogic
+from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, \
+    VariableLogic, InitLogic
 from conjur.util import CredentialsFromFile
 from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData
 from conjur.data_object import PolicyData, UserInputData, VariableData
@@ -565,11 +567,22 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url=None, name=None, certificate='', force=None, ssl_verify=True):
+    def handle_init_logic(cls, url=None, account=None, cert=None, force=None, ssl_verify=True):
         """
         Method that wraps the init call logic
+        Initializes the client, creating the .conjurrc file
         """
-        Client.initialize(url, name, certificate, force, ssl_verify=ssl_verify)
+        ssl_service = SSLClient()
+        conjurrc_data = ConjurrcData(appliance_url=url,
+                                     account=account,
+                                     cert_file=cert)
+
+        init_logic = InitLogic(ssl_service)
+        input_controller = InitController(conjurrc_data=conjurrc_data,
+                                          init_logic=init_logic,
+                                          force=force,
+                                          ssl_verify=ssl_verify)
+        input_controller.load()
 
     @classmethod
     def handle_login_logic(cls, identifier=None, password=None, ssl_verify=True):

@@ -12,6 +12,7 @@ import logging
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.errors import InvalidOperationException
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:
@@ -27,6 +28,7 @@ class LoginLogic:
         self.credentials_storage = credentials_storage
 
     @classmethod
+    # pylint: disable=line-too-long,logging-fstring-interpolation
     def get_api_key(cls, ssl_verify, credential_data, password, conjurrc):
         """
         Method to fetch the user/host's API key from Conjur
@@ -41,10 +43,10 @@ class LoginLogic:
         elif ssl_verify and credential_data.machine.startswith("https"):
             # Catches the case where a user does not run in insecure mode but the
             # .conjurrc cert_file entry is empty
-            if conjurrc.cert_file == '':
-                certificate_path = True
-            else:
-                certificate_path = conjurrc.cert_file
+            if conjurrc.cert_file == '' and ssl_verify:
+                raise InvalidOperationException
+
+            certificate_path = conjurrc.cert_file
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur")

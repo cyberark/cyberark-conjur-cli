@@ -13,15 +13,12 @@ import logging
 # Internals
 import netrc
 
+from conjur.errors import InvalidOperationException
 from conjur.util import util_functions
 from conjur.api import Api
-from conjur.api.ssl_client import SSLClient
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
-from conjur.controller import InitController
-from conjur.logic import InitLogic
 from conjur.util import CredentialsFromFile
-from conjur.data_object import ConjurrcData
 from conjur.resource import Resource
 
 
@@ -39,7 +36,7 @@ class ConfigException(Exception):
     SDK in their code.
     """
 
-
+# pylint: disable=logging-fstring-interpolation,line-too-long
 class Client():
     """
     Client
@@ -54,7 +51,7 @@ class Client():
 
     # The method signature is long but we want to explicitly control
     # what parameters are allowed
-    # pylint: disable=too-many-arguments,too-many-locals
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches
     def __init__(self,
                  account=None,
                  api_key=None,
@@ -90,12 +87,20 @@ class Client():
                     if field_value:
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
-                # pylint: disable=logging-fstring-interpolation
+                # Raise exception if the client was initialized in insecure mode
+                # but a follow-up request is run without the insecure flag
+                if ssl_verify is True and loaded_config['ca_bundle'] == '':
+                    raise InvalidOperationException(cause="The client was initialized without certificate verification, "
+                                        "even though the command was ran with certificate verification enabled.",
+                                        solution="To continue communicating with the server insecurely, run the command "
+                                        "again with the --insecure flag. Otherwise, reinitialize the client`")
+
                 logging.debug("Fetched connection details: "
                               f"{{'account': {loaded_config['account']}, "
                               f"'appliance_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
-
+            except InvalidOperationException:
+                raise
             # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:
                 raise ConfigException(exc) from exc
@@ -145,27 +150,6 @@ class Client():
             logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
         else:
             logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT)
-
-    # Technical debt: refactor when time permits because this function
-    # doesn't belong here
-    @staticmethod
-    def initialize(url, account, cert, force, ssl_verify):
-        """
-        Initializes the client, creating the .conjurrc file
-        """
-        ssl_service = SSLClient()
-
-        conjurrc_data = ConjurrcData(url,
-                                     account,
-                                     cert)
-
-        init_logic = InitLogic(ssl_service)
-
-        input_controller = InitController(conjurrc_data,
-                                          init_logic,
-                                          force,
-                                          ssl_verify)
-        input_controller.load()
 
     ### API passthrough
 

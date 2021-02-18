@@ -27,6 +27,13 @@ class UserControllerTest(unittest.TestCase):
         with self.assertRaises(OperationNotCompletedException):
             user_controller.rotate_api_key()
 
+    @patch('conjur.logic.user_logic')
+    def test_login_rotate_api_key_can_raise_operation_not_completed_exception(self, mock_user_logic):
+        mock_user_logic.rotate_api_key = MagicMock(side_effect=OperationNotCompletedException)
+        mock_user_controller = UserController(mock_user_logic, self.user_input_data)
+        with self.assertRaises(OperationNotCompletedException):
+            mock_user_controller.rotate_api_key()
+
     def test_change_password_can_raise_authn_error(self):
         # mock the status code of the error received
         mock_response = MagicMock()

@@ -1,5 +1,5 @@
 ---
 account: dev
 appliance_url: https://conjur-https
-cert_file:
+cert_file: ''
 plugins: []
