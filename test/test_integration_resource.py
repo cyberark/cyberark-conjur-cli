@@ -160,7 +160,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     def test_user_change_password_not_complex_enough_prompts_input(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
-        self.assertIn("Invalid password. The password must contain at least", output)
+        self.assertIn("Error: Invalid password", output)
 
     @integration_test()
     def test_user_change_password_meets_password_complexity(self):
@@ -182,8 +182,8 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                 output = self.invoke_cli(self.cli_auth_params,
                                          ['user', 'change-password'], exit_code=1)
 
-        self.assertIn("Invalid password. The password must contain at least", str(mock_log.output))
-        self.assertIn("Invalid password. The password must contain at least", output)
+        self.assertIn("Error: Invalid password", str(mock_log.output))
+        self.assertIn("Error: Invalid password", output)
 
     @integration_test(True)
     def test_host_rotate_api_key_without_host_prompts_input(self):

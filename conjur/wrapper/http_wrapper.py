@@ -2,16 +2,18 @@
 
 """
 Http module
-
 This module aggregates all methods directly needed to interact with
 HTTP-based endpoints in a generic way
 """
 
 import base64
 import logging
+import re
 from enum import Enum
 from urllib.parse import quote
 import requests
+
+from conjur.errors import CertificateHostnameMismatchException
 
 
 class HttpVerb(Enum):
@@ -63,12 +65,17 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
                                   auth=auth,
                                   headers=headers)
     except requests.exceptions.SSLError:
-        response = request_method(url, *args,
-                                  params=query,
-                                  verify=ssl_verify,
-                                  auth=auth,
-                                  headers=headers)
-
+        try:
+            response = request_method(url, *args,
+                                      params=query,
+                                      verify=ssl_verify,
+                                      auth=auth,
+                                      headers=headers)
+        except requests.exceptions.SSLError as ssl_error:
+            host_mismatch_message = re.search("(?:doesn't match either of)", str(ssl_error))
+            if host_mismatch_message:
+                raise CertificateHostnameMismatchException from ssl_error
+            raise ssl_error
 
     if check_errors:
         # takes the "requests" response object and expands the

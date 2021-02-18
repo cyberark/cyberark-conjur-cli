@@ -366,5 +366,3 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
             Cli().run_action('host', mock_obj)
             mock_handle_host.assert_called_once()
-
-

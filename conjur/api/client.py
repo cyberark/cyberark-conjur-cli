@@ -9,18 +9,16 @@ the Conjur server
 
 # Builtins
 import logging
-
-# Internals
 import netrc
 
-from conjur.errors import InvalidOperationException
+# Internals
+from conjur.errors import InvalidCertificateVerificationException
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.util import CredentialsFromFile
 from conjur.resource import Resource
-
 
 class ConfigException(Exception):
     """
@@ -90,16 +88,16 @@ class Client():
                 # Raise exception if the client was initialized in insecure mode
                 # but a follow-up request is run without the insecure flag
                 if ssl_verify is True and loaded_config['ca_bundle'] == '':
-                    raise InvalidOperationException(cause="The client was initialized without certificate verification, "
+                    raise InvalidCertificateVerificationException(cause="The client was initialized without certificate verification, "
                                         "even though the command was ran with certificate verification enabled.",
                                         solution="To continue communicating with the server insecurely, run the command "
-                                        "again with the --insecure flag. Otherwise, reinitialize the client`")
+                                        "again with ssl_verify = False. Otherwise, reinitialize the client.")
 
                 logging.debug("Fetched connection details: "
                               f"{{'account': {loaded_config['account']}, "
                               f"'appliance_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
-            except InvalidOperationException:
+            except InvalidCertificateVerificationException:
                 raise
             # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:

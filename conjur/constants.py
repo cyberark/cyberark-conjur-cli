@@ -26,8 +26,8 @@ DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', DEFAULT_NETRC_FILE_NAM
 DEFAULT_CERTIFICATE_FILE = os.path.expanduser(os.path.join('~', "conjur-server.pem"))
 CREDENTIAL_HOST_PATH = "/authn"
 
-PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE = "The password must contain at least 12 characters: " \
-                                          "2 uppercase, 2 lowercase, 1 digit, 1 special character"
+PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE = "(it must contain at least 12 characters: " \
+                                          "2 uppercase, 2 lowercase, 1 digit, 1 special character)"
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"
