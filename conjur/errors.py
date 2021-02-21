@@ -5,6 +5,7 @@ Error module
 
 This module holds Conjur CLI/SDK-specific errors for this project
 """
+from conjur.errors_messages import MISMATCH_HOSTNAME_MESSAGE
 
 class InvalidPasswordComplexityException(Exception):
     """
@@ -39,7 +40,7 @@ class InvalidFormatException(Exception):
         self.message = message
         super().__init__("Failed to execute command. Reason: " + self.message)
 
-class InvalidCertificateVerificationException(Exception):
+class CertificateVerificationException(Exception):
     """
     Exception for when the user runs the Client in conflicting modes. For example,
     initializing the client using --insecure but running a follow-up command in secure mode
@@ -53,8 +54,5 @@ class InvalidCertificateVerificationException(Exception):
 class CertificateHostnameMismatchException(Exception):
     """ Exception for when machine's hostname does not match the hostname on the certificate """
     def __init__(self):
-        cause = "The machine's hostname did not match any names on the certificate."
-        solution = "Make sure the names on the certificate (common name or SANs) match the machine's hostname. "
-
-        self.message = f"{cause} {solution}"
+        self.message = MISMATCH_HOSTNAME_MESSAGE
         super().__init__(self.message)

@@ -20,7 +20,8 @@ import requests
 
 # Internals
 from conjur.api import SSLClient
-from conjur.errors import InvalidCertificateVerificationException
+from conjur.errors import CertificateVerificationException
+from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
@@ -556,12 +557,9 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
-        except InvalidCertificateVerificationException:
+        except CertificateVerificationException:
             logging.debug(traceback.format_exc())
-            sys.stdout.write("Failed to execute command. Reason: The client was initialized without certificate verification, "
-                            "even though the command was ran with certificate verification enabled. To continue "
-                            "communicating with the server insecurely, run the command again with --insecure flag. "
-                            "Otherwise, reinitialize the client.\n")
+            sys.stdout.write(F"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

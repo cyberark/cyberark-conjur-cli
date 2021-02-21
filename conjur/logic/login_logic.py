@@ -12,7 +12,7 @@ import logging
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.errors import InvalidCertificateVerificationException
+from conjur.errors import CertificateVerificationException
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:
@@ -44,7 +44,7 @@ class LoginLogic:
             # Catches the case where a user does not run in insecure mode but the
             # .conjurrc cert_file entry is empty
             if conjurrc.cert_file == '' and ssl_verify:
-                raise InvalidCertificateVerificationException
+                raise CertificateVerificationException
 
             certificate_path = conjurrc.cert_file
 

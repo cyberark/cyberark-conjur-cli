@@ -113,7 +113,7 @@ class InitController:
                 # a 401 status code will be returned.
                 # If the endpoint does not exist, the user will be prompted to enter in their account.
                 # pylint: disable=no-member
-                if hasattr(error.response, 'status_code') and error.response.status_code == 401:
+                if hasattr(error.response, 'status_code') and str(error.response.status_code) == '401':
                     conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
                     if conjurrc_data.account is None or conjurrc_data.account == '':
                         raise RuntimeError("Error: account is required")

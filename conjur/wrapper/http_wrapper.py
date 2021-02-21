@@ -52,30 +52,24 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
         encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
         headers['Authorization'] = 'Token token="{}"'.format(encoded_token)
 
-    request_method = getattr(requests, http_verb.name.lower())
-
     # By default, on each request the certificate will be verified. If there is
     # a failure in verification, the fallback solution will be passing in the
     # server pem received during initialization of the client
     #pylint: disable=not-callable
     try:
-        response = request_method(url, *args,
-                                  params=query,
-                                  verify=True,
+        response = invoke_request(http_verb,
+                                  url, *args,
+                                  query=query,
+                                  ssl_verify=True,
                                   auth=auth,
                                   headers=headers)
     except requests.exceptions.SSLError:
-        try:
-            response = request_method(url, *args,
-                                      params=query,
-                                      verify=ssl_verify,
-                                      auth=auth,
-                                      headers=headers)
-        except requests.exceptions.SSLError as ssl_error:
-            host_mismatch_message = re.search("(?:doesn't match either of)", str(ssl_error))
-            if host_mismatch_message:
-                raise CertificateHostnameMismatchException from ssl_error
-            raise ssl_error
+        response = invoke_request(http_verb,
+                                  url, *args,
+                                  query=query,
+                                  ssl_verify=ssl_verify,
+                                  auth=auth,
+                                  headers=headers)
 
     if check_errors:
         # takes the "requests" response object and expands the
@@ -92,6 +86,26 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
             raise general_error
 
     return response
+
+def invoke_request(http_verb, url, *args, query, ssl_verify, auth, headers):
+    """
+    This method preforms the actual request and catches possible SSLErrors to
+    perform more user-friendly messages
+    """
+    request_method = getattr(requests, http_verb.name.lower())
+
+    try:
+        return request_method(url, *args,
+                              params=query,
+                              verify=ssl_verify,
+                              auth=auth,
+                              headers=headers)
+
+    except requests.exceptions.SSLError as ssl_error:
+        host_mismatch_message = re.search("(?:doesn't match either of)", str(ssl_error))
+        if host_mismatch_message:
+            raise CertificateHostnameMismatchException from ssl_error
+        raise ssl_error
 
 # Not coverage tested since this code should never be hit
 # from checked-in code

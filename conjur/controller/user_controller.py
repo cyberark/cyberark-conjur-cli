@@ -13,10 +13,9 @@ import sys
 import requests
 
 # Internals
-from conjur.constants import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 from conjur.errors import InvalidPasswordComplexityException, \
     OperationNotCompletedException
-
+from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 
 class UserController():
     """

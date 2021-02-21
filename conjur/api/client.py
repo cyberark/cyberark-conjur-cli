@@ -12,7 +12,7 @@ import logging
 import netrc
 
 # Internals
-from conjur.errors import InvalidCertificateVerificationException
+from conjur.errors import CertificateVerificationException
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
@@ -85,10 +85,10 @@ class Client():
                     if field_value:
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
-                # Raise exception if the client was initialized in insecure mode
-                # but a follow-up request is run without the insecure flag
+                # Raise exception if the client was initialized with verify=False
+                # but a follow-up request is run with verify=True
                 if ssl_verify is True and loaded_config['ca_bundle'] == '':
-                    raise InvalidCertificateVerificationException(cause="The client was initialized without certificate verification, "
+                    raise CertificateVerificationException(cause="The client was initialized without certificate verification, "
                                         "even though the command was ran with certificate verification enabled.",
                                         solution="To continue communicating with the server insecurely, run the command "
                                         "again with ssl_verify = False. Otherwise, reinitialize the client.")
@@ -97,7 +97,7 @@ class Client():
                               f"{{'account': {loaded_config['account']}, "
                               f"'appliance_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
-            except InvalidCertificateVerificationException:
+            except CertificateVerificationException:
                 raise
             # TODO add error handling for when conjurrc field doesn't exist
             except Exception as exc:
