@@ -62,30 +62,30 @@ class InitController:
         Method to get the certificate from the Conjur endpoint detailed by the user
         """
         # pylint: disable=line-too-long
-        if self.conjurrc_data.appliance_url is None:
-            self.conjurrc_data.appliance_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
-            if self.conjurrc_data.appliance_url == '':
+        if self.conjurrc_data.conjur_url is None:
+            self.conjurrc_data.conjur_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
+            if self.conjurrc_data.conjur_url == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
 
         # Chops off the '/ if supplied by the user to avoid a server error
-        if self.conjurrc_data.appliance_url.endswith('/'):
-            self.conjurrc_data.appliance_url=self.conjurrc_data.appliance_url[:-1]
+        if self.conjurrc_data.conjur_url.endswith('/'):
+            self.conjurrc_data.conjur_url=self.conjurrc_data.conjur_url[:-1]
 
-        url = urlparse(self.conjurrc_data.appliance_url)
+        url = urlparse(self.conjurrc_data.conjur_url)
 
         # TODO: Factor out the following URL validation to ConjurrcData class
         # and add integration tests
         if url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
-                   f"'{self.conjurrc_data.appliance_url}' is not supported.")
+                   f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
         if self.conjurrc_data.cert_file is not None:
             # Return None because we do not need to fetch the certificate
             return None
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.appliance_url}'")
+        logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.conjur_url}'")
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
@@ -103,7 +103,7 @@ class InitController:
         """
         Method to fetch the account from the user
         """
-        if conjurrc_data.account is None:
+        if conjurrc_data.conjur_account is None:
             try:
                 self.init_logic.fetch_account_from_server(self.conjurrc_data)
             except CertificateHostnameMismatchException:
@@ -114,8 +114,8 @@ class InitController:
                 # If the endpoint does not exist, the user will be prompted to enter in their account.
                 # pylint: disable=no-member
                 if hasattr(error.response, 'status_code') and str(error.response.status_code) == '401':
-                    conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
-                    if conjurrc_data.account is None or conjurrc_data.account == '':
+                    conjurrc_data.conjur_account = input("Enter the Conjur account name (required): ").strip()
+                    if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
                         raise RuntimeError("Error: account is required")
                 else:
                     raise
@@ -124,7 +124,7 @@ class InitController:
         """
         Method to write the certificate fetched from the Conjur endpoint on the user's machine
         """
-        url = urlparse(self.conjurrc_data.appliance_url)
+        url = urlparse(self.conjurrc_data.conjur_url)
         # pylint: disable=line-too-long
         if self.conjurrc_data.cert_file is None and url.scheme == "https":
             self.conjurrc_data.cert_file = DEFAULT_CERTIFICATE_FILE

@@ -34,8 +34,8 @@ class LoginLogic:
         Method to fetch the user/host's API key from Conjur
         """
         params = {
-            'url': conjurrc.appliance_url,
-            'account': conjurrc.account
+            'url': conjurrc.conjur_url,
+            'account': conjurrc.conjur_account
         }
 
         if ssl_verify is False:

@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
 
 ### Changed
+- The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`.
+  Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
+  .conjurrc file for use in the SDK and will need to update accordingly.
+  [cyberark/conjur-api-python3#206](https://github.com/cyberark/conjur-api-python3/issues/206)
 - CLI command UX has been improved according to UX guidelines
   [cyberark/conjur-api-python3#132](https://github.com/cyberark/conjur-api-python3/issues/132)
   See [design guidelines](https://ljfz3b.axshare.com/#id=x8ktq8&p=conjur_help__init&g=1)

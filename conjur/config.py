@@ -27,10 +27,9 @@ class Config():
     # We intentionally remap some fields to friendlier names
     # Conjurrc field / Config name / Mandatory
     FIELDS = [
-        ('account', 'account', True),
-        ('appliance_url', 'url', True),
+        ('conjur_account', 'account', True),
+        ('conjur_url', 'url', True),
         ('cert_file', 'ca_bundle', False),
-        ('plugins', 'plugins', False),
     ]
 
     _config = {}

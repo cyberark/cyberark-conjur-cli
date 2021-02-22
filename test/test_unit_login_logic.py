@@ -13,16 +13,14 @@ class MockCredentialsData:
     api_key = 'somepass'
 
 class MockConjurrc:
-    appliance_url = 'https://someurl'
-    account = 'someacc'
+    conjur_url = 'https://someurl'
+    conjur_account = 'someacc'
     cert_file = 'some/path/to/pem'
-    plugins: []
 
 class MockConjurrcEmptyCertEntry:
-    appliance_url = 'https://someurl'
-    account = 'someacc'
+    conjur_url = 'https://someurl'
+    conjur_account = 'someacc'
     cert_file = ''
-    plugins: []
 
 class MockClientResponse():
     def __init__(self, text='myretval', content='mycontent'):

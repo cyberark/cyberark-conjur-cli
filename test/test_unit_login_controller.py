@@ -9,10 +9,9 @@ from conjur.logic.login_logic import LoginLogic
 
 
 class MockConjurrc:
-    appliance_url = 'https://someurl'
+    conjur_url = 'https://someurl'
     account = 'someacc'
     cert_file = 'some/path/to/pem'
-    plugins: []
 
 
 class MockCredentialsData:

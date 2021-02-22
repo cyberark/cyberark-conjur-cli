@@ -1,16 +1,14 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.controller.logout_controller import LogoutController
 from conjur.logic.logout_logic import LogoutLogic
 
 
 class MockConjurrc:
-    appliance_url = 'https://someurl'
-    account = 'someacc'
+    conjur_url = 'https://someurl'
+    conjur_account = 'someacc'
     cert_file = 'some/path/to/pem'
-    plugins: []
 
 
 class LogoutControllerTest(unittest.TestCase):
@@ -29,7 +27,7 @@ class LogoutControllerTest(unittest.TestCase):
         mock_logout_logic.remove_credentials = MagicMock()
         mock_logout_controller = LogoutController(True, mock_logout_logic)
         mock_logout_controller.remove_credentials()
-        mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc.appliance_url)
+        mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc.conjur_url)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=0)

@@ -1,5 +1,4 @@
 ---
-account: dev
-appliance_url: https://conjur-https
+conjur_account: dev
+conjur_url: https://conjur-https
 cert_file: ./test/test_config/https/nginx.conf
-plugins: []

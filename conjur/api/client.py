@@ -94,8 +94,8 @@ class Client():
                                         "again with ssl_verify = False. Otherwise, reinitialize the client.")
 
                 logging.debug("Fetched connection details: "
-                              f"{{'account': {loaded_config['account']}, "
-                              f"'appliance_url': {loaded_config['url']}, "
+                              f"{{'conjur_account': {loaded_config['account']}, "
+                              f"'conjur_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
             except CertificateVerificationException:
                 raise

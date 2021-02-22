@@ -42,7 +42,7 @@ class InitControllerTest(unittest.TestCase):
         mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
         mock_conjurrc_data = ConjurrcData()
         with self.assertRaises(RuntimeError):
-            mock_conjurrc_data.appliance_url = 'https://someurl'
+            mock_conjurrc_data.conjur_url = 'https://someurl'
             mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
             mock_init_controller.get_account_info(mock_conjurrc_data)
 
@@ -53,17 +53,17 @@ class InitControllerTest(unittest.TestCase):
         mock_response.status_code = 401
         mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
         mock_conjurrc_data = ConjurrcData()
-        mock_conjurrc_data.appliance_url="https://someaccount"
+        mock_conjurrc_data.conjur_url="https://someaccount"
         mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
         mock_init_controller.get_account_info(mock_conjurrc_data)
-        self.assertEquals(mock_conjurrc_data.account, 'someaccount')
+        self.assertEquals(mock_conjurrc_data.conjur_account, 'someaccount')
 
     '''
     When user does not trust the certificate, an exception will be raised
     '''
     @patch('builtins.input', side_effect=['no'])
     def test_init_not_trusting_cert_raises_error(self, mock_input):
-        self.conjurrc_data.appliance_url = 'https://someurl'
+        self.conjurrc_data.conjur_url = 'https://someurl'
         ctx = SSL.Context(method=SSL.TLSv1_2_METHOD)
         sock = OpenSSL.SSL.Connection(ctx)
         self.init_logic.connect = MagicMock(return_value = sock)
@@ -79,7 +79,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', side_effect=['yes'])
     def test_init_user_trusts_cert_returns_cert(self, mock_input):
         mock_certificate = "cert"
-        self.conjurrc_data.appliance_url = "https://someurl"
+        self.conjurrc_data.conjur_url = "https://someurl"
         self.init_logic.get_certificate = MagicMock(return_value = ["12:AB", mock_certificate])
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
         fetched_certificate = init_controller.get_server_certificate()
@@ -109,7 +109,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value='yes')
     def test_user_confirms_force_overwrites_writes_cert_to_file(self, mock_input, mock_init_logic):
         with redirect_stdout(self.capture_stream):
-            self.conjurrc_data.appliance_url = "https://someurl"
+            self.conjurrc_data.conjur_url = "https://someurl"
             init_controller = InitController(self.conjurrc_data, mock_init_logic, False, True)
             # Mock that a certificate file already exists
             mock_init_logic.write_certificate_to_file.return_value = False
@@ -130,7 +130,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value='yes')
     def test_user_confirms_force_overwrites_writes_conjurrc_to_file(self, mock_input, mock_init_logic):
         with redirect_stdout(self.capture_stream):
-            self.conjurrc_data.appliance_url = "https://someurl"
+            self.conjurrc_data.conjur_url = "https://someurl"
             init_controller = InitController(self.conjurrc_data, mock_init_logic, False, True)
             # Mock that a conjurrc file already exists
             mock_init_logic.write_conjurrc.return_value = False
@@ -141,7 +141,7 @@ class InitControllerTest(unittest.TestCase):
 
     @patch('builtins.input', return_value='')
     def test_user_does_not_input_url_raises_error(self, mock_input):
-        mock_conjurrc_data = ConjurrcData(appliance_url=None)
+        mock_conjurrc_data = ConjurrcData(conjur_url=None)
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
             init_controller.get_server_certificate()
@@ -149,7 +149,7 @@ class InitControllerTest(unittest.TestCase):
 
     @patch('builtins.input', return_value='somehost')
     def test_user_does_not_input_https_will_raises_error(self, mock_input):
-        mock_conjurrc_data = ConjurrcData(appliance_url='somehost')
+        mock_conjurrc_data = ConjurrcData(conjur_url='somehost')
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
             init_controller.get_server_certificate()

@@ -16,10 +16,9 @@ MIIDOD...
 
 EXPECTED_CONFIG= \
 '''---
-account: someaccount
-appliance_url: https://someurl
+conjur_account: someaccount
+conjur_url: https://someurl
 cert_file: /path/to/conjur-someaccount.pem
-plugins: [foo, bar]
 '''
 
 class InitLogicTest(unittest.TestCase):
@@ -78,9 +77,8 @@ class InitLogicTest(unittest.TestCase):
                 with open('path/to/conjurrc', 'r') as conjurrc:
                     lines = conjurrc.readlines()
                     self.assertEquals(lines[0].strip(), "---")
-                    self.assertEquals(lines[1].strip(), "account: someaccount")
+                    self.assertEquals(lines[1].strip(), "conjur_account: someaccount")
                     self.assertEquals(lines[3].strip(), "cert_file: /path/to/conjur-someaccount.pem")
-                    self.assertEquals(lines[4].strip(), "plugins: [foo, bar]")
 
     def test_cert_error_will_raise_exception(self):
         with patch.object(SSLClient, 'get_certificate', side_effect=Exception) as mock_get_cert:

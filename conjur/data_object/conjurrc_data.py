@@ -19,11 +19,10 @@ class ConjurrcData:
     """
     Used for setting user input data
     """
-    def __init__(self, appliance_url=None, account=None, cert_file=None):
-        self.appliance_url = appliance_url
-        self.account = account
+    def __init__(self, conjur_url=None, account=None, cert_file=None):
+        self.conjur_url = conjur_url
+        self.conjur_account = account
         self.cert_file = cert_file
-        self.plugins = []
 
     @classmethod
     def load_from_file(cls, conjurrc_path=DEFAULT_CONFIG_FILE):
@@ -32,11 +31,11 @@ class ConjurrcData:
         """
         with open(conjurrc_path, 'r') as conjurrc:
             loaded_conjurrc = yaml_load(conjurrc, Loader=YamlLoader)
-            return ConjurrcData(loaded_conjurrc['appliance_url'],
-                                loaded_conjurrc['account'],
+            return ConjurrcData(loaded_conjurrc['conjur_url'],
+                                loaded_conjurrc['conjur_account'],
                                 loaded_conjurrc['cert_file'])
 
     # pylint: disable=line-too-long
     def __repr__(self):
-        return f"{{'appliance_url': '{self.appliance_url}', 'account': '{self.account}', " \
-               f"'cert_file': '{self.cert_file}', 'plugins': {self.plugins}}}"
+        return f"{{'conjur_url': '{self.conjur_url}', 'conjur_account': '{self.conjur_account}', " \
+               f"'cert_file': '{self.cert_file}'}}"

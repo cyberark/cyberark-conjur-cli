@@ -3,17 +3,16 @@ from unittest.mock import mock_open, patch
 
 from conjur.data_object.conjurrc_data import ConjurrcData
 
-EXPECTED_REP_OBJECT={'appliance_url': 'https://someurl', 'account': 'someaccount', 'cert_file': "/some/cert/path", 'plugins': []}
+EXPECTED_REP_OBJECT={'conjur_url': 'https://someurl', 'conjur_account': 'someaccount', 'cert_file': "/some/cert/path"}
 EXPECTED_CONJURRC = \
 """
 ---
-account: someacc
-appliance_url: https://someurl
+conjur_account: someacc
+conjur_url: https://someurl
 cert_file: /some/path/to/pem
-plugins: []
 """
 
-CONJURRC_DICT = {'appliance_url': 'https://someurl', 'account': 'someacc', 'cert_file': '/some/path/to/pem', 'plugins':[]}
+CONJURRC_DICT = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem'}
 
 class ConjurrcDataTest(unittest.TestCase):
 
