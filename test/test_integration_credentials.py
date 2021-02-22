@@ -6,14 +6,11 @@ CLI Integration Credentials tests
 This test file handles the login/logout test flows when running
 `conjur login`/`conjur logout`
 """
-import base64
 import io
 import os
 import shutil
 import string
-from contextlib import redirect_stderr
 from unittest.mock import patch
-import requests
 
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -73,26 +70,21 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs a command in 
     insecure mode, then they will succeed
     '''
-    @integration_test()
-    def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes(self):
-        capture_stream = io.StringIO()
-        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes(self, mock_input):
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account', self.client_params.account])
 
-        with redirect_stderr(capture_stream):
-            self.invoke_cli(self.cli_auth_params,
+        output = self.invoke_cli(self.cli_auth_params,
                             ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
-        self.assertIn('InsecureRequestWarning', capture_stream.getvalue())
+        self.assertIn('Successfully logged in to Conjur', output)
 
     '''
     Validates a user can log in with a password, instead of their API key
     To do this, we perform the following:
-    1. Load the user
-    2. Fetch the user's API key (using the admin's access token) 
-       to be able to use it to create a password for them
-    3. Update their password to a randomly generated one
-    4. Login with their password
     '''
-    @integration_test(True)
+    @integration_test()
     @patch('builtins.input', return_value='yes')
     def test_https_netrc_is_created_with_all_parameters_given(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
@@ -102,43 +94,29 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.invoke_cli(self.cli_auth_params,
                         ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path('conjur')])
 
-        # Get admin's access token to be able to use it to change the user's password
-        headers = {
-            'Content-Type': 'text/plain'
-        }
-        response = requests.request("POST",
-                                    f"{self.client_params.hostname}/authn/{self.client_params.account}/admin/authenticate",
-                                    headers=headers, data=self.client_params.env_api_key,
-                                    verify=self.environment.path_provider.certificate_path)
-        access_token = base64.b64encode(response.content).decode("utf-8")
-        headers = {
-            'Authorization': f'Token token="{access_token}"'
-        }
+        # Rotate the new user's API key
+        user_api_key = self.invoke_cli(self.cli_auth_params,
+                                       ['user', 'rotate-api-key', '-i', 'someuser'])
+        extract_api_key_from_message = user_api_key.split(":")[1].strip()
 
-        # We want to rotate the API key of the host so we will know the value
-        user_api_key = requests.request("PUT",
-                                        f"{self.client_params.hostname}/authn/{self.client_params.account}/api_key?role=user:someuser",
-                                        headers=headers, data=self.client_params.env_api_key,
-                                        verify=self.environment.path_provider.certificate_path).text
+        # Login to change personal password
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
-        # Creates a password that meets Conjur-specific criteria
+        # Creates a password that meets Conjur password complexity standards
         password = string.hexdigits + "$!@"
-        combo = base64.b64encode(f"someuser:{user_api_key}".encode("utf-8"))
-        headers = {
-            'Authorization': f'Basic {str(combo, "utf-8")}',
-            'Content-Type': 'text/plain'
-        }
-        requests.request("PUT", f"{self.client_params.hostname}/authn/{self.client_params.account}/password",
-                         headers=headers, data=password,
-                         verify=self.environment.path_provider.certificate_path)
+        self.invoke_cli(self.cli_auth_params,
+                        ['user', 'change-password', '-p', password])
 
-        # Need to remove the netrc because we are attempting to login as a user with their new password
-        os.remove(DEFAULT_NETRC_FILE)
+        self.invoke_cli(self.cli_auth_params,
+                        ['logout'])
+
+        # Attempt to login with newly created password
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'someuser', '-p', password])
+                        ['login', '-i', 'someuser', '-p', password])
 
         self.assertIn("Successfully logged in to Conjur", output.strip())
-        self.validate_netrc(f"{self.client_params.hostname}/authn", "someuser", user_api_key)
+        self.validate_netrc(f"{self.client_params.hostname}/authn", "someuser", extract_api_key_from_message)
 
     '''
     Validates interactively provided params create netrc
@@ -215,7 +193,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     There is currently no way to fetch a host's API key so this is a work around for the 
     purposes of this test
     '''
-    @integration_test(True)
+    @integration_test()
     def test_https_netrc_is_created_with_host(self):
         # Setup for fetching the API key of a host. To fetch we need to login
         self.write_to_netrc(f"{self.client_params.hostname}/authn", "admin", self.client_params.env_api_key)
@@ -223,29 +201,18 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.invoke_cli(self.cli_auth_params,
                         ['policy', 'replace', '-b', 'root', '-f',self.environment.path_provider.get_policy_path('conjur')])
 
-        url = f"{self.client_params.hostname}/authn/{self.client_params.account}/admin/authenticate"
-        headers = {
-            'Content-Type': 'text/plain'
-        }
+        host_api_key = self.invoke_cli(self.cli_auth_params,
+                                       ['host', 'rotate-api-key', '-i', 'somehost'])
 
-        response = requests.request("POST", url, headers=headers, data=self.client_params.env_api_key,
-                                    verify=self.environment.path_provider.certificate_path)
-        access_token = base64.b64encode(response.content).decode("utf-8")
+        extract_api_key_from_message = host_api_key.split(":")[1].strip()
 
-        headers = {
-            'Authorization': f'Token token="{access_token}"'
-        }
-        url = f"{self.client_params.hostname}/authn/{self.client_params.account}/api_key?role=host:somehost"
-        # We want to rotate the API key of the host so we will know the value
-        host_api_key = requests.request("PUT", url, headers=headers, data=self.client_params.env_api_key,
-                                        verify=self.environment.path_provider.certificate_path).text
-
-        os.remove(DEFAULT_NETRC_FILE)
+        self.invoke_cli(self.cli_auth_params,
+                        ['logout'])
 
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'host/somehost', '-p', f'{host_api_key}'])
+                                 ['login', '-i', 'host/somehost', '-p', f'{extract_api_key_from_message}'])
 
-        self.validate_netrc(f"{self.client_params.hostname}/authn", "host/somehost", host_api_key)
+        self.validate_netrc(f"{self.client_params.hostname}/authn", "host/somehost", extract_api_key_from_message)
         self.assertIn("Successfully logged in to Conjur", output.strip())
 
     '''
