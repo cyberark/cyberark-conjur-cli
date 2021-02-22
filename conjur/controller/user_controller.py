@@ -13,10 +13,9 @@ import sys
 import requests
 
 # Internals
-from conjur.constants import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 from conjur.errors import InvalidPasswordComplexityException, \
     OperationNotCompletedException
-
+from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 
 class UserController():
     """
@@ -53,9 +52,9 @@ class UserController():
             if http_error.response.status_code == 401:
                 raise
 
-            logging.debug(f"Invalid password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
+            logging.debug(f"Invalid password {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")
             # pylint: disable=line-too-long
-            raise InvalidPasswordComplexityException("Error: Invalid password. "
+            raise InvalidPasswordComplexityException("Error: Invalid password "
                                                      f"{PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}.") from http_error
         logging.debug(f"Successfully changed password for '{self.user_input_data.user_id}'.")
         sys.stdout.write(f"Successfully changed password for '{self.user_input_data.user_id}'.\n")
@@ -66,7 +65,7 @@ class UserController():
         """
         if self.user_input_data.new_password is None:
             # pylint: disable=line-too-long
-            self.user_input_data.new_password = getpass.getpass(prompt=f"Enter the new password. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
+            self.user_input_data.new_password = getpass.getpass(prompt=f"Enter the new password {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
             self.check_password_validity()
 
     def check_password_validity(self):
@@ -75,4 +74,4 @@ class UserController():
         """
         # For the future, we can add client-side validations here
         while self.user_input_data.new_password == '':
-            self.user_input_data.new_password = getpass.getpass(prompt=f"Invalid format. {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
+            self.user_input_data.new_password = getpass.getpass(prompt=f"Invalid format {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")

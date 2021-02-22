@@ -20,6 +20,8 @@ import requests
 
 # Internals
 from conjur.api import SSLClient
+from conjur.errors import CertificateVerificationException
+from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
@@ -70,7 +72,7 @@ Usage:
         return '''
 To get help on a specific command, see `conjur <command> -h | --help`
 
-To start using Conjur with your environment, you must first initialize the configuration. See `conjur init -h` for more help.
+To start using Conjur with your environment, you must first initialize the configuration. See `conjur init -h` for more information.
 '''
 
     @staticmethod
@@ -296,7 +298,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                              description=self.command_description(policy_replace_name,
                                                                                                   policy_replace_usage),
                                                              epilog=self.command_epilog(
-                                                                 'conjur policy replace -f /tmp/myPolicy.yml -b root\t'
+                                                                 'conjur policy replace -f /tmp/myPolicy.yml -b root\t\t'
                                                                  'Replaces the existing policy myPolicy.yml under branch root\n'),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
@@ -552,6 +554,12 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         except requests.exceptions.HTTPError as client_error:
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
+            if args.debug is False:
+                sys.stdout.write("Run the command again in debug mode for more information.\n")
+            sys.exit(1)
+        except CertificateVerificationException:
+            logging.debug(traceback.format_exc())
+            sys.stdout.write(F"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

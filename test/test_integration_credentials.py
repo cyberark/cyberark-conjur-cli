@@ -67,7 +67,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
         output = self.invoke_cli(self.cli_auth_params,
                             ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
-        self.assertIn("Error: Invalid operation. Reason: The client was initialized without", output)
+        self.assertIn("The client was initialized without", output)
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 

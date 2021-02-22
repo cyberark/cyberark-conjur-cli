@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur.errors import OperationNotCompletedException, InvalidOperationException
+from conjur.errors import CertificateVerificationException
 from conjur.util import util_functions
 from conjur.data_object.credentials_data import CredentialsData
 from conjur.controller.login_controller import LoginController
@@ -85,10 +85,10 @@ class LoginControllerTest(unittest.TestCase):
                                                            MockConjurrc)
 
     @patch('conjur.logic.login_logic')
-    def test_login_get_api_can_raise_operation_not_completed_exception(self, mock_logic):
-        mock_logic.get_api_key = MagicMock(side_effect=InvalidOperationException)
+    def test_login_get_api_can_raise_operation_invalid_operation_exception(self, mock_logic):
+        mock_logic.get_api_key = MagicMock(side_effect=CertificateVerificationException)
         mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
-        with self.assertRaises(InvalidOperationException):
+        with self.assertRaises(CertificateVerificationException):
             mock_login_controller.get_api_key('someconjurrc')
 
     def test_login_raises_error_when_error_occurred_while_getting_api_key(self):

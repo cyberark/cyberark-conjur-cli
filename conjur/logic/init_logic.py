@@ -46,8 +46,8 @@ class InitLogic:
 
         return fingerprint, readable_certificate
 
-    @staticmethod
-    def fetch_account_from_server(conjurrc_data):
+    @classmethod
+    def fetch_account_from_server(cls, conjurrc_data):
         """
         Fetches the account from the DAP server by making a request to the /info endpoint.
         This endpoint only exists in the DAP server
