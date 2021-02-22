@@ -84,7 +84,7 @@ class LoginController:
         properties and to send a login request to Conjur
         """
         conjurrc = ConjurrcData.load_from_file()
-        self.credential_data.machine = conjurrc.appliance_url + CREDENTIAL_HOST_PATH
+        self.credential_data.machine = conjurrc.conjur_url + CREDENTIAL_HOST_PATH
 
         return conjurrc
 

@@ -170,8 +170,8 @@ repo. Copy this executable into every OS you wish to run the CLI integration tes
 
 ###### Example
 ```
-./integrations_tests_runner \
-  --identifier test-with-process \
+./dist/integrations_tests_runner \
+  --identifier test_with_process \
   --url https://conjur-server \
   --account someaccount \
   --login somelogin \

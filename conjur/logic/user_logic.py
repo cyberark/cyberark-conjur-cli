@@ -67,7 +67,7 @@ class UserLogic:
         keys and change passwords
         """
         loaded_conjurrc = self.conjurrc_data.load_from_file()
-        return self.credentials_from_store.load(loaded_conjurrc.appliance_url)
+        return self.credentials_from_store.load(loaded_conjurrc.conjur_url)
 
     def rotate_other_api_key(self, resource_to_update):
         """

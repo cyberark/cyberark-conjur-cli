@@ -10,16 +10,14 @@ from conjur.logic.user_logic import UserLogic
 
 
 class MockConjurrc:
-    appliance_url = 'someurl'
+    conjur_url = 'someurl'
     account = 'someacc'
     cert_file = 'some/path/to/pem'
-    plugins: []
 
 
-CONJURRC_DICT = {'appliance_url': 'someurl',
+CONJURRC_DICT = {'conjur_url': 'someurl',
                  'account': 'someacc',
-                 'cert_file': 'some/path/to/pem',
-                 'plugins': []}
+                 'cert_file': 'some/path/to/pem'}
 
 
 class UserLogicTest(unittest.TestCase):

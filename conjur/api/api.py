@@ -45,7 +45,6 @@ class Api():
                  ca_bundle=None,
                  http_debug=False,
                  login_id=None,
-                 plugins=None,
                  ssl_verify=True,
                  url=None):
 

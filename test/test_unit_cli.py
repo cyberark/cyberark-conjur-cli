@@ -16,7 +16,7 @@ RESOURCE_LIST = [
     'some_id2',
 ]
 WHOAMI_RESPONSE = {
-    "account": "myaccount"
+    "conjur_account": "myaccount"
 }
 
 class MockArgs(object):
@@ -216,7 +216,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
     def test_cli_invokes_whoami_outputs_formatted_json(self, cli_invocation, output, client):
-        self.assertEquals('{\n    "account": "myaccount"\n}\n', output)
+        self.assertEquals('{\n    "conjur_account": "myaccount"\n}\n', output)
 
     @patch.object(Cli, 'handle_init_logic')
     def test_cli_init_functions_are_properly_called(self, mock_init):

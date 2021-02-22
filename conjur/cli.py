@@ -581,7 +581,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Initializes the client, creating the .conjurrc file
         """
         ssl_service = SSLClient()
-        conjurrc_data = ConjurrcData(appliance_url=url,
+        conjurrc_data = ConjurrcData(conjur_url=url,
                                      account=account,
                                      cert_file=cert)
 

@@ -257,7 +257,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
     * `RuntimeError` should be replaced with `MissingParameterException`
 
       ```python
-      if self.conjurrc_data.appliance_url == '':
+      if self.conjurrc_data.conjur_url == '':
           raise RuntimeError("Error: URL is required")
       ```
 
@@ -266,7 +266,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
   ```python
       if url.scheme != 'https':
           raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
-                 f"'{self.conjurrc_data.appliance_url}' is not supported.")
+                 f"'{self.conjurrc_data.conjur_url}' is not supported.")
   ```
 
 * `RuntimeError` should be replaced with `ConfirmationException`
@@ -286,9 +286,9 @@ The following is a mapping of builtin and third-party exceptions that are curren
           self.init_logic.fetch_account_from_server(self.conjurrc_data)
       except Exception as error:
           logging.warning(f"Unable to fetch the account from the Conjur server. Reason: {error}")
-          conjurrc_data.account = input("Enter the Conjur account name (required): ").strip()
+          conjurrc_data.conjur_account = input("Enter the Conjur account name (required): ").strip()
 
-          if conjurrc_data.account is None or conjurrc_data.account == '':
+          if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
               raise RuntimeError("Error: account is required")
     ```
 
@@ -362,7 +362,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
             sys.stdout.write("Successfully logged out from Conjur.\n")
         elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
             conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
-            self.logout_logic.remove_credentials(conjurrc.appliance_url)
+            self.logout_logic.remove_credentials(conjurrc.conjur_url)
             logging.debug("Logout successful")
             sys.stdout.write("Successfully logged out from Conjur.\n")
         else:

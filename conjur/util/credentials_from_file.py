@@ -46,7 +46,7 @@ class CredentialsFromFile:
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
 
-    def load(self, conjurrc_appliance_url):
+    def load(self, conjurrc_conjur_url):
         """
         Method that loads the netrc data.
         Triggered before each CLI action
@@ -63,7 +63,7 @@ class CredentialsFromFile:
 
         logging.debug(f"Retrieving credentials from file: {self.netrc_path}")
         for host in netrc_obj.hosts:
-            if conjurrc_appliance_url in host:
+            if conjurrc_conjur_url in host:
                 netrc_host_url = host
                 netrc_auth = netrc_obj.authenticators(netrc_host_url)
 
@@ -89,11 +89,11 @@ class CredentialsFromFile:
         hosts[credential_data['machine']] = (user_to_update, None, new_api_key)
         self.build_netrc(netrc_obj)
 
-    def remove_credentials(self, conjurrc_appliance_url):
+    def remove_credentials(self, conjurrc_conjur_url):
         """
         Method that removes the described login entry from netrc
         """
-        netrc_data = self.load(conjurrc_appliance_url)
+        netrc_data = self.load(conjurrc_conjur_url)
 
         netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
         hosts = netrc_obj.hosts

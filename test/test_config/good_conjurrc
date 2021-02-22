@@ -1,5 +1,4 @@
 ---
-account: accountname
-appliance_url: https://someurl/somepath
+conjur_account: accountname
+conjur_url: https://someurl/somepath
 cert_file: "/cert/file/location"
-plugins: ['foo', 'bar']

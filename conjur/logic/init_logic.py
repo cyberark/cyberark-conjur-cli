@@ -53,11 +53,11 @@ class InitLogic:
         This endpoint only exists in the DAP server
         """
         params = {
-            'url': conjurrc_data.appliance_url
+            'url': conjurrc_data.conjur_url
         }
         # If the user provides us with the certificate path, we will use it
         # to make a request to /info
-        if conjurrc_data.cert_file is None and conjurrc_data.appliance_url.startswith("https"):
+        if conjurrc_data.cert_file is None and conjurrc_data.conjur_url.startswith("https"):
             certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
                                           "conjur-server.pem")
         else:
@@ -68,10 +68,10 @@ class InitLogic:
                                    ConjurEndpoint.INFO,
                                    params,
                                    ssl_verify=certificate_path).json()
-        conjurrc_data.account = response['configuration']['conjur']['account']
+        conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Account '{conjurrc_data.account}' "
+        logging.debug(f"Account '{conjurrc_data.conjur_account}' "
                       "successfully fetched from the Conjur server")
 
     @classmethod

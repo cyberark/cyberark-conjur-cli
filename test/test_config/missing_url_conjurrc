@@ -1,4 +1,3 @@
 ---
-account: accountname
+conjur_account: accountname
 cert_file: "/cert/file/location"
-plugins: ['foo', 'bar']

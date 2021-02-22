@@ -15,7 +15,6 @@ class ConfigTest(unittest.TestCase):
     EXPECTED_CONFIG = {
       'account': 'accountname',
       'ca_bundle': '/cert/file/location',
-      'plugins': ['foo', 'bar'],
       'url': 'https://someurl/somepath',
     }
 
@@ -47,7 +46,6 @@ class ConfigTest(unittest.TestCase):
                 "^config:\n" +
                 "\s+account: accountname\n" +
                 "\s+ca_bundle: /cert/file/location\n" +
-                "\s+plugins:.*foo.*bar.*\n" +
                 "\s+url: https://someurl/somepath\n",
                 re.MULTILINE | re.DOTALL,
             ))
