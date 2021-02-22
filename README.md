@@ -1,20 +1,14 @@
 # conjur-api-python3
 
-Python3-based API SDK for [Conjur OSS](https://www.conjur.org/). The repo
-also includes a self-contained CLI tool (`conjur-cli`) that wraps the API
-in a simple executable script/binary.
+Command-line tool and programmatic Python access to the Conjur API to manage your Conjur resources. 
+
+This repository includes both the self-contained Conjur command-line tool (`conjur`) and Python3-based SDK for Conjur.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
 
 ---
 
-### **Status**: Alpha
-
-#### **Warning: Naming and APIs are still subject to breaking changes!**
-
----
-
-## Installing the code
+### **Status**: GA
 
 ### Using conjur-api-python3 with Conjur OSS 
 
@@ -27,13 +21,38 @@ compatibility. When possible, upgrade your Conjur version to match the
 when using integrations, choose the latest suite release that matches your Conjur version. For any 
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
-### From PyPI
+### Support Services
+
+- Conjur OSS ***TODO find lowest version***
+- Conjur Enterprise ***TODO find lowest version***
+
+### Installation
+
+#### Install the CLI
+
+You can access the latest release of the CLI to install on your machine by navigating to our 
+[release](https://github.com/cyberark/conjur-api-python3/releases) page. For instructions on 
+how to setup and configure the CLI, see our official documentation ***(TODO add link to docs)*** 
+
+If Python is installed on the target machine, you can install the client library by pulling from PyPI:
 
 ```
 $ pip3 install conjur-client
+
+$ conjur --help
 ```
 
-### From source
+#### Install the SDK
+
+The SDK can be installed via PyPI:
+
+```
+$ pip3 install conjur-client
+
+$ conjur --help
+```
+
+Alternatively, you can install the library from the source:
 
 ```
 $ pip3 install .
@@ -46,22 +65,13 @@ you will want to use `pip3` if it's available for your platform.
 
 ### CLI
 
-CLI can either be used with the included executable script:
+For more information on how to setup, configure, and start using the CLI, see our official 
+documentation found here ***(TODO add link to docs)***.
 
-```shell
-conjur-cli --insecure -l https://myserver -a orgname -u admin -p secret \
-  variable get foo/bar
-```
+### SDK
 
-Or through the installed module:
-
-```shell
-python -m conjur --insecure -l https://myserver -a orgname -u admin -p secret list
-```
-
-### API
-
-Most usage is done by creating a Client instance and then invoking the API on it:
+To start using the SDK in your applications, create a Client instance and then invoke the 
+API on it:
 
 #### With login ID and password
 
@@ -85,9 +95,9 @@ new_value = client.get('conjur/my/variable')
 print("Variable value is:", new_value.decode('utf-8'))
 ```
 
-#### With login Id and API key
+#### With login ID and API key
 
-Write the code same as in the first example but create the client with the following arguments:
+Write the code same as in the first example but initialize the Client with the following arguments:
 
 ```python3
 client = Client(url='https://conjur.myorg.com',
@@ -97,15 +107,43 @@ client = Client(url='https://conjur.myorg.com',
                 ca_bundle='/path/to/my/ca/bundle.pem')
 ```
 
-#### With `.netrc` and `.conjurrc` settings
+#### With `.netrc` and `.conjurrc` files
 
-Write the code same as in the first example but create the client with the following arguments:
+You can provide the above parameters passed in as part of the Client initialization process in two files 
+(`.netrc` and `.conjurrc`). Both `.netrc` and `.conjurrc` files should be saved to your home directory. 
+For example `~/.netrc`. 
 
-```python3
+The `.conjurrc` contains connection details needed to connect to the Conjur endpoint and should 
+contain details for cert_file, conjur_account, and conjur_url.
+
+```
+# .conjurrc
+---
+cert_file: /Users/someuser/conjur-server.pem
+conjur_account: someaccount
+conjur_url: https://conjur-server
+```
+
+The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to login the 
+Conjur endpoint and should consist of machine, login, and password. Note that the value for 
+'machine' should have `/authn` appended to the end of the url and 'password' should contain the 
+API key of the user you intend to log in as.
+
+```
+# .netrc / _netrc
+machine https://conjur-server/authn
+login admin
+password 1234....
+```
+
+Write the code same as in the first example but create the Client 
+in the following way:
+
+```
 client = Client()
 ```
 
-## Currently supported client methods:
+## Supported Client methods
 
 #### `get(variable_id)`
 
@@ -125,7 +163,7 @@ Sets a variable to a specific value based on its ID.
 Note: Policy to create the variable must have been already loaded
 otherwise you will get a 404 error during invocation.
 
-#### `apply_policy_file(policy_name, policy_file)`
+#### `load_policy_file(policy_name, policy_file)`
 
 Applies a file-based YAML to a named policy. This method only
 supports additive changes. Result is a dictionary object constructed
@@ -137,17 +175,46 @@ Replaces a named policy with one from the provided file. This is
 usually a destructive invocation. Result is a dictionary object
 constructed from the returned JSON data.
 
-#### `delete_policy_file(policy_name, policy_file)`
+#### `update_policy_file(policy_name, policy_file)`
 
 Modifies an existing Conjur policy. Data may be explicitly
-deleted using the !delete, !revoke, and !deny statements. Unlike
+deleted using the `!delete`, `!revoke`, and `!deny` statements. Unlike
 "replace" mode, no data is ever implicitly deleted. Result is a
 dictionary object constructed from the returned JSON data.
 
-#### `list()`
+#### `list(list_constraints)`
 
-Returns a Python list of all the available resources for the current
+Returns a list of all the available resources for the current
 account.
+
+The list constraints parameter is optional and should be provided as a dictionary. 
+For example: `client.list({'kind': 'user', 'inspect': True})`
+
+| List constraints | Explanation                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| kind             | Filter resources by specified kind (user, host, layer, group, policy, variable, or webservice) |
+| limit            | Limit list of resources to specified number                  |
+| offset           | Skip specified number of resources                           |
+| role             | Retrieve list of resources that specified role is entitled to see (must specify role’s full ID) |
+| search           | Search for resources based on specified query                |
+| inspect          | List the metadata for resources                              |
+
+#### `rotate_other_api_key(resource: Resource)`
+
+Rotates another entity's API key and returns it as a string.
+
+Note: resource is of type Resource which should be a `type` (user / host) and `name` pair.
+
+#### `rotate_personal_api_key(logged_in_user, current_password)`
+
+Rotates personal API key and returns it as a string.
+
+#### `change_personal_password(logged_in_user, current_password, new_password)`
+
+Updates the current, logged in user's password with the password parameter provided. 
+
+Note: the new password must meet the Conjur password complexity constraints. It must contain at 
+least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special character.
 
 #### `whoami()`
 
@@ -158,12 +225,9 @@ API request (such as its ip address, user, account,
 token expiration date etc.).
 
 
-
 ## Contributing
 
-We store instructions for development and guidelines for how to build and test this
-project in the [CONTRIBUTING.md](CONTRIBUTING.md) - please refer to that document
-if you would like to contribute.
+Instructions for how to deploy a deployment environment and run our tests can be found in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
