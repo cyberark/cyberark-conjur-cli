@@ -16,5 +16,5 @@ PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE = "(it must contain at least 12 characte
                                           "2 uppercase, 2 lowercase, 1 digit, 1 special character)"
 
 # pylint: disable=line-too-long
-MISMATCH_HOSTNAME_MESSAGE = "The machine's hostname did not match any names on the certificate." \
-                            "Make sure the names on the certificate (common name or SANs) match the machine's hostname. "
+MISMATCH_HOSTNAME_MESSAGE = "The machine's hostname did not match any names on the certificate. " \
+                            "Make sure the names on the certificate (common name or SANs) match the machine's hostname"
