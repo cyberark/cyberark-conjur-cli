@@ -133,7 +133,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     @integration_test(True)
     def test_https_cli_fails_if_cert_is_bad(self):
         # bad conjurrc
-        conjurrc = ConfigFile(account=self.client_params.login, conjur_url=self.client_params.hostname,
+        conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file=self.environment.path_provider.nginx_conf_path)
         conjurrc.dump_to_file()
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
@@ -146,7 +146,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
     @integration_test(True)
     def test_https_cli_fails_if_cert_is_not_provided(self):
-        conjurrc = ConfigFile(account=self.client_params.login, conjur_url=self.client_params.hostname,
+        conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file="")
         conjurrc.dump_to_file()
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
