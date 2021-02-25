@@ -49,19 +49,19 @@ pipeline {
         }
       }
     }
-
+    // Temporarily comment this out until either the SDK is GA or the two use-cases are separated
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {
-        stage('Publish to PyPI') {
-          steps {
-            sh 'summon -e production ./bin/publish_package'
-          }
+        //stage('Publish to PyPI') {
+        //  steps {
+        //    sh 'summon -e production ./bin/publish_package'
+        //  }
 
-          when {
-            branch "master"
-          }
-        }
+        //  when {
+        //    branch "master"
+        //  }
+        //}
 
         stage('Publish containers') {
           steps {
