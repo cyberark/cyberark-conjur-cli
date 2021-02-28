@@ -97,10 +97,10 @@ class UserLogicTest(unittest.TestCase):
     Raises exception when HTTPError was raised
     '''
     def test_rotate_personal_api_key_raises_exception_when_unauthorized(self):
-        client = MagicMock(return_value=None)
-        mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
-        mock_user_logic.client.rotate_personal_api_key = MagicMock(side_effect=requests.exceptions.HTTPError)
         with self.assertRaises(requests.exceptions.HTTPError):
+            client = MagicMock(return_value=None)
+            mock_user_logic = UserLogic(ConjurrcData, CredentialsFromFile, client)
+            mock_user_logic.client.rotate_personal_api_key = MagicMock(side_effect=requests.exceptions.HTTPError)
             mock_user_logic.rotate_personal_api_key('someuser', 'somecreds', 'somepass')
 
     '''

@@ -108,7 +108,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                                                ['user', 'rotate-api-key', '-i', 'someunprivilegeduser'])
         # extract the API key we get from the CLI success message
         extract_api_key_from_message = unprivileged_api_key.split(":")[1].strip()
-        print(extract_api_key_from_message)
+
         # verify user can login with their new API key
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'someunprivilegeduser', '-p', extract_api_key_from_message])
@@ -158,6 +158,14 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_user_change_password_not_complex_enough_prompts_input(self):
+        # Login as user to avoid changing admin password
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+
         output = self.invoke_cli(self.cli_auth_params,
                                  ['user', 'change-password', '-p', 'someinvalidpassword'], exit_code=1)
         self.assertIn("Error: Invalid password", output)
@@ -177,6 +185,13 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test()
     def test_user_change_password_empty_password_provided_prompts_input(self):
+        # Login as user to avoid changing admin password
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
         with self.assertLogs('', level='DEBUG') as mock_log:
             with patch('getpass.getpass', side_effect=['mypassword']):
                 output = self.invoke_cli(self.cli_auth_params,

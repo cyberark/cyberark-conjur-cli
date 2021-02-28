@@ -1,8 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
-
 from conjur.controller.logout_controller import LogoutController
-from conjur.logic.logout_logic import LogoutLogic
+from conjur.data_object import ConjurrcData
 
 
 class MockConjurrc:
@@ -22,8 +21,8 @@ class LogoutControllerTest(unittest.TestCase):
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
-    def test_logout_removes_credentials(self, mock_exists, mock_size, mock_conjurrc):
-        mock_logout_logic = LogoutLogic
+    @patch('conjur.logic.logout_logic')
+    def test_logout_removes_credentials(self, mock_logout_logic, mock_exists, mock_size, mock_conjurrc):
         mock_logout_logic.remove_credentials = MagicMock()
         mock_logout_controller = LogoutController(True, mock_logout_logic)
         mock_logout_controller.remove_credentials()
@@ -31,18 +30,17 @@ class LogoutControllerTest(unittest.TestCase):
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=0)
-    def test_logout_netrc_does_not_exist_raises_already_logged_out_exception(self, mock_exists, mock_size):
-        mock_logout_logic = LogoutLogic
+    @patch('conjur.logic.logout_logic')
+    def test_logout_netrc_does_not_exist_raises_already_logged_out_exception(self, mock_logout_logic, mock_exists, mock_size):
         mock_logout_controller = LogoutController(True, mock_logout_logic)
         with self.assertRaises(Exception):
             mock_logout_controller.remove_credentials()
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
-           return_value=MagicMock(side_effect=Exception))
-    def test_logout_remove_credentials_operation_fails_raises_exception(self, mock_exists, mock_size, mock_conjurrc):
-        mock_logout_logic = LogoutLogic
-        mock_logout_controller = LogoutController(True, mock_logout_logic)
-        with self.assertRaises(Exception):
-            mock_logout_controller.remove_credentials()
+    @patch('conjur.logic.logout_logic')
+    def test_logout_remove_credentials_operation_fails_raises_exception(self, mock_logout_logic, mock_size, mock_conjurrc):
+        with patch.object(ConjurrcData, 'load_from_file', side_effect=Exception):
+            with self.assertRaises(Exception):
+                mock_logout_controller = LogoutController(True, mock_logout_logic)
+                mock_logout_controller.remove_credentials()
