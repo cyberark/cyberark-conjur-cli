@@ -23,8 +23,8 @@ questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/
 
 ### Support Services
 
-- Conjur OSS ***TODO find lowest version***
-- Conjur Enterprise ***TODO find lowest version***
+- Conjur OSS v1.2.0+
+- Conjur Enterprise v5.6.3+
 
 ### Installation
 
@@ -34,17 +34,10 @@ You can access the latest release of the CLI to install on your machine by navig
 [release](https://github.com/cyberark/conjur-api-python3/releases) page. For instructions on 
 how to setup and configure the CLI, see our official documentation ***(TODO add link to docs)*** 
 
-If Python is installed on the target machine, you can install the client library by pulling from PyPI:
-
-```
-$ pip3 install conjur-client
-
-$ conjur --help
-```
-
 #### Install the SDK
 
-The SDK can be installed via PyPI:
+The SDK can be installed via PyPI. Note that the SDK pushed to PyPI does not have the updated
+capabilities and experience as the GA CLI version offers. The latest version pushed to PyPI is v.0.1.1.
 
 ```
 $ pip3 install conjur-client
@@ -52,7 +45,8 @@ $ pip3 install conjur-client
 $ conjur --help
 ```
 
-Alternatively, you can install the library from the source:
+Alternatively, you can install the library from the source. Note that this will install the latest work from the
+cloned source and not necessarily an official release. Clone the project and run:
 
 ```
 $ pip3 install .
@@ -163,7 +157,7 @@ Sets a variable to a specific value based on its ID.
 Note: Policy to create the variable must have been already loaded
 otherwise you will get a 404 error during invocation.
 
-#### `load_policy_file(policy_name, policy_file)`
+#### `apply_policy_file(policy_name, policy_file)`
 
 Applies a file-based YAML to a named policy. This method only
 supports additive changes. Result is a dictionary object constructed
@@ -175,46 +169,17 @@ Replaces a named policy with one from the provided file. This is
 usually a destructive invocation. Result is a dictionary object
 constructed from the returned JSON data.
 
-#### `update_policy_file(policy_name, policy_file)`
+#### `delete_policy_file(policy_name, policy_file)`
 
 Modifies an existing Conjur policy. Data may be explicitly
 deleted using the `!delete`, `!revoke`, and `!deny` statements. Unlike
 "replace" mode, no data is ever implicitly deleted. Result is a
 dictionary object constructed from the returned JSON data.
 
-#### `list(list_constraints)`
+#### `list()`
 
 Returns a list of all the available resources for the current
 account.
-
-The list constraints parameter is optional and should be provided as a dictionary. 
-For example: `client.list({'kind': 'user', 'inspect': True})`
-
-| List constraints | Explanation                                                  |
-| ---------------- | ------------------------------------------------------------ |
-| kind             | Filter resources by specified kind (user, host, layer, group, policy, variable, or webservice) |
-| limit            | Limit list of resources to specified number                  |
-| offset           | Skip specified number of resources                           |
-| role             | Retrieve list of resources that specified role is entitled to see (must specify role’s full ID) |
-| search           | Search for resources based on specified query                |
-| inspect          | List the metadata for resources                              |
-
-#### `rotate_other_api_key(resource: Resource)`
-
-Rotates another entity's API key and returns it as a string.
-
-Note: resource is of type Resource which should be a `type` (user / host) and `name` pair.
-
-#### `rotate_personal_api_key(logged_in_user, current_password)`
-
-Rotates personal API key and returns it as a string.
-
-#### `change_personal_password(logged_in_user, current_password, new_password)`
-
-Updates the current, logged in user's password with the password parameter provided. 
-
-Note: the new password must meet the Conjur password complexity constraints. It must contain at 
-least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special character.
 
 #### `whoami()`
 
@@ -224,10 +189,9 @@ Returns a Python dictionary of information about the client making an
 API request (such as its ip address, user, account,
 token expiration date etc.).
 
-
 ## Contributing
 
-Instructions for how to deploy a deployment environment and run our tests can be found in [CONTRIBUTING.md](CONTRIBUTING.md).
+Instructions for how to deploy a deployment environment and run project tests can be found in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
