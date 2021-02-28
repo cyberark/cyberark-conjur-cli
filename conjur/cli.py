@@ -170,7 +170,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                                                     'Prompts for the login name and password to log in to Conjur server\n'
                                                                                     '    conjur login -i admin \t\t\t'
                                                                                     'Prompts for password of the admin user to log in to Conjur server\n'
-                                                                                    '    conjur login -i admin -p Myp@ssw0rd!\t'
+                                                                                    '    conjur login -i admin -p Myp@SSw0rds!\t'
                                                                                     'Logs the admin user in to Conjur server and saves the user and password '
                                                                                     'in the local cache (netrc file)'),
                                                          usage=argparse.SUPPRESS,
@@ -386,8 +386,8 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                               user_change_password_name, user_change_password_usage),
                                                           epilog=self.command_epilog('conjur user change-password\t\t\t'
                                                                                      'Prompts for a new password for the logged-in user\n'
-                                                                                     '    conjur user change-password -p Myp@ssw0rd!\t'
-                                                                                     'Changes the password for the logged-in user to Myp@ssw0rd!'),
+                                                                                     '    conjur user change-password -p Myp@SSw0rds!\t'
+                                                                                     'Changes the password for the logged-in user to Myp@SSw0rds!'),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
                                                           formatter_class=formatter_class)
