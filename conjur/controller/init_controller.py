@@ -15,7 +15,7 @@ import sys
 from urllib.parse import urlparse
 
 # Internals
-from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
 
@@ -93,7 +93,7 @@ class InitController:
                          "command on the Conjur server:\n"
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
         trust_certificate = input("Trust this certificate? (Default=no): ").strip()
-        if trust_certificate.lower() != 'yes':
+        if trust_certificate.lower() not in VALID_CONFIRMATIONS:
             raise RuntimeError("You decided not to trust the certificate")
 
         return fetched_certificate
@@ -160,5 +160,5 @@ class InitController:
         """
         force_overwrite = input(f"File {config_file} exists. "
                                 f"Overwrite? (Default=yes): ").strip()
-        if force_overwrite != '' and force_overwrite.lower() != 'yes':
+        if force_overwrite != '' and force_overwrite.lower() not in VALID_CONFIRMATIONS:
             raise Exception(f"Not overwriting {config_file}")
