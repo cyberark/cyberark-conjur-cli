@@ -20,8 +20,8 @@ class UserControllerTest(unittest.TestCase):
         assert user_controller.user_logic == mock_user_logic
         assert user_controller.user_input_data == mock_user_input_data
 
-    def test_operation_failure_raises_error(self):
-        mock_user_logic = UserLogic
+    @patch('conjur.logic.user_logic')
+    def test_operation_failure_raises_error(self, mock_user_logic):
         user_controller = UserController(mock_user_logic, self.user_input_data)
         mock_user_logic.rotate_api_key = MagicMock(side_effect=OperationNotCompletedException)
         with self.assertRaises(OperationNotCompletedException):
@@ -34,11 +34,11 @@ class UserControllerTest(unittest.TestCase):
         with self.assertRaises(OperationNotCompletedException):
             mock_user_controller.rotate_api_key()
 
-    def test_change_password_can_raise_authn_error(self):
+    @patch('conjur.logic.user_logic')
+    def test_change_password_can_raise_authn_error(self, mock_user_logic):
         # mock the status code of the error received
         mock_response = MagicMock()
         mock_response.status_code = 401
-        mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
         mock_user_logic.change_personal_password = MagicMock(
@@ -46,11 +46,11 @@ class UserControllerTest(unittest.TestCase):
         with self.assertRaises(requests.exceptions.HTTPError):
             user_controller.change_personal_password()
 
-    def test_change_password_can_raise_invalid_complexity_error(self):
+    @patch('conjur.logic.user_logic')
+    def test_change_password_can_raise_invalid_complexity_error(self, mock_user_logic):
         # mock the status code of the error received
         mock_response = MagicMock()
         mock_response.status_code = 422
-        mock_user_logic = UserLogic
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
         mock_user_logic.change_personal_password = MagicMock(
