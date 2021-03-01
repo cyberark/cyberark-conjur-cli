@@ -86,6 +86,36 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
+    Validates that the conjurrc was created on the machine when user provides Y instead of 'yes'
+    '''
+    @integration_test(True)
+    @patch('builtins.input', return_value='Y')
+    def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
+
+    '''
+    Validates that the conjurrc was created on the machine when user provides Y instead of 'yes' 
+    when prompted to overwrite the conjurrc file
+    '''
+    @integration_test(True)
+    @patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y'])
+    def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+        # Intentional double init here to test that the overwriting of the file prompt can take 'Y'
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
+
+    '''
     Validates that the conjurrc was created on the machine when a user mistakenly supplies an extra '/' at the end of the URL
     '''
     @integration_test()
