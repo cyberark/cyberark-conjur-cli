@@ -559,13 +559,13 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             sys.exit(1)
         except CertificateVerificationException:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(F"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
+            sys.stdout.write(f"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"{str(error)}\n")
+            sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

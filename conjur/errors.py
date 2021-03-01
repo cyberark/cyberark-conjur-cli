@@ -18,14 +18,8 @@ class OperationNotCompletedException(Exception):
     Exception for when an operation was not completed successfully
     and CLI is left in instable state
     """
-    def __init__(self, message="Error: Failed to run command to completion."):
+    def __init__(self, message=""):
         self.message = message
-        super().__init__(self.message)
-
-class InvalidOperationException(Exception):
-    """ Exception for when the operation performed was invalid """
-    def __init__(self, cause="", solution=""):
-        self.message = f"Error: Invalid operation. Reason: {cause} {solution}"
         super().__init__(self.message)
 
 class MissingRequiredParameterException(Exception):
@@ -38,7 +32,7 @@ class InvalidFormatException(Exception):
     """
     def __init__(self, message=""):
         self.message = message
-        super().__init__("Failed to execute command. Reason: " + self.message)
+        super().__init__(self.message)
 
 class CertificateVerificationException(Exception):
     """
