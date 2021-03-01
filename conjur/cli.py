@@ -348,8 +348,8 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                                                    'Rotates the API key for user joe\n'
                                                                                    '    conjur user change-password\t\t\t'
                                                                                    'Prompts for password change for the logged-in user\n'
-                                                                                   '    conjur user change-password -p Myp@SSw0rd1!\t'
-                                                                                   'Changes the password for the logged-in user to Myp@SSw0rd1!',
+                                                                                   '    conjur user change-password -p Myp@SSw0rds!\t'
+                                                                                   'Changes the password for the logged-in user to Myp@SSw0rds!',
                                                                                    command='user',
                                                                                    subcommands=['rotate-api-key',
                                                                                                 'change-password']),
@@ -496,7 +496,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                                        formatter_class=formatter_class)
         variable_set_options = variable_set_subcommand_parser.add_argument_group(title=self.title("Options"))
 
-        variable_set_options.add_argument('-i', '--id', dest='identifier',
+        variable_set_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
                                           help='Provide variable identifier', required=True)
         variable_set_options.add_argument('-v', '--value', metavar='VALUE',
                                           help='Set the value of the specified variable', required=True)
@@ -559,13 +559,13 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             sys.exit(1)
         except CertificateVerificationException:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(F"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
+            sys.stdout.write(f"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
         except Exception as error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"{str(error)}\n")
+            sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

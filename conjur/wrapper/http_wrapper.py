@@ -102,7 +102,7 @@ def invoke_request(http_verb, url, *args, query, ssl_verify, auth, headers):
                               headers=headers)
 
     except requests.exceptions.SSLError as ssl_error:
-        host_mismatch_message = re.search("(?:doesn't match either of)", str(ssl_error))
+        host_mismatch_message = re.search("hostname '.+' doesn't match", str(ssl_error))
         if host_mismatch_message:
             raise CertificateHostnameMismatchException from ssl_error
         raise ssl_error
