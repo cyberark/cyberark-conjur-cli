@@ -348,8 +348,8 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                                                    'Rotates the API key for user joe\n'
                                                                                    '    conjur user change-password\t\t\t'
                                                                                    'Prompts for password change for the logged-in user\n'
-                                                                                   '    conjur user change-password -p Myp@SSw0rd1!\t'
-                                                                                   'Changes the password for the logged-in user to Myp@SSw0rd1!',
+                                                                                   '    conjur user change-password -p Myp@SSw0rds!\t'
+                                                                                   'Changes the password for the logged-in user to Myp@SSw0rds!',
                                                                                    command='user',
                                                                                    subcommands=['rotate-api-key',
                                                                                                 'change-password']),
@@ -496,7 +496,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                                        formatter_class=formatter_class)
         variable_set_options = variable_set_subcommand_parser.add_argument_group(title=self.title("Options"))
 
-        variable_set_options.add_argument('-i', '--id', dest='identifier',
+        variable_set_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
                                           help='Provide variable identifier', required=True)
         variable_set_options.add_argument('-v', '--value', metavar='VALUE',
                                           help='Set the value of the specified variable', required=True)

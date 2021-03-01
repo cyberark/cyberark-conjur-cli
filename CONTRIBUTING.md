@@ -175,7 +175,7 @@ repo. Copy this executable into every OS you wish to run the CLI integration tes
   --url https://conjur-server \
   --account someaccount \
   --login somelogin \
-  --password Myp@ssw0rd1! \
+  --password Myp@SSw0rds! \
   --files-folder /test \
   --cli-to-test /dist/conjur \
   --invoke-cli-as-process
