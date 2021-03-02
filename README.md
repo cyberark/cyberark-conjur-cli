@@ -8,7 +8,22 @@ This repository includes both the self-contained Conjur command-line tool (`conj
 
 ---
 
-### **Status**: GA
+## Certificate level
+
+### CLI
+
+![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
+
+The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will securely
+work with CyberArk DAP as documented. In addition, CyberArk offers Enterprise-level support for these features. For
+more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
+
+### SDK
+
+![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
+
+The Conjur Python SDK is a **Community** level project. It's a community contributed project that **is not reviewed or supported
+by CyberArk**. For more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
 
 ### Using conjur-api-python3 with Conjur OSS 
 
@@ -122,6 +137,9 @@ The `.netrc` file or (`_netrc` for Windows environments) contains credentials ne
 Conjur endpoint and should consist of machine, login, and password. Note that the value for 
 'machine' should have `/authn` appended to the end of the url and 'password' should contain the 
 API key of the user you intend to log in as.
+
+Important! If you choose to create this file yourself, ensure you follow least privilege, allowing only the
+user who has created the file to have read/write permissions on it (`chmod 700 .netrc`).
 
 ```
 # .netrc / _netrc
