@@ -551,9 +551,15 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
             sys.exit(1)
-        except requests.exceptions.HTTPError as client_error:
+        except requests.exceptions.HTTPError as server_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
+            # pylint: disable=no-member
+            if hasattr(server_error.response, 'status_code') and str(server_error.response.status_code) == '401':
+                sys.stdout.write("Failed to log in to Conjur. Unable to authenticate with Conjur. "
+                    f"Reason: {server_error}. Check your credentials and try again.\n")
+            else:
+                sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
+
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

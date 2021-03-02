@@ -12,7 +12,6 @@ import getpass
 import logging
 import sys
 
-from conjur.errors import CertificateVerificationException
 from conjur.util import util_functions
 from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -93,13 +92,7 @@ class LoginController:
         """
         Method to fetch the user/host's API key from Conjur which is to be added to the netrc
         """
-        try:
-            self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verify,
-                                                                        self.credential_data,
-                                                                        self.user_password,
-                                                                        conjurrc)
-        except CertificateVerificationException:
-            raise
-        except Exception as error:
-            raise RuntimeError("Failed to log in to Conjur. Unable to authenticate with Conjur. "
-                f"Reason: {error}. Check your credentials and try again.") from error
+        self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verify,
+                                                                    self.credential_data,
+                                                                    self.user_password,
+                                                                    conjurrc)
