@@ -22,6 +22,7 @@ import requests
 from conjur.api import SSLClient
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
+from conjur.util.util_functions import determine_status_code_specific_error_messages
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
@@ -551,9 +552,14 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             logging.debug(traceback.format_exc())
             sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
             sys.exit(1)
-        except requests.exceptions.HTTPError as client_error:
+        except requests.exceptions.HTTPError as server_error:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {client_error}\n")
+            # pylint: disable=no-member
+            if hasattr(server_error.response, 'status_code'):
+                sys.stdout.write(determine_status_code_specific_error_messages(server_error))
+            else:
+                sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
+
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)

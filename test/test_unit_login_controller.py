@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
+import requests
 
 from conjur.errors import CertificateVerificationException
 from conjur.util import util_functions
@@ -91,8 +92,10 @@ class LoginControllerTest(unittest.TestCase):
             mock_login_controller.get_api_key('someconjurrc')
 
     def test_login_raises_error_when_error_occurred_while_getting_api_key(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 401
         with patch('conjur.logic.login_logic') as mock_logic:
-            mock_logic.get_api_key = MagicMock(side_effect=RuntimeError)
+            mock_logic.get_api_key = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
             mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(requests.exceptions.HTTPError):
                 mock_login_controller.get_api_key(MockCredentialsData)
