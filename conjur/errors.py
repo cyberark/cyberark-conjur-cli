@@ -50,3 +50,9 @@ class CertificateHostnameMismatchException(Exception):
     def __init__(self):
         self.message = MISMATCH_HOSTNAME_MESSAGE
         super().__init__(self.message)
+
+class ConfigurationMissingException(Exception):
+    """ Exception for when configuration is missing """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)

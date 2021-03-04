@@ -12,7 +12,7 @@ import logging
 import netrc
 
 # Internals
-from conjur.errors import CertificateVerificationException
+from conjur.errors import CertificateVerificationException, ConfigurationMissingException
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
@@ -20,19 +20,16 @@ from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.util import CredentialsFromFile
 from conjur.resource import Resource
 
-class ConfigException(Exception):
-    """
-    ConfigException
 
-    This class is used to wrap a regular exception with a more-descriptive class name
-
-    *************** DEVELOPER NOTE ***************
-    For backwards capability purposes, do not remove existing functionality
-    in this class or remove params from the constructor. Although via
-    the CLI we do not support commandline arguments, other developers
-    use these parameters defined in this class to initialize our Python
-    SDK in their code.
-    """
+# pylint: disable=pointless-string-statement
+"""
+*************** DEVELOPER NOTE ***************
+For backwards capability purposes, do not remove existing functionality
+in this class or remove params from the constructor. Although via
+the CLI we do not support commandline arguments, other developers
+use these parameters defined in this class to initialize our Python
+SDK in their code.
+"""
 
 # pylint: disable=logging-fstring-interpolation,line-too-long
 class Client():
@@ -75,33 +72,37 @@ class Client():
             'account': account,
             'ca_bundle': ca_bundle,
         }
+        # Parameters from initialized client are missing and
+        # will try to search for them in the conjurrc
         if not url or not login_id or (not password and not api_key):
             try:
                 on_disk_config = dict(ApiConfig())
-
                 # We want to retain any overrides that the user provided from params
                 # but only if those values are valid
                 for field_name, field_value in loaded_config.items():
                     if field_value:
                         on_disk_config[field_name] = field_value
                 loaded_config = on_disk_config
+
                 # Raise exception if the client was initialized with verify=False
                 # but a follow-up request is run with verify=True
                 if ssl_verify is True and loaded_config['ca_bundle'] == '':
-                    raise CertificateVerificationException(cause="The client was initialized without certificate verification, "
-                                        "even though the command was ran with certificate verification enabled.",
-                                        solution="To continue communicating with the server insecurely, run the command "
-                                        "again with ssl_verify = False. Otherwise, reinitialize the client.")
+                    raise CertificateVerificationException
 
                 logging.debug("Fetched connection details: "
                               f"{{'conjur_account': {loaded_config['account']}, "
                               f"'conjur_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
             except CertificateVerificationException:
-                raise
-            # TODO add error handling for when conjurrc field doesn't exist
+                raise CertificateVerificationException(cause="The client was initialized without certificate verification, "
+                                        "even though the command was ran with certificate verification enabled.",
+                                        solution="To continue communicating with the server insecurely, run the command "
+                                        "again with ssl_verify = False. Otherwise, reinitialize the client.")
             except Exception as exc:
-                raise ConfigException(exc) from exc
+                raise ConfigurationMissingException("The conjurrc configuration file is either missing, empty, "
+                                                    "or missing parameters. Reinitialize the client or ensure that "
+                                                    "the conjurrc contains 'conjur_account', 'conjur_url', and "
+                                                    "'cert_file'.") from exc
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.

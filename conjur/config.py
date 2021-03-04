@@ -10,6 +10,7 @@ variables needed for the API to be used with minimal effort
 import logging
 
 from yaml import load, dump
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -17,6 +18,7 @@ except ImportError:  # pragma: no cover
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.errors import ConfigurationMissingException
 
 class Config():
     """
@@ -29,25 +31,28 @@ class Config():
     FIELDS = [
         ('conjur_account', 'account', True),
         ('conjur_url', 'url', True),
-        ('cert_file', 'ca_bundle', False),
+        ('cert_file', 'ca_bundle', True),
     ]
 
     _config = {}
 
     def __init__(self, config_file=DEFAULT_CONFIG_FILE):
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Fetching connection details from filesystem {config_file}")
 
+        logging.debug(f"Fetching connection details from filesystem {config_file}")
         config = None
         with open(config_file, 'r') as config_fp:
             config = load(config_fp, Loader=Loader)
 
-        for config_field_name, attribute_name, mandatory in self.FIELDS:
-            if mandatory:
-                assert config_field_name in config
+        if not config:
+            for config_field_name, attribute_name, mandatory in self.FIELDS:
+                if mandatory:
+                    assert config_field_name in config
 
-            setattr(self, attribute_name, config[config_field_name])
-            self._config[attribute_name] = getattr(self, attribute_name)
+                setattr(self, attribute_name, config[config_field_name])
+                self._config[attribute_name] = getattr(self, attribute_name)
+        else:
+            raise ConfigurationMissingException
 
     def __repr__(self):
         return dump({'config': self._config}, Dumper=Dumper, indent=4)

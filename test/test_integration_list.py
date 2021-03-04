@@ -6,8 +6,11 @@ CLI List Integration tests
 This test file handles the main test flows for the list command
 """
 import io
+import os
+import shutil
 from contextlib import redirect_stderr
 
+from conjur.constants import DEFAULT_CONFIG_FILE
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
@@ -35,6 +38,14 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
 
     # *************** TESTS ***************
+
+    @integration_test()
+    def test_list_without_valid_conjurrc_raises_config_exception(self):
+        os.remove(DEFAULT_CONFIG_FILE)
+        shutil.copy(self.environment.path_provider.test_missing_account_conjurrc, self.environment.path_provider.conjurrc_path)
+
+        with self.assertRaises(AssertionError):
+            self.invoke_cli(self.cli_auth_params, ['list'])
 
     @integration_test()
     def test_list_returns_resources(self):
