@@ -75,4 +75,3 @@ class CredentialsFromFileTest(unittest.TestCase):
             credentials = CredentialsFromFile()
             credentials.build_netrc(MockCredentialsData)
             utils.validate_netrc_contents(self)
-

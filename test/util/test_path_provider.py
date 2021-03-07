@@ -47,6 +47,10 @@ class TestRunnerPathProvider():  # pragma: no cover
         return os.path.join(self.ROOT_DIR, self.conjurrc_file_name)
 
     @property
+    def test_missing_account_conjurrc(self):
+        return os.path.join(self.HELPERS_FILES_DIR, "test_config", "missing_account_conjurrc")
+
+    @property
     def test_insecure_conjurrc_file_path(self):
         return os.path.join(self.HELPERS_FILES_DIR, "test_config", "no_cert_conjurrc")
 

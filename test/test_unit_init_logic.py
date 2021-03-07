@@ -4,9 +4,11 @@ import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open
 
+from conjur.api.endpoints import ConjurEndpoint
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.api.ssl_client import SSLClient
+from conjur.wrapper.http_wrapper import HttpVerb
 
 MOCK_CERT='''
 -----BEGIN CERTIFICATE-----
@@ -97,3 +99,21 @@ class InitLogicTest(unittest.TestCase):
             fingerprint, readable_certificate = mock_init_command.get_certificate("https://someurl", 443)
             self.assertEquals(fingerprint, "12:AB")
             self.assertEquals(readable_certificate, "cert")
+
+    @patch('conjur.logic.init_logic.invoke_endpoint')
+    def test_empty_cert_file_loads_default_cert_location(self, mock_http_client):
+        mock_http_client.json.return_value = [{'release': 'somerelease'}]
+
+        conjurrc_data = ConjurrcData('https://someurl', 'someacc', None)
+        mock_init_logic = InitLogic('someservice')
+        mock_init_logic.fetch_account_from_server(conjurrc_data)
+        mock_http_client.assert_called_once_with(HttpVerb.GET, ConjurEndpoint.INFO, {'url': 'https://someurl'}, ssl_verify='/root/conjur-server.pem')
+
+    @patch('conjur.logic.init_logic.invoke_endpoint')
+    def test_provided_cert_file_loads_provided_cert_location(self, mock_http_client):
+        mock_http_client.json.return_value = [{'release': 'somerelease'}]
+
+        conjurrc_data = ConjurrcData('https://someurl', 'someacc', '/some/path/conjur-server.pem')
+        mock_init_logic = InitLogic('someservice')
+        mock_init_logic.fetch_account_from_server(conjurrc_data)
+        mock_http_client.assert_called_once_with(HttpVerb.GET, ConjurEndpoint.INFO, {'url': 'https://someurl'}, ssl_verify='/some/path/conjur-server.pem')

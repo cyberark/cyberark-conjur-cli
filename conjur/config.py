@@ -10,6 +10,7 @@ variables needed for the API to be used with minimal effort
 import logging
 
 from yaml import load, dump
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -17,6 +18,7 @@ except ImportError:  # pragma: no cover
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.errors import ConfigurationMissingException, InvalidConfigurationException
 
 class Config():
     """
@@ -29,23 +31,27 @@ class Config():
     FIELDS = [
         ('conjur_account', 'account', True),
         ('conjur_url', 'url', True),
-        ('cert_file', 'ca_bundle', False),
+        ('cert_file', 'ca_bundle', True),
     ]
 
     _config = {}
 
     def __init__(self, config_file=DEFAULT_CONFIG_FILE):
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Fetching connection details from filesystem {config_file}")
 
+        logging.debug(f"Fetching connection details from filesystem {config_file}")
         config = None
         with open(config_file, 'r') as config_fp:
             config = load(config_fp, Loader=Loader)
 
-        for config_field_name, attribute_name, mandatory in self.FIELDS:
-            if mandatory:
-                assert config_field_name in config
+        if not config:
+            raise ConfigurationMissingException
 
+        # TODO consider using load_from_file (ConjurrcData) instead of the following logic
+        # Sets the value of that FIELDS maps to with the values found in the conjurrc
+        for config_field_name, attribute_name, mandatory in self.FIELDS:
+            if mandatory and config_field_name not in config:
+                raise InvalidConfigurationException
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
 

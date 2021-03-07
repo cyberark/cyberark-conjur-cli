@@ -2,9 +2,9 @@ import logging
 import netrc
 import unittest
 import uuid
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-from conjur.api.client import ConfigException, Client
+from conjur.api.client import ConfigurationMissingException, Client
 
 # CredentialsFromFile mocked class
 from conjur.errors import CertificateVerificationException
@@ -27,6 +27,11 @@ class MockApiConfig(object):
 
     def __iter__(self):
         return iter(self.CONFIG.items())
+
+# ApiConfig mocking class
+class EmptyMockApiConfig(object):
+    def __init__(self):
+        raise ConfigurationMissingException("oops!")
 
 # ApiConfig mocking class
 class MockApiConfigNoCert(object):
@@ -55,18 +60,22 @@ class MissingMockApiConfig(object):
 
 class ConfigErrorTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):
-        with self.assertRaises(ConfigException):
-            raise ConfigException('abc')
+        with self.assertRaises(ConfigurationMissingException):
+            raise ConfigurationMissingException('abc')
 
 
 class ClientTest(unittest.TestCase):
     # To run properly, we need to configure the loaded conjurrc
 
     ### Init configuration tests ###
-
     @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)
     def test_client_throws_error_when_no_config(self):
-        with self.assertRaises(ConfigException):
+        with self.assertRaises(FileNotFoundError):
+            Client()
+
+    @patch('conjur.api.client.ApiConfig', new=EmptyMockApiConfig)
+    def test_client_throws_error_with_empty_config(self):
+        with self.assertRaises(ConfigurationMissingException):
             Client()
 
     @patch('conjur.api.client.Api')
