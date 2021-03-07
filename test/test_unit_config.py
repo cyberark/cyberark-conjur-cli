@@ -3,6 +3,8 @@ import re
 import unittest
 
 from conjur.config import Config
+from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
+
 
 class ConfigTest(unittest.TestCase):
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -11,6 +13,7 @@ class ConfigTest(unittest.TestCase):
 
     MISSING_ACCOUNT_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_account_conjurrc')
     MISSING_URL_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_url_conjurrc')
+    MISSING_CONTENT_CONJURRC = os.path.join(CURRENT_DIR, 'test_config', 'missing_content_conjurrc')
 
     EXPECTED_CONFIG = {
       'account': 'accountname',
@@ -55,9 +58,13 @@ class ConfigTest(unittest.TestCase):
             Config(config_file='/tmp/foo')
 
     def test_config_with_no_conjurrc_account_raises_error(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(InvalidConfigurationException):
             Config(config_file=self.MISSING_ACCOUNT_CONJURRC)
 
     def test_config_with_no_conjurrc_url_raises_error(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(InvalidConfigurationException):
             Config(config_file=self.MISSING_URL_CONJURRC)
+
+    def test_config_with_empty_conjurrc_raises_error(self):
+        with self.assertRaises(ConfigurationMissingException):
+            Config(config_file=self.MISSING_CONTENT_CONJURRC)

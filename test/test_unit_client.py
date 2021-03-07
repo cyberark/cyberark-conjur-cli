@@ -30,10 +30,8 @@ class MockApiConfig(object):
 
 # ApiConfig mocking class
 class EmptyMockApiConfig(object):
-    CONFIG = {}
-
-    def __iter__(self):
-        return iter(self.CONFIG.items())
+    def __init__(self):
+        raise ConfigurationMissingException("oops!")
 
 # ApiConfig mocking class
 class MockApiConfigNoCert(object):
@@ -72,16 +70,11 @@ class ClientTest(unittest.TestCase):
     ### Init configuration tests ###
     @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)
     def test_client_throws_error_when_no_config(self):
-        with self.assertRaises(ConfigurationMissingException):
+        with self.assertRaises(FileNotFoundError):
             Client()
 
     @patch('conjur.api.client.ApiConfig', new=EmptyMockApiConfig)
-    def test_client_throws_error_with_missing_config(self):
-        with self.assertRaises(ConfigurationMissingException):
-            Client()
-
-    @patch('conjur.api.client.ApiConfig', new=MissingMockApiConfig)
-    def test_client_throws_error_when_no_config(self):
+    def test_client_throws_error_with_empty_config(self):
         with self.assertRaises(ConfigurationMissingException):
             Client()
 

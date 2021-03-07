@@ -18,7 +18,7 @@ except ImportError:  # pragma: no cover
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
-from conjur.errors import ConfigurationMissingException
+from conjur.errors import ConfigurationMissingException, InvalidConfigurationException
 
 class Config():
     """
@@ -45,14 +45,15 @@ class Config():
             config = load(config_fp, Loader=Loader)
 
         if not config:
-            for config_field_name, attribute_name, mandatory in self.FIELDS:
-                if mandatory:
-                    assert config_field_name in config
-
-                setattr(self, attribute_name, config[config_field_name])
-                self._config[attribute_name] = getattr(self, attribute_name)
-        else:
             raise ConfigurationMissingException
+
+        # TODO consider using load_from_file (ConjurrcData) instead of the following logic
+        # Sets the value of that FIELDS maps to with the values found in the conjurrc
+        for config_field_name, attribute_name, mandatory in self.FIELDS:
+            if mandatory and config_field_name not in config:
+                raise InvalidConfigurationException
+            setattr(self, attribute_name, config[config_field_name])
+            self._config[attribute_name] = getattr(self, attribute_name)
 
     def __repr__(self):
         return dump({'config': self._config}, Dumper=Dumper, indent=4)
