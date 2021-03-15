@@ -9,11 +9,8 @@ required to successfully configure the Credentials
 
 # Builtins
 import getpass
-import logging
-import sys
 
 from conjur.util import util_functions
-from conjur.constants import CREDENTIAL_HOST_PATH, DEFAULT_NETRC_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
 
 class LoginController:
@@ -48,13 +45,7 @@ class LoginController:
         conjurrc = self.load_conjurrc_data()
         self.get_api_key(conjurrc)
 
-        # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Saving credentials to '{DEFAULT_NETRC_FILE}'")
         self.login_logic.save(self.credential_data)
-        # pylint: disable=logging-fstring-interpolation
-        logging.debug("Credentials written to "
-                      f"'{DEFAULT_NETRC_FILE}'")
-        sys.stdout.write("Successfully logged in to Conjur.\n")
 
     def get_username(self):
         """
@@ -83,7 +74,7 @@ class LoginController:
         properties and to send a login request to Conjur
         """
         conjurrc = ConjurrcData.load_from_file()
-        self.credential_data.machine = conjurrc.conjur_url + CREDENTIAL_HOST_PATH
+        self.credential_data.machine = conjurrc.conjur_url
 
         return conjurrc
 

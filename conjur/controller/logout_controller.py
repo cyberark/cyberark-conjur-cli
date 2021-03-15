@@ -9,11 +9,12 @@ required to successfully logout
 
 # Builtins
 import logging
-import os
-import sys
+
+# Third party
+import keyring
 
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
 
 # pylint: disable=too-few-public-methods
@@ -31,17 +32,18 @@ class LogoutController:
         """
         Method for removing credentials from user machine
         """
-        logging.debug("Attempting to log out of Conjur")
         try:
-            if not os.path.exists(DEFAULT_NETRC_FILE):
-                sys.stdout.write("Successfully logged out from Conjur.\n")
-            elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
-                conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
-                self.logout_logic.remove_credentials(conjurrc.conjur_url)
-                logging.debug("Logout successful")
-                sys.stdout.write("Successfully logged out from Conjur.\n")
-            else:
-                raise Exception("You are already logged out")
+            loaded_conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
+            self.logout_logic.remove_credentials(loaded_conjurrc)
+        # Catches when credentials do not exist in the keyring. If the key does not exist,
+        # the user has already logged out
+        except keyring.errors.PasswordDeleteError:
+            # pylint: disable=logging-fstring-interpolation
+            logging.debug("Successfully removed credentials from the "
+                          f"keyring '{keyring.get_keyring().name}'")
+            return
+        except keyring.errors.KeyringError:
+            raise
         except Exception as error:
             # pylint: disable=raise-missing-from
-            raise Exception(f"Failed to log out. {error}.")
+            raise Exception(f"Failed to log out. {error}")

@@ -158,6 +158,6 @@ def update_policy_from_string(self, policy):
 def validate_netrc_contents(self):
     with open('path/to/netrc', 'r') as netrc:
         lines = netrc.readlines()
-        self.assertEquals(lines[0].strip(), "machine https://someurl/authn")
+        self.assertEquals(lines[0].strip(), "machine https://someurl")
         self.assertEquals(lines[1].strip(), "login somelogin")
         self.assertEquals(lines[2].strip(), "password somepass")

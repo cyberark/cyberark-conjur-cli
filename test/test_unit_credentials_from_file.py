@@ -6,14 +6,14 @@ from conjur.util.credentials_from_file import CredentialsFromFile
 from test.util import test_helpers as utils
 
 class MockCredentialsData:
-    machine = 'https://someurl/authn'
+    machine = 'https://someurl'
     login = 'somelogin'
     api_key = 'somepass'
 
 
 class MockNetrc:
-    hosts = {'https://someurl/authn': ('somelogin', None, 'somepass')}
-    machine = 'https://someurl/authn'
+    hosts = {'https://someurl': ('somelogin', None, 'somepass')}
+    machine = 'https://someurl'
     login = 'somelogin'
     password = 'somepass'
 
@@ -26,7 +26,7 @@ class MockEmptyNetrc:
 
 
 EXPECTED_NETRC = \
-    '''machine https://someurl/authn
+    '''machine https://someurl
 login somelogin
 password somepass
 '''
@@ -60,7 +60,7 @@ class CredentialsFromFileTest(unittest.TestCase):
         netrc.netrc.hosts = MagicMock()
         netrc.netrc.return_value.authenticators = MagicMock(return_value=('somelogin', None, 'somepass'))
         credentials = CredentialsFromFile()
-        self.assertEquals(credentials.load("https://someurl"), {'machine': 'https://someurl/authn',
+        self.assertEquals(credentials.load("https://someurl"), {'machine': 'https://someurl',
                                                                 'api_key': 'somepass',
                                                                 'login_id': 'somelogin'})
 

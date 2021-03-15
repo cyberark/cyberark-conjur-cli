@@ -24,9 +24,11 @@ DEFAULT_NETRC_FILE_NAME = INTERNAL_FILE_PREFIX + "netrc"
 DEFAULT_CONFIG_FILE = os.path.expanduser(os.path.join('~', '.conjurrc'))
 DEFAULT_NETRC_FILE = os.path.expanduser(os.path.join('~', DEFAULT_NETRC_FILE_NAME))
 DEFAULT_CERTIFICATE_FILE = os.path.expanduser(os.path.join('~', "conjur-server.pem"))
-CREDENTIAL_HOST_PATH = "/authn"
 
 VALID_CONFIRMATIONS = ["yes", "y"]
+
+SUPPORTED_BACKENDS = ["macOS Keyring", "Windows WinVaultKeyring",
+                      "kwallet DBusKeyring", "SecretService Keyring"]
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"

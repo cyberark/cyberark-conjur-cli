@@ -12,7 +12,6 @@ import requests
 
 # Internals
 from conjur.errors import OperationNotCompletedException
-from conjur.util import CredentialsFromFile
 from conjur.resource import Resource
 
 
@@ -97,14 +96,12 @@ class UserLogic:
         except requests.exceptions.HTTPError:
             raise
         except Exception as incomplete_operation:
-            raise OperationNotCompletedException from incomplete_operation
+            raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
         return new_api_key
 
-    @classmethod
     # pylint: disable=line-too-long
-    def update_api_key_in_credential_store(cls, resource_to_update, loaded_credentials, new_api_key):
+    def update_api_key_in_credential_store(self, resource_to_update, loaded_credentials, new_api_key):
         """
         Method to update the newly rotated API key in the credential store
         """
-        credentials = CredentialsFromFile()
-        credentials.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)
+        self.credentials_from_store.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)

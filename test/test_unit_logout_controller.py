@@ -1,8 +1,10 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch
+
+from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controller.logout_controller import LogoutController
 from conjur.data_object import ConjurrcData
-
 
 class MockConjurrc:
     conjur_url = 'https://someurl'
@@ -26,19 +28,29 @@ class LogoutControllerTest(unittest.TestCase):
         mock_logout_logic.remove_credentials = MagicMock()
         mock_logout_controller = LogoutController(True, mock_logout_logic)
         mock_logout_controller.remove_credentials()
-        mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc.conjur_url)
+        mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=0)
     @patch('conjur.logic.logout_logic')
-    def test_logout_netrc_does_not_exist_raises_already_logged_out_exception(self, mock_logout_logic, mock_exists, mock_size):
-        mock_logout_controller = LogoutController(True, mock_logout_logic)
+    def test_logout_netrc_exists_but_is_empty_raises_already_logged_out_exception(self, mock_logout_logic, mock_exists, mock_size):
+        mock_logout_logic.remove_credentials = MagicMock(side_effect=Exception)
         with self.assertRaises(Exception):
+            mock_logout_controller = LogoutController(True, mock_logout_logic)
             mock_logout_controller.remove_credentials()
+
+    @patch('os.path.exists', return_value=False)
+    @patch('os.path.getsize', return_value=0)
+    @patch('conjur.logic.logout_logic')
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    def test_logout_netrc_does_not_exist_does_not_raise_exception(self, mock_conjurrc, mock_logout_logic, mock_exists, mock_size):
+        mock_logout_controller = LogoutController(True, mock_logout_logic)
+        mock_logout_controller.remove_credentials()
+        self.assertEquals(os.path.isdir(DEFAULT_NETRC_FILE), False)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=1)
-    @patch('conjur.logic.logout_logic')
+    @patch('conjur.logic.logout_logic', side_effect=Exception)
     def test_logout_remove_credentials_operation_fails_raises_exception(self, mock_logout_logic, mock_size, mock_conjurrc):
         with patch.object(ConjurrcData, 'load_from_file', side_effect=Exception):
             with self.assertRaises(Exception):

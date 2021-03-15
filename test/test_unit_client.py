@@ -84,7 +84,7 @@ class ClientTest(unittest.TestCase):
         Client(url='http://myurl', account='myacct', login_id='mylogin',
                password='mypass')
 
-        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.WARNING)
+        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT_WARNING, level=logging.WARNING)
 
     @patch('conjur.api.client.Api')
     @patch('logging.basicConfig')

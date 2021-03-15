@@ -16,7 +16,7 @@ import stat
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE
 
-
+# pylint: disable=logging-fstring-interpolation
 class CredentialsFromFile:
     """
     CredentialsFromFile
@@ -32,6 +32,7 @@ class CredentialsFromFile:
         Method that writes user data to a netrc file
         and updates permissions on the file
         """
+        logging.debug(f"Attempting to write credentials to {DEFAULT_NETRC_FILE}")
         if os.path.exists(self.netrc_path):
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
@@ -45,13 +46,13 @@ class CredentialsFromFile:
 
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
+        logging.debug(f"Credentials written to '{DEFAULT_NETRC_FILE}'")
 
     def load(self, conjurrc_conjur_url):
         """
         Method that loads the netrc data.
         Triggered before each CLI action
         """
-        # pylint: disable=logging-fstring-interpolation
         loaded_netrc = {}
         netrc_auth = ""
         netrc_obj = netrc.netrc(self.netrc_path)
@@ -59,9 +60,9 @@ class CredentialsFromFile:
         # we might want to trigger the LOGIN command by creating
         # a custom error
         if netrc_obj.hosts == {}:
-            raise Exception("You are already logged out")
+            raise Exception("You are already logged out.")
 
-        logging.debug(f"Retrieving credentials from file: {self.netrc_path}")
+        logging.debug(f"Retrieving credentials from file '{self.netrc_path}'")
         for host in netrc_obj.hosts:
             if conjurrc_conjur_url in host:
                 netrc_host_url = host
@@ -70,7 +71,7 @@ class CredentialsFromFile:
         # The netrc_authn will be empty if the user already logged out
         # (their entry isn't found) and attempts to logout again
         if netrc_auth == "":
-            raise Exception("You are already logged out")
+            raise Exception("You are already logged out.")
 
         login_id, _, api_key = netrc_auth
         loaded_netrc['machine'] = netrc_host_url
@@ -89,19 +90,28 @@ class CredentialsFromFile:
         hosts[credential_data['machine']] = (user_to_update, None, new_api_key)
         self.build_netrc(netrc_obj)
 
-    def remove_credentials(self, conjurrc_conjur_url):
+    def remove_credentials(self, conjurrc):
         """
         Method that removes the described login entry from netrc
         """
-        netrc_data = self.load(conjurrc_conjur_url)
+        logging.debug(f"Attempting to remove credentials from '{DEFAULT_NETRC_FILE}'")
+        # pylint: disable=no-else-return
+        if not os.path.exists(DEFAULT_NETRC_FILE):
+            return
+        elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
+            netrc_data = self.load(conjurrc.conjur_url)
 
-        netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
-        hosts = netrc_obj.hosts
-        hosts.pop(netrc_data['machine'], None)
+            netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
+            hosts = netrc_obj.hosts
+            hosts.pop(netrc_data['machine'], None)
 
-        netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
-        netrc_obj.hosts.pop(netrc_data['machine'], None)
-        self.build_netrc(netrc_obj)
+            netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
+            netrc_obj.hosts.pop(netrc_data['machine'], None)
+            self.build_netrc(netrc_obj)
+        else:
+            raise Exception("You are already logged out.")
+
+        logging.debug(f"Successfully removed credentials from '{DEFAULT_NETRC_FILE}'")
 
     @classmethod
     def build_netrc(cls, netrc_obj):
