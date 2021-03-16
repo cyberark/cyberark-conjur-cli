@@ -220,7 +220,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
     ```python
     try:
-        credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
+        credentials = FileCredentialsProvider(DEFAULT_NETRC_FILE)
         loaded_netrc = credentials.load(loaded_config['url'])
     except netrc.NetrcParseError as netrc_error:
         raise Exception("Error: netrc is in an invalid format. "

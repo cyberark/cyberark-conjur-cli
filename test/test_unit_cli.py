@@ -7,7 +7,7 @@ from conjur.controller.host_controller import HostController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
 from conjur.controller.user_controller import UserController
-from conjur.util import CredentialsFromFile
+from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
@@ -236,12 +236,12 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
-        Cli().handle_login_logic(credentials_from_store=CredentialsFromFile, identifier='someidentifier', password='somepassword', ssl_verify=True)
+        Cli().handle_login_logic(credential_provider=FileCredentialsProvider, identifier='someidentifier', password='somepassword', ssl_verify=True)
         mock_load.assert_called_once()
 
     @patch.object(LogoutController, 'remove_credentials')
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):
-        Cli().handle_logout_logic(credentials_from_store=CredentialsFromFile, ssl_verify=True)
+        Cli().handle_logout_logic(credential_provider=FileCredentialsProvider, ssl_verify=True)
         mock_remove_creds.assert_called_once()
 
     @patch.object(UserController, 'rotate_api_key')
@@ -250,7 +250,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'rotate-api-key'
         mock_obj.id = 'someid'
 
-        Cli().handle_user_logic(credentials_from_store=CredentialsFromFile(), args=mock_obj, client='someclient')
+        Cli().handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj, client='someclient')
         mock_rotate_api_key.assert_called_once()
 
     @patch.object(UserController, 'change_personal_password')
@@ -259,7 +259,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'change-password'
         mock_obj.password = 'somepass'
 
-        Cli().handle_user_logic(credentials_from_store=CredentialsFromFile, args=mock_obj, client='someclient')
+        Cli().handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj, client='someclient')
         mock_change_password.assert_called_once()
 
     @patch.object(HostController, 'rotate_api_key')
@@ -294,7 +294,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.exists', side_effect=[False, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 1])
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=None)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     @patch('keyring.get_keyring')
     def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init):
         with patch('conjur.cli.Client') as mock_client:
@@ -349,7 +349,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
     @patch('keyring.get_keyring')
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=None)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_host):
         with patch('conjur.cli.Client') as mock_client:
             mock_keyring.name.return_value = 'somekeyring'

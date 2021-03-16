@@ -9,20 +9,14 @@ the Conjur server
 
 # Builtins
 import logging
-import netrc
-
-# Third party
-import keyring
 
 # Internals
+from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
     InvalidConfigurationException
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
-from conjur.constants import DEFAULT_NETRC_FILE, SUPPORTED_BACKENDS
-from conjur.util import CredentialsFromFile
-from conjur.util.credentials_from_keystore import CredentialsFromKeystore
 from conjur.resource import Resource
 
 
@@ -135,28 +129,15 @@ class Client():
                             **loaded_config)
             self._api.login(login_id, password)
         else:
-            if keyring.get_keyring().name in SUPPORTED_BACKENDS:
-                logging.debug(f"Attempting to fetch credentials from keyring '{keyring.get_keyring().name}'")
-                credentials = CredentialsFromKeystore()
-                loaded_credentials = credentials.load(loaded_config['url'])
-                logging.debug(f"Credentials from keyring '{keyring.get_keyring().name}' fetched successfully")
-            else:
-                logging.debug(f"Attempting to fetch credentials from '{DEFAULT_NETRC_FILE}'")
-                try:
-                    credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
-                    loaded_credentials = credentials.load(loaded_config['url'])
-                    logging.debug(f"Credentials from {DEFAULT_NETRC_FILE} fetched successfully")
-                except netrc.NetrcParseError as netrc_error:
-                    raise Exception("Error: netrc is in an invalid format. "
-                                    f"Reason: {netrc_error}") from netrc_error
-                except Exception as exception:
-                    # pylint: disable=line-too-long
-                    raise RuntimeError("Unable to authenticate with Conjur. Please log in and try again.") from exception
+            credential_provider, credential_location = CredentialStoreFactory.create_credential_store()
+            logging.debug(f"Attempting to retrieve credentials from '{credential_location}'")
+            loaded_credentials = credential_provider.load(loaded_config['url'])
+            logging.debug(f"Credentials from '{credential_location}' were retrieved successfully")
 
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
-                            login_id=loaded_credentials['login_id'],
-                            api_key=loaded_credentials['api_key'],
+                            login_id=loaded_credentials.login,
+                            api_key=loaded_credentials.password,
                             **loaded_config)
 
         logging.debug("Client initialized")

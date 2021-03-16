@@ -27,8 +27,12 @@ DEFAULT_CERTIFICATE_FILE = os.path.expanduser(os.path.join('~', "conjur-server.p
 
 VALID_CONFIRMATIONS = ["yes", "y"]
 
-SUPPORTED_BACKENDS = ["macOS Keyring", "Windows WinVaultKeyring",
-                      "kwallet DBusKeyring", "SecretService Keyring"]
+SUPPORTED_BACKENDS = ["macOS Keyring", "Windows WinVaultKeyring", "SecretService Keyring"]
+
+MACHINE = "machine"
+LOGIN = "login"
+PASSWORD = "password"
+KEYSTORE_ATTRIBUTES = [MACHINE, LOGIN, PASSWORD]
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"

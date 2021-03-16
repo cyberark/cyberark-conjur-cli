@@ -83,7 +83,7 @@ class LoginController:
         """
         Method to fetch the user/host's API key from Conjur which is to be added to the netrc
         """
-        self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verify,
+        self.credential_data.password = self.login_logic.get_api_key(self.ssl_verify,
                                                                     self.credential_data,
                                                                     self.user_password,
                                                                     conjurrc)

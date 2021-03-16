@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 from conjur.errors import CertificateVerificationException
-from conjur.util.credentials_from_file import CredentialsFromFile
+from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb
 from conjur.logic.login_logic import LoginLogic
@@ -10,7 +10,7 @@ from conjur.logic.login_logic import LoginLogic
 class MockCredentialsData:
     machine = 'https://someurl'
     login = 'somelogin'
-    api_key = 'somepass'
+    password = 'somepass'
 
 class MockConjurrc:
     conjur_url = 'https://someurl'
@@ -28,7 +28,7 @@ class MockClientResponse():
         setattr(self, 'text', text)
 
 class LoginLogicTest(unittest.TestCase):
-    credential_store = CredentialsFromFile
+    credential_store = FileCredentialsProvider
     login_logic = LoginLogic(credential_store)
 
     def test_login_logic_controller_constructor(self):
@@ -48,7 +48,7 @@ class LoginLogicTest(unittest.TestCase):
 
     @patch('conjur.logic.login_logic.invoke_endpoint', return_value=MockClientResponse())
     def test_verify_true_invoke_endpoint_and_passes_cert_path(self, mock_invoke_endpoint):
-        mock_credential_store = CredentialsFromFile
+        mock_credential_store = FileCredentialsProvider
         mock_login_logic = LoginLogic(mock_credential_store)
         mock_login_logic.get_api_key(True, MockCredentialsData, 'somepass', MockConjurrc)
         params={'url':'https://someurl','account':'someacc'}

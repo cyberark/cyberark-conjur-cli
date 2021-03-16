@@ -21,9 +21,9 @@ class UserLogic:
 
     This class holds the business logic for handling user activity
     """
-    def __init__(self, conjurrc_data, credentials_from_store, client):
+    def __init__(self, conjurrc_data, credential_provider, client):
         self.conjurrc_data=conjurrc_data
-        self.credentials_from_store=credentials_from_store
+        self.credential_provider=credential_provider
         self.client=client
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
@@ -34,14 +34,14 @@ class UserLogic:
         2. Rotate another users API key
         """
         logged_in_credentials = self.extract_credentials_from_credential_store()
-        logged_in_username = logged_in_credentials['login_id']
+        logged_in_username = logged_in_credentials.login
 
         # if the user provides their own user id and they are logged in,
         # then for the sake of a successful outcome, we will ignore the input.
         # Otherwise, the Conjur server will fail the request.
         if resource_to_update in (None, logged_in_username):
             resource_to_update = logged_in_username
-            new_api_key = self.rotate_personal_api_key(resource_to_update, logged_in_credentials, logged_in_credentials['api_key'])
+            new_api_key = self.rotate_personal_api_key(resource_to_update, logged_in_credentials, logged_in_credentials.password)
         # the user supplied a user to rotate their API key
         else:
             new_api_key = self.rotate_other_api_key(resource_to_update)
@@ -54,10 +54,10 @@ class UserLogic:
         Method to call the client to change the logged in user's password
         """
         logged_in_credentials = self.extract_credentials_from_credential_store()
-        resource_to_update = logged_in_credentials['login_id']
+        resource_to_update = logged_in_credentials.login
         logging.debug(f"Changing password for '{resource_to_update}'")
         # pylint: disable=line-too-long
-        return resource_to_update, self.client.change_personal_password(resource_to_update, logged_in_credentials['api_key'], new_password)
+        return resource_to_update, self.client.change_personal_password(resource_to_update, logged_in_credentials.password, new_password)
 
     def extract_credentials_from_credential_store(self):
         """
@@ -66,7 +66,7 @@ class UserLogic:
         keys and change passwords
         """
         loaded_conjurrc = self.conjurrc_data.load_from_file()
-        return self.credentials_from_store.load(loaded_conjurrc.conjur_url)
+        return self.credential_provider.load(loaded_conjurrc.conjur_url)
 
     def rotate_other_api_key(self, resource_to_update):
         """
@@ -104,4 +104,4 @@ class UserLogic:
         """
         Method to update the newly rotated API key in the credential store
         """
-        self.credentials_from_store.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)
+        self.credential_provider.update_api_key_entry(resource_to_update, loaded_credentials, new_api_key)

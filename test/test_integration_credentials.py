@@ -251,7 +251,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         with open(DEFAULT_NETRC_FILE) as netrc_file:
             assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
-
     @integration_test(True)
     def test_no_netrc_and_logout_returns_successful_logout_message(self):
         try:
@@ -259,8 +258,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         except OSError:
             pass
         logout = self.invoke_cli(self.cli_auth_params,
-                                              ['logout'])
-        self.assertIn("Successfully logged out from Conjur", logout.strip())
+                                              ['logout'], exit_code=1)
+        self.assertIn("You are already logged out", logout.strip())
 
     '''
     Validates logout doesn't remove another entry not associated with Cyberark
@@ -291,14 +290,16 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             assert "password somepass\n" in entries
 
     '''
-    Validates that when the user does not log in and attempt
-    to interface with the CLI, they will be prompted to
+    Validates that when the user hasn't logged in and attempts 
+    to run a command, they will be prompted to login
     '''
     @integration_test()
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')
     def test_user_runs_list_without_netrc_prompts_user_to_login(self, mock_pass, mock_input):
-
+        # Set this environment variable to prompt the user to login
+        os.environ["TEST_ENV"] = "False"
         list_attempt = self.invoke_cli(self.cli_auth_params,
                                        ['list'], exit_code=1)
         self.assertRegex(list_attempt.strip(), "Unable to authenticate with Conjur.")
+        os.environ["TEST_ENV"] = "True"
