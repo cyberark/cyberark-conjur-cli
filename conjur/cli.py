@@ -265,7 +265,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                                               '    conjur policy update -f /tmp/myPolicy.yml -b root\t\t'
                                                               'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n',
                                                               command='policy',
-                                                              subcommands=['load', 'replace', 'apply']),
+                                                              subcommands=['load', 'replace', 'update']),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
                                                           formatter_class=formatter_class)
