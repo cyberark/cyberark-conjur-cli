@@ -58,3 +58,19 @@ class KeystoreAdapter:
         Method to get the system's keyring name
         """
         return keyring.get_keyring().name
+
+    @classmethod
+    def is_keyring_accessible(cls):
+        """
+        Method to check if the keyring is accessible
+        """
+        try:
+            # Send a dummy request to test if the keyring is accessible
+            keyring.get_password('test-system', 'test-unlock')
+        except keyring.errors.KeyringLocked:
+            return False
+        # All other errors means that the keyring is accessible
+        except keyring.errors.KeyringError:
+            return True
+
+        return True

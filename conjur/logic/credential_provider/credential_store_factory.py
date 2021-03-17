@@ -26,6 +26,11 @@ class CredentialStoreFactory:
         Factory method for determining which store to use
         """
         if KeystoreAdapter.get_keyring_name() in SUPPORTED_BACKENDS:
-            return KeyStoreCredentialsProvider(), f'keyring {KeystoreAdapter.get_keyring_name()}'
+            # If the keyring is unlocked then we will use that
+            if KeystoreAdapter.is_keyring_accessible():
+                # pylint: disable=line-too-long
+                return KeyStoreCredentialsProvider(), f'keyring {KeystoreAdapter.get_keyring_name()}'
+            # If the keystore is not unlocked we will resort to netrc
+            return FileCredentialsProvider(), DEFAULT_NETRC_FILE
 
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE

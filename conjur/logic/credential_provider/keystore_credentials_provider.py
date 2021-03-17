@@ -27,7 +27,7 @@ class KeyStoreCredentialsProvider(CredentialsStoreInterface):
     in the system's keystore
     """
 
-    def __init__(self):
+    def __init__(self): # pragma: no cover
         pass
 
     # pylint: disable=line-too-long,logging-fstring-interpolation

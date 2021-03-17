@@ -10,7 +10,7 @@ This class describes a shared interface for accessing user credentials
 from conjur.data_object import CredentialsData
 
 # pylint: disable=unnecessary-pass
-class CredentialsStoreInterface:
+class CredentialsStoreInterface: # pragma: no cover
     """
     CredentialsStoreInterface
 
