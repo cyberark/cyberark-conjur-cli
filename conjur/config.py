@@ -39,7 +39,7 @@ class Config():
     def __init__(self, config_file=DEFAULT_CONFIG_FILE):
         # pylint: disable=logging-fstring-interpolation
 
-        logging.debug(f"Fetching connection details from filesystem {config_file}")
+        logging.debug(f"Fetching connection details from filesystem '{config_file}'...")
         config = None
         with open(config_file, 'r') as config_fp:
             config = load(config_fp, Loader=Loader)

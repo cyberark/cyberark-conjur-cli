@@ -37,8 +37,9 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         """
         logging.warning("No supported keystore found! Saving credentials in "
                         f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                        "after you have finished using the CLI.")
-        logging.debug(f"Attempting to write credentials to {DEFAULT_NETRC_FILE}")
+                        "after you have finished using the CLI")
+        logging.debug(f"Attempting to write credentials to '{DEFAULT_NETRC_FILE}'...")
+        # TDOO use private function
         if os.path.exists(self.netrc_path):
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
@@ -62,12 +63,12 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         try:
             if not self.is_exists(conjurrc_conjur_url):
                 raise CredentialRetrievalException
-
+            # TODO use private function
             loaded_credentials = {}
             netrc_auth = ""
             netrc_obj = netrc.netrc(self.netrc_path)
 
-            logging.debug(f"Retrieving credentials from file '{self.netrc_path}'")
+            logging.debug(f"Retrieving credentials from file '{self.netrc_path}'...")
             for host in netrc_obj.hosts:
                 if conjurrc_conjur_url in host:
                     netrc_host_url = host
@@ -119,7 +120,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         """
         Method that removes the described login entry from netrc
         """
-        logging.debug(f"Attempting to remove credentials from '{DEFAULT_NETRC_FILE}'")
+        logging.debug(f"Attempting to remove credentials from '{DEFAULT_NETRC_FILE}'...")
         # pylint: disable=no-else-return
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
@@ -138,6 +139,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
         logging.debug(f"Successfully removed credentials from '{DEFAULT_NETRC_FILE}'")
 
+    # TODO check if we are using outside of this class. if not make private
     @classmethod
     def build_netrc(cls, netrc_obj):
         """

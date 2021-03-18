@@ -63,7 +63,7 @@ class InitLogic:
         else:
             certificate_path = conjurrc_data.cert_file
 
-        logging.debug("Attempting to fetch the account from the Conjur server")
+        logging.debug("Attempting to fetch the account from the Conjur server...")
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,
                                    params,

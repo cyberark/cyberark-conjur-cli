@@ -6,7 +6,7 @@ from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.controller.logout_controller import LogoutController
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.data_object import ConjurrcData
-from conjur.logic.credential_provider.keystore_credentials_provider import KeyStoreCredentialsProvider
+from conjur.logic.credential_provider.keystore_credentials_provider import KeystoreCredentialsProvider
 
 class MockConjurrc:
     conjur_url = 'https://someurl'
@@ -18,7 +18,7 @@ class LogoutControllerTest(unittest.TestCase):
     def test_logout_controller_constructor(self):
         mock_ssl_verify = True
         mock_logout_logic = None
-        mock_cred_provider = KeyStoreCredentialsProvider
+        mock_cred_provider = KeystoreCredentialsProvider
         mock_logout_controller = LogoutController(mock_ssl_verify, mock_logout_logic, mock_cred_provider)
         self.assertEquals(mock_logout_controller.ssl_verify, mock_ssl_verify)
         self.assertEquals(mock_logout_controller.logout_logic, mock_logout_logic)

@@ -72,7 +72,7 @@ class UserLogic:
         """
         Method to make the call to rotate another user's API key
         """
-        logging.debug(f"Rotating API key for '{resource_to_update}'")
+        logging.debug(f"Rotating API key for '{resource_to_update}'...")
 
         resource = Resource(type_='user', name=resource_to_update)
         new_api_key = self.client.rotate_other_api_key(resource)
@@ -84,12 +84,12 @@ class UserLogic:
         Method to call the client to rotate the logged-in user's personal API key
         """
         try:
-            logging.debug(f"Rotating API key for '{logged_in_username}'")
+            logging.debug(f"Rotating API key for '{logged_in_username}'...")
             new_api_key = self.client.rotate_personal_api_key(logged_in_username, current_password)
 
             # Update the new rotated API for the logged-in user
             logging.debug("Updating credential store with new API key "
-                          f"for '{logged_in_username}'")
+                          f"for '{logged_in_username}'...")
             self.update_api_key_in_credential_store(logged_in_username,
                                                     logged_in_credentials,
                                                     new_api_key)

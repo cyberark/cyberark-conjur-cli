@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-KeyStoreCredentialsProvider module
+KeystoreCredentialsProvider module
 
 This module holds the logic for saving user-specific credentials
 to the system's keyring when they login
@@ -19,9 +19,9 @@ from conjur.wrapper import KeystoreAdapter
 
 
 # pylint: disable=logging-fstring-interpolation
-class KeyStoreCredentialsProvider(CredentialsStoreInterface):
+class KeystoreCredentialsProvider(CredentialsStoreInterface):
     """
-    KeyStoreCredentialsProvider
+    KeystoreCredentialsProvider
 
     This class holds logic for performing CRUD operations on credentials are kept
     in the system's keystore
@@ -30,18 +30,19 @@ class KeyStoreCredentialsProvider(CredentialsStoreInterface):
     def __init__(self): # pragma: no cover
         pass
 
+    # TODO assign variable identifier = credential_data.machine and use it inside set_password
     # pylint: disable=line-too-long,logging-fstring-interpolation
     def save(self, credential_data: CredentialsData):
         """
         Method for saving user credentials in the system's keyring
         """
-        logging.debug("Attempting to save credentials to the system's keyring "
-                      f"'{KeystoreAdapter.get_keyring_name()}'")
+        logging.debug("Attempting to save credentials to the system's credential store "
+                      f"'{KeystoreAdapter.get_keyring_name()}'...")
         try:
             KeystoreAdapter.set_password(credential_data.machine, MACHINE, credential_data.machine)
             KeystoreAdapter.set_password(credential_data.machine, LOGIN, credential_data.login)
             KeystoreAdapter.set_password(credential_data.machine, PASSWORD, credential_data.password)
-            logging.debug(f"Credentials saved to keyring '{KeystoreAdapter.get_keyring_name()}'")
+            logging.debug(f"Credentials saved to the '{KeystoreAdapter.get_keyring_name()}' credential store")
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
@@ -79,6 +80,6 @@ class KeyStoreCredentialsProvider(CredentialsStoreInterface):
         """
         Method for removing user credentials in the system's keyring
         """
-        logging.debug(f"Attempting to remove credentials from the keyring '{KeystoreAdapter.get_keyring_name()}'")
+        logging.debug(f"Attempting to remove credentials from the '{KeystoreAdapter.get_keyring_name()}' credential store...")
         KeystoreAdapter.delete_password(conjurrc.conjur_url)
-        logging.debug(f"Successfully removed credentials from the keyring '{KeystoreAdapter.get_keyring_name()}'")
+        logging.debug(f"Successfully removed credentials from the '{KeystoreAdapter.get_keyring_name()}' credential store...")

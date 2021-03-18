@@ -49,7 +49,7 @@ class LoginLogic:
             certificate_path = conjurrc.cert_file
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur")
+        logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur...")
         api_key = invoke_endpoint(HttpVerb.GET,
                                   ConjurEndpoint.LOGIN,
                                   params,

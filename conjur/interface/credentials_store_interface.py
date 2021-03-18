@@ -9,6 +9,7 @@ This class describes a shared interface for accessing user credentials
 # Internals
 from conjur.data_object import CredentialsData
 
+# TODO use ABC formal interface to make sure inherit classes implement interface
 # pylint: disable=unnecessary-pass
 class CredentialsStoreInterface: # pragma: no cover
     """

@@ -612,7 +612,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                                            login_logic=login_logic)
         login_controller.load()
 
-        sys.stdout.write("Successfully logged in to Conjur.\n")
+        sys.stdout.write("Successfully logged in to Conjur\n")
 
     @classmethod
     def handle_logout_logic(cls, credential_provider, ssl_verify=True):
@@ -716,7 +716,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             return
         elif resource == 'logout':
             Cli.handle_logout_logic(credential_provider, args.ssl_verify)
-            sys.stdout.write("Successfully logged out from Conjur.\n")
+            sys.stdout.write("Successfully logged out from Conjur\n")
             return
 
         # Needed for unit tests so that they do not require configuring

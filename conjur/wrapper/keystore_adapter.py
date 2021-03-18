@@ -15,6 +15,8 @@ import keyring
 from conjur.constants import KEYSTORE_ATTRIBUTES
 
 
+# TODO should verify we are using the exact keyring version wanted and
+#  disable insecure keyring such as PlaintextKeyring.
 class KeystoreAdapter:
     """
     KeystoreAdapter
@@ -36,6 +38,7 @@ class KeystoreAdapter:
         """
         return keyring.get_password(identifier, key)
 
+    # TODO add simple delete for one attribute only here in the adapter
     # pylint: disable=try-except-raise
     @classmethod
     def delete_password(cls, identifier):
@@ -45,6 +48,7 @@ class KeystoreAdapter:
         try:
             for attr in KEYSTORE_ATTRIBUTES:
                 keyring.delete_password(identifier, attr)
+        # TODO do not raise keyring module errors
         # Catches when credentials do not exist in the keyring. If the key does not exist,
         # the user has already logged out
         except keyring.errors.PasswordDeleteError:
@@ -59,18 +63,17 @@ class KeystoreAdapter:
         """
         return keyring.get_keyring().name
 
+    # TODO add a more robust check
     @classmethod
     def is_keyring_accessible(cls):
         """
         Method to check if the keyring is accessible
         """
+        # TODO investigate other errors that would make a keyring not accessible
         try:
             # Send a dummy request to test if the keyring is accessible
             keyring.get_password('test-system', 'test-unlock')
         except keyring.errors.KeyringLocked:
             return False
-        # All other errors means that the keyring is accessible
-        except keyring.errors.KeyringError:
-            return True
 
         return True

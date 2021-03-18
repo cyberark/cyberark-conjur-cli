@@ -130,9 +130,9 @@ class Client():
             self._api.login(login_id, password)
         else:
             credential_provider, credential_location = CredentialStoreFactory.create_credential_store()
-            logging.debug(f"Attempting to retrieve credentials from '{credential_location}'")
+            logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")
             loaded_credentials = credential_provider.load(loaded_config['url'])
-            logging.debug(f"Credentials from '{credential_location}' were retrieved successfully")
+            logging.debug(f"Successfully retrieved credentials from the '{credential_location}'")
 
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
