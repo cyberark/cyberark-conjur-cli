@@ -16,6 +16,8 @@ import sys
 
 # Third party
 import traceback
+import webbrowser
+
 import requests
 
 # Internals
@@ -522,6 +524,20 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
         whoami_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
+        # *************** UI COMMAND ***************
+        ui_name = 'ui - Open browser for the init url conjure UI'
+        ui_usage = 'conjur [global options] ui [options]'
+        ui_subparser = resource_subparsers.add_parser('ui',
+                                                      help='Open browser for the init url conjure UI',
+                                                      description=self.command_description(ui_name,
+                                                                                           ui_usage),
+                                                      usage=argparse.SUPPRESS,
+                                                      add_help=False,
+                                                      formatter_class=formatter_class)
+        ui_options = ui_subparser.add_argument_group(title=self.title("Options"))
+
+        ui_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
         # *************** MAIN HELP SCREEN OPTIONS ***************
 
         global_optional.add_argument('-h', '--help', action='help', help="Display help list")
@@ -694,6 +710,17 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         host_controller = HostController(client=client, host_resource_data=host_resource_data)
         host_controller.rotate_api_key()
 
+    @classmethod
+    def handle_ui_logic(cls):
+        """
+        Method that wraps the ui call logic
+        """
+        url = f"{ConjurrcData.load_from_file().conjur_url}/ui"
+        sys.stdout.write(f"Openenig browser with url {url}\n")
+        webbrowser.open_new_tab(f"{url}")
+        sys.stdout.write("Opened UI in browser\n")
+
+
     @staticmethod
     # pylint: disable=too-many-branches
     def run_action(resource, args):
@@ -754,6 +781,9 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         elif resource == 'host':
             Cli.handle_host_logic(args, client)
 
+        elif resource == 'ui':
+            Cli.handle_ui_logic()
+
     @staticmethod
     def _parse_args(parser):
         args = parser.parse_args()
@@ -763,7 +793,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             sys.exit(0)
 
         # Check whether we are running a command with required additional arguments/options
-        if args.resource not in ['list', 'whoami', 'init', 'login', 'logout']:
+        if args.resource not in ['list', 'whoami', 'init', 'login', 'logout','ui']:
             if 'action' not in args or not args.action:
                 parser.print_help()
                 sys.exit(0)
