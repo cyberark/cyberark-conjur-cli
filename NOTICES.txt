@@ -25,7 +25,6 @@ Section 4: MIT
 >>> github.com/yaml/pyyaml - 5.3.1
 
 
-
 APPENDIX: Standard License Files and Templates
 
 >>> Apache-2.0
@@ -206,6 +205,8 @@ it will have to comply with the GPL license. See also our
 
 
 --------------- SECTION 4: MIT ----------
+
+MIT License is applicable to the following component(s).
 
 >>> github.com/jaraco/keyring - 23.0.0
 
