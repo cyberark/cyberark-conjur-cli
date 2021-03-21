@@ -7,6 +7,7 @@ from conjur.controller.host_controller import HostController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
 from conjur.controller.user_controller import UserController
+from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
@@ -18,6 +19,11 @@ RESOURCE_LIST = [
 WHOAMI_RESPONSE = {
     "conjur_account": "myaccount"
 }
+
+class MockConjurrc:
+    conjur_url = 'https://someurl'
+    conjur_account = 'someacc'
+    cert_file = 'some/path/to/pem'
 
 class MockArgs(object):
     pass
@@ -230,12 +236,12 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
-        Cli().handle_login_logic(identifier='someidentifier', password='somepassword', ssl_verify=True)
+        Cli().handle_login_logic(credential_provider=FileCredentialsProvider, identifier='someidentifier', password='somepassword', ssl_verify=True)
         mock_load.assert_called_once()
 
     @patch.object(LogoutController, 'remove_credentials')
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):
-        Cli().handle_logout_logic(ssl_verify=True)
+        Cli().handle_logout_logic(credential_provider=FileCredentialsProvider, ssl_verify=True)
         mock_remove_creds.assert_called_once()
 
     @patch.object(UserController, 'rotate_api_key')
@@ -244,7 +250,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'rotate-api-key'
         mock_obj.id = 'someid'
 
-        Cli().handle_user_logic(args=mock_obj, client='someclient')
+        Cli().handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj, client='someclient')
         mock_rotate_api_key.assert_called_once()
 
     @patch.object(UserController, 'change_personal_password')
@@ -253,7 +259,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'change-password'
         mock_obj.password = 'somepass'
 
-        Cli().handle_user_logic(args=mock_obj, client='someclient')
+        Cli().handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj, client='someclient')
         mock_change_password.assert_called_once()
 
     @patch.object(HostController, 'rotate_api_key')
@@ -279,28 +285,6 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         Cli().run_action('init', mock_obj)
         mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force', True)
 
-    @patch.object(Cli, 'handle_login_logic')
-    @patch.object(Client, 'setup_logging')
-    def test_run_action_runs_login_logic(self, mock_setup_logging, mock_handle_login):
-        mock_obj = MockArgs()
-        mock_obj.identifier = 'someidentifier'
-        mock_obj.password = 'somepassword'
-        mock_obj.ssl_verify = False
-        mock_obj.debug = 'somedebug'
-
-        Cli().run_action('login', mock_obj)
-        mock_handle_login.assert_called_once_with('someidentifier', 'somepassword', False)
-
-    @patch.object(Cli, 'handle_logout_logic')
-    @patch.object(Client, 'setup_logging')
-    def test_run_action_runs_logout_logic(self, mock_setup_logging, mock_handle_logout):
-        mock_obj = MockArgs()
-        mock_obj.ssl_verify = False
-        mock_obj.debug = 'somedebug'
-
-        Cli().run_action('logout', mock_obj)
-        mock_handle_logout.assert_called_once_with(False)
-
     '''
     Verifies that if a user didn't run init, they are prompted to do so and that after they initialize,
     a command will be run to completion. In this case, variable.
@@ -310,7 +294,9 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.exists', side_effect=[False, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 1])
-    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init):
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('keyring.get_keyring')
+    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -329,8 +315,11 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.exists', side_effect=[True, False])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 0])
-    def test_run_action_runs_login_if_netrc_not_found(self, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_login):
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('keyring.get_keyring')
+    def test_run_action_runs_login_if_netrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_login):
         with patch('conjur.cli.Client') as mock_client:
+            mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
             mock_obj.ssl_verify = False
@@ -343,7 +332,9 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
-    def test_run_action_runs_user_logic(self, mock_size, mock_getenv, mock_path_exists, mock_handle_user):
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('keyring.get_keyring')
+    def test_run_action_runs_user_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_user):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -357,8 +348,11 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
-    def test_run_action_runs_host_logic(self, mock_size, mock_getenv, mock_path_exists, mock_handle_host):
+    @patch('keyring.get_keyring')
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_host):
         with patch('conjur.cli.Client') as mock_client:
+            mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
             mock_obj.ssl_verify = False

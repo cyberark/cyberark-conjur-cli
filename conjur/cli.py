@@ -13,24 +13,24 @@ import json
 import logging
 import os
 import sys
+import traceback
 
 # Third party
-import traceback
 import requests
 
 # Internals
 from conjur.api import SSLClient
+from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.util.util_functions import determine_status_code_specific_error_messages
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
-from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.controller import HostController, ListController, LogoutController, InitController
 from conjur.controller import LoginController, PolicyController, UserController, VariableController
 from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, \
     VariableLogic, InitLogic
-from conjur.util import CredentialsFromFile
 from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData
 from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
@@ -599,29 +599,30 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         input_controller.load()
 
     @classmethod
-    def handle_login_logic(cls, identifier=None, password=None, ssl_verify=True):
+    # pylint: disable=line-too-long
+    def handle_login_logic(cls, credential_provider, identifier=None, password=None, ssl_verify=True):
         """
         Method that wraps the login call logic
         """
         credential_data = CredentialsData(login=identifier)
-        credentials = CredentialsFromFile(netrc_path=DEFAULT_NETRC_FILE)
-        login_logic = LoginLogic(credentials)
+        login_logic = LoginLogic(credential_provider)
         login_controller = LoginController(ssl_verify=ssl_verify,
                                            user_password=password,
                                            credential_data=credential_data,
                                            login_logic=login_logic)
         login_controller.load()
 
+        sys.stdout.write("Successfully logged in to Conjur\n")
+
     @classmethod
-    def handle_logout_logic(cls, ssl_verify=True):
+    def handle_logout_logic(cls, credential_provider, ssl_verify=True):
         """
         Method that wraps the logout call logic
         """
-        credentials = CredentialsFromFile(DEFAULT_NETRC_FILE)
-        logout_logic = LogoutLogic(credentials)
-
+        logout_logic = LogoutLogic(credential_provider)
         logout_controller = LogoutController(ssl_verify=ssl_verify,
-                                             logout_logic=logout_logic)
+                                             logout_logic=logout_logic,
+                                             credentials_provider=credential_provider)
         logout_controller.remove_credentials()
 
     @classmethod
@@ -664,16 +665,16 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         policy_controller.load()
 
     @classmethod
-    def handle_user_logic(cls, args=None, client=None):
+    def handle_user_logic(cls, credential_provider, args=None, client=None):
         """
         Method that wraps the user call logic
         """
-        credentials = CredentialsFromFile()
-        user_logic = UserLogic(ConjurrcData, credentials, client)
+        user_logic = UserLogic(ConjurrcData, credential_provider, client)
         if args.action == 'rotate-api-key':
             user_input_data = UserInputData(action=args.action,
                                             id=args.id,
                                             new_password=None)
+
             user_controller = UserController(user_logic=user_logic,
                                              user_input_data=user_input_data)
             user_controller.rotate_api_key()
@@ -695,13 +696,15 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         host_controller.rotate_api_key()
 
     @staticmethod
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,logging-fstring-interpolation
     def run_action(resource, args):
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
         """
         Client.setup_logging(Client, args.debug)
+
+        credential_provider, _ = CredentialStoreFactory.create_credential_store()
         # pylint: disable=no-else-return,line-too-long
         if resource == 'init':
             Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
@@ -709,25 +712,28 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             # the Client because the init command does not require the Client
             return
         elif resource == 'login':
-            Cli.handle_login_logic(args.identifier, args.password, args.ssl_verify)
+            Cli.handle_login_logic(credential_provider, args.identifier, args.password, args.ssl_verify)
             return
         elif resource == 'logout':
-            Cli.handle_logout_logic(args.ssl_verify)
+            Cli.handle_logout_logic(credential_provider, args.ssl_verify)
+            sys.stdout.write("Successfully logged out from Conjur\n")
             return
 
         # Needed for unit tests so that they do not require configuring
         if os.getenv('TEST_ENV') is None or os.getenv('TEST_ENV') == 'False':
-            # If the user runs a command without configuring the CLI or logging in,
+            # If the user runs a command without configuring the CLI,
             # we request they do so before executing their request
             # pylint: disable=line-too-long
             if not os.path.exists(DEFAULT_CONFIG_FILE) or os.path.getsize(DEFAULT_CONFIG_FILE) == 0:
                 sys.stdout.write("Error: The Conjur CLI has not been initialized\n")
                 Cli.handle_init_logic()
 
-            # pylint: disable=line-too-long
-            if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
+            # If the user runs a command without logging into the CLI,
+            # we request they do so before executing their request
+            loaded_conjurrc = ConjurrcData.load_from_file()
+            if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
                 sys.stdout.write("Error: You have not logged in\n")
-                Cli.handle_login_logic(ssl_verify=args.ssl_verify)
+                Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
@@ -749,7 +755,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             Cli.handle_policy_logic(policy_data, client)
 
         elif resource == 'user':
-            Cli.handle_user_logic(args, client)
+            Cli.handle_user_logic(credential_provider, args, client)
 
         elif resource == 'host':
             Cli.handle_host_logic(args, client)

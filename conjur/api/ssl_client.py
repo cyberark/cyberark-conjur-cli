@@ -76,7 +76,7 @@ class SSLClient:
         conjur_sock.do_handshake()
 
         logging.debug("TLS connection established. " \
-                      "Fetching certificate from Conjur server")
+                      "Fetching certificate from Conjur server...")
 
         return conjur_sock
 

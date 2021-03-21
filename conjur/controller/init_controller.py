@@ -85,7 +85,7 @@ class InitController:
             return None
 
         # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.conjur_url}'")
+        logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.conjur_url}'...")
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")

@@ -167,7 +167,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
                               cert_file=self.environment.path_provider.nginx_conf_path)
         conjurrc.dump_to_file()
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
-            netrc_test.write(f"machine {self.client_params.hostname}/authn\n")
+            netrc_test.write(f"machine {self.client_params.hostname}\n")
             netrc_test.write("login admin\n")
             netrc_test.write(f"password {self.client_params.env_api_key}\n")
         self.setup_cli_params({})
@@ -180,7 +180,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
                               cert_file="")
         conjurrc.dump_to_file()
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
-            netrc_test.write(f"machine {self.client_params.hostname}/authn\n")
+            netrc_test.write(f"machine {self.client_params.hostname}\n")
             netrc_test.write("login admin\n")
             netrc_test.write(f"password {self.client_params.env_api_key}\n")
         self.setup_cli_params({})

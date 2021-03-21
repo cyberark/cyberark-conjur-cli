@@ -7,13 +7,8 @@ This module is the controller that facilitates all logout actions
 required to successfully logout
 """
 
-# Builtins
-import logging
-import os
-import sys
-
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
 
 # pylint: disable=too-few-public-methods
@@ -23,25 +18,20 @@ class LogoutController:
 
     This class represents the Presentation Layer for the LOGOUT command
     """
-    def __init__(self, ssl_verify, logout_logic):
+    def __init__(self, ssl_verify, logout_logic, credentials_provider):
         self.ssl_verify = ssl_verify
         self.logout_logic = logout_logic
+        self.credentials_provider = credentials_provider
 
     def remove_credentials(self):
         """
         Method for removing credentials from user machine
         """
-        logging.debug("Attempting to log out of Conjur")
         try:
-            if not os.path.exists(DEFAULT_NETRC_FILE):
-                sys.stdout.write("Successfully logged out from Conjur.\n")
-            elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
-                conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
-                self.logout_logic.remove_credentials(conjurrc.conjur_url)
-                logging.debug("Logout successful")
-                sys.stdout.write("Successfully logged out from Conjur.\n")
-            else:
-                raise Exception("You are already logged out")
+            loaded_conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
+            if not self.credentials_provider.is_exists(loaded_conjurrc.conjur_url):
+                raise Exception("You are already logged out.")
+            self.logout_logic.remove_credentials(loaded_conjurrc)
         except Exception as error:
             # pylint: disable=raise-missing-from
-            raise Exception(f"Failed to log out. {error}.")
+            raise Exception(f"Failed to log out. {error}")

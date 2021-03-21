@@ -2,6 +2,6 @@ machine https://randommachine/
   login randomlogin
   password randompass
 
-machine https://someurl/somepath/authn
+machine https://someurl/somepath
   login someadmin
   password conjurapikey
