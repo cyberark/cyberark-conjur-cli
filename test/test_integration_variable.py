@@ -261,7 +261,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         # TEST_ENV is set to False so we will purposely be prompted to login
         os.environ['TEST_ENV'] = 'False'
         try:
-            utils.remove_file(DEFAULT_NETRC_FILE)
+            utils.delete_credentials()
         except OSError:
             pass
 

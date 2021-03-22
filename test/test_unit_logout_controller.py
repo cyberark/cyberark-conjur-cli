@@ -51,7 +51,7 @@ class LogoutControllerTest(unittest.TestCase):
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     def test_logout_netrc_does_not_exist_raises_logged_out_exception(self, mock_conjurrc, mock_logout_logic, mock_exists, mock_size):
         with self.assertRaises(Exception):
-            mock_credentials_provider, _ = CredentialStoreFactory.create_credential_store()
+            mock_credentials_provider, _ = CredentialStoreFactory().create_credential_store()
             mock_logout_controller = LogoutController(True, mock_logout_logic, mock_credentials_provider)
             mock_logout_controller.remove_credentials()
         self.assertEquals(os.path.isdir(DEFAULT_NETRC_FILE), False)

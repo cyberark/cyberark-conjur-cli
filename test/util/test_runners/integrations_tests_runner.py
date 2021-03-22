@@ -7,6 +7,9 @@ for all integration tests
 # Builtins
 import sys
 
+from conjur.data_object import ConjurrcData
+from conjur.logic.credential_provider import FileCredentialsProvider
+
 sys.path.append('.')
 sys.path.append('..')
 # Third party
@@ -29,6 +32,7 @@ from test.test_integration_variable import CliIntegrationTestVariable
 from test.test_integration_configurations import CliIntegrationTestConfigurations
 from test.test_integration_credentials import CliIntegrationTestCredentials
 from test.test_integration_list import CliIntegrationTestList
+from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
 from test.test_integration_resource import CliIntegrationResourceTest
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -36,21 +40,27 @@ from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
 from conjur.constants import *
+from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
+from conjur import cli
 
 
 def main():
     args = TestRunnerArgs.create_from_args()
-
+    args.invoke_cli_as_process = True
     runner = TestRunner(args)
-    test_to_run_list=[CliIntegrationTestConfigurations,
-                      CliIntegrationTestVariable,
-                      CliIntegrationTestCredentials,
-                      CliIntegrationResourceTest,
-                      CliIntegrationTestList,
-                      CliIntegrationPolicy]
+    test_to_run_list = [
+                        CliIntegrationTestCredentials,
+                        CliIntegrationTestCredentialsNetrc,
+                        CliIntegrationTestConfigurations,
+                        CliIntegrationTestVariable,
+                        CliIntegrationResourceTest,
+                        CliIntegrationTestList,
+                        CliIntegrationPolicy
+                        ]
     if args.run_oss_tests:
         test_to_run_list.append(CliIntegrationTestOSS)
     runner.run_tests(test_modules=test_to_run_list)
+
 
 class TestRunner:  # pragma: no cover
 
@@ -82,7 +92,8 @@ class TestRunner:  # pragma: no cover
         path_provider = TestRunnerPathProvider(file_helper_dir=self.runner_args.files_folder)
         self.__create_conjurrc_file()
         self.__create_netrc_file()
-        self.env_params = TestEnvironmentParams(self.runner_args.cli_to_test, self.runner_args.invoke_cli_as_process, path_provider)
+        self.env_params = TestEnvironmentParams(self.runner_args.cli_to_test, self.runner_args.invoke_cli_as_process,
+                                                path_provider)
         self.client_params = ClientParams(url=self.runner_args.hostname, account=self.runner_args.account,
                                           login=self.runner_args.login, api_key=self.api_key)
 
@@ -102,19 +113,15 @@ class TestRunner:  # pragma: no cover
         shutil.copy(path_provider.conjurrc_path, path_provider.test_conjurrc_file_path)
 
     def __create_netrc_file(self):
-        path_provider = TestRunnerPathProvider.getInstance()
-        proc = sb.Popen(
-            [self.runner_args.cli_to_test, "login", "-i", f"{self.runner_args.login}", "-p",
-             f"{self.runner_args.password}"],
-            stdin=sb.PIPE,
-            stdout=sb.PIPE,
-            stderr=sb.PIPE)
-        output = proc.communicate(timeout=10)[0]
-        if proc.returncode != 0:
-            raise RuntimeError(f"Error Login: {output}")
 
+        path_provider = TestRunnerPathProvider.getInstance()
+
+        credential_store = CredentialStoreFactory().create_credential_store()[0]
+        cli.Cli.handle_login_logic(credential_store, self.runner_args.login, self.runner_args.password)
+        credentials = credential_store.load(self.runner_args.hostname)
+        FileCredentialsProvider().save(credentials)
         shutil.copy(path_provider.netrc_path,
-            os.path.join(path_provider.helpers_files_path, path_provider.netrc_file_name))
+                    os.path.join(path_provider.helpers_files_path, path_provider.netrc_file_name))
 
     def __get_api_key(self):
         url = f"{self.runner_args.hostname}/authn/{self.runner_args.account}/login"
@@ -139,7 +146,7 @@ class TestRunner:  # pragma: no cover
             specific_test = test_cases_class(test_name, self.client_params, self.env_params)
             suite.addTest(specific_test)
         result = unittest.TextTestRunner().run(suite)
-        print("Failed: ","\n".join([str(f[0]).split(" ")[0] for f in result.failures]))
+        print("Failed: ", "\n".join([str(f[0]).split(" ")[0] for f in result.failures]))
         return result.wasSuccessful()
 
     def __get_relevant_tests_for_class(self, class_name: IntegrationTestCaseBase) -> list:

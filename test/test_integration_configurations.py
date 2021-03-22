@@ -11,6 +11,8 @@ from unittest.mock import patch
 
 import requests
 
+from conjur.data_object import CredentialsData
+from conjur.logic.credential_provider import CredentialStoreFactory
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
@@ -33,6 +35,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
     def setUp(self):
         self.setup_cli_params({})
+        utils.delete_credentials()
         utils.remove_file(DEFAULT_CONFIG_FILE)
         utils.remove_file(DEFAULT_CERTIFICATE_FILE)
 
@@ -50,6 +53,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc cert_file entry is blank when run in --insecure mode
     '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_in_insecure_mode_leaves_cert_file_empty(self, mock_input):
@@ -62,6 +66,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that certificate flag is overwritten when running in --insecure mode
     '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_provided_cert_file_path_is_overwritten_in_insecure_mode(self, mock_input):
@@ -75,6 +80,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine
     '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
@@ -82,12 +88,14 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
-        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
     Validates that the conjurrc was created on the machine when user provides Y instead of 'yes'
     '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='Y')
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes(self, mock_input):
@@ -95,37 +103,44 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
-        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
     Validates that the conjurrc was created on the machine when user provides Y instead of 'yes' 
     when prompted to overwrite the conjurrc file
     '''
+
     @integration_test(True)
-    @patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y'])
-    def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self, mock_input):
+
+    def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self):
         self.setup_cli_params({})
-        self.invoke_cli(self.cli_auth_params,
+        with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
+            self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
         # Intentional double init here to test that the overwriting of the file prompt can take 'Y'
-        self.invoke_cli(self.cli_auth_params,
+        with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
+            self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
-        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
     Validates that the conjurrc was created on the machine when a user mistakenly supplies an extra '/' at the end of the URL
     '''
+
     @integration_test()
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_successfully_with_extra_slash_in_url(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname+"/", '--account', 'someaccount'])
+                        ['init', '--url', self.client_params.hostname + "/", '--account', 'someaccount'])
 
-        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, self.environment.path_provider.certificate_path)
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
@@ -166,10 +181,11 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file=self.environment.path_provider.nginx_conf_path)
         conjurrc.dump_to_file()
-        with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
-            netrc_test.write(f"machine {self.client_params.hostname}\n")
-            netrc_test.write("login admin\n")
-            netrc_test.write(f"password {self.client_params.env_api_key}\n")
+        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        credential_data = CredentialsData(machine=self.client_params.hostname,
+                                          login="admin",
+                                          password=self.client_params.env_api_key)
+        cred_store.save(credential_data)
         self.setup_cli_params({})
 
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
@@ -179,10 +195,11 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file="")
         conjurrc.dump_to_file()
-        with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
-            netrc_test.write(f"machine {self.client_params.hostname}\n")
-            netrc_test.write("login admin\n")
-            netrc_test.write(f"password {self.client_params.env_api_key}\n")
+        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        credential_data = CredentialsData(machine=self.client_params.hostname,
+                                          login="admin",
+                                          password=self.client_params.env_api_key)
+        cred_store.save(credential_data)
         self.setup_cli_params({})
 
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)

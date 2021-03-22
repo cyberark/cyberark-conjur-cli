@@ -12,6 +12,8 @@ from unittest.mock import patch
 
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE
+from conjur.data_object import ConjurrcData
+from conjur.logic.credential_provider import CredentialStoreFactory
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
@@ -33,6 +35,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     def setUp(self):
         self.setup_cli_params({})
+        utils.delete_credentials()
         # Need to configure the CLI and login to perform further commands
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
@@ -66,22 +69,17 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
-        with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
-            for line in netrc_test.readlines():
-                if line.strip().find('password') == 0:
-                    # extract the password from the netrc
-                    old_api_key = line.split(" ")[1]
-
+        credential_store,_ = CredentialStoreFactory().create_credential_store()
+        loaded_conjurrc = ConjurrcData.load_from_file()
+        old_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
                                             ['user', 'rotate-api-key'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         assert old_api_key != extract_api_key_from_message, "the API keys are the same!"
 
-        with open(f"{DEFAULT_NETRC_FILE}", "r") as netrc_test:
-            for line in netrc_test.readlines():
-                if line.strip().find('password') == 0:
-                    new_api_key = line.split(" ")[1]
+        credential_store, _ = CredentialStoreFactory().create_credential_store()
+        new_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
 
         assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"
 
@@ -156,7 +154,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
                                      ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
 
-    @integration_test(True)
+    @integration_test()
     def test_user_change_password_not_complex_enough_prompts_input(self):
         # Login as user to avoid changing admin password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,

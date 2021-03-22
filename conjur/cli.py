@@ -704,7 +704,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         """
         Client.setup_logging(Client, args.debug)
 
-        credential_provider, _ = CredentialStoreFactory.create_credential_store()
+        credential_provider, _ = CredentialStoreFactory().create_credential_store()
         # pylint: disable=no-else-return,line-too-long
         if resource == 'init':
             Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)

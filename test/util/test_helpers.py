@@ -8,6 +8,8 @@ from unittest.mock import patch
 # *********** INTEGRATION TESTS HELPERS ***********
 # *************************************************
 from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.data_object import ConjurrcData, CredentialsData
+from conjur.logic.credential_provider import CredentialStoreFactory
 
 
 def remove_file(file_path):
@@ -161,3 +163,25 @@ def validate_netrc_contents(self):
         self.assertEquals(lines[0].strip(), "machine https://someurl")
         self.assertEquals(lines[1].strip(), "login somelogin")
         self.assertEquals(lines[2].strip(), "password somepass")
+
+def get_credentials()->CredentialsData:
+    try:
+        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        conjurrc = ConjurrcData.load_from_file()
+        return cred_store.load(conjurrc.conjur_url)
+    except:
+        print("unable to fetch credentials")
+
+def delete_credentials():
+    try:
+        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        conjurrc = ConjurrcData.load_from_file()
+        if cred_store.is_exists(conjurrc.conjur_url):
+            return cred_store.remove_credentials(conjurrc)
+    except:
+        # this is a util test not throwing for now. user should make sure conjurrc file exists
+        pass
+
+def save_credentials(credentials):
+    cred_store,_ = CredentialStoreFactory().create_credential_store()
+    cred_store.save(credentials)

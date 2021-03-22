@@ -35,9 +35,6 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         Method that writes user data to a netrc file
         and updates permissions on the file
         """
-        logging.warning("No supported keystore found! Saving credentials in "
-                        f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                        "after you have finished using the CLI")
         logging.debug(f"Attempting to write credentials to '{DEFAULT_NETRC_FILE}'...")
         # TDOO use private function
         if os.path.exists(self.netrc_path):
