@@ -29,7 +29,7 @@ class CredentialStoreFactory(metaclass=Singleton):
 
     def __init__(self):
         self.override_provider = None
-        self.first_run = True
+        self.first_time_return_insecure_store = True
 
     def create_credential_store(self) -> CredentialsStoreInterface:
         """
@@ -51,16 +51,16 @@ class CredentialStoreFactory(metaclass=Singleton):
         self._log_netrc_warning()
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE
 
-    def override_usage(self, usage: CredentialProviderTypes):
+    def override_usage(self, provider_type: CredentialProviderTypes):
         """
         if set to 'NETRC' create_credential_store will always return FileCredentialsProvider
         if set to 'KEYSTORE' create_credential_store will always return KeystoreCredentialsProvider
         """
-        self.override_provider = usage
+        self.override_provider = provider_type
 
     def _log_netrc_warning(self):
-        if self.first_run:
+        if self.first_time_return_insecure_store:
             logging.warning("No supported keystore found! Saving credentials in "
                             f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
                             f"after you have finished using the CLI")
-        self.first_run = False
+        self.first_time_return_insecure_store = False
