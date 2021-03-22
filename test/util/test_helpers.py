@@ -172,6 +172,16 @@ def get_credentials()->CredentialsData:
     except:
         print("unable to fetch credentials")
 
+
+
+def is_credentials_exist(conjur_url)->bool:
+    try:
+        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        conjurrc = ConjurrcData.load_from_file()
+        return cred_store.is_exists(conjur_url)
+    except:
+        print("unable to vlidate credentials exist")
+
 def delete_credentials():
     try:
         cred_store,_ = CredentialStoreFactory().create_credential_store()
