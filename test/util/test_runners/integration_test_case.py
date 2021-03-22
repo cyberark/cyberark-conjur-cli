@@ -15,10 +15,13 @@ from unittest.mock import patch, MagicMock
 
 # Internals
 from conjur.cli import Cli
+from conjur.logic.credential_provider import CredentialStoreFactory
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util import test_helpers as utils
 
 MAX_INTERACTIONS_ALLOWED = 5
+
+
 class IntegrationTestCaseBase(TestCase):
 
     def __init__(self, testname, client_params: ClientParams = None,
@@ -31,7 +34,6 @@ class IntegrationTestCaseBase(TestCase):
         self.client_params = ClientParams() if client_params is None else client_params
 
         super(IntegrationTestCaseBase, self).__init__(testname)
-
 
     def invoke_cli(self, *args, exit_code=0) -> str:
         """
@@ -65,6 +67,7 @@ def invoke_cli_as_code(test_runner, *args, exit_code=0):
     test_runner.assertEqual(sys_exit.exception.code, exit_code,
                             f"ERROR: CLI returned an unexpected error status code: '{cli_args}'. Output: {capture_stream.getvalue()}")
     return capture_stream.getvalue()
+
 
 def invoke_cli_as_process(test_runner, *args, exit_code=0) -> str:
     """
@@ -112,6 +115,7 @@ def invoke_cli_as_process(test_runner, *args, exit_code=0) -> str:
                                 "ERROR: CLI returned an unexpected error status code: '{}'".format(cli_args))
     return output.decode('utf-8')
 
+
 def get_input_if_exist(timeout=0.1):
     # get the input from the "unittest.patch"
     def get_input():
@@ -121,6 +125,7 @@ def get_input_if_exist(timeout=0.1):
         except:
             # timeout
             return
+
     try:
         sys_in = utils.run_func_with_timeout(timeout, get_input)
         if sys_in:

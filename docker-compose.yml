@@ -70,6 +70,7 @@ services:
     command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
+      PYTHON_KEYRING_BACKEND: Null
       TEST_ENV: "True"
     depends_on:
       - conjur
