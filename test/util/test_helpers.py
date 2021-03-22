@@ -102,14 +102,14 @@ def generate_policy_string(self):
     # the """ formatter is indentation sensitive and
     # policy should start at the far left of the line
     policy = \
-        """
-        - !variable
-          id: {variable_1}
-        - !variable
-          id: {variable_2}
-        - !variable
-          id: {variable_3}
-        """
+"""
+- !variable
+  id: {variable_1}
+- !variable
+  id: {variable_2}
+- !variable
+  id: {variable_3}
+"""
 
     dynamic_policy = policy.format(variable_1=variable_1,
                                    variable_2=variable_2,
@@ -171,6 +171,48 @@ def update_policy_from_string(self, policy):
     return output
 
 
+# *************** CREDENTIALS ***************
+
+def create_cred_store():
+    cred_store, _ = CredentialStoreFactory().create_credential_store()
+    return cred_store
+
+
+def get_credentials() -> CredentialsData:
+    try:
+        cred_store = create_cred_store()
+        conjurrc = ConjurrcData.load_from_file()
+        return cred_store.load(conjurrc.conjur_url)
+    except:
+        print("unable to fetch credentials")
+
+
+def is_credentials_exist(conjur_url=None) -> bool:
+    try:
+        cred_store = create_cred_store()
+        if conjur_url is None:
+            conjur_url = ConjurrcData.load_from_file().conjur_url
+        return cred_store.is_exists(conjur_url)
+    except:
+        print("Unable to validate that credentials exist")
+
+
+def delete_credentials():
+    try:
+        cred_store = create_cred_store()
+        conjurrc = ConjurrcData.load_from_file()
+        if cred_store.is_exists(conjurrc.conjur_url):
+            return cred_store.remove_credentials(conjurrc)
+    except:
+        # this is a util test not throwing for now. user should make sure conjurrc file exists
+        pass
+
+
+def save_credentials(credentials):
+    cred_store = create_cred_store()
+    cred_store.save(credentials)
+
+
 # *************************************************
 # *************** UNIT TESTS HELPERS **************
 # *************************************************
@@ -181,37 +223,3 @@ def validate_netrc_contents(self):
         self.assertEquals(lines[0].strip(), "machine https://someurl")
         self.assertEquals(lines[1].strip(), "login somelogin")
         self.assertEquals(lines[2].strip(), "password somepass")
-
-
-def get_credentials() -> CredentialsData:
-    try:
-        cred_store, _ = CredentialStoreFactory().create_credential_store()
-        conjurrc = ConjurrcData.load_from_file()
-        return cred_store.load(conjurrc.conjur_url)
-    except:
-        print("unable to fetch credentials")
-
-
-def is_credentials_exist(conjur_url) -> bool:
-    try:
-        cred_store, _ = CredentialStoreFactory().create_credential_store()
-        conjurrc = ConjurrcData.load_from_file()
-        return cred_store.is_exists(conjur_url)
-    except:
-        print("unable to vlidate credentials exist")
-
-
-def delete_credentials():
-    try:
-        cred_store, _ = CredentialStoreFactory().create_credential_store()
-        conjurrc = ConjurrcData.load_from_file()
-        if cred_store.is_exists(conjurrc.conjur_url):
-            return cred_store.remove_credentials(conjurrc)
-    except:
-        # this is a util test not throwing for now. user should make sure conjurrc file exists
-        pass
-
-
-def save_credentials(credentials):
-    cred_store, _ = CredentialStoreFactory().create_credential_store()
-    cred_store.save(credentials)

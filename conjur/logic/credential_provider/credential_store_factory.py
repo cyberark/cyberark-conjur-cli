@@ -5,13 +5,12 @@ CredentialStoreFactory module
 
 This module is a factory for determining which credential store to use
 """
-# Third party
+# Builtins
 import logging
 
 # Internals
 from conjur.constants import SUPPORTED_BACKENDS, DEFAULT_NETRC_FILE
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
-from conjur.logic.credential_provider.CredentialProviderTypes import CredentialProviderTypes
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
@@ -28,19 +27,12 @@ class CredentialStoreFactory(metaclass=Singleton):
     """
 
     def __init__(self):
-        self.override_provider = None
-        self.first_time_return_insecure_store = True
+        self.first_time_log_insecure_store_warning = True
 
     def create_credential_store(self) -> CredentialsStoreInterface:
         """
         Factory method for determining which store to use
         """
-        if self.override_provider == CredentialProviderTypes.KEYSTORE:
-            return KeystoreCredentialsProvider(), f'{KeystoreAdapter.get_keyring_name()} credential store'
-        if self.override_provider == CredentialProviderTypes.NETRC:
-            self._log_netrc_warning()
-            return FileCredentialsProvider(), DEFAULT_NETRC_FILE
-
         if KeystoreAdapter.get_keyring_name() in SUPPORTED_BACKENDS:
             # TODO investigate other errors that would make a keyring not accessible
             # If the keyring is unlocked then we will use that
@@ -51,16 +43,13 @@ class CredentialStoreFactory(metaclass=Singleton):
         self._log_netrc_warning()
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE
 
-    def override_usage(self, provider_type: CredentialProviderTypes):
-        """
-        if set to 'NETRC' create_credential_store will always return FileCredentialsProvider
-        if set to 'KEYSTORE' create_credential_store will always return KeystoreCredentialsProvider
-        """
-        self.override_provider = provider_type
-
     def _log_netrc_warning(self):
-        if self.first_time_return_insecure_store:
+        """
+        Method logging the fact we are using insecure CredentialProvider.
+        This will write to log for every cli run
+        """
+        if self.first_time_log_insecure_store_warning:
             logging.warning("No supported keystore found! Saving credentials in "
                             f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
                             f"after you have finished using the CLI")
-        self.first_time_return_insecure_store = False
+        self.first_time_log_insecure_store_warning = False

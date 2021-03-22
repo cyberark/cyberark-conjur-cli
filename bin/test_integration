@@ -44,7 +44,7 @@ docker-compose up -d test
 rm -rf $CURRENT_DIR/output/*
 
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test bash
+  docker-compose exec --privileged test bash #Hint: Otherwise we get operation not permitted
   exit
 fi
 

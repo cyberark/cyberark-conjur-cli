@@ -7,9 +7,6 @@ for all integration tests
 # Builtins
 import sys
 
-from conjur.data_object import ConjurrcData
-from conjur.logic.credential_provider import FileCredentialsProvider
-
 sys.path.append('.')
 sys.path.append('..')
 # Third party
@@ -30,7 +27,7 @@ import uuid
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
 from test.test_integration_configurations import CliIntegrationTestConfigurations
-from test.test_integration_credentials import CliIntegrationTestCredentials
+from test.test_integration_credentials_keyring import CliIntegrationTestCredentialsKeyring
 from test.test_integration_list import CliIntegrationTestList
 from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
@@ -42,14 +39,14 @@ from test.util.test_path_provider import TestRunnerPathProvider
 from conjur.constants import *
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur import cli
-
+from conjur.logic.credential_provider import FileCredentialsProvider
 
 def main():
     args = TestRunnerArgs.create_from_args()
-    args.invoke_cli_as_process = True
+    args.invoke_cli_as_process = False
     runner = TestRunner(args)
     test_to_run_list = [
-                        CliIntegrationTestCredentials,
+                        CliIntegrationTestCredentialsKeyring,
                         CliIntegrationTestCredentialsNetrc,
                         CliIntegrationTestConfigurations,
                         CliIntegrationTestVariable,

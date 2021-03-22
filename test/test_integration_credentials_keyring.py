@@ -18,13 +18,13 @@ from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
-from conjur.constants import  DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE,DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE
 
 
-class CliIntegrationTestCredentials(IntegrationTestCaseBase):
+class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     # *************** HELPERS ***************
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationTestCredentials, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationTestCredentialsKeyring, self).__init__(testname, client_params, environment_params)
 
     def setup_cli_params(self, env_vars, *params):
         self.cli_auth_params = ['--debug']
@@ -50,38 +50,42 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         assert creds.login == login
         assert creds.password == password
 
-
     # *************** LOGIN CREDENTIALS TESTS ***************
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
+
     @integration_test(True)
     def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
-        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path, self.environment.path_provider.conjurrc_path)
+        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
+                    self.environment.path_provider.conjurrc_path)
         output = self.invoke_cli(self.cli_auth_params,
-                            ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
+                                 ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 
     insecure mode, then they will succeed
     '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
-                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account', self.client_params.account])
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account])
 
         output = self.invoke_cli(self.cli_auth_params,
-                            ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
+                                 ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
         self.assertIn('Successfully logged in to Conjur', output)
 
     '''
     Validates a user can log in with a password, instead of their API key
     To do this, we perform the following:
     '''
+
     @integration_test()
     @patch('builtins.input', return_value='yes')
     def test_https_credentials_created_with_all_parameters_given(self, mock_input):
@@ -90,7 +94,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
 
         # Load in new user
         self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path('conjur')])
+                        ['policy', 'replace', '-b', 'root', '-f',
+                         self.environment.path_provider.get_policy_path('conjur')])
 
         # Rotate the new user's API key
         user_api_key = self.invoke_cli(self.cli_auth_params,
@@ -111,7 +116,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
 
         # Attempt to login with newly created password
         output = self.invoke_cli(self.cli_auth_params,
-                        ['login', '-i', 'someuser', '-p', password])
+                                 ['login', '-i', 'someuser', '-p', password])
 
         self.assertIn("Successfully logged in to Conjur", output.strip())
         utils.get_credentials()
@@ -120,6 +125,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates a wrong username will raise Unauthorized error
     '''
+
     @integration_test()
     @patch('builtins.input', return_value='somebaduser')
     def test_https_credentials_raises_error_with_wrong_user(self, mock_pass):
@@ -132,6 +138,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     '''
     Validates a wrong password will raise Unauthorized error
     '''
+
     @integration_test()
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value='somewrongpass')
@@ -142,15 +149,11 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
 
         self.assertRegex(output, "Reason: 401")
 
-
-
-
-
-
     '''
     Validates that when the user hasn't logged in and attempts 
     to run a command, they will be prompted to login
     '''
+
     @integration_test()
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')
@@ -175,8 +178,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
 
     '''
-        Validates interactively provided params create credentials
-        '''
+    Validates interactively provided params create credentials
+    '''
 
     @integration_test()
     @patch('builtins.input', return_value='admin')
@@ -189,17 +192,17 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
 
     '''
-        Validates login is successful for hosts
+    Validates login is successful for hosts
 
-        Note we need to create the host first and rotate it's API key so that we can access it.
-        There is currently no way to fetch a host's API key so this is a work around for the 
-        purposes of this test
-        '''
+    Note we need to create the host first and rotate it's API key so that we can access it.
+    There is currently no way to fetch a host's API key so this is a work around for the 
+    purposes of this test
+    '''
 
     @integration_test()
     def test_https_credentials_is_created_with_host(self):
         # Setup for fetching the API key of a host. To fetch we need to login
-        credentials = CredentialsData(self.client_params.hostname,"admin",self.client_params.env_api_key)
+        credentials = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
         utils.save_credentials(credentials)
 
         self.invoke_cli(self.cli_auth_params,
@@ -221,17 +224,17 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.assertIn("Successfully logged in to Conjur", output.strip())
 
     @integration_test()
-    def test_working_with_keystore(self):
-        cred_store,_ = CredentialStoreFactory().create_credential_store()
-        self.assertEquals(type(cred_store) , type(KeystoreCredentialsProvider()))
+    def test_provider_can_return_keystore_provider(self):
+        cred_store = utils.create_cred_store()
+        self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
 
     '''
-        Validates logout doesn't remove another entry not associated with Cyberark
-        '''
+    Validates logout doesn't remove another entry not associated with Cyberark
+    '''
 
     @integration_test(True)
     def test_https_credentials_does_not_remove_irrelevant_entry(self):
-        creds = CredentialsData(self.client_params.hostname,"admin",self.client_params.env_api_key)
+        creds = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
         utils.save_credentials(creds)
 
         creds = CredentialsData("somemachine", "somelogin", "somepass")
@@ -239,7 +242,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
 
         self.invoke_cli(self.cli_auth_params,
                         ['logout'])
-        cred_store, _ = CredentialStoreFactory().create_credential_store()
+        cred_store = utils.create_cred_store()
         assert cred_store.is_exists("somemachine")
         assert not cred_store.is_exists(self.client_params.hostname)
 
@@ -256,9 +259,9 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
                                               ['logout'], exit_code=1)
 
         self.assertIn("Failed to log out. You are already logged out", unsuccessful_logout.strip())
-
+        assert not utils.is_credentials_exist()
     '''
-        Validates when a user can logout successfully
+    Validates when a user can logout successfully
     '''
 
     @integration_test(True)
@@ -273,8 +276,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.assertIn('Successfully logged out from Conjur', output.strip())
 
     '''
-        Validates that if a user configures the CLI in insecure mode and runs the command not in 
-        insecure mode, then they will fail
+    Validates that if a user configures the CLI in insecure mode and runs the command not in 
+    insecure mode, then they will fail
     '''
 
     @integration_test(True)
@@ -284,7 +287,6 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
-
 
     @integration_test(True)
     def test_https_logout_successful(self):
@@ -298,8 +300,8 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         self.assertIn('Successfully logged out from Conjur', output.strip())
 
     '''
-        Validates that if a user configures the CLI in insecure mode and runs the command not in 
-        insecure mode, then they will fail
+    Validates that if a user configures the CLI in insecure mode and runs the command not in 
+    insecure mode, then they will fail
     '''
 
     @integration_test(True)
@@ -315,9 +317,9 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
         utils.setup_cli(self)
         creds = utils.get_credentials()
         assert creds.machine == self.client_params.hostname
-        self.invoke_cli(self.cli_auth_params,['logout'])
+        self.invoke_cli(self.cli_auth_params, ['logout'])
         assert not utils.is_credentials_exist(creds.machine)
-        self.invoke_cli(self.cli_auth_params, ['list'],exit_code=1)
+        self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
 
     @integration_test(True)
     def test_https_can_load_policy(self):
@@ -333,7 +335,7 @@ class CliIntegrationTestCredentials(IntegrationTestCaseBase):
     def test_keyring_locked_in_the_middle(self):
         utils.setup_cli(self)
         with patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False):
-            self.invoke_cli(self.cli_auth_params, ['logout'],exit_code=1)
+            self.invoke_cli(self.cli_auth_params, ['logout'], exit_code=1)
 
     @integration_test()
     def test_secret(self):

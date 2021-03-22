@@ -1,11 +1,11 @@
 #!/bin/bash
-## dbus command runing in .bashrc allow us to export the variables to currnet session
-# runing eval cmd to start dubs
+## dbus command running in .bashrc allow us to export the variables to current session
+# Running eval to start dbus
 echo 'eval "$(dbus-launch --sh-syntax)"' > ~/.bashrc
 # make bus keyring dirs
 mkdir -p ~/.cache
 mkdir -p ~/.local/share/keyrings
-# unlock bus
+# Unlock dbus with empty password
 echo 'eval "$(echo | gnome-keyring-daemon --unlock)"' >> ~/.bashrc
 # Export dbus variables to working shell to support keyring
 echo "export DBUS_SESSION_BUS_ADDRESS" >> ~/.bashrc

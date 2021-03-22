@@ -35,7 +35,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
     def setUp(self):
         self.setup_cli_params({})
-        utils.delete_credentials()
         utils.remove_file(DEFAULT_CONFIG_FILE)
         utils.remove_file(DEFAULT_CERTIFICATE_FILE)
 
@@ -113,16 +112,15 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
 
     @integration_test(True)
-
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self):
         self.setup_cli_params({})
         with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
             self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+                            ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
         # Intentional double init here to test that the overwriting of the file prompt can take 'Y'
         with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
             self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+                            ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path)
@@ -181,7 +179,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file=self.environment.path_provider.nginx_conf_path)
         conjurrc.dump_to_file()
-        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
                                           login="admin",
                                           password=self.client_params.env_api_key)
@@ -195,7 +193,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,
                               cert_file="")
         conjurrc.dump_to_file()
-        cred_store,_ = CredentialStoreFactory().create_credential_store()
+        cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
                                           login="admin",
                                           password=self.client_params.env_api_key)
