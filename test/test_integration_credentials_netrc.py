@@ -324,7 +324,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
 
     '''
-    Validates logout doesn't remove another entry not associated with Cyberark
+    Validates logout doesn't remove an irrelevant entry
     '''
     @integration_test(True)
     def test_https_netrc_does_not_remove_irrelevant_entry_netrc(self, mocks):

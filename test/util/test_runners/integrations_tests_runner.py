@@ -6,9 +6,11 @@ for all integration tests
 
 # Builtins
 import sys
+import os
 
 sys.path.append('.')
 sys.path.append('..')
+
 # Third party
 import unittest.mock
 import unittest
@@ -41,19 +43,20 @@ from conjur.logic.credential_provider.credential_store_factory import Credential
 from conjur import cli
 from conjur.logic.credential_provider import FileCredentialsProvider
 
+
 def main():
     args = TestRunnerArgs.create_from_args()
     args.invoke_cli_as_process = False
     runner = TestRunner(args)
     test_to_run_list = [
-                        CliIntegrationTestCredentialsKeyring,
-                        CliIntegrationTestCredentialsNetrc,
-                        CliIntegrationTestConfigurations,
-                        CliIntegrationTestVariable,
-                        CliIntegrationResourceTest,
-                        CliIntegrationTestList,
-                        CliIntegrationPolicy
-                        ]
+        CliIntegrationTestCredentialsKeyring,
+        CliIntegrationTestCredentialsNetrc,
+        CliIntegrationTestConfigurations,
+        CliIntegrationTestVariable,
+        CliIntegrationResourceTest,
+        CliIntegrationTestList,
+        CliIntegrationPolicy
+    ]
     if args.run_oss_tests:
         test_to_run_list.append(CliIntegrationTestOSS)
     runner.run_tests(test_modules=test_to_run_list)
@@ -83,7 +86,7 @@ class TestRunner:  # pragma: no cover
         set up the test environment
         Test environment setup will be in the following order:
         1) Run conjur init to initialize the CLI and get the certificate and conjurrc files
-        1) Run login a login to CLI and generate netrc file
+        2) Run login a login to CLI and generate netrc file
         """
 
         path_provider = TestRunnerPathProvider(file_helper_dir=self.runner_args.files_folder)
@@ -93,6 +96,8 @@ class TestRunner:  # pragma: no cover
                                                 path_provider)
         self.client_params = ClientParams(url=self.runner_args.hostname, account=self.runner_args.account,
                                           login=self.runner_args.login, api_key=self.api_key)
+        if (os.getenv('TEST_ENV') is None):
+            os.environ['TEST_ENV'] = 'True'
 
     def __create_conjurrc_file(self):
         path_provider = TestRunnerPathProvider.getInstance()

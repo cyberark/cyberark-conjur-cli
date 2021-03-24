@@ -135,7 +135,6 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     '''
     @integration_test(True)
     def test_no_credentials_and_logout_returns_successful_logout_message_keyring(self):
-
         utils.delete_credentials()
         logout = self.invoke_cli(self.cli_auth_params,
                                  ['logout'], exit_code=1)
@@ -246,7 +245,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
 
     '''
-    Validates logout doesn't remove another entry not associated with Cyberark
+    Validates logout doesn't remove an irrelevant entry
     '''
     @integration_test(True)
     def test_https_credentials_does_not_remove_irrelevant_entry_keyring(self):
@@ -280,7 +279,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         assert not utils.is_credentials_exist()
 
     '''
-    Validates when a user can logout successfully
+    Validates that a user can logout successfully
     '''
     @integration_test(True)
     def test_https_logout_successful_keyring(self):
@@ -292,6 +291,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
                                  ['logout'])
 
         self.assertIn('Successfully logged out from Conjur', output.strip())
+        assert not utils.is_credentials_exist()
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs the command not in 

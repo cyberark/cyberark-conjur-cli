@@ -11,11 +11,9 @@ from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object import ConjurrcData, CredentialsData
 from conjur.logic.credential_provider import CredentialStoreFactory
 
-
 def remove_file(file_path):
     if os.path.isfile(file_path):
         os.remove(file_path)
-
 
 def run_func_with_timeout(timeout, func, *args):
     # IMPORTANT! this must raise an exception for the interrupt to work with blocking functions
@@ -30,22 +28,18 @@ def run_func_with_timeout(timeout, func, *args):
     signal.alarm(0)
     return function_output
 
-
 @patch('builtins.input', return_value='yes')
 def init_to_cli(self, mock_input):
     self.invoke_cli(self.cli_auth_params,
                     ['init', '-u', self.client_params.hostname, '-a', self.client_params.account])
 
-
 def login_to_cli(self):
     self.invoke_cli(self.cli_auth_params,
                     ['login', '-i', self.client_params.login, '-p', self.client_params.env_api_key])
 
-
 def setup_cli(self):
     init_to_cli(self)
     login_to_cli(self)
-
 
 # *************** INIT ***************
 
@@ -57,18 +51,15 @@ def verify_conjurrc_contents(account, hostname, cert):
         assert f"conjur_account: {account}" in lines[2]
         assert f"conjur_url: {hostname}" in lines[3]
 
-
 # *************** VARIABLE ***************
 
 def set_variable(self, variable_id, value, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
                            ['variable', 'set', '-i', variable_id, '-v', value], exit_code=exit_code)
 
-
 def get_variable(self, *variable_ids, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
                            ['variable', 'get', '-i', *variable_ids], exit_code=exit_code)
-
 
 def assert_set_and_get(self, variable_id):
     expected_value = uuid.uuid4().hex
@@ -78,18 +69,15 @@ def assert_set_and_get(self, variable_id):
     # using AssertIn and not AssertEqual as in the process we get the entire Conjur STDOUT stdout
     self.assertIn(expected_value, output.strip())
 
-
 def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
     with self.assertRaises(error_class):
         self.set_variable(variable_id, uuid.uuid4().hex, exit_code)
-
 
 def print_instead_of_raise_error(self, variable_id, error_message_regex):
     output = self.invoke_cli(self.cli_auth_params,
                              ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
 
     self.assertRegex(output, error_message_regex)
-
 
 # *************** POLICY ***************
 
@@ -110,11 +98,9 @@ def generate_policy_string():
 
     return policy, [variable_1, variable_2, variable_3]
 
-
 def load_policy(self, policy_path, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
                            ['policy', 'load', '-b', 'root', '-f', policy_path], exit_code=exit_code)
-
 
 def load_policy_from_string(self, policy, exit_code=0):
     file_name = os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
@@ -126,11 +112,9 @@ def load_policy_from_string(self, policy, exit_code=0):
     os.remove(file_name)
     return output
 
-
 def replace_policy(self, policy_path, exit_code=0):
     return self.invoke_cli(self.cli_auth_params,
                            ['policy', 'replace', '-b', 'root', '-f', policy_path], exit_code=exit_code)
-
 
 def replace_policy_from_string(self, policy, exit_code=0):
     output = None
@@ -145,11 +129,9 @@ def replace_policy_from_string(self, policy, exit_code=0):
     os.remove(file_name)
     return output
 
-
 def update_policy(self, policy_path):
     return self.invoke_cli(self.cli_auth_params,
                            ['policy', 'update', '-b', 'root', '-f', policy_path])
-
 
 def update_policy_from_string(self, policy):
     output = None
@@ -163,13 +145,11 @@ def update_policy_from_string(self, policy):
     os.remove(file_name)
     return output
 
-
 # *************** CREDENTIALS ***************
 
 def create_cred_store():
     cred_store, _ = CredentialStoreFactory().create_credential_store()
     return cred_store
-
 
 def get_credentials() -> CredentialsData:
     try:
@@ -179,7 +159,6 @@ def get_credentials() -> CredentialsData:
     except:
         print("Unable to fetch credentials")
 
-
 def is_credentials_exist(conjur_url=None) -> bool:
     try:
         cred_store = create_cred_store()
@@ -188,7 +167,6 @@ def is_credentials_exist(conjur_url=None) -> bool:
         return cred_store.is_exists(conjur_url)
     except:
         print("Unable to validate that credentials exist")
-
 
 def delete_credentials():
     try:
@@ -200,11 +178,9 @@ def delete_credentials():
         # this is a util test not throwing for now. user should make sure conjurrc file exists
         pass
 
-
 def save_credentials(credentials):
     cred_store = create_cred_store()
     cred_store.save(credentials)
-
 
 # *************************************************
 # *************** UNIT TESTS HELPERS **************

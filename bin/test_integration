@@ -53,6 +53,6 @@ fi
 docker-compose run \
   --rm \
   --no-deps \
-    --privileged
+  --privileged
   test \
   nose2 -v -X --config integration_test.cfg -A 'integration' $@

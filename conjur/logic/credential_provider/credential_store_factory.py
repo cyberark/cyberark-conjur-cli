@@ -15,7 +15,7 @@ from conjur.logic.credential_provider.file_credentials_provider import FileCrede
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreAdapter
-from conjur.util.Singleton import Singleton
+from conjur.util.singleton import Singleton
 
 
 # pylint: disable=too-few-public-methods
@@ -45,11 +45,12 @@ class CredentialStoreFactory(metaclass=Singleton):
 
     def _log_netrc_warning(self):
         """
-        Method logging the fact we are using insecure CredentialProvider.
+        Method logging an insecure credential provider (netrc) will be used.
         This will be displayed to the user as a warning on every CLI run
         """
         if self.first_time_log_insecure_store_warning:
+            # pylint: disable=logging-fstring-interpolation
             logging.warning("No supported keystore found! Saving credentials in "
                             f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                            f"after you have finished using the CLI")
+                            "after you have finished using the CLI")
         self.first_time_log_insecure_store_warning = False
