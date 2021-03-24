@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-CLI Integration Credentials tests
+CLI Integration Credentials using .netrc tests
 
 This test file handles the login/logout test flows when running
-`conjur login`/`conjur logout`
+conjur login/conjur logout and writing to .netrc
 """
 import os
 import shutil
@@ -14,14 +14,16 @@ import uuid
 
 from conjur.data_object import CredentialsData
 from conjur.logic.credential_provider import FileCredentialsProvider
-from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
 
-
+"""
+All tests require that the Keyring on the system's environment is not accessible. 
+This is required to validate that the CLI operates as expected under such conditions.
+"""
 @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
 class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     # *************** HELPERS ***************
@@ -61,7 +63,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates that when a user already logged in and reattempts and fails, the previous successful session is not removed
     '''
-
     @integration_test(True)
     def test_https_netrc_was_not_overwritten_when_login_failed_but_already_logged_in(self, mock_accessible):
         utils.setup_cli(self)
@@ -77,7 +78,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates logout doesn't remove another entry not associated with the current login
     '''
-
     @integration_test(True)
     def test_https_logout_successful_netrc(self, mock_accessible):
         utils.setup_cli(self)
@@ -96,7 +96,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates when a user attempts to logout after an already 
     successful logout, will fail
     '''
-
     @integration_test(True)
     def test_https_logout_twice_returns_could_not_logout_message_netrc(self, mock_accessible):
         utils.setup_cli(self)
@@ -113,6 +112,9 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         with open(DEFAULT_NETRC_FILE) as netrc_file:
             assert netrc_file.read().strip() == "", 'netrc file is not empty!'
 
+    '''
+    Validate correct message when try to logout already logout user
+    '''
     @integration_test(True)
     def test_no_netrc_and_logout_returns_successful_logout_message_netrc(self, mock_accessible):
         utils.setup_cli(self)
@@ -125,10 +127,9 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         self.assertIn("You are already logged out", logout.strip())
 
     '''
-        Validates that if a user configures the CLI in insecure mode and runs the command not in 
-        insecure mode, then they will fail
-        '''
-
+    Validates that if a user configures the CLI in insecure mode and runs the command not in 
+    insecure mode, then they will fail
+    '''
     @integration_test(True)
     def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
@@ -142,7 +143,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs a command in 
     insecure mode, then they will succeed
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes_netrc(self, mock_input,
@@ -160,10 +160,9 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates a user can log in with a password, instead of their API key
     To do this, we perform the following:
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='yes')
-    def test_https_netrc_is_created_with_all_parameters_given_netrc(self, mock_input, keystore_disable_mock):
+    def test_https_credentials_user_can_login_successfully_when_another_user_is_already_logged_in(self, mock_input, keystore_disable_mock):
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
@@ -199,9 +198,19 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         self.validate_netrc(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
 
     '''
+    Validates interactively provided params create credentials
+    '''
+    @integration_test()
+    def test_https_credentials_created_with_all_parameters_given_netrc(self, keystore_disable_mock):
+        utils.setup_cli(self)
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
+        utils.get_credentials()
+        self.validate_netrc(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
+
+    '''
     Validates a wrong username will raise Unauthorized error
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='somebaduser')
     def test_https_netrc_raises_error_with_wrong_user_netrc(self, mock_pass, keystore_disable_mock):
@@ -215,7 +224,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates a wrong password will raise Unauthorized error
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value='somewrongpass')
@@ -230,7 +238,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates that when the user hasn't logged in and attempts 
     to run a command, they will be prompted to login
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')
@@ -244,6 +251,13 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         self.assertRegex(list_attempt.strip(), "Unable to authenticate with Conjur.")
         os.environ["TEST_ENV"] = "True"
 
+    '''
+    Validates login is successful for hosts
+
+    Note we need to create the host first and rotate it's API key so that we can access it.
+    There is currently no way to fetch a host's API key so this is a work around for the 
+    purposes of this test
+    '''
     @integration_test()
     @patch('builtins.input', return_value='admin')
     def test_https_netrc_is_created_when_provided_user_api_key_netrc(self, mock_pass, keystore_disable_mock):
@@ -258,9 +272,8 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
             self.validate_netrc(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
 
     '''
-        Validates interactively provided params create netrc
-        '''
-
+    Validates interactively provided params create netrc
+    '''
     @integration_test()
     @patch('builtins.input', return_value='admin')
     def test_https_netrc_is_created_with_all_parameters_given_interactively_netrc(self, mock_pass, mock_accessible):
@@ -279,7 +292,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     There is currently no way to fetch a host's API key so this is a work around for the 
     purposes of this test
     '''
-
     @integration_test()
     def test_https_netrc_is_created_with_host_netrc(self, mocks):
         utils.setup_cli(self)
@@ -314,7 +326,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates logout doesn't remove another entry not associated with Cyberark
     '''
-
     @integration_test(True)
     def test_https_netrc_does_not_remove_irrelevant_entry_netrc(self, mocks):
         utils.setup_cli(self)
@@ -334,7 +345,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
-
     @integration_test(True)
     def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_netrc(self, mocks):
         utils.setup_cli(self)
@@ -344,8 +354,11 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
 
+    '''
+    Validate that logout indeed remove credentials and terminate access to conjur
+    '''
     @integration_test()
-    def test_simple_login_netrc(self, keystore_disable_mock):
+    def test_cli_simple_login_logout_flow_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         assert os.path.isfile(DEFAULT_NETRC_FILE)
         self.invoke_cli(self.cli_auth_params, ['logout'])
@@ -353,17 +366,23 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
             assert netrc_file.read().strip() == "", 'netrc file is not empty!'
         self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
 
+    '''
+    Validate basic policy flow with netrc
+    '''
     @integration_test(True)
     def test_https_can_load_policy_netrc(self, mock_accessible):
         utils.setup_cli(self)
         self.setup_cli_params({})
 
-        policy, variables = utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string()
         utils.load_policy_from_string(self, policy)
 
         for variable in variables:
             utils.assert_set_and_get(self, variable)
 
+    '''
+    Validate variable operation with netrc
+    '''
     @integration_test()
     def test_secret_netrc(self, mock_accessible):
         """

@@ -14,14 +14,9 @@ RUN apt-get update && \
                     python3-pip \
                     gnome-keyring \
                     dbus-x11
+
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
-
-# Workaround for https://bugs.launchpad.net/usd-importer/+bug/1794041
-RUN pip3 install --upgrade keyrings.alt
-
-# Add Kering dbus support
-RUN pip3 install keyring_jeepney
 
 COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
@@ -30,4 +25,4 @@ COPY . $INSTALL_DIR
 
 COPY ./test/configure_dbus.sh /configure_dbus.sh
 
-ENTRYPOINT ["./test/dbus.sh"]
+ENTRYPOINT ["./test/configure_dbus.sh"]

@@ -1,4 +1,3 @@
-
 """
 Singleton Base Class
 
@@ -7,10 +6,11 @@ We inherit from the Single Base Class when we need a resource to be created only
 """
 class Singleton(type):
     """
-    Metaclass to create sindelton classes The usage should be as follows:
+    Metaclass to create Singleton classes The usage should be as follows:
     class A(metaclass = Singleton)
     """
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)

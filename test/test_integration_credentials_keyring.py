@@ -56,9 +56,8 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
-
     @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
+    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring(self):
         shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
                     self.environment.path_provider.conjurrc_path)
         output = self.invoke_cli(self.cli_auth_params,
@@ -69,10 +68,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs a command in 
     insecure mode, then they will succeed
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
-    def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes(self, mock_input):
+    def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes_keyring(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
                         ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
                          self.client_params.account])
@@ -85,10 +83,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates a user can log in with a password, instead of their API key
     To do this, we perform the following:
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='yes')
-    def test_https_credentials_created_with_all_parameters_given(self, mock_input):
+    def test_https_credentials_user_can_login_successfully_when_another_user_is_already_logged_in_keyring(self, mock_input):
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
 
@@ -123,12 +120,33 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.validate_credentials(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
 
     '''
+    Validate that login create valid credentials
+    '''
+    @integration_test()
+    @patch('builtins.input', return_value='yes')
+    def test_https_credentials_created_with_all_parameters_given_keyring(self, mock_input):
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
+        utils.get_credentials()
+        self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
+
+    '''
+    Validate correct message when try to logout already logout user
+    '''
+    @integration_test(True)
+    def test_no_credentials_and_logout_returns_successful_logout_message_keyring(self):
+
+        utils.delete_credentials()
+        logout = self.invoke_cli(self.cli_auth_params,
+                                 ['logout'], exit_code=1)
+        self.assertIn("You are already logged out", logout.strip())
+
+    '''
     Validates a wrong username will raise Unauthorized error
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='somebaduser')
-    def test_https_credentials_raises_error_with_wrong_user(self, mock_pass):
+    def test_https_credentials_raises_error_with_wrong_user_keyring(self, mock_pass):
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
             output = self.invoke_cli(self.cli_auth_params,
                                      ['login'], exit_code=1)
@@ -138,11 +156,10 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     '''
     Validates a wrong password will raise Unauthorized error
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='admin')
     @patch('getpass.getpass', return_value='somewrongpass')
-    def test_https_credentials_with_wrong_password(self, mock_pass, mock_input):
+    def test_https_credentials_with_wrong_password_keyring(self, mock_pass, mock_input):
 
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login'], exit_code=1)
@@ -153,11 +170,10 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates that when the user hasn't logged in and attempts 
     to run a command, they will be prompted to login
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='someaccount')
     @patch('getpass.getpass', return_value='somepass')
-    def test_user_runs_list_without_credentials_prompts_user_to_login(self, mock_pass, mock_input):
+    def test_user_runs_list_without_credentials_prompts_user_to_login_keyring(self, mock_pass, mock_input):
         # Set this environment variable to prompt the user to login
         os.environ["TEST_ENV"] = "False"
         list_attempt = self.invoke_cli(self.cli_auth_params,
@@ -165,9 +181,12 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertRegex(list_attempt.strip(), "Unable to authenticate with Conjur.")
         os.environ["TEST_ENV"] = "True"
 
+    '''
+    Validate interactive login 
+    '''
     @integration_test()
     @patch('builtins.input', return_value='admin')
-    def test_https_credentials_is_created_when_provided_user_api_key(self, mock_pass):
+    def test_https_credentials_is_created_when_provided_user_api_key_keyring(self, mock_pass):
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
             output = self.invoke_cli(self.cli_auth_params,
                                      ['login'])
@@ -180,10 +199,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     '''
     Validates interactively provided params create credentials
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='admin')
-    def test_https_credentials_is_created_with_all_parameters_given_interactively(self, mock_pass):
+    def test_https_credentials_is_created_with_all_parameters_given_interactively_keyring(self, mock_pass):
         with patch('getpass.getpass', return_value=self.client_params.env_api_key):
             output = self.invoke_cli(self.cli_auth_params, ['login'])
 
@@ -198,9 +216,8 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     There is currently no way to fetch a host's API key so this is a work around for the 
     purposes of this test
     '''
-
     @integration_test()
-    def test_https_credentials_is_created_with_host(self):
+    def test_https_credentials_is_created_with_host_keyring(self):
         # Setup for fetching the API key of a host. To fetch we need to login
         credentials = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
         utils.save_credentials(credentials)
@@ -224,16 +241,15 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("Successfully logged in to Conjur", output.strip())
 
     @integration_test()
-    def test_provider_can_return_keystore_provider(self):
+    def test_provider_can_return_keystore_provider_keyring(self):
         cred_store = utils.create_cred_store()
         self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
 
     '''
     Validates logout doesn't remove another entry not associated with Cyberark
     '''
-
     @integration_test(True)
-    def test_https_credentials_does_not_remove_irrelevant_entry(self):
+    def test_https_credentials_does_not_remove_irrelevant_entry_keyring(self):
         creds = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
         utils.save_credentials(creds)
 
@@ -246,9 +262,11 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         assert cred_store.is_exists("somemachine")
         assert not cred_store.is_exists(self.client_params.hostname)
 
+    '''
+    Validate logout after logout flow
+    '''
     @integration_test(True)
-    def test_https_logout_twice_returns_could_not_logout_message(self):
-
+    def test_https_logout_twice_returns_could_not_logout_message_keyring(self):
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
 
@@ -260,12 +278,12 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
 
         self.assertIn("Failed to log out. You are already logged out", unsuccessful_logout.strip())
         assert not utils.is_credentials_exist()
+
     '''
     Validates when a user can logout successfully
     '''
-
     @integration_test(True)
-    def test_https_logout_successful(self):
+    def test_https_logout_successful_keyring(self):
 
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
@@ -279,17 +297,19 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
-
     @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
+    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring(self):
         shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
                     self.environment.path_provider.conjurrc_path)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
 
+    '''
+    Validate logout flow
+    '''
     @integration_test(True)
-    def test_https_logout_successful(self):
+    def test_https_logout_successful_keyring(self):
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
@@ -303,17 +323,19 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
-
     @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error(self):
+    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring(self):
         shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
                     self.environment.path_provider.conjurrc_path)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
 
+    '''
+    Validate that logout indeed remove credentials and terminate access to conjur
+    '''
     @integration_test()
-    def test_simple_login(self):
+    def test_cli_simple_login_logout_flow_keyring(self):
         utils.setup_cli(self)
         creds = utils.get_credentials()
         assert creds.machine == self.client_params.hostname
@@ -321,24 +343,33 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         assert not utils.is_credentials_exist(creds.machine)
         self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
 
+    '''
+    Validate basic policy flow with keyring
+    '''
     @integration_test(True)
-    def test_https_can_load_policy(self):
+    def test_https_can_load_policy_keyring(self):
         self.setup_cli_params({})
         utils.setup_cli(self)
-        policy, variables = utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string()
         utils.load_policy_from_string(self, policy)
 
         for variable in variables:
             utils.assert_set_and_get(self, variable)
 
+    '''
+    Validate access is blocked when keyring disabled after login
+    '''
     @integration_test(True)
-    def test_keyring_locked_in_the_middle(self):
+    def test_keyring_locked_after_login_will_raise_error_keyring(self):
         utils.setup_cli(self)
         with patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False):
-            self.invoke_cli(self.cli_auth_params, ['logout'], exit_code=1)
+            self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
 
+    '''
+    Validate variable operation with keyring
+    '''
     @integration_test()
-    def test_secret(self):
+    def test_secret_keyring(self):
         """
         Note about version tests, the Conjur server only keeps a certain number of versions.
         With each run of the integration tests, version tests are resetting variable values

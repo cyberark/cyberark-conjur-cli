@@ -46,7 +46,7 @@ class CredentialStoreFactory(metaclass=Singleton):
     def _log_netrc_warning(self):
         """
         Method logging the fact we are using insecure CredentialProvider.
-        This will write to log for every cli run
+        This will be displayed to the user as a warning on every CLI run
         """
         if self.first_time_log_insecure_store_warning:
             logging.warning("No supported keystore found! Saving credentials in "

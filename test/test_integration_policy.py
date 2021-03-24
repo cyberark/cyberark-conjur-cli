@@ -43,7 +43,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_load_policy(self):
         self.setup_cli_params({})
 
-        policy, variables = utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string()
         utils.load_policy_from_string(self, policy)
 
         for variable in variables:
@@ -170,7 +170,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_replace_policy(self):
         self.setup_cli_params({})
 
-        orig_policy, old_variables = utils.generate_policy_string(self)
+        orig_policy, old_variables = utils.generate_policy_string()
 
         file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
         with open(file_name, 'w+b') as temp_policy_file:
@@ -179,7 +179,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
             utils.load_policy(self, temp_policy_file.name)
 
-        replacement_policy, new_variables = utils.generate_policy_string(self)
+        replacement_policy, new_variables = utils.generate_policy_string()
         utils.replace_policy_from_string(self, replacement_policy)
 
         for new_variable in new_variables:
@@ -234,7 +234,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_update_policy(self):
         self.setup_cli_params({})
 
-        policy, variables = utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string()
         utils.update_policy_from_string(self, policy)
 
         for variable in variables:
@@ -316,3 +316,4 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         response = json.loads(output)
         self.assertIn(f'{self.client_params.account}', response.get('account'))
         self.assertIn('admin', response.get('username'))
+

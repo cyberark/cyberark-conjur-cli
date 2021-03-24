@@ -93,29 +93,22 @@ def print_instead_of_raise_error(self, variable_id, error_message_regex):
 
 # *************** POLICY ***************
 
-def generate_policy_string(self):
+def generate_policy_string():
     variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
     variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
     variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
 
-    # this policy is purposefully not indented because
-    # the """ formatter is indentation sensitive and
-    # policy should start at the far left of the line
-    policy = \
-"""
-- !variable
-  id: {variable_1}
-- !variable
-  id: {variable_2}
-- !variable
-  id: {variable_3}
-"""
+    # We purposefully build this policy like this
+    # this is due to the fact inteliJ auto - ident
+    # keep changing the string, in case we use it as one string
+    policy = "        - !variable\n"
+    policy += f"          id: {variable_1}\n"
+    policy += "        - !variable\n"
+    policy += f"          id: {variable_2}\n"
+    policy += "        - !variable\n"
+    policy += f"          id: {variable_3}"
 
-    dynamic_policy = policy.format(variable_1=variable_1,
-                                   variable_2=variable_2,
-                                   variable_3=variable_3)
-
-    return (dynamic_policy, [variable_1, variable_2, variable_3])
+    return policy, [variable_1, variable_2, variable_3]
 
 
 def load_policy(self, policy_path, exit_code=0):
@@ -184,7 +177,7 @@ def get_credentials() -> CredentialsData:
         conjurrc = ConjurrcData.load_from_file()
         return cred_store.load(conjurrc.conjur_url)
     except:
-        print("unable to fetch credentials")
+        print("Unable to fetch credentials")
 
 
 def is_credentials_exist(conjur_url=None) -> bool:

@@ -43,8 +43,10 @@ docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
 
+# Hint: '--privileged' is added here otherwise we will get operation
+# not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test bash #Hint: Otherwise we get operation not permitted
+  docker-compose exec --privileged test bash
   exit
 fi
 
