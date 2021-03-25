@@ -13,30 +13,30 @@ pipeline {
   }
 
    stages {
-//     stage('Linting') {
-//       parallel {
-//         stage('Code') {
-//           steps { sh './bin/test_linting' }
-//         }
-//
-//         stage('Changelog') {
-//           steps { sh './bin/test_changelog' }
-//         }
-//       }
-//     }
-//
-//     stage('Unit tests') {
-//       steps {
-//         sh './bin/test_unit'
-//       }
-//       post {
-//         always {
-//           junit 'output/**/*.xml'
-//           cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-//           ccCoverage("coverage.py")
-//         }
-//       }
-//     }
+    stage('Linting') {
+      parallel {
+        stage('Code') {
+          steps { sh './bin/test_linting' }
+        }
+
+        stage('Changelog') {
+          steps { sh './bin/test_changelog' }
+        }
+      }
+    }
+
+    stage('Unit tests') {
+      steps {
+        sh './bin/test_unit'
+      }
+      post {
+        always {
+          junit 'output/**/*.xml'
+          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+          ccCoverage("coverage.py")
+        }
+      }
+    }
 
     stage('Integration tests') {
       steps {

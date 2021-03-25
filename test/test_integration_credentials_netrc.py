@@ -58,7 +58,15 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
             netrc_test.write(f"login {login}\n")
             netrc_test.write(f"password {password}\n")
 
-    # *************** LOGIN CREDENTIALS TESTS ***************
+    # *************** LOGIN CREDENTIALS TESTS ß***************
+    '''
+    Validate the right CredentialStore selected
+    '''
+    @integration_test()
+    def test_provider_can_return_file_provider_netrc(self, mocks):
+        utils.setup_cli(self)
+        cred_store = utils.create_cred_store()
+        self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
 
     '''
     Validates that when a user already logged in and reattempts and fails, the previous successful session is not removed
@@ -316,12 +324,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
 
         self.validate_netrc(f"{self.client_params.hostname}", "host/somehost", extract_api_key_from_message)
         self.assertIn("Successfully logged in to Conjur", output.strip())
-
-    @integration_test()
-    def test_provider_can_return_file_provider_netrc(self, mocks):
-        utils.setup_cli(self)
-        cred_store = utils.create_cred_store()
-        self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
 
     '''
     Validates logout doesn't remove an irrelevant entry

@@ -53,6 +53,14 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     # *************** LOGIN CREDENTIALS TESTS ***************
 
     '''
+    Validate the right CredentialStore selected
+    '''
+    @integration_test()
+    def test_provider_can_return_keystore_provider_keyring(self):
+        cred_store = utils.create_cred_store()
+        self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
+
+    '''
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
     '''
@@ -238,11 +246,6 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
 
         self.validate_credentials(f"{self.client_params.hostname}", "host/somehost", extract_api_key_from_message)
         self.assertIn("Successfully logged in to Conjur", output.strip())
-
-    @integration_test()
-    def test_provider_can_return_keystore_provider_keyring(self):
-        cred_store = utils.create_cred_store()
-        self.assertEquals(type(cred_store), type(FileExistsError()))
 
     '''
     Validates logout doesn't remove an irrelevant entry
