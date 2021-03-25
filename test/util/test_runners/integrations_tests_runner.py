@@ -118,7 +118,7 @@ class TestRunner:  # pragma: no cover
 
         path_provider = TestRunnerPathProvider.getInstance()
 
-        credential_store = CredentialStoreFactory().create_credential_store()[0]
+        credential_store = CredentialStoreFactory.create_credential_store()[0]
         cli.Cli.handle_login_logic(credential_store, self.runner_args.login, self.runner_args.password)
         credentials = credential_store.load(self.runner_args.hostname)
         FileCredentialsProvider().save(credentials)

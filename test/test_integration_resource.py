@@ -69,7 +69,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         self.invoke_cli(self.cli_auth_params,
                         ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
-        credential_store,_ = CredentialStoreFactory().create_credential_store()
+        credential_store,_ = CredentialStoreFactory.create_credential_store()
         loaded_conjurrc = ConjurrcData.load_from_file()
         old_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
@@ -78,7 +78,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         assert old_api_key != extract_api_key_from_message, "the API keys are the same!"
 
-        credential_store, _ = CredentialStoreFactory().create_credential_store()
+        credential_store, _ = CredentialStoreFactory.create_credential_store()
         new_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
 
         assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"

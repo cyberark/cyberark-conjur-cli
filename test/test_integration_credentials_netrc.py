@@ -58,7 +58,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
             netrc_test.write(f"login {login}\n")
             netrc_test.write(f"password {password}\n")
 
-    # *************** LOGIN CREDENTIALS TESTS ß***************
+    # *************** LOGIN CREDENTIALS TESTS ***************
     '''
     Validate the right CredentialStore selected
     '''

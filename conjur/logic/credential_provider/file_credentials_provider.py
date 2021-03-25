@@ -154,14 +154,15 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
             netrc_file.write(ret.replace('\t', ''))
 
-    def _log_netrc_warning(self):
+    @classmethod
+    def _log_netrc_warning(cls):
         """
         Method logging an insecure credential provider (netrc) will be used.
         This will be displayed to the user as a warning on every CLI run
         """
-        if FileCredentialsProvider.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
+        if cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
             # pylint: disable=logging-fstring-interpolation
             logging.warning("No supported keystore found! Saving credentials in "
                             f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
                             "after you have finished using the CLI")
-            FileCredentialsProvider.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
+            cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
