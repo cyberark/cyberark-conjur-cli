@@ -242,7 +242,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     @integration_test()
     def test_provider_can_return_keystore_provider_keyring(self):
         cred_store = utils.create_cred_store()
-        self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
+        self.assertEquals(type(cred_store), type(FileExistsError()))
 
     '''
     Validates logout doesn't remove an irrelevant entry
