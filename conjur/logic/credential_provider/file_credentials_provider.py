@@ -19,6 +19,7 @@ from conjur.data_object import CredentialsData
 from conjur.errors import CredentialRetrievalException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
+
 # pylint: disable=logging-fstring-interpolation, line-too-long
 class FileCredentialsProvider(CredentialsStoreInterface):
     """
@@ -26,6 +27,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
     This class holds logic when credentials are kept in the netrc
     """
+    FIRST_TIME_LOG_INSECURE_STORE_WARNING = True  # Static
 
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
         self.netrc_path = netrc_path
@@ -35,6 +37,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         Method that writes user data to a netrc file
         and updates permissions on the file
         """
+        self._log_netrc_warning()
         logging.debug(f"Attempting to write credentials to '{DEFAULT_NETRC_FILE}'...")
         # TDOO use private function
         if os.path.exists(self.netrc_path):
@@ -150,3 +153,15 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                 ret += entry + '\n'
 
             netrc_file.write(ret.replace('\t', ''))
+
+    def _log_netrc_warning(self):
+        """
+        Method logging an insecure credential provider (netrc) will be used.
+        This will be displayed to the user as a warning on every CLI run
+        """
+        if FileCredentialsProvider.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
+            # pylint: disable=logging-fstring-interpolation
+            logging.warning("No supported keystore found! Saving credentials in "
+                            f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
+                            "after you have finished using the CLI")
+            FileCredentialsProvider.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False

@@ -26,9 +26,6 @@ class CredentialStoreFactory(metaclass=Singleton):
     This class follows the Factory pattern to determine which credential store to choose
     """
 
-    def __init__(self):
-        self.first_time_log_insecure_store_warning = True
-
     def create_credential_store(self) -> CredentialsStoreInterface:
         """
         Factory method for determining which store to use
@@ -40,17 +37,4 @@ class CredentialStoreFactory(metaclass=Singleton):
                 # pylint: disable=line-too-long
                 return KeystoreCredentialsProvider(), f'{KeystoreAdapter.get_keyring_name()} credential store'
 
-        self._log_netrc_warning()
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE
-
-    def _log_netrc_warning(self):
-        """
-        Method logging an insecure credential provider (netrc) will be used.
-        This will be displayed to the user as a warning on every CLI run
-        """
-        if self.first_time_log_insecure_store_warning:
-            # pylint: disable=logging-fstring-interpolation
-            logging.warning("No supported keystore found! Saving credentials in "
-                            f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                            "after you have finished using the CLI")
-        self.first_time_log_insecure_store_warning = False

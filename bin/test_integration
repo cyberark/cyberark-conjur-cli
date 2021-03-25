@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 cleanup() {
   echo "Cleaning up..."
@@ -53,6 +53,5 @@ fi
 docker-compose run \
   --rm \
   --no-deps \
-  --privileged
   test \
-  nose2 -v -X --config integration_test.cfg -A 'integration' $@
+  /bin/sh -c " /dbus.sh" $@

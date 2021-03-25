@@ -64,6 +64,7 @@ services:
       - conjur-https
 
   test:
+    privileged: true
     build:
       context: .
       dockerfile: Dockerfile.test
