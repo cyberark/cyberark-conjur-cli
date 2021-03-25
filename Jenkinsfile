@@ -12,7 +12,7 @@ pipeline {
     cron(getDailyCronString())
   }
 
-//   stages {
+   stages {
 //     stage('Linting') {
 //       parallel {
 //         stage('Code') {
