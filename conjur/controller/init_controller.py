@@ -53,8 +53,8 @@ class InitController:
         self.get_account_info(self.conjurrc_data)
         self.write_conjurrc()
 
-        sys.stdout.write("Configuration was initialized successfully.\n")
-        sys.stdout.write("To begin using the Conjur CLI, log in to the Conjur server by "
+        sys.stdout.write("Successfully initialized the Conjur CLI.\n")
+        sys.stdout.write("To start using the Conjur CLI, log in to the Conjur server by "
                          "running `conjur login`\n")
 
     def get_server_certificate(self):
@@ -89,10 +89,10 @@ class InitController:
         fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
-        sys.stdout.write("\nTo verify this certificate, it is recommended to run the following "
+        sys.stdout.write("\nTo verify this certificate, we recommend running the following "
                          "command on the Conjur server:\n"
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
-        trust_certificate = input("Trust this certificate? (Default=no): ").strip()
+        trust_certificate = input("Trust this certificate? yes/no (Default: no): ").strip()
         if trust_certificate.lower() not in VALID_CONFIRMATIONS:
             raise RuntimeError("You decided not to trust the certificate")
 
@@ -159,6 +159,6 @@ class InitController:
         Method to handle user overwriting logic
         """
         force_overwrite = input(f"File {config_file} exists. "
-                                f"Overwrite? (Default=yes): ").strip()
+                                f"Overwrite? yes/no (Default: yes): ").strip()
         if force_overwrite != '' and force_overwrite.lower() not in VALID_CONFIRMATIONS:
             raise Exception(f"Not overwriting {config_file}")

@@ -23,7 +23,7 @@ from conjur.api import SSLClient
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
-from conjur.util.util_functions import determine_status_code_specific_error_messages
+from conjur.util.util_functions import determine_status_code_specific_error_messages, file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_CONFIG_FILE
@@ -706,34 +706,37 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
         credential_provider, _ = CredentialStoreFactory.create_credential_store()
         # pylint: disable=no-else-return,line-too-long
+        if resource == 'logout':
+            Cli.handle_logout_logic(credential_provider, args.ssl_verify)
+            sys.stdout.write("Successfully logged out from Conjur\n")
+            return
+
         if resource == 'init':
             Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             return
-        elif resource == 'login':
-            Cli.handle_login_logic(credential_provider, args.identifier, args.password, args.ssl_verify)
-            return
-        elif resource == 'logout':
-            Cli.handle_logout_logic(credential_provider, args.ssl_verify)
-            sys.stdout.write("Successfully logged out from Conjur\n")
-            return
 
         # Needed for unit tests so that they do not require configuring
-        if os.getenv('TEST_ENV') is None or os.getenv('TEST_ENV') == 'False':
-            # If the user runs a command without configuring the CLI,
-            # we request they do so before executing their request
-            # pylint: disable=line-too-long
-            if not os.path.exists(DEFAULT_CONFIG_FILE) or os.path.getsize(DEFAULT_CONFIG_FILE) == 0:
-                sys.stdout.write("Error: The Conjur CLI has not been initialized\n")
-                Cli.handle_init_logic()
+        is_testing_env = os.getenv('TEST_ENV') in ('true', 'True')
 
-            # If the user runs a command without logging into the CLI,
-            # we request they do so before executing their request
-            loaded_conjurrc = ConjurrcData.load_from_file()
-            if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-                sys.stdout.write("Error: You have not logged in\n")
-                Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
+        # If the user runs a command without configuring the CLI,
+        # we request they do so before executing their request
+        # pylint: disable=line-too-long
+        if not is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
+            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it.\n")
+            Cli.handle_init_logic()
+
+        if resource == 'login':
+            Cli.handle_login_logic(credential_provider, args.identifier, args.password, args.ssl_verify)
+            return
+
+        # If the user runs a command without logging into the CLI,
+        # we request they do so before executing their request
+        loaded_conjurrc = ConjurrcData.load_from_file()
+        if not is_testing_env and not credential_provider.is_exists(loaded_conjurrc.conjur_url):
+            sys.stdout.write("To start using the CLI, log in to Conjur.\n")
+            Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 

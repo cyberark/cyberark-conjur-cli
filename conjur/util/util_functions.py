@@ -6,6 +6,7 @@ Utils module
 This module holds the common logic across the codebase
 """
 import logging
+import os
 
 
 def get_insecure_warning():
@@ -19,3 +20,7 @@ def determine_status_code_specific_error_messages(server_error):
         return "Failed to log in to Conjur. Unable to authenticate with Conjur. " \
               f"Reason: {server_error}. Check your credentials and try again.\n"
     return f"Failed to execute command. Reason: {server_error}\n"
+
+
+def file_is_missing_or_empty(file):
+    return not os.path.exists(file) or os.path.getsize(file) == 0
