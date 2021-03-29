@@ -306,7 +306,6 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
             Cli().run_action('variable', mock_obj)
             mock_handle_init.assert_called_once()
-    test_run_action_runs_init_if_conjurrc_not_found.someidentifier=True
 
     '''
     Verifies that if a user didn't run login, they are prompted to do so and that after they login,

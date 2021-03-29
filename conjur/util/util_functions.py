@@ -23,5 +23,5 @@ def determine_status_code_specific_error_messages(server_error):
 
 
 def file_is_missing_or_empty(file):
-    """ Returns true if the file argument exists or the file size is zero; false otherwise """
+    """ Returns true if the file corresponding to the file argument exists or the file size is zero; false otherwise """
     return not os.path.exists(file) or os.path.getsize(file) == 0

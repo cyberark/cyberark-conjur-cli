@@ -23,7 +23,8 @@ from conjur.api import SSLClient
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
-from conjur.util.util_functions import determine_status_code_specific_error_messages, file_is_missing_or_empty
+from conjur.util.util_functions import determine_status_code_specific_error_messages,\
+    file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_CONFIG_FILE
