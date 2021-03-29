@@ -68,6 +68,7 @@ and a certificate and its fingerprint is returned
 class SSLServiceTest(unittest.TestCase):
     ssl_service = SSLClient()
 
+    @unittest.skip('Github certificate fingerpring is not static')
     def test_service_gets_and_returns_fingerprint_and_certificate(self):
         url = {'hostname': 'github.com', 'port': 443}
         url = SimpleNamespace(**url)

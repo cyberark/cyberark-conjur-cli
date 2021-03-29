@@ -11,7 +11,7 @@ trap 'echo "ERROR: Test script encountered an error! logs in cleanup.log"; docke
 trap 'cleanup' EXIT
 cleanup
 
-echo "Building API containers..."
+echo "Building containers..."
 docker-compose build
 
 echo "Starting test env..."
@@ -19,6 +19,7 @@ docker-compose up -d --no-deps test
 
 rm -rf $CURRENT_DIR/output/*
 
-docker-compose exec -T\
+docker-compose exec -T \
+  --privileged \
   test \
-  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config nose_test.cfg -A '\\!integration'"
+  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config unit_test.cfg -A '!integration'"
