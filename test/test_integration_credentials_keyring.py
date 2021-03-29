@@ -53,13 +53,16 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     # *************** LOGIN CREDENTIALS TESTS ***************
 
     '''
-    Validate the right CredentialStore selected
+    Validate the correct CredentialStore selected. This test is important 
+    because it determines if we are using the correct credential provider 
+    for these tests (keyring)
     '''
     @integration_test()
     def test_provider_can_return_keystore_provider_keyring(self):
         cred_store = utils.create_cred_store()
         self.assertEquals(type(cred_store), type(KeystoreCredentialsProvider()))
 
+    test_provider_can_return_keystore_provider_keyring.tester=True
     '''
     Validates that if a user configures the CLI in insecure mode and runs the command not in 
     insecure mode, then they will fail
@@ -71,6 +74,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
+        self.assertEquals(utils.is_netrc_exists(), False)
+
+    test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring.tester=True
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 
@@ -86,6 +92,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
         self.assertIn('Successfully logged in to Conjur', output)
+        self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validates a user can log in with a password, instead of their API key

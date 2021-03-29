@@ -9,6 +9,8 @@ library and functionality should we need to do so in the future.
 """
 
 # Third party
+import logging
+
 import keyring
 
 # Internals
@@ -69,11 +71,12 @@ class KeystoreAdapter:
         """
         Method to check if the keyring is accessible
         """
-        # TODO investigate other errors that would make a keyring not accessible
+        # TODO investigate other errors that would make a keyring inaccessible
         try:
             # Send a dummy request to test if the keyring is accessible
-            keyring.get_password('test-system', 'test-unlock')
-        except keyring.errors.KeyringLocked:
+            keyring.get_password('test-system', 'test-accessibility')
+        except keyring.errors.KeyringError as keyring_error:
+            logging.debug(keyring_error)
             return False
 
         return True

@@ -60,7 +60,9 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
 
     # *************** LOGIN CREDENTIALS TESTS ***************
     '''
-    Validate the right CredentialStore selected
+    Validate the correct CredentialStore selected. This test is important 
+    because it determines if we are using the correct credential provider 
+    for these tests (netrc)
     '''
     @integration_test()
     def test_provider_can_return_file_provider_netrc(self, mocks):

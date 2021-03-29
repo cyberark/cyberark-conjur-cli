@@ -54,4 +54,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  /bin/sh -c " /dbus.sh" $@
+  "nose2 -v -X --config integration_test.cfg -A 'integration'"
