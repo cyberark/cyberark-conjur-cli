@@ -733,10 +733,12 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
         # If the user runs a command without logging into the CLI,
         # we request they do so before executing their request
-        loaded_conjurrc = ConjurrcData.load_from_file()
-        if not is_testing_env and not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-            sys.stdout.write("To start using the CLI, log in to Conjur.\n")
-            Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
+
+        if not is_testing_env:
+            loaded_conjurrc = ConjurrcData.load_from_file()
+            if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
+                sys.stdout.write("To start using the CLI, log in to Conjur.\n")
+                Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 

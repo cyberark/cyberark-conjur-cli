@@ -289,6 +289,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     Verifies that if a user didn't run init, they are prompted to do so and that after they initialize,
     a command will be run to completion. In this case, variable.
     '''
+    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
     @patch.object(Cli, 'handle_init_logic')
     @patch.object(Cli, 'handle_variable_logic')
     @patch('os.path.exists', side_effect=[False, True])
@@ -296,7 +297,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.getsize', side_effect=[1, 1])
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init):
+    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv,    mock_path_exists, mock_variable_init, mock_handle_init, mock_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -305,6 +306,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
             Cli().run_action('variable', mock_obj)
             mock_handle_init.assert_called_once()
+    test_run_action_runs_init_if_conjurrc_not_found.someidentifier=True
 
     '''
     Verifies that if a user didn't run login, they are prompted to do so and that after they login,
@@ -328,13 +330,14 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             Cli().run_action('variable', mock_obj)
             mock_handle_login.assert_called_once()
 
+    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
     @patch.object(Cli, 'handle_user_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_user_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_user):
+    def test_run_action_runs_user_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_user, mock_is_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -344,13 +347,14 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             Cli().run_action('user', mock_obj)
             mock_handle_user.assert_called_once()
 
+    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
     @patch.object(Cli, 'handle_host_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
     @patch('keyring.get_keyring')
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
-    def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_host):
+    def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_host, mock_is_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
