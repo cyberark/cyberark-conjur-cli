@@ -5,14 +5,24 @@ SRC_DIRS=( "./conjur"
 
 DISABLED_ERRORS="fixme"
 
+cleanup() {
+  echo "Cleaning up..."
+  docker-compose logs test
+  docker-compose rm --stop --force
+}
+trap 'cleanup' EXIT
+
 echo "Building API container..."
 docker-compose build
+
+docker-compose up -d --no-deps test
 
 for src_dir in "${SRC_DIRS[@]}"; do
   echo "Checking linting in $src_dir..."
   set -x
-  docker-compose run --rm \
-    --no-deps \
+  docker-compose exec \
+    -e src_dir \
+    -e DISABLED_ERRORS \
     test \
     pylint -r n -f parseable --disable="$DISABLED_ERRORS" "$src_dir"
 done
