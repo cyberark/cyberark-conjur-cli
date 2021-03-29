@@ -46,6 +46,7 @@ pipeline {
       post {
         always {
           junit 'output/**/*.xml'
+          archiveArtifacts artifacts: 'cleanup.log', allowEmptyArchive: true
         }
       }
     }

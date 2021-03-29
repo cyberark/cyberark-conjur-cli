@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Configuring DBUS environment"
 eval "$(dbus-launch --sh-syntax)"
 ## make bus keyring dirs
 mkdir -p ~/.cache

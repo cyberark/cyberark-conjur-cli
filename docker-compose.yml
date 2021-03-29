@@ -64,11 +64,12 @@ services:
       - conjur-https
 
   test:
+    entrypoint: [ "bash", "-c" ]
+    command: [ "sleep 999d" ]
     privileged: true
     build:
       context: .
       dockerfile: Dockerfile.test
-    command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
       PYTHON_KEYRING_BACKEND: Null

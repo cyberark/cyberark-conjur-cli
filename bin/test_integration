@@ -1,8 +1,8 @@
 #!/bin/bash -ex
 
 cleanup() {
-  echo "Cleaning up..."
-  docker-compose rm --stop --force -v
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
 }
 
 if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
@@ -10,7 +10,7 @@ if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
   shift
 fi
 
-trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
@@ -46,12 +46,10 @@ rm -rf $CURRENT_DIR/output/*
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test bash
+  docker-compose exec test bash -c '. test/configure_dbus.sh; bash'
   exit
 fi
 
-docker-compose run \
-  --rm \
-  --no-deps \
+docker-compose exec \
   test \
-  "nose2 -v -X --config integration_test.cfg -A 'integration'"
+  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config integration_test.cfg -A 'integration'"
