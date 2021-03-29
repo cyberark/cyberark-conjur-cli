@@ -17,4 +17,5 @@ docker run --rm \
            -t \
            -e TEST_ENV=true \
            -v "$(pwd):/opt/conjur-api-python3" \
+           --privileged \
            conjur-api-python3-test nose2 -v -X -A '!integration' --config unit_test.cfg --with-coverage $@
