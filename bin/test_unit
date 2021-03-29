@@ -1,21 +1,24 @@
 #!/bin/bash -ex
 
-CURRENT_DIR=$(pwd)
-
 rm -rf coverage.xml
 
-if [[ "$1" == "-l" ]]; then
-  shift
-  nose2 -v -X -A '!integration' --with-coverage $@
-  exit 0
-fi
+cleanup() {
+  echo "Cleaning up..."
+  docker-compose rm --stop --force
+}
 
-$CURRENT_DIR/bin/build_test_container
+trap 'echo "ERROR: Test script encountered an error! logs in cleanup.log"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'cleanup' EXIT
+cleanup
+
+echo "Building API containers..."
+docker-compose build
+
+echo "Starting test env..."
+docker-compose up -d --no-deps test
 
 rm -rf $CURRENT_DIR/output/*
-docker run --rm \
-           -t \
-           -e TEST_ENV=true \
-           -v "$(pwd):/opt/conjur-api-python3" \
-           --privileged \
-           conjur-api-python3-test nose2 -v -X -A '!integration' --config unit_test.cfg --with-coverage $@
+
+docker-compose exec -T\
+  test \
+  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config nose_test.cfg -A '\\!integration'"

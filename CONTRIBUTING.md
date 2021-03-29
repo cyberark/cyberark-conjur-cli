@@ -121,10 +121,10 @@ my-integration-test.someidentifier=True
 1. Add the identifier to the following command:
 
 ```
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A '<identifier>' $@
+root@123456:/opt/conjur-api-python3# nose2 -v -X --config nose_test.cfg -A '<identifier>' $@
 
 ## Example
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A 'someidentifier' $@
+root@123456:/opt/conjur-api-python3# nose2 -v -X --config nose_test.cfg -A 'someidentifier' $@
 ```
 
 1. You should see that only that specific test is run. Every change made locally can be seen in the container so you

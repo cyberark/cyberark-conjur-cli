@@ -134,7 +134,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
             self.invoke_cli(self.cli_auth_params,
                             ['user', 'rotate-api-key', '-i'], exit_code=1)
         self.assertIn('Error argument -i/--id', self.capture_stream.getvalue())
-
+    @integration_test()
     def test_logged_in_user_rotate_api_key_with_their_user_as_flag_returns_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['user', 'rotate-api-key', '-i', 'admin'])

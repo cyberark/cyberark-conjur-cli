@@ -52,4 +52,4 @@ fi
 
 docker-compose exec \
   test \
-  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config integration_test.cfg -A 'integration'"
+  bash -c ". test/configure_dbus.sh; nose2 -vvv -X --config nose_test.cfg -A 'integration'"
