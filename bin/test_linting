@@ -20,7 +20,7 @@ docker-compose up -d --no-deps test
 for src_dir in "${SRC_DIRS[@]}"; do
   echo "Checking linting in $src_dir..."
   set -x
-  docker-compose exec \
+  docker-compose exec -T \
     test \
     pylint -r n -f parseable --disable="$DISABLED_ERRORS" "$src_dir"
 done
