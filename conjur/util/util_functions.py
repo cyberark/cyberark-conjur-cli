@@ -21,7 +21,6 @@ def determine_status_code_specific_error_messages(server_error):
               f"Reason: {server_error}. Check your credentials and try again.\n"
     return f"Failed to execute command. Reason: {server_error}\n"
 
-
 def file_is_missing_or_empty(file):
     """
     Returns true if the file corresponding to the file argument

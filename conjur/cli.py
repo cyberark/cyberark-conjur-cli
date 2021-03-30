@@ -27,7 +27,7 @@ from conjur.util.util_functions import determine_status_code_specific_error_mess
     file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
-from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, LOGIN_IS_REQUIRED
 from conjur.controller import HostController, ListController, LogoutController, InitController
 from conjur.controller import LoginController, PolicyController, UserController, VariableController
 from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, \
@@ -734,11 +734,10 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
 
         # If the user runs a command without logging into the CLI,
         # we request they do so before executing their request
-
         if not is_testing_env:
             loaded_conjurrc = ConjurrcData.load_from_file()
             if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-                sys.stdout.write("To start using the CLI, log in to Conjur.\n")
+                sys.stdout.write("%s\n" % LOGIN_IS_REQUIRED)
                 Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)

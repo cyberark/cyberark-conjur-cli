@@ -297,7 +297,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
     @patch('os.path.getsize', side_effect=[1, 1])
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv,    mock_path_exists, mock_variable_init, mock_handle_init, mock_exists):
+    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init, mock_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
