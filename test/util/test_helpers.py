@@ -7,7 +7,7 @@ from unittest.mock import patch
 # *************************************************
 # *********** INTEGRATION TESTS HELPERS ***********
 # *************************************************
-from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_NETRC_FILE
 from conjur.data_object import ConjurrcData, CredentialsData
 from conjur.logic.credential_provider import CredentialStoreFactory
 
@@ -181,6 +181,11 @@ def delete_credentials():
 def save_credentials(credentials):
     cred_store = create_cred_store()
     cred_store.save(credentials)
+
+def is_netrc_exists():
+    if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
+        return False
+    return True
 
 # *************************************************
 # *************** UNIT TESTS HELPERS **************

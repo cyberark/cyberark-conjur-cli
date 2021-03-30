@@ -53,7 +53,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     # *************** LOGIN CREDENTIALS TESTS ***************
 
     '''
-    Validate the right CredentialStore selected
+    Validate the correct CredentialStore selected. This test is important 
+    because it determines if we are using the correct credential provider 
+    for these tests (keyring)
     '''
     @integration_test()
     def test_provider_can_return_keystore_provider_keyring(self):
@@ -71,6 +73,9 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
+        self.assertEquals(utils.is_netrc_exists(), False)
+
+    test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring.tester=True
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 
@@ -86,6 +91,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
         self.assertIn('Successfully logged in to Conjur', output)
+        self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validates a user can log in with a password, instead of their API key
@@ -126,6 +132,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("Successfully logged in to Conjur", output.strip())
         utils.get_credentials()
         self.validate_credentials(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
+        self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validate that login create valid credentials
@@ -137,6 +144,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
         utils.get_credentials()
         self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
+        self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validate correct message when try to logout already logout user
@@ -202,6 +210,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             self.assertIn("Successfully logged in to Conjur", output.strip())
 
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
+            self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validates interactively provided params create credentials
@@ -215,10 +224,10 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             assert utils.get_credentials() is not None
             self.assertIn("Successfully logged in to Conjur", output.strip())
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
+            self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validates login is successful for hosts
-
     Note we need to create the host first and rotate it's API key so that we can access it.
     There is currently no way to fetch a host's API key so this is a work around for the 
     purposes of this test
@@ -246,6 +255,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
 
         self.validate_credentials(f"{self.client_params.hostname}", "host/somehost", extract_api_key_from_message)
         self.assertIn("Successfully logged in to Conjur", output.strip())
+        self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
     Validates logout doesn't remove an irrelevant entry
@@ -309,7 +319,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("The client was initialized without", output)
 
     '''
-    Validate logout flow
+    Validate logout flow when using the system's keyring
     '''
     @integration_test(True)
     def test_https_logout_successful_keyring(self):
@@ -335,7 +345,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("The client was initialized without", output)
 
     '''
-    Validate that logout indeed remove credentials and terminate access to conjur
+    Validate that logout indeed remove credentials and terminate access to Conjur
     '''
     @integration_test()
     def test_cli_simple_login_logout_flow_keyring(self):
@@ -372,7 +382,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     Validate variable operation with keyring
     '''
     @integration_test()
-    def test_secret_keyring(self):
+    def test_basic_secret_retrieval_with_keyring(self):
         """
         Note about version tests, the Conjur server only keeps a certain number of versions.
         With each run of the integration tests, version tests are resetting variable values

@@ -72,6 +72,7 @@ services:
     environment:
       CONJUR_AUTHN_API_KEY: Null
       PYTHON_KEYRING_BACKEND: Null
+      DEBUG: Null
       TEST_ENV: "True"
     depends_on:
       - conjur
