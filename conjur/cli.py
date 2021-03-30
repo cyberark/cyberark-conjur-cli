@@ -716,6 +716,8 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
+            sys.stdout.write("To start using the Conjur CLI, log in to the Conjur server by "
+                             "running `conjur login`\n")
             return
 
         # Needed for unit tests so that they do not require configuring
@@ -725,7 +727,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         # we request they do so before executing their request
         # pylint: disable=line-too-long
         if not is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
-            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it.\n")
+            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
             Cli.handle_init_logic()
 
         if resource == 'login':
@@ -737,7 +739,8 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         if not is_testing_env:
             loaded_conjurrc = ConjurrcData.load_from_file()
             if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-                sys.stdout.write("%s\n" % LOGIN_IS_REQUIRED)
+                # pylint: disable=logging-fstring-interpolation
+                sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
                 Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
