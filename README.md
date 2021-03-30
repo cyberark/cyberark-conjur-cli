@@ -36,10 +36,16 @@ compatibility. When possible, upgrade your Conjur version to match the
 when using integrations, choose the latest suite release that matches your Conjur version. For any 
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
-### Support Services
+### Supported Services
 
 - Conjur OSS v1.2.0+
 - Conjur Enterprise v5.6.3+
+
+### Sypported Platforms
+
+- macOS Catalina+
+- Windows 10+
+- Red Hat Enterprise Linux 7/8
 
 ### Installation
 
