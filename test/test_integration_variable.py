@@ -166,7 +166,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test()
     def test_cli_can_batch_get_multiple_variables(self):
-        policy, variables = utils.generate_policy_string(self)
+        policy, variables = utils.generate_policy_string()
         file_name=os.path.join(tempfile.gettempdir(), os.urandom(24).hex())
         with open(file_name, 'w+b') as temp_policy_file:
             temp_policy_file.write(policy.encode('utf-8'))
@@ -261,7 +261,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         # TEST_ENV is set to False so we will purposely be prompted to login
         os.environ['TEST_ENV'] = 'False'
         try:
-            utils.remove_file(DEFAULT_NETRC_FILE)
+            utils.delete_credentials()
         except OSError:
             pass
 

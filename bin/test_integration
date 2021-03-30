@@ -1,16 +1,18 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 cleanup() {
   echo "Cleaning up..."
-  docker-compose rm --stop --force -v
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
 }
 
+DEBUG="false"
 if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
   DEBUG="true"
   shift
 fi
 
-trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs; cleanup' ERR
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
@@ -27,7 +29,8 @@ docker-compose exec -T conjur conjurctl wait
 echo "Configuring Conjur..."
 admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
 export CONJUR_AUTHN_API_KEY=$admin_api_key
-
+export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
+export DEBUG=$DEBUG
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
 
@@ -35,6 +38,8 @@ conjur_port="${conjur_host_port##*:}"
 # so we will have these variables in the container
 cat <<ENV > .env
 CONJUR_AUTHN_API_KEY=$admin_api_key
+PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
+DEBUG=$DEBUG
 ENV
 
 echo "Starting test env..."
@@ -42,8 +47,10 @@ docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
 
+# Hint: '--privileged' is added here otherwise we will get operation
+# not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec test bash
+  docker-compose exec --privileged test /bin/sh -c " /dbus.sh" $@
   exit
 fi
 
@@ -51,4 +58,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  nose2 -v -X --config integration_test.cfg -A 'integration' $@
+  /bin/sh -c " /dbus.sh" $@

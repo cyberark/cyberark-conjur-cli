@@ -8,12 +8,14 @@ credentials in a system's keyring. This module allows us to easily swap out both
 library and functionality should we need to do so in the future.
 """
 
+# Builtins
+import logging
+
 # Third party
 import keyring
 
 # Internals
 from conjur.constants import KEYSTORE_ATTRIBUTES
-
 
 # TODO should verify we are using the exact keyring version wanted and
 #  disable insecure keyring such as PlaintextKeyring.
@@ -72,8 +74,9 @@ class KeystoreAdapter:
         # TODO investigate other errors that would make a keyring not accessible
         try:
             # Send a dummy request to test if the keyring is accessible
-            keyring.get_password('test-system', 'test-unlock')
-        except keyring.errors.KeyringLocked:
+            keyring.get_password('test-system', 'test-accessibility')
+        except keyring.errors.KeyringError as keyring_error:
+            logging.debug(keyring_error)
             return False
 
         return True
