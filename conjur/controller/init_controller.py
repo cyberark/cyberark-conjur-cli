@@ -54,8 +54,6 @@ class InitController:
         self.write_conjurrc()
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
-        sys.stdout.write("To start using the Conjur CLI, log in to the Conjur server by "
-                         "running `conjur login`\n")
 
     def get_server_certificate(self):
         """
@@ -92,7 +90,7 @@ class InitController:
         sys.stdout.write("\nTo verify this certificate, we recommend running the following "
                          "command on the Conjur server:\n"
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
-        trust_certificate = input("Trust this certificate? yes/no (Default=no): ").strip()
+        trust_certificate = input("Trust this certificate? yes/no (Default: no): ").strip()
         if trust_certificate.lower() not in VALID_CONFIRMATIONS:
             raise RuntimeError("You decided not to trust the certificate")
 
