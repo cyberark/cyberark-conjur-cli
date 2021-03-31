@@ -36,6 +36,7 @@ KEYSTORE_ATTRIBUTES = [MACHINE, LOGIN, PASSWORD]
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"
+TEST_KEYRING = "SecretService Keyring"
 
 # For user interaction
 LOGIN_IS_REQUIRED = "To start using the CLI, log in to Conjur"
