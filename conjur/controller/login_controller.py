@@ -53,7 +53,7 @@ class LoginController:
         """
         if self.credential_data.login is None:
             # pylint: disable=logging-fstring-interpolation,line-too-long
-            self.credential_data.login = input("Enter your login name to log into Conjur: ").strip()
+            self.credential_data.login = input("Enter your username: ").strip()
             if self.credential_data.login == '':
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: Login name is required")
@@ -64,9 +64,9 @@ class LoginController:
         """
         if self.user_password is None:
             # pylint: disable=line-too-long
-            self.user_password = getpass.getpass(prompt=f"Please enter {self.credential_data.login}'s password or API key (it will not be echoed): ")
+            self.user_password = getpass.getpass(prompt="Enter your password or API key (this will not be echoed): ")
             while self.user_password == '':
-                self.user_password = getpass.getpass(prompt=f"Invalid format. Please enter {self.credential_data.login}'s password (it will not be echoed): ")
+                self.user_password = getpass.getpass(prompt="Invalid format. Enter your password or API key (this will not be echoed): ")
 
     def load_conjurrc_data(self):
         """

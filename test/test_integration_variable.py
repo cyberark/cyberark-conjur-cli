@@ -12,7 +12,7 @@ import uuid
 from contextlib import redirect_stderr
 from unittest.mock import patch
 
-from conjur.constants import DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_NETRC_FILE, LOGIN_IS_REQUIRED
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
@@ -269,7 +269,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
             output = self.invoke_cli(self.cli_auth_params,
                                      ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'])
 
-            self.assertIn("Error: You have not logged in", output)
+            self.assertIn(LOGIN_IS_REQUIRED, output)
             self.assertIn("Successfully logged in to Conjur", output)
             self.assertIn('Successfully set value for variable \'one/password\'', output)
         os.environ['TEST_ENV'] = 'True'
