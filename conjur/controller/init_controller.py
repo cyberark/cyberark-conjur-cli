@@ -43,8 +43,10 @@ class InitController:
         Method that facilitates all method calls in this class
         """
         if self.conjurrc_data.conjur_url is None:
-            self.get_conjur_server_url()
-        formatted_conjur_url = self.format_conjur_server_url()
+            self.get_conjur_url()
+
+        formatted_conjur_url = self.format_conjur_url()
+        self.validate_conjur_url(formatted_conjur_url)
 
         if self.ssl_verify is True:
             fetched_certificate = self.get_server_certificate(formatted_conjur_url)
@@ -61,7 +63,7 @@ class InitController:
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
-    def get_conjur_server_url(self):
+    def get_conjur_url(self):
         """
         Method to get the Conjur server URL if not provided
         """
@@ -72,23 +74,29 @@ class InitController:
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
 
+    # TODO: Factor out the following URL validation to ConjurrcData class
+    def format_conjur_url(self):
+        """
+        Method for formatting the Conjur server URL to
+        break down the URL into segments
+        """
         # Chops off the '/ if supplied by the user to avoid a server error
         if self.conjurrc_data.conjur_url.endswith('/'):
-            self.conjurrc_data.conjur_url=self.conjurrc_data.conjur_url[:-1]
+            self.conjurrc_data.conjur_url = self.conjurrc_data.conjur_url[:-1]
 
-    # TODO: Factor out the following URL validation to ConjurrcData class
-    def format_conjur_server_url(self):
+        return urlparse(self.conjurrc_data.conjur_url)
+
+    def validate_conjur_url(self, conjur_url):
         """
-        Method for formatting the Conjur server URL
+        Method for validating the Conjur server URL to
+        ensure it is provided as expected
         """
-        url = urlparse(self.conjurrc_data.conjur_url)
-        if url.scheme != 'https':
+        if conjur_url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
                    f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
-        return url
-
-    def get_server_certificate(self, formatted_conjur_url):
+    # pylint: disable=line-too-long
+    def get_server_certificate(self, conjur_url):
         """
         Method to get the certificate from the Conjur endpoint detailed by the user
         """
@@ -98,9 +106,8 @@ class InitController:
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.conjur_url}'...")
-        # pylint: disable=line-too-long
-        fingerprint, fetched_certificate = self.init_logic.get_certificate(formatted_conjur_url.hostname,
-                                                                           formatted_conjur_url.port)
+        fingerprint, fetched_certificate = self.init_logic.get_certificate(conjur_url.hostname,
+                                                                           conjur_url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
         sys.stdout.write("\nTo verify this certificate, we recommend running the following "

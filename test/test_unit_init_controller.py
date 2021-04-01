@@ -19,6 +19,7 @@ MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 class MOCK_FORMATTED_URL:
     hostname = MockConjurrcData.conjur_url
     port = 443
+    scheme = "somescheme"
 
 class InitControllerTest(unittest.TestCase):
     capture_stream = io.StringIO()
@@ -151,7 +152,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url=None)
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_conjur_server_url()
+            init_controller.get_conjur_url()
         self.assertRegex(str(context.exception), 'Error: URL is required')
 
     @patch('builtins.input', return_value=MockConjurrcData.conjur_url)
@@ -159,7 +160,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url='somehost')
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.format_conjur_server_url()
+            init_controller.validate_conjur_url(MOCK_FORMATTED_URL)
         self.assertRegex(str(context.exception), 'Error: undefined behavior')
 
     @patch('builtins.input', return_value='no')

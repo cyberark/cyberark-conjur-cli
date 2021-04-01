@@ -75,8 +75,6 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("The client was initialized without", output)
         self.assertEquals(utils.is_netrc_exists(), False)
 
-    test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring.tester=True
-
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 
     insecure mode, then they will succeed
@@ -99,9 +97,11 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     '''
     @integration_test(True)
     def test_cli_configured_in_insecure_mode_with_params_and_passes_keyring(self):
-        with patch('builtins.input', side_effect=[self.client_params.hostname, self.client_params.account, 'yes']):
+        utils.remove_file(DEFAULT_CONFIG_FILE)
+        utils.remove_file(DEFAULT_CERTIFICATE_FILE)
+        with patch('builtins.input', side_effect=[self.client_params.hostname, self.client_params.account]):
             output = self.invoke_cli(self.cli_auth_params,
-                            ['--insecure', 'init'])
+                                    ['--insecure', 'init'])
 
         self.assertRegex(output, 'To start using the Conjur CLI')
 
