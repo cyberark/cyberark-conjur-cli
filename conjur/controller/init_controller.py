@@ -88,8 +88,9 @@ class InitController:
 
     def validate_conjur_url(self, conjur_url):
         """
-        Method for validating the Conjur server URL to
-        ensure it is provided as expected
+        Validates the specified url
+
+        Raises a RuntimeError in case of an invalid url format
         """
         if conjur_url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
@@ -98,7 +99,11 @@ class InitController:
     # pylint: disable=line-too-long
     def get_server_certificate(self, conjur_url):
         """
-        Method to get the certificate from the Conjur endpoint detailed by the user
+        Get the certificate from the specified conjur_url
+
+        Returns:
+            tuple of certificate fingerprint and certificate chains or
+            None if the user provided a certificate
         """
         if self.conjurrc_data.cert_file is not None:
             # Return None because we do not need to fetch the certificate
