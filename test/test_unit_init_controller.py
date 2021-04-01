@@ -7,11 +7,18 @@ import OpenSSL
 import requests
 from OpenSSL import SSL
 
+from conjur.constants import TEST_HOSTNAME
 from conjur.errors import CertificateHostnameMismatchException
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.api.ssl_client import SSLClient
+
+MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
+
+class MOCK_FORMATTED_URL:
+    hostname = MockConjurrcData.conjur_url
+    port = 443
 
 class InitControllerTest(unittest.TestCase):
     capture_stream = io.StringIO()
@@ -71,7 +78,7 @@ class InitControllerTest(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_server_certificate()
+            init_controller.get_server_certificate(MOCK_FORMATTED_URL)
 
     '''
     When user trusts the certificate, the certificate should be returned
@@ -82,14 +89,14 @@ class InitControllerTest(unittest.TestCase):
         self.conjurrc_data.conjur_url = "https://someurl"
         self.init_logic.get_certificate = MagicMock(return_value = ["12:AB", mock_certificate])
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-        fetched_certificate = init_controller.get_server_certificate()
+        fetched_certificate = init_controller.get_server_certificate(MOCK_FORMATTED_URL)
         self.assertEquals(fetched_certificate, mock_certificate)
 
     @patch('builtins.input', side_effect=['http://someurl'])
     def test_user_supplied_certificate_returns_none(self, mock_input):
         self.conjurrc_data.cert_file = "/some/path/somepem.pem"
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-        fetched_certificate = init_controller.get_server_certificate()
+        fetched_certificate = init_controller.get_server_certificate(MOCK_FORMATTED_URL)
         assert self.conjurrc_data.cert_file == "/some/path/somepem.pem"
         self.assertEquals(fetched_certificate, None)
 
@@ -144,15 +151,15 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url=None)
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_server_certificate()
+            init_controller.get_conjur_server_url()
         self.assertRegex(str(context.exception), 'Error: URL is required')
 
-    @patch('builtins.input', return_value='somehost')
+    @patch('builtins.input', return_value=MockConjurrcData.conjur_url)
     def test_user_does_not_input_https_will_raises_error(self, mock_input):
         mock_conjurrc_data = ConjurrcData(conjur_url='somehost')
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_server_certificate()
+            init_controller.format_conjur_server_url()
         self.assertRegex(str(context.exception), 'Error: undefined behavior')
 
     @patch('builtins.input', return_value='no')

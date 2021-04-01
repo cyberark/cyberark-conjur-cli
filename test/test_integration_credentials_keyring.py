@@ -94,6 +94,18 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertEquals(utils.is_netrc_exists(), False)
 
     '''
+    Validates that if a user runs in insecure mode without supplying inputs, 
+    we will ask for them and successfully initialize the client
+    '''
+    @integration_test(True)
+    def test_cli_configured_in_insecure_mode_with_params_and_passes_keyring(self):
+        with patch('builtins.input', side_effect=[self.client_params.hostname, self.client_params.account, 'yes']):
+            output = self.invoke_cli(self.cli_auth_params,
+                            ['--insecure', 'init'])
+
+        self.assertRegex(output, 'To start using the Conjur CLI')
+
+    '''
     Validates a user can log in with a password, instead of their API key
     To do this, we perform the following:
     '''

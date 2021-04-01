@@ -99,7 +99,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
     @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
     def test_remove_credentials_raises_keyring_error_when_delete_password_raises_keyring_error(self,
                                                                                                mock_keystore_adapter,
-                                                                                               another_mock_keystore_adatper):
+                                                                                               another_mock_keystore_adapter):
         credential_provider = KeystoreCredentialsProvider()
         with self.assertRaises(keyring.errors.KeyringError):
             credential_provider.remove_credentials(MockConjurrcData)
