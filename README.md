@@ -45,7 +45,7 @@ questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/
 
 - macOS Catalina+
 - Windows 10+
-- Red Hat Enterprise Linux 7/8
+- Red Hat Enterprise Linux 7, 8
 
 ### Installation
 
@@ -57,8 +57,11 @@ how to setup and configure the CLI, see our official documentation ***(TODO add 
 
 #### Install the SDK
 
-The SDK can be installed via PyPI. Note that the SDK pushed to PyPI does not have the updated
-capabilities and experience as the GA CLI version offers. The latest version pushed to PyPI is v.0.1.1.
+The SDK can be installed via PyPI. Note that the SDK is a **Community** level project meaning 
+that the SDK is subject to alterations that may result in breaking change. 
+
+To avoid unanticipated breaking changes, make sure that you stay up-to-date on our 
+latest releases and review the project's [CHANGELOG.md](CHANGELOG.md).
 
 ```
 $ pip3 install conjur-client
@@ -67,14 +70,13 @@ $ conjur --help
 ```
 
 Alternatively, you can install the library from the source. Note that this will install the latest work from the
-cloned source and not necessarily an official release. Clone the project and run:
+cloned source and not necessarily an official release. 
+
+Clone the project and run:
 
 ```
 $ pip3 install .
 ```
-
-Note: On some machines, you have to use `pip` instead of `pip3` but in most cases,
-you will want to use `pip3` if it's available for your platform.
 
 ## Usage
 
@@ -122,14 +124,15 @@ client = Client(url='https://conjur.myorg.com',
                 ca_bundle='/path/to/my/ca/bundle.pem')
 ```
 
-#### With `.netrc` and `.conjurrc` files
+#### Defining the Conjur server endpoint
 
-You can provide the above parameters passed in as part of the Client initialization process in two files 
-(`.netrc` and `.conjurrc`). Both `.netrc` and `.conjurrc` files should be saved to your home directory. 
-For example `~/.netrc`. 
+A configuration file called, `.conjurrc` is used to hold details required to communicate 
+to the Conjur server. You can provide these details needed to open a connection to the 
+Conjur endpoint in a file called `.conjurrc` instead of passing them in (`url`, `account`, 
+and `ca_bundle`)  during initialization of the Client.
 
-The `.conjurrc` contains connection details needed to connect to the Conjur endpoint and should 
-contain details for cert_file, conjur_account, and conjur_url.
+The `.conjurrc` file should be saved to your home directory and should contain `conjur_url`, 
+`conjur_account`, and`cert_file`.
 
 ```
 # .conjurrc
@@ -139,23 +142,32 @@ conjur_account: someaccount
 conjur_url: https://conjur-server
 ```
 
-The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to login the 
-Conjur endpoint and should consist of machine, login, and password. Note that the value for 
-'machine' should have `/authn` appended to the end of the url and 'password' should contain the 
-API key of the user you intend to log in as.
+#### Storing credentials
 
-Important! If you choose to create this file yourself, ensure you follow least privilege, allowing only the
+When using the SDK, you can keep credentials in the system's native credential store 
+instead of passing them in during initialization of the Client. By default, the Client 
+will favor saving credentials (login ID and password) to the system's credential store. 
+If the detected credential store is not one we support or is not accessible, the 
+credentials will be written to a configuration file, `.netrc`, in plaintext. 
+
+If written to the `.netrc`, it is highly recommended that you remove the file when done.
+
+The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to login the 
+Conjur endpoint and should consist of machine, login, and password.
+
+Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the
 user who has created the file to have read/write permissions on it (`chmod 700 .netrc`).
 
 ```
 # .netrc / _netrc
-machine https://conjur-server/authn
+machine https://conjur.myorg.com
 login admin
 password 1234....
 ```
 
-Write the code same as in the first example but create the Client 
-in the following way:
+If you store connection details in the `conjurrc` and use a credential store or `netrc` for 
+storing credentials, you can create the Client in the following way and the details will 
+be extracted implicitly:
 
 ```
 client = Client()
@@ -181,7 +193,7 @@ Sets a variable to a specific value based on its ID.
 Note: Policy to create the variable must have been already loaded
 otherwise you will get a 404 error during invocation.
 
-#### `apply_policy_file(policy_name, policy_file)`
+#### `load_policy_file(policy_name, policy_file)`
 
 Applies a file-based YAML to a named policy. This method only
 supports additive changes. Result is a dictionary object constructed
@@ -193,17 +205,49 @@ Replaces a named policy with one from the provided file. This is
 usually a destructive invocation. Result is a dictionary object
 constructed from the returned JSON data.
 
-#### `delete_policy_file(policy_name, policy_file)`
+#### `update_policy_file(policy_name, policy_file)`
 
 Modifies an existing Conjur policy. Data may be explicitly
 deleted using the `!delete`, `!revoke`, and `!deny` statements. Unlike
 "replace" mode, no data is ever implicitly deleted. Result is a
 dictionary object constructed from the returned JSON data.
 
-#### `list()`
+#### `list(list_constraints)`
 
-Returns a list of all the available resources for the current
+Returns a list of all available resources for the current
 account.
+
+The list constraints parameter is optional and should be provided as
+a dictionary.
+
+For example: `client.list({'kind': 'user', 'inspect': True})`
+
+| List constraints | Explanation                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| kind             | Filter resources by specified kind (user, host, layer, group, policy, variable, or webservice) |
+| limit            | Limit list of resources to specified number                  |
+| offset           | Skip specified number of resources                           |
+| role             | Retrieve list of resources that specified role is entitled to see (must specify role’s full ID) |
+| search           | Search for resources based on specified query                |
+| inspect          | List the metadata for resources                              |
+
+#### `rotate_other_api_key(resource: Resource)`
+
+Rotates another entity's API key and returns it as a string.
+
+Note: resource is of type Resource which should have `type` (user / host) and 
+`name` attributes.
+
+#### `rotate_personal_api_key(logged_in_user, current_password)`
+
+Rotates the personal API key of the logged-in user and returns it as a string.
+
+#### `change_personal_password(logged_in_user, current_password, new_password)`
+
+Updates the current, the logged in user's password with the password parameter provided. 
+
+Note: the new password must meet the Conjur password complexity constraints. It must 
+contain at least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special character.
 
 #### `whoami()`
 
