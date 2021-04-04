@@ -77,8 +77,14 @@ class KeystoreAdapter:
             # not be configured correctly and not available for use. Therefore, false
             # will be returned
             keyring.get_password('test-system', 'test-accessibility')
-        except keyring.errors.KeyringError as keyring_error:
-            logging.debug(keyring_error)
+        except keyring.errors.KeyringError:
             return False
 
         return True
+
+    @classmethod
+    def configure_keyring_log_to_info(cls):
+        """
+        Method to configure the keyring logs to info
+        """
+        logging.getLogger('keyring').setLevel(logging.INFO)
