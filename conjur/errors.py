@@ -69,3 +69,21 @@ class CredentialRetrievalException(Exception):
     def __init__(self):
         self.message = FETCH_CREDENTIALS_FAILURE_MESSAGE
         super().__init__(self.message)
+
+class KeyringGeneralError(Exception):
+    """ Exception for when configuration is invalid """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
+class KeyringDeletionError(KeyringGeneralError):
+    """ Exception for when configuration is invalid """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
+class KeyringSetError(KeyringGeneralError):
+    """ Exception for when configuration is invalid """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)

@@ -29,7 +29,6 @@ docker-compose exec -T conjur conjurctl wait
 echo "Configuring Conjur..."
 admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
 export CONJUR_AUTHN_API_KEY=$admin_api_key
-export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
 export DEBUG=$DEBUG
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
@@ -38,7 +37,6 @@ conjur_port="${conjur_host_port##*:}"
 # so we will have these variables in the container
 cat <<ENV > .env
 CONJUR_AUTHN_API_KEY=$admin_api_key
-PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
 DEBUG=$DEBUG
 ENV
 

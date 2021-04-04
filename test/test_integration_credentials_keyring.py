@@ -11,6 +11,7 @@ import shutil
 import string
 from unittest.mock import patch
 import uuid
+import platform
 
 from conjur.data_object import CredentialsData
 from conjur.logic.credential_provider import CredentialStoreFactory, KeystoreCredentialsProvider
@@ -377,6 +378,19 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         utils.setup_cli(self)
         with patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False):
             self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
+
+    '''
+    Validate env variable is set correctly
+    '''
+    @integration_test(True)
+    def test_keyring_locked_after_login_will_raise_error_keyring(self):
+        _ = utils.create_cred_store()
+        if platform.system() == "Darwin":
+            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.macOS.Keyring"
+        if platform.system() == "Linux":
+            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.SecretService.Keyring"
+        if platform.system() == "Windows":
+            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.Windows.WinVaultKeyring"
 
     '''
     Validate variable operation with keyring
