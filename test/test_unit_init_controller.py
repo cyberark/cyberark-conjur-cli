@@ -152,7 +152,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url=None)
         with self.assertRaises(RuntimeError) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_conjur_url()
+            init_controller.prompt_for_conjur_url()
         self.assertRegex(str(context.exception), 'Error: URL is required')
 
     @patch('builtins.input', return_value=MockConjurrcData.conjur_url)

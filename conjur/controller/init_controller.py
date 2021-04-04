@@ -43,7 +43,7 @@ class InitController:
         Method that facilitates all method calls in this class
         """
         if self.conjurrc_data.conjur_url is None:
-            self.get_conjur_url()
+            self.prompt_for_conjur_url()
 
         formatted_conjur_url = self.format_conjur_url()
         self.validate_conjur_url(formatted_conjur_url)
@@ -63,7 +63,7 @@ class InitController:
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
-    def get_conjur_url(self):
+    def prompt_for_conjur_url(self):
         """
         Method to get the Conjur server URL if not provided
         """
