@@ -88,7 +88,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 KeystoreAdapter.delete_password(conjurrc.conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
-            except KeyringDeletionError:
+            except KeyringDeletionError as err:
+                logging.debug(f"keyring unable to delete key {attr}. maybe not exist. {err}")
                 continue
 
         logging.debug(

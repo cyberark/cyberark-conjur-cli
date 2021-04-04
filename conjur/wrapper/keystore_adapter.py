@@ -82,7 +82,8 @@ class KeystoreAdapter:
         """
         try:
             return keyring.get_keyring().name
-        except Exception:  # pylint: disable=broad-except
+        except Exception as keyring_error:  # pylint: disable=broad-except
+            logging.debug(keyring_error)
             return None
 
     @classmethod
