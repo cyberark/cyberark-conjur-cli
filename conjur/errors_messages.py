@@ -19,4 +19,4 @@ PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE = "(it must contain at least 12 characte
 MISMATCH_HOSTNAME_MESSAGE = "The machine's hostname did not match any names on the certificate. " \
                             "Make sure the names on the certificate (common name or SANs) match the machine's hostname."
 
-FETCH_CREDENTIALS_FAILURE_MESSAGE = "Failed to fetch credentials"
+FETCH_CREDENTIALS_FAILURE_MESSAGE = "Failed to fetch credentials. Log in again and rerun the command."

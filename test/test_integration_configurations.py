@@ -52,7 +52,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc cert_file entry is blank when run in --insecure mode
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_in_insecure_mode_leaves_cert_file_empty(self, mock_input):
@@ -65,7 +64,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that certificate flag is overwritten when running in --insecure mode
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_provided_cert_file_path_is_overwritten_in_insecure_mode(self, mock_input):
@@ -79,7 +77,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
@@ -94,7 +91,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine when user provides Y instead of 'yes'
     '''
-
     @integration_test(True)
     @patch('builtins.input', return_value='Y')
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes(self, mock_input):
@@ -110,7 +106,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that the conjurrc was created on the machine when user provides Y instead of 'yes' 
     when prompted to overwrite the conjurrc file
     '''
-
     @integration_test(True)
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self):
         self.setup_cli_params({})
@@ -129,7 +124,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     '''
     Validates that the conjurrc was created on the machine when a user mistakenly supplies an extra '/' at the end of the URL
     '''
-
     @integration_test()
     @patch('builtins.input', return_value='yes')
     def test_https_conjurrc_is_created_successfully_with_extra_slash_in_url(self, mock_input):
@@ -145,7 +139,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that if user does not trust the certificate,
     the conjurrc is not be created on the user's machine
     '''
-
     @integration_test(True)
     def test_https_conjurrc_user_does_not_trust_cert(self):
         with patch('builtins.input', side_effect=[self.client_params.hostname, 'no']):
@@ -160,7 +153,6 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     Validates that when the user adds the force flag,
     no confirmation is required
     '''
-
     @integration_test(True)
     # The additional side effects here ('somesideffect') would prompt the CLI to
     # request for confirmation which would fail the test

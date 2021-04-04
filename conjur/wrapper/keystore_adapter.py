@@ -41,6 +41,7 @@ class KeystoreAdapter:
         return keyring.get_password(identifier, key)
 
     # TODO add simple delete for one attribute only here in the adapter
+    # TODO do not raise keyring module errors
     # pylint: disable=try-except-raise
     @classmethod
     def delete_password(cls, identifier):
@@ -50,7 +51,6 @@ class KeystoreAdapter:
         try:
             for attr in KEYSTORE_ATTRIBUTES:
                 keyring.delete_password(identifier, attr)
-        # TODO do not raise keyring module errors
         # Catches when credentials do not exist in the keyring. If the key does not exist,
         # the user has already logged out
         except keyring.errors.PasswordDeleteError:
@@ -65,15 +65,17 @@ class KeystoreAdapter:
         """
         return keyring.get_keyring().name
 
-    # TODO add a more robust check
     @classmethod
     def is_keyring_accessible(cls):
         """
         Method to check if the keyring is accessible
         """
-        # TODO investigate other errors that would make a keyring not accessible
         try:
-            # Send a dummy request to test if the keyring is accessible
+            # The following sends a dummy request to test if the system's keyring is
+            # accessible. 'get_password' returns None if the password does not exist.
+            # If get_password raises an error, then we can infer that the keyring has
+            # not be configured correctly and not available for use. Therefore, false
+            # will be returned
             keyring.get_password('test-system', 'test-accessibility')
         except keyring.errors.KeyringError as keyring_error:
             logging.debug(keyring_error)
