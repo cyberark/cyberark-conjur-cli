@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
 - The `user` methods 'rotate-api-key' and 'change-password' are now available in CLI and SDK to manage users
   [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
-- Add ability to get previous variable/secret versions. This is available in both CLI and SDK
+- Previous versions of a variable/secret can now be retrieved. This is available in both CLI and SDK
   [cyberark/conjur-api-python3#151](https://github.com/cyberark/conjur-api-python3/issues/151)
 - The `list` flag constraints are now available in both CLI and SDK to filter resource results
   [cyberark/conjur-api-python3#128](https://github.com/cyberark/conjur-api-python3/issues/91)
@@ -21,14 +21,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
 
 ### Changed
+- The CLI and SDK now use a system's native credential store to save credentials instead of a netrc file by default. 
+  If a store is not available, the credentials will be saved to the netrc as a fallback.
 - The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`.
   Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
   .conjurrc file for use in the SDK and will need to update accordingly.
   [cyberark/conjur-api-python3#206](https://github.com/cyberark/conjur-api-python3/issues/206)
+- Policy functions `apply_policy_file` and `delete_policy_file` have been replaced with `load_policy_file` and 
+  `update_policy_file` respectively. This is a breaking change and users who import the SDK will need to update 
+  these references in their projects [cyberark/conjur-api-python3#112](https://github.com/cyberark/conjur-api-python3/issues/112)
 - CLI command UX has been improved according to UX guidelines
   [cyberark/conjur-api-python3#132](https://github.com/cyberark/conjur-api-python3/issues/132)
   See [design guidelines](https://ljfz3b.axshare.com/#id=x8ktq8&p=conjur_help__init&g=1)
-- Update version from 0.x.x to 7.0.0 to prep for the GA release
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
 - Directory structure has been refactored. See [design document](https://github.com/cyberark/conjur-api-python3/blob/master/design/general_refactorings.md) for more details.
