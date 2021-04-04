@@ -54,9 +54,10 @@ class InitController:
             # or CA-signed, we will write the certificate on the machine
             self.write_certificate(fetched_certificate)
         else:
-            logging.warning('You chose to initialize the client in insecure mode. Reinitialize '
-                            'the client should you choose to communicate to the server securely')
-            self.conjurrc_data.cert_file=""
+            logging.warning('You chose to initialize the client in insecure mode. If you '
+                            'If you prefer to communicate with the server securely, you '
+                            'must reinitialize the client in secure mode.')
+            self.conjurrc_data.cert_file = ""
 
         self.get_account_info(self.conjurrc_data)
         self.write_conjurrc()
