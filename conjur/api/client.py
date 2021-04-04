@@ -148,7 +148,7 @@ class Client():
         Configures the logging for the client
         """
         # Suppress third party logs
-        KeystoreAdapter.configure_keyring_log()
+        KeystoreAdapter.configure_keyring_log_to_info()
 
         if debug:
             logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)

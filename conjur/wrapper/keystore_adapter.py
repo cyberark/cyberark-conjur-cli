@@ -83,8 +83,8 @@ class KeystoreAdapter:
         return True
 
     @classmethod
-    def configure_keyring_log(cls):
+    def configure_keyring_log_to_info(cls):
         """
-        Method to configure the keyring logs
+        Method to configure the keyring logs to info
         """
-        logging.getLogger('keyring').setLevel(logging.WARNING)
+        logging.getLogger('keyring').setLevel(logging.INFO)
