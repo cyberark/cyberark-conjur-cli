@@ -128,15 +128,17 @@ class ClientTest(unittest.TestCase):
             url='http://myurl',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.Api')
-    def test_client_performs_password_api_login_if_password_is_provided(self, mock_api_instance):
+    def test_client_performs_password_api_login_if_password_is_provided(self, mock_api_instance, mock_accessible):
         Client(url='http://foo', account='myacct', login_id='mylogin',
                password='mypass')
 
         mock_api_instance.return_value.login.assert_called_once_with('mylogin', 'mypass')
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.Api')
-    def test_client_initializes_client_with_api_key_if_its_provided(self, mock_api_instance):
+    def test_client_initializes_client_with_api_key_if_its_provided(self, mock_api_instance, mock_accessible):
         Client(url='http://foo', account='myacct', login_id='mylogin',
                api_key='someapikey')
 
@@ -150,11 +152,12 @@ class ClientTest(unittest.TestCase):
             url='http://foo',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_performs_no_api_login_if_password_is_not_provided(self, mock_api_instance, mock_creds,
-                                                                      mock_api_config):
+                                                                      mock_api_config, mock_accessible):
         Client(url='http://foo', account='myacct', login_id='mylogin')
 
         mock_api_instance.return_value.login.assert_not_called()
@@ -208,11 +211,12 @@ class ClientTest(unittest.TestCase):
             url='http://foo',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_config_from_apiconfig_if_password_is_not_provided(self, mock_api_instance, mock_creds,
-                                                                             mock_api_config):
+                                                                             mock_api_config, mock_accessible):
         Client(url='http://foo', account='myacct', login_id='mylogin')
 
         mock_api_instance.assert_called_with(
@@ -227,11 +231,12 @@ class ClientTest(unittest.TestCase):
             url='http://foo',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_overrides_apiconfig_value_with_explicitly_provided_ones(self, mock_api_instance, mock_creds,
-                                                                            mock_api_config):
+                                                                            mock_api_config, mock_accessible):
         Client(url='http://foo', account='myacct', login_id='mylogin',
                ca_bundle='mybundle')
 
@@ -247,11 +252,12 @@ class ClientTest(unittest.TestCase):
             url='http://foo',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_does_not_override_apiconfig_values_with_empty_values(self, mock_api_instance, mock_creds,
-                                                                         mock_api_config):
+                                                                         mock_api_config, mock_accessible):
         Client(url=None, account=None, login_id=None, ca_bundle=None)
 
         mock_api_instance.assert_called_with(
@@ -268,6 +274,7 @@ class ClientTest(unittest.TestCase):
 
     ### API passthrough tests ###
 
+
     @patch('conjur.api.client.Api')
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('logging.basicConfig')
@@ -277,31 +284,34 @@ class ClientTest(unittest.TestCase):
 
         mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_get_variable_params(self, mock_api_instance, mock_creds,
-                                                           mock_api_config):
+                                                           mock_api_config, mock_accessible):
         Client().get('variable_id')
 
         mock_api_instance.return_value.get_variable.assert_called_once_with('variable_id', None)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_get_variable_result(self, mock_api_instance, mock_creds,
-                                                mock_api_config):
+                                                mock_api_config, mock_accessible):
         variable_value = uuid.uuid4().hex
         mock_api_instance.return_value.get_variable.return_value = variable_value
 
         return_value = Client().get('variable_id')
         self.assertEquals(return_value, variable_value)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_get_many_variables_params(self, mock_api_instance, mock_creds,
-                                                                 mock_api_config):
+                                                                 mock_api_config, mock_accessible):
         Client().get_many('variable_id', 'variable_id2')
 
         mock_api_instance.return_value.get_variables.assert_called_once_with(
@@ -309,22 +319,24 @@ class ClientTest(unittest.TestCase):
             'variable_id2'
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_get_variables_result(self, mock_api_instance, mock_creds,
-                                                 mock_api_config):
+                                                 mock_api_config, mock_accessible):
         variable_values = uuid.uuid4().hex
         mock_api_instance.return_value.get_variables.return_value = variable_values
 
         return_value = Client().get_many('variable_id', 'variable_id2')
         self.assertEquals(return_value, variable_values)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_set_variable_params(self, mock_api_instance, mock_creds,
-                                                           mock_api_config):
+                                                           mock_api_config, mock_accessible):
         Client().set('variable_id', 'variable_value')
 
         mock_api_instance.return_value.set_variable.assert_called_once_with(
@@ -332,11 +344,12 @@ class ClientTest(unittest.TestCase):
             'variable_value',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_load_policy_params(self, mock_api_instance, mock_creds,
-                                                          mock_api_config):
+                                                          mock_api_config, mock_accessible):
         Client().load_policy_file('name', 'policy')
 
         mock_api_instance.return_value.load_policy_file.assert_called_once_with(
@@ -344,21 +357,24 @@ class ClientTest(unittest.TestCase):
             'policy',
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
-    def test_client_returns_load_policy_result(self, mock_api_instance, mock_creds, mock_api_config):
+    def test_client_returns_load_policy_result(self, mock_api_instance, mock_creds,
+                                               mock_api_config, mock_accessible):
         load_policy_result = uuid.uuid4().hex
         mock_api_instance.return_value.load_policy_file.return_value = load_policy_result
 
         return_value = Client().load_policy_file('name', 'policy')
         self.assertEquals(return_value, load_policy_result)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_replace_policy_params(self, mock_api_instance, mock_creds,
-                                                             mock_api_config):
+                                                             mock_api_config, mock_accessible):
         Client().replace_policy_file('name', 'policy')
 
         mock_api_instance.return_value.replace_policy_file.assert_called_once_with(
@@ -366,22 +382,24 @@ class ClientTest(unittest.TestCase):
             'policy'
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
-    @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
-    def test_client_returns_replace_policy_result(self, mock_api_instance, mock_creds,
-                                                  mock_api_config):
-        replace_policy_result = uuid.uuid4().hex
-        mock_api_instance.return_value.replace_policy_file.return_value = replace_policy_result
+    def test_client_returns_replace_policy_result(self, mock_api_instance,
+                                                  mock_api_config, mock_accessible):
+        with patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials):
+            replace_policy_result = uuid.uuid4().hex
+            mock_api_instance.return_value.replace_policy_file.return_value = replace_policy_result
 
-        return_value = Client().replace_policy_file('name', 'policy')
-        self.assertEquals(return_value, replace_policy_result)
+            return_value = Client().replace_policy_file('name', 'policy')
+            self.assertEquals(return_value, replace_policy_result)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_update_policy_params(self, mock_api_instance, mock_creds,
-                                                            mock_api_config):
+                                                            mock_api_config, mock_accessible):
         Client().update_policy_file('name', 'policy')
 
         mock_api_instance.return_value.update_policy_file.assert_called_once_with(
@@ -389,59 +407,65 @@ class ClientTest(unittest.TestCase):
             'policy'
         )
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_returns_update_policy_result(self, mock_api_instance, mock_creds,
-                                                 mock_api_config):
+                                                 mock_api_config, mock_accessible):
         update_policy_result = uuid.uuid4().hex
         mock_api_instance.return_value.update_policy_file.return_value = update_policy_result
 
         return_value = Client().update_policy_file('name', 'policy')
         self.assertEquals(return_value, update_policy_result)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_resource_list_method(self, mock_api_instance, mock_creds,
-                                                        mock_api_config):
+                                                        mock_api_config, mock_accessible):
         Client().list({})
 
         mock_api_instance.return_value.resources_list.assert_called_once_with({})
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_whoami_method(self, mock_api_instance, mock_creds,
-                                                 mock_api_config):
+                                                 mock_api_config, mock_accessible):
         Client().whoami()
 
         mock_api_instance.return_value.whoami.assert_called_once_with()
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_rotate_other_api_key_params(self, mock_api_instance, mock_creds,
-                                                                   mock_api_config):
+                                                                   mock_api_config, mock_accessible):
         Client().rotate_other_api_key(MOCK_RESOURCE)
 
         mock_api_instance.return_value.rotate_other_api_key.assert_called_once_with(MOCK_RESOURCE)
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_rotate_personal_api_key_params(self, mock_api_instance, mock_creds,
-                                                                      mock_api_config):
+                                                                      mock_api_config, mock_accessible):
         Client().rotate_personal_api_key("someloggedinuser", "somecurrentpassword")
 
         mock_api_instance.return_value.rotate_personal_api_key.assert_called_once_with("someloggedinuser",
                                                                                        "somecurrentpassword")
 
+    @patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
     @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_change_password_params(self, mock_api_instance, mock_creds,
-                                                              mock_api_config):
+                                                              mock_api_config, mock_accessible):
         Client().change_personal_password("someloggedinuser", "somecurrentpassword", "somenewpassword")
 
         mock_api_instance.return_value.change_personal_password.assert_called_once_with("someloggedinuser",

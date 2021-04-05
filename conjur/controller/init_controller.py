@@ -32,7 +32,8 @@ class InitController:
     def __init__(self, conjurrc_data, init_logic, force, ssl_verify):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
-            util_functions.get_insecure_warning()
+            util_functions.get_insecure_warning_in_debug()
+            util_functions.get_insecure_warning_in_warning()
 
         self.conjurrc_data = conjurrc_data
         self.init_logic = init_logic
@@ -42,22 +43,28 @@ class InitController:
         """
         Method that facilitates all method calls in this class
         """
+        if self.conjurrc_data.conjur_url is None:
+            self.prompt_for_conjur_url()
+
+        formatted_conjur_url = self.format_conjur_url()
+        self.validate_conjur_url(formatted_conjur_url)
+
         if self.ssl_verify is True:
-            fetched_certificate = self.get_server_certificate()
+            fetched_certificate = self.get_server_certificate(formatted_conjur_url)
             # For a uniform experience, regardless if the certificate is self-signed
             # or CA-signed, we will write the certificate on the machine
             self.write_certificate(fetched_certificate)
         else:
-            self.conjurrc_data.cert_file=""
+            self.conjurrc_data.cert_file = ""
 
         self.get_account_info(self.conjurrc_data)
         self.write_conjurrc()
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
-    def get_server_certificate(self):
+    def prompt_for_conjur_url(self):
         """
-        Method to get the certificate from the Conjur endpoint detailed by the user
+        Method to get the Conjur server URL if not provided
         """
         # pylint: disable=line-too-long
         if self.conjurrc_data.conjur_url is None:
@@ -66,25 +73,45 @@ class InitController:
                 # pylint: disable=raise-missing-from
                 raise RuntimeError("Error: URL is required")
 
+    # TODO: Factor out the following URL validation to ConjurrcData class
+    def format_conjur_url(self):
+        """
+        Method for formatting the Conjur server URL to
+        break down the URL into segments
+        """
         # Chops off the '/ if supplied by the user to avoid a server error
         if self.conjurrc_data.conjur_url.endswith('/'):
-            self.conjurrc_data.conjur_url=self.conjurrc_data.conjur_url[:-1]
+            self.conjurrc_data.conjur_url = self.conjurrc_data.conjur_url[:-1]
 
-        url = urlparse(self.conjurrc_data.conjur_url)
+        return urlparse(self.conjurrc_data.conjur_url)
 
-        # TODO: Factor out the following URL validation to ConjurrcData class
-        # and add integration tests
-        if url.scheme != 'https':
+    def validate_conjur_url(self, conjur_url):
+        """
+        Validates the specified url
+
+        Raises a RuntimeError in case of an invalid url format
+        """
+        if conjur_url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
                    f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
+    # pylint: disable=line-too-long
+    def get_server_certificate(self, conjur_url):
+        """
+        Get the certificate from the specified conjur_url
+
+        Returns:
+            tuple of certificate fingerprint and certificate chains or
+            None if the user provided a certificate
+        """
         if self.conjurrc_data.cert_file is not None:
             # Return None because we do not need to fetch the certificate
             return None
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Initiating a TLS connection with '{self.conjurrc_data.conjur_url}'...")
-        fingerprint, fetched_certificate = self.init_logic.get_certificate(url.hostname, url.port)
+        fingerprint, fetched_certificate = self.init_logic.get_certificate(conjur_url.hostname,
+                                                                           conjur_url.port)
 
         sys.stdout.write(f"\nThe Conjur server's certificate SHA-1 fingerprint is:\n{fingerprint}\n")
         sys.stdout.write("\nTo verify this certificate, we recommend running the following "

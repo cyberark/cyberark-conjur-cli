@@ -12,6 +12,7 @@ import re
 from enum import Enum
 from urllib.parse import quote
 import requests
+import urllib3
 
 from conjur.errors import CertificateHostnameMismatchException
 
@@ -36,6 +37,7 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
+    urllib3.disable_warnings()
     orig_params = params or {}
     # Escape all params
     params = {}

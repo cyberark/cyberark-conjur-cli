@@ -49,8 +49,9 @@ class InitLogic:
     @classmethod
     def fetch_account_from_server(cls, conjurrc_data):
         """
-        Fetches the account from the DAP server by making a request to the /info endpoint.
-        This endpoint only exists in the DAP server
+        Fetches the account from the Conjur Enterprise server by making a
+        request to the /info endpoint. This endpoint only exists in the
+        Conjur Enterprise server
         """
         params = {
             'url': conjurrc_data.conjur_url

@@ -8,11 +8,16 @@ This module holds the common logic across the codebase
 import logging
 import os
 
-
-def get_insecure_warning():
+def get_insecure_warning_in_warning():
     """ Log warning message"""
-    logging.debug("Warning: Running the command with '--insecure'"
-                  " makes your system vulnerable to security attacks")
+    logging.warning("You chose to initialize the client in insecure mode. "
+                    "If you prefer to communicate with the server securely, "
+                    "you must reinitialize the client in secure mode.")
+
+def get_insecure_warning_in_debug():
+    """ Log debug message"""
+    logging.debug("Warning: Running the command with '--insecure' "
+                  "makes your system vulnerable to security attacks")
 
 def determine_status_code_specific_error_messages(server_error):
     """ Method for returning status code-specific error messages """

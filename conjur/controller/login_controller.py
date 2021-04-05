@@ -29,7 +29,8 @@ class LoginController:
         """
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
-            util_functions.get_insecure_warning()
+            util_functions.get_insecure_warning_in_debug()
+            util_functions.get_insecure_warning_in_warning()
 
         self.user_password = user_password
         self.credential_data = credential_data
