@@ -13,7 +13,7 @@ import logging
 # Internals
 from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
 from conjur.data_object import CredentialsData
-from conjur.errors import OperationNotCompletedException,\
+from conjur.errors import OperationNotCompletedException, \
     CredentialRetrievalException, KeyringDeletionError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper import KeystoreAdapter
@@ -28,7 +28,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
     in the system's keystore
     """
 
-    def __init__(self):  # pragma: no cover
+    def __init__(self): # pragma: no cover
         pass
 
     # pylint: disable=line-too-long,logging-fstring-interpolation
@@ -38,11 +38,11 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         """
         logging.debug("Attempting to save credentials to the system's credential store "
                       f"'{KeystoreAdapter.get_keyring_name()}'...")
-        cred_id = credential_data.machine
+        credential_id = credential_data.machine
         try:
-            KeystoreAdapter.set_password(cred_id, MACHINE, credential_data.machine)
-            KeystoreAdapter.set_password(cred_id, LOGIN, credential_data.login)
-            KeystoreAdapter.set_password(cred_id, PASSWORD, credential_data.password)
+            KeystoreAdapter.set_password(credential_id, MACHINE, credential_data.machine)
+            KeystoreAdapter.set_password(credential_id, LOGIN, credential_data.login)
+            KeystoreAdapter.set_password(credential_id, PASSWORD, credential_data.password)
             logging.debug(f"Credentials saved to the '{KeystoreAdapter.get_keyring_name()}' credential store")
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
@@ -81,8 +81,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         """
         Method for removing user credentials in the system's keyring
         """
-        logging.debug(
-            f"Attempting to remove credentials from the '{KeystoreAdapter.get_keyring_name()}' credential store...")
+        logging.debug("Attempting to remove credentials from "
+                      f"the '{KeystoreAdapter.get_keyring_name()}' credential store...")
         for attr in KEYSTORE_ATTRIBUTES:
             try:
                 KeystoreAdapter.delete_password(conjurrc.conjur_url, attr)
@@ -92,5 +92,5 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 logging.debug(f"keyring unable to delete key {attr}. maybe not exist. {err}")
                 continue
 
-        logging.debug(
-            f"Successfully removed credentials from the '{KeystoreAdapter.get_keyring_name()}' credential store...")
+        logging.debug(f"Successfully removed credentials from the "
+                      f"'{KeystoreAdapter.get_keyring_name()}' credential store")

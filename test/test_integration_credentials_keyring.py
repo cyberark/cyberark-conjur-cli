@@ -14,12 +14,15 @@ import uuid
 import platform
 
 from conjur.data_object import CredentialsData
-from conjur.logic.credential_provider import CredentialStoreFactory, KeystoreCredentialsProvider
+from conjur.data_object.OsTypes import OsTypes
+from conjur.logic.credential_provider import KeystoreCredentialsProvider
+from conjur.util.util_functions import get_current_os
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
-from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE \
+    , KEYRING_TYPE_ENV_VARIABLE_NAME, WINDOWS_KEYRING_NAME, MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME
 
 
 class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
@@ -384,13 +387,15 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     '''
     @integration_test(True)
     def test_keyring_locked_after_login_will_raise_error_keyring(self):
-        _ = utils.create_cred_store()
-        if platform.system() == "Darwin":
-            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.macOS.Keyring"
-        if platform.system() == "Linux":
-            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.SecretService.Keyring"
-        if platform.system() == "Windows":
-            assert os.getenv("PYTHON_KEYRING_BACKEND") == "keyring.backends.Windows.WinVaultKeyring"
+        utils.create_cred_store()
+
+        current_platform = get_current_os()
+        if current_platform == OsTypes.MAC_OS:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == MAC_OS_KEYRING_NAME
+        if current_platform == OsTypes.LINUX:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == LINUX_KEYRING_NAME
+        if current_platform == OsTypes.WINDOWS:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == WINDOWS_KEYRING_NAME
 
     '''
     Validate variable operation with keyring

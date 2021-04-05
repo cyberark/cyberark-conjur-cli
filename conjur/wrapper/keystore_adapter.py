@@ -10,23 +10,15 @@ library and functionality should we need to do so in the future.
 
 # Builtins
 import logging
-import platform
-import os
 
 # Third party
 import keyring
 
-# TODO should verify we are using the exact keyring version wanted and
-#  disable insecure keyring such as PlaintextKeyring.
+# Internals
 from conjur.errors import KeyringDeletionError, KeyringGeneralError, KeyringSetError
+from conjur.util.util_functions import setup_keyring_env_variable
 
-if platform.system() == "Darwin":
-    os.environ["PYTHON_KEYRING_BACKEND"] = "keyring.backends.macOS.Keyring"
-if platform.system() == "Linux":
-    os.environ["PYTHON_KEYRING_BACKEND"] = "keyring.backends.SecretService.Keyring"
-if platform.system() == "Windows":
-    os.environ["PYTHON_KEYRING_BACKEND"] = "keyring.backends.Windows.WinVaultKeyring"
-
+setup_keyring_env_variable()
 
 class KeystoreAdapter:
     """
@@ -42,12 +34,12 @@ class KeystoreAdapter:
         """
         try:
             keyring.set_password(identifier, key, val)
-        except keyring.errors.PasswordSetError as err:
-            raise KeyringSetError(
-                f"unable to set key: {key} for identifier: {identifier}") from err
-        except keyring.errors.KeyringError as err:
-            raise KeyringGeneralError(
-                f"unable to set key: {key} for identifier: {identifier}") from err
+        except keyring.errors.PasswordSetError as password_error:
+            raise KeyringSetError(f"unable to set key: {key} for identifier: "
+                                  f"{identifier}") from password_error
+        except keyring.errors.KeyringError as keyring_error:
+            raise KeyringGeneralError(f"unable to set key: {key} for identifier: "
+                                      f"{identifier}") from keyring_error
 
     @classmethod
     def get_password(cls, identifier, key):
@@ -56,9 +48,9 @@ class KeystoreAdapter:
         """
         try:
             return keyring.get_password(identifier, key)
-        except keyring.errors.KeyringError as err:
-            raise KeyringGeneralError(
-                f"unable to get value for key: {key} for identifier: {identifier}") from err
+        except keyring.errors.KeyringError as keyring_error:
+            raise KeyringGeneralError(f"unable to get value for key: {key} "
+                                      f"for identifier: {identifier}") from keyring_error
 
     # pylint: disable=try-except-raise
     @classmethod
@@ -68,22 +60,26 @@ class KeystoreAdapter:
         """
         try:
             keyring.delete_password(identifier, key)
-        except keyring.errors.PasswordDeleteError as err:
-            raise KeyringDeletionError(
-                f"unable to delete key: {key} for identifier: {identifier}") from err
-        except keyring.errors.KeyringError as err:
-            raise KeyringGeneralError(
-                f"unable to delete key: {key} for identifier: {identifier}") from err
+        except keyring.errors.PasswordDeleteError as password_error:
+            raise KeyringDeletionError(f"unable to delete key: {key} for identifier: "
+                                       f"{identifier}") from password_error
+        except keyring.errors.KeyringError as keyring_error:
+            raise KeyringGeneralError(f"unable to delete key: {key} for identifier:"
+                                      f" {identifier}") from keyring_error
 
     @classmethod
     def get_keyring_name(cls):
         """
         Method to get the system's keyring name
         """
+        # keyring.get_keyring() can throw various types of exceptions
+        # some are OS exceptions that is the reason we catch general exception.
+        # please note that this is a critical path, if we get error here the
+        # entire app could not function
         try:
             return keyring.get_keyring().name
-        except Exception as keyring_error:  # pylint: disable=broad-except
-            logging.debug(keyring_error)
+        except Exception as err:  # pylint: disable=broad-except
+            logging.debug(err)
             return None
 
     @classmethod
@@ -91,13 +87,15 @@ class KeystoreAdapter:
         """
         Method to check if the keyring is accessible
         """
-        # noinspection PyBroadException
         try:
             # Send a dummy request to test if the keyring is accessible
             # this should return None if value not exist
+            # catch Exception and not specific type since it can throw various
+            # types of exceptions (some are OS exceptions) and if get_password
+            # doesn't throws it means that kearying is accessible otherwise it isn't
             keyring.get_password('test-system', 'test-accessibility')
-        except Exception as keyring_error:  # pylint: disable=broad-except
-            logging.debug(keyring_error)
+        except Exception as err:  # pylint: disable=broad-except
+            logging.debug(err)
             return False
 
         return True

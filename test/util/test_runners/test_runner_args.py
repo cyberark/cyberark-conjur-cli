@@ -64,7 +64,7 @@ class TestRunnerArgs:
         parser.add_argument('-a', '--account', dest='account', action='store', default='dev', help='account name')
         parser.add_argument('-l', '--login', dest='login', action='store', default='admin', help='user name')
         parser.add_argument('-p', '--password', dest='password', action='store', help='the user password')
-        parser.add_argument('-c', '--cli-to-test', dest='cli_to_test', action='store',default=None,
+        parser.add_argument('-c', '--cli-to-test', dest='cli_to_test', action='store', default=None,
                             help='the cli binaries to test')
         parser.add_argument('-f', '--files-folder', dest='files_folder', action='store', default='./test',
                             help='where the test assets are located')

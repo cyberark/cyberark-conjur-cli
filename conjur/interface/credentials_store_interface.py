@@ -6,14 +6,13 @@ CredentialsStoreInterface Interface
 This class describes a shared interface for accessing user credentials
 """
 
-# 3rd parties
+# Builtins
 import abc
 
 # Internals
 from conjur.data_object import CredentialsData
 
 
-# pylint: disable=unnecessary-pass
 class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
     """
     CredentialsStoreInterface

@@ -148,7 +148,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                             "after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
-    def _get_credentials_from_file(self, conjurrc_conjur_url):
+    def _get_credentials_from_file(self, conjurrc_conjur_url): # pragma: no cover
         try:
             loaded_credentials = {}
             netrc_auth = ""

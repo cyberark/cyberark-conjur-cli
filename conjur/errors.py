@@ -71,19 +71,19 @@ class CredentialRetrievalException(Exception):
         super().__init__(self.message)
 
 class KeyringGeneralError(Exception):
-    """ Exception for when configuration is invalid """
+    """ Exception for Keyring Adapter """
     def __init__(self, message=""):
         self.message = message
         super().__init__(self.message)
 
 class KeyringDeletionError(KeyringGeneralError):
-    """ Exception for when configuration is invalid """
+    """ Exception for Keyring Adapter when underlying deletion operation failed """
     def __init__(self, message=""):
         self.message = message
         super().__init__(self.message)
 
 class KeyringSetError(KeyringGeneralError):
-    """ Exception for when configuration is invalid """
+    """ Exception for Keyring Adapter when underlying set operation failed """
     def __init__(self, message=""):
         self.message = message
         super().__init__(self.message)
