@@ -7,7 +7,7 @@ This module is used to represent different os platforms.
 from enum import Enum
 
 
-class OSTypes(Enum):
+class OSTypes(Enum):   # pragma: no cover
     """
     Represent possible platforms that the cli might be running on
     """

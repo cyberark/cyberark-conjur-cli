@@ -49,7 +49,7 @@ def configure_env_var_with_keyring():
     else:
         logging.debug("working on an unsupported platform: %s", platform.system())
 
-def get_current_os() -> OSTypes:
+def get_current_os() -> OSTypes: # pragma: no cover
     """
     Determine which os we currently use
     """
