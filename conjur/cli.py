@@ -57,13 +57,13 @@ class Cli():
         parser = ArgParseBuilder()\
             .add_login_parser()\
             .add_init_parser()\
-            .add_logout()\
-            .add_list()\
-            .add_host()\
-            .add_policy()\
-            .add_user()\
-            .add_variable()\
-            .add_whoami()\
+            .add_logout_parser()\
+            .add_list_parser()\
+            .add_host_parser()\
+            .add_policy_parser()\
+            .add_user_parser()\
+            .add_variable_parser()\
+            .add_whoami_parser()\
             .add_main_screen_options()\
             .build()
 

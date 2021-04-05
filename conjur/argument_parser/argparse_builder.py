@@ -79,7 +79,7 @@ class ArgParseBuilder:
 
         return self
 
-    def add_logout(self):
+    def add_logout_parser(self):
         logout_name = 'logout - Log out and delete local cache'
         logout_usage = 'conjur [global options] logout [options]'
         # pylint: disable=line-too-long
@@ -97,7 +97,7 @@ class ArgParseBuilder:
         logout_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
-    def add_list(self):
+    def add_list_parser(self):
         list_name = 'list - List resources within an organization\'s account'
         list_usage = 'conjur [global options] list [options] [args]'
         # pylint: disable=line-too-long
@@ -143,7 +143,7 @@ class ArgParseBuilder:
 
         return self
 
-    def add_policy(self):
+    def add_policy_parser(self):
         policy_name = 'policy - Manage policies'
         policy_usage = 'conjur [global options] policy <subcommand> [options] [args]'
         # pylint: disable=line-too-long
@@ -232,7 +232,7 @@ class ArgParseBuilder:
 
         return self
 
-    def add_user(self):
+    def add_user_parser(self):
         user_name = 'user - Manage users'
         user_usage = 'conjur [global options] user <subcommand> [options] [args]'
         user_subparser = self.resource_subparsers.add_parser('user',
@@ -299,7 +299,7 @@ class ArgParseBuilder:
         user_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
-    def add_host(self):
+    def add_host_parser(self):
         host_name = 'host - Manage hosts'
         host_usage = 'conjur [global options] host <subcommand> [options] [args]'
         host_subparser = self.resource_subparsers.add_parser('host',
@@ -337,7 +337,7 @@ class ArgParseBuilder:
         host_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
-    def add_variable(self):
+    def add_variable_parser(self):
         variable_name = 'variable - Manage variables'
         variable_usage = 'conjur [global options] variable <subcommand> [options] [args]'
 
@@ -406,7 +406,7 @@ class ArgParseBuilder:
         policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
-    def add_whoami(self):
+    def add_whoami_parser(self):
         whoami_name = 'whoami - Print information about the current logged-in user'
         whoami_usage = 'conjur [global options] whoami [options]'
         # pylint: disable=line-too-long
@@ -440,5 +440,5 @@ class ArgParseBuilder:
                                      action='store_false')
         return self
 
-    def build(self):
+    def build(self) -> ArgparseWrapper:
         return self.parser
