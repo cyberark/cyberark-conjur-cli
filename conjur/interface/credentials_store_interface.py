@@ -56,7 +56,7 @@ class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def cleanup_if_exist(self, conjurrc_conjur_url):
+    def cleanup_if_exists(self, conjurrc_conjur_url):
         """
         Method to cleanup credential leftovers if exist.
         For example, if a user delete item manually from the local pc keyring,

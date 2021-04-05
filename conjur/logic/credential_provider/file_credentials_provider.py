@@ -171,7 +171,8 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             raise Exception("Error: netrc is in an invalid format. "
                             f"Reason: {netrc_error}") from netrc_error
 
-    def cleanup_if_exist(self, conjurrc_conjur_url):
+    # pylint: disable=unnecessary-pass
+    def cleanup_if_exists(self, conjurrc_conjur_url):
         """
         Not implemented for netrc for now.
         """

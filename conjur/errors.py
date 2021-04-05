@@ -71,7 +71,7 @@ class CredentialRetrievalException(Exception):
         super().__init__(self.message)
 
 class KeyringAdapterGeneralError(Exception):
-    """ Exception for Keyring Adapter """
+    """ General Exception for Keyring Adapter """
     def __init__(self, message=""):
         self.message = message
         super().__init__(self.message)

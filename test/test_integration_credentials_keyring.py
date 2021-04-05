@@ -11,10 +11,9 @@ import shutil
 import string
 from unittest.mock import patch
 import uuid
-import platform
 
 from conjur.data_object import CredentialsData
-from conjur.data_object.OsTypes import OsTypes
+from conjur.util.os_types import OSTypes
 from conjur.logic.credential_provider import KeystoreCredentialsProvider
 from conjur.util.util_functions import get_current_os
 from test.util.test_infrastructure import integration_test
@@ -390,11 +389,11 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         utils.create_cred_store()
 
         current_platform = get_current_os()
-        if current_platform == OsTypes.MAC_OS:
+        if current_platform == OSTypes.MAC_OS:
             assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == MAC_OS_KEYRING_NAME
-        if current_platform == OsTypes.LINUX:
+        if current_platform == OSTypes.LINUX:
             assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == LINUX_KEYRING_NAME
-        if current_platform == OsTypes.WINDOWS:
+        if current_platform == OSTypes.WINDOWS:
             assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == WINDOWS_KEYRING_NAME
 
     '''

@@ -15,10 +15,13 @@ import logging
 import keyring
 
 # Internals
-from conjur.errors import KeyringAdapterDeletionError, KeyringAdapterGeneralError, KeyringAdapterSetError
-from conjur.util.util_functions import setup_keyring_env_variable
+from conjur.errors import KeyringAdapterDeletionError, KeyringAdapterGeneralError\
+    , KeyringAdapterSetError
+from conjur.util.util_functions import configure_env_var_with_keyring
 
-setup_keyring_env_variable()
+# Function is called in the module so that before accessing the
+# system’s keyring, the environment will be configured correctly
+configure_env_var_with_keyring()
 
 
 class KeystoreAdapter:
@@ -39,8 +42,8 @@ class KeystoreAdapter:
             raise KeyringAdapterSetError(f"Failed to set key '{key}' for identifier "
                                          f"'{identifier}'") from password_error
         except Exception as exception:
-            raise KeyringAdapterGeneralError(
-                message=f"General keyring error has occurred (Failed to set '{key}')'") from exception
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to set '{key}')'") from exception
 
     @classmethod
     def get_password(cls, identifier, key):
@@ -65,18 +68,18 @@ class KeystoreAdapter:
             raise KeyringAdapterDeletionError(f"Failed to delete key '{key}' for identifier "
                                               f"'{identifier}'") from password_error
         except Exception as exception:
-            raise KeyringAdapterGeneralError(
-                message=f"General keyring error has occurred (Failed to delete '{key}')'") from exception
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to delete '{key}')'") from exception
 
     @classmethod
     def get_keyring_name(cls):
         """
         Method to get the system's keyring name
         """
-        # keyring.get_keyring() can throw various types of exceptions
-        # some are OS exceptions that is the reason we catch general exception.
-        # please note that this is a critical path, if we get error here the
-        # entire app could not function
+        # keyring.get_keyring can throw various types of Exceptions.
+        # Some are OS exceptions and that is the reason we catch general Exceptions.
+        # Note that this is a critical path, if we get error, we will return None and not raise
+        # the exception because we want to write to the netrc and not fail the CLI
         try:
             return keyring.get_keyring().name
         except Exception as err:  # pylint: disable=broad-except
@@ -90,11 +93,10 @@ class KeystoreAdapter:
         """
         try:
             # Send a dummy request to test if the keyring is accessible
-            # this should return None if value not exist
-            # catch Exception and not specific type since it can throw various
-            # types of exceptions (some are OS exceptions) and if get_password
-            # doesn't throws it means that kearying is accessible otherwise it isn't
+            # this should return None if value not exist.
             keyring.get_password('test-system', 'test-accessibility')
+        # Catch Exception and not a specific type since various exceptions
+        # can be thrown. For example some related to OS and others related to keyring.
         except Exception as err:  # pylint: disable=broad-except
             logging.debug(err)
             return False

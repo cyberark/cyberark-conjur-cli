@@ -34,8 +34,9 @@ class LogoutController:
         try:
             loaded_conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
             if not self.credentials_provider.is_exists(loaded_conjurrc.conjur_url):
-                # This is here to make sure no leftovers left.
-                # For example if user deleted part of his password manually.
+                # Cleans up credentials leftover to make sure the environment is
+                # not left in a partial state. For example, if user deleted
+                # their username or password manually.
                 self.logout_logic.cleanup_credentials(loaded_conjurrc)
                 raise Exception("You are already logged out.")
             self.logout_logic.remove_credentials(loaded_conjurrc)

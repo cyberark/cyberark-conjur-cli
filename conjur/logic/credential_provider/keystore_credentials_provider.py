@@ -92,13 +92,12 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             except KeyringAdapterDeletionError:
                 logging.debug(
                     f"Unable to delete item '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
-                    "credential store. Item may not exist.\n"
-                    f"{traceback.format_exc()}")
+                    "credential store. Item may not exist.\n{traceback.format_exc()}")
 
         logging.debug("Successfully removed credentials from the "
                       f"'{KeystoreAdapter.get_keyring_name()}' credential store")
 
-    def cleanup_if_exist(self, conjurrc_conjur_url):
+    def cleanup_if_exists(self, conjurrc_conjur_url):
         """
         For each credential attribute, check if exists for
         the conjurrc_conjur_url identifier and delete if exists
@@ -109,8 +108,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                     KeystoreAdapter.delete_password(conjurrc_conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
-            except:
+            except Exception:  # pylint: disable=broad-except
                 logging.debug(
                     f"Cleanup failed for item '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
-                    "credential store.\n"
-                    f"{traceback.format_exc()}")
+                    f"credential store.\n{traceback.format_exc()}")

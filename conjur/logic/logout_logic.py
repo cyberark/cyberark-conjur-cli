@@ -31,4 +31,4 @@ class LogoutLogic:
         """
         Method to remove credentials during logout
         """
-        self.credentials_provider.cleanup_if_exist(conjurrc.conjur_url)
+        self.credentials_provider.cleanup_if_exists(conjurrc.conjur_url)
