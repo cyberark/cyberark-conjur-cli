@@ -15,7 +15,7 @@ import logging
 import keyring
 
 # Internals
-from conjur.errors import KeyringDeletionError, KeyringGeneralError, KeyringSetError
+from conjur.errors import KeyringAdapterDeletionError, KeyringAdapterGeneralError, KeyringAdapterSetError
 from conjur.util.util_functions import setup_keyring_env_variable
 
 setup_keyring_env_variable()
@@ -35,10 +35,10 @@ class KeystoreAdapter:
         try:
             keyring.set_password(identifier, key, val)
         except keyring.errors.PasswordSetError as password_error:
-            raise KeyringSetError(f"unable to set key: {key} for identifier: "
+            raise KeyringAdapterSetError(f"unable to set key: {key} for identifier: "
                                   f"{identifier}") from password_error
         except keyring.errors.KeyringError as keyring_error:
-            raise KeyringGeneralError(f"unable to set key: {key} for identifier: "
+            raise KeyringAdapterGeneralError(f"unable to set key: {key} for identifier: "
                                       f"{identifier}") from keyring_error
 
     @classmethod
@@ -49,7 +49,7 @@ class KeystoreAdapter:
         try:
             return keyring.get_password(identifier, key)
         except keyring.errors.KeyringError as keyring_error:
-            raise KeyringGeneralError(f"unable to get value for key: {key} "
+            raise KeyringAdapterGeneralError(f"unable to get value for key: {key} "
                                       f"for identifier: {identifier}") from keyring_error
 
     # pylint: disable=try-except-raise
@@ -61,10 +61,10 @@ class KeystoreAdapter:
         try:
             keyring.delete_password(identifier, key)
         except keyring.errors.PasswordDeleteError as password_error:
-            raise KeyringDeletionError(f"unable to delete key: {key} for identifier: "
+            raise KeyringAdapterDeletionError(f"unable to delete key: {key} for identifier: "
                                        f"{identifier}") from password_error
         except keyring.errors.KeyringError as keyring_error:
-            raise KeyringGeneralError(f"unable to delete key: {key} for identifier:"
+            raise KeyringAdapterGeneralError(f"unable to delete key: {key} for identifier:"
                                       f" {identifier}") from keyring_error
 
     @classmethod

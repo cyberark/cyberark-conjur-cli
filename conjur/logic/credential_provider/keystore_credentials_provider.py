@@ -14,7 +14,7 @@ import logging
 from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
 from conjur.data_object import CredentialsData
 from conjur.errors import OperationNotCompletedException, \
-    CredentialRetrievalException, KeyringDeletionError
+    CredentialRetrievalException, KeyringAdapterDeletionError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper import KeystoreAdapter
 
@@ -88,7 +88,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 KeystoreAdapter.delete_password(conjurrc.conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
-            except KeyringDeletionError as err:
+            except KeyringAdapterDeletionError as err:
                 logging.debug(f"keyring unable to delete key {attr}. maybe not exist. {err}")
                 continue
 
