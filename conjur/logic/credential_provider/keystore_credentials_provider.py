@@ -89,7 +89,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
             except KeyringAdapterDeletionError as err:
-                logging.debug(f"keyring unable to delete key {attr}. maybe not exist. {err}")
+                logging.debug(f"Unable to delete item {attr} from the '{KeystoreAdapter.get_keyring_name()}' "
+                              f"credential store. They may not exist. {err}")
                 continue
 
         logging.debug(f"Successfully removed credentials from the "

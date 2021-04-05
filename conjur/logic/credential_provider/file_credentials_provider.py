@@ -105,7 +105,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         # pylint: disable=no-else-return
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
-        elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
+        elif os.path.getsize(DEFAULT_NETRC_FILE) != 0:
             credential_data = self.load(conjurrc.conjur_url)
 
             netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)

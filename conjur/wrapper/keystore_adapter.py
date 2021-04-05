@@ -61,11 +61,11 @@ class KeystoreAdapter:
         try:
             keyring.delete_password(identifier, key)
         except keyring.errors.PasswordDeleteError as password_error:
-            raise KeyringAdapterDeletionError(f"unable to delete key: {key} for identifier: "
-                                       f"{identifier}") from password_error
+            raise KeyringAdapterDeletionError(f"Failed to delete key '{key}' for identifier "
+                                       f"'{identifier}'") from password_error
         except keyring.errors.KeyringError as keyring_error:
-            raise KeyringAdapterGeneralError(f"unable to delete key: {key} for identifier:"
-                                      f" {identifier}") from keyring_error
+            raise KeyringAdapterGeneralError(f"Failed to delete key '{key}' for identifier "
+                                      f"'{identifier}'") from keyring_error
 
     @classmethod
     def get_keyring_name(cls):
