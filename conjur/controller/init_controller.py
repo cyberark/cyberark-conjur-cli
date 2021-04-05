@@ -32,7 +32,8 @@ class InitController:
     def __init__(self, conjurrc_data, init_logic, force, ssl_verify):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
-            util_functions.get_insecure_warning()
+            util_functions.get_insecure_warning_in_debug()
+            util_functions.get_insecure_warning_in_warning()
 
         self.conjurrc_data = conjurrc_data
         self.init_logic = init_logic

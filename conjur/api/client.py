@@ -60,7 +60,7 @@ class Client():
                  url=None):
 
         if ssl_verify is False:
-            util_functions.get_insecure_warning()
+            util_functions.get_insecure_warning_in_debug()
 
         self.setup_logging(debug)
 
