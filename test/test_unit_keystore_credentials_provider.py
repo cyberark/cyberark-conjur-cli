@@ -106,3 +106,15 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         credential_provider = KeystoreCredentialsProvider()
         with self.assertRaises(keyring.errors.KeyringError):
             credential_provider.remove_credentials(MockConjurrcData)
+
+
+    @patch.object(KeystoreAdapter, "get_password", return_value="Some_password")
+    @patch.object(KeystoreAdapter, "delete_password", return_value=None)
+    @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
+    def test_cleanup_calls_3_times(self, mock_keystore_adapter_1, mock_keystore_adapter_2,mock_keystore_adapter_3):
+        credential_provider = KeystoreCredentialsProvider()
+        credential_provider.remove_credentials(MockConjurrcData)
+        calls = [call(TEST_HOSTNAME, MACHINE),
+                 call(TEST_HOSTNAME, LOGIN),
+                 call(TEST_HOSTNAME, PASSWORD)]
+        mock_keystore_adapter_2.assert_has_calls(calls)
