@@ -9,7 +9,7 @@ This module represents an object that holds conjurrc data
 from yaml import load as yaml_load
 try:
     from yaml import CLoader as YamlLoader
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     from yaml import Loader as YamlLoader
 
 # Internals

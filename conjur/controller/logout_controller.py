@@ -11,6 +11,9 @@ required to successfully logout
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
 
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+
+
 # pylint: disable=too-few-public-methods
 class LogoutController:
     """
@@ -18,7 +21,8 @@ class LogoutController:
 
     This class represents the Presentation Layer for the LOGOUT command
     """
-    def __init__(self, ssl_verify, logout_logic, credentials_provider):
+
+    def __init__(self, ssl_verify, logout_logic, credentials_provider: CredentialsStoreInterface):
         self.ssl_verify = ssl_verify
         self.logout_logic = logout_logic
         self.credentials_provider = credentials_provider
@@ -30,6 +34,9 @@ class LogoutController:
         try:
             loaded_conjurrc = ConjurrcData.load_from_file(DEFAULT_CONFIG_FILE)
             if not self.credentials_provider.is_exists(loaded_conjurrc.conjur_url):
+                # This is here to make sure no leftovers left.
+                # For example if user deleted part of his password manually.
+                self.logout_logic.cleanup_credentials(loaded_conjurrc)
                 raise Exception("You are already logged out.")
             self.logout_logic.remove_credentials(loaded_conjurrc)
         except Exception as error:

@@ -27,6 +27,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
     This class holds logic when credentials are kept in the netrc
     """
+
     FIRST_TIME_LOG_INSECURE_STORE_WARNING = True  # Static
 
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
@@ -148,7 +149,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                             "after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
-    def _get_credentials_from_file(self, conjurrc_conjur_url): # pragma: no cover
+    def _get_credentials_from_file(self, conjurrc_conjur_url):  # pragma: no cover
         try:
             loaded_credentials = {}
             netrc_auth = ""
@@ -169,3 +170,12 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         except netrc.NetrcParseError as netrc_error:
             raise Exception("Error: netrc is in an invalid format. "
                             f"Reason: {netrc_error}") from netrc_error
+
+    def cleanup_if_exist(self, conjurrc_conjur_url):
+        """
+        Not implemented for netrc for now.
+        """
+        # We use this function to cleanup credentials in case user
+        # did some work manually and left unstable state. this is more
+        # relevant for the Keyring scenario than the netrc for now.
+        pass

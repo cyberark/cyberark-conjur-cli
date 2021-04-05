@@ -20,6 +20,7 @@ from conjur.util.util_functions import setup_keyring_env_variable
 
 setup_keyring_env_variable()
 
+
 class KeystoreAdapter:
     """
     KeystoreAdapter
@@ -35,11 +36,11 @@ class KeystoreAdapter:
         try:
             keyring.set_password(identifier, key, val)
         except keyring.errors.PasswordSetError as password_error:
-            raise KeyringAdapterSetError(f"unable to set key: {key} for identifier: "
-                                  f"{identifier}") from password_error
-        except keyring.errors.KeyringError as keyring_error:
-            raise KeyringAdapterGeneralError(f"unable to set key: {key} for identifier: "
-                                      f"{identifier}") from keyring_error
+            raise KeyringAdapterSetError(f"Failed to set key '{key}' for identifier "
+                                         f"'{identifier}'") from password_error
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(
+                message=f"General keyring error has occurred (Failed to set '{key}')'") from exception
 
     @classmethod
     def get_password(cls, identifier, key):
@@ -50,7 +51,7 @@ class KeystoreAdapter:
             return keyring.get_password(identifier, key)
         except keyring.errors.KeyringError as keyring_error:
             raise KeyringAdapterGeneralError(f"unable to get value for key: {key} "
-                                      f"for identifier: {identifier}") from keyring_error
+                                             f"for identifier: {identifier}") from keyring_error
 
     # pylint: disable=try-except-raise
     @classmethod
@@ -62,10 +63,10 @@ class KeystoreAdapter:
             keyring.delete_password(identifier, key)
         except keyring.errors.PasswordDeleteError as password_error:
             raise KeyringAdapterDeletionError(f"Failed to delete key '{key}' for identifier "
-                                       f"'{identifier}'") from password_error
-        except keyring.errors.KeyringError as keyring_error:
-            raise KeyringAdapterGeneralError(f"Failed to delete key '{key}' for identifier "
-                                      f"'{identifier}'") from keyring_error
+                                              f"'{identifier}'") from password_error
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(
+                message=f"General keyring error has occurred (Failed to delete '{key}')'") from exception
 
     @classmethod
     def get_keyring_name(cls):
