@@ -45,6 +45,7 @@ class KeystoreAdapter:
             raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to set '{key}')'") from exception
 
+    # pylint: disable=try-except-raise
     @classmethod
     def get_password(cls, identifier, key):
         """
@@ -52,9 +53,9 @@ class KeystoreAdapter:
         """
         try:
             return keyring.get_password(identifier, key)
-        except keyring.errors.KeyringError as keyring_error:
-            raise KeyringAdapterGeneralError(f"unable to get value for key: {key} "
-                                             f"for identifier: {identifier}") from keyring_error
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to get '{key}')'") from exception
 
     # pylint: disable=try-except-raise
     @classmethod
