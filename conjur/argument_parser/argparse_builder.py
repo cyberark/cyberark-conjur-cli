@@ -167,6 +167,7 @@ class ArgParseBuilder:
         list_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         return self
+
     # pylint: disable=too-many-locals
     def add_policy_parser(self):
         """
