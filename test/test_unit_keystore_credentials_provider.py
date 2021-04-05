@@ -90,10 +90,13 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
 
     @patch.object(KeystoreAdapter, "delete_password", return_value=None)
     @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
-    def test_remove_credentials_calls_delete_password(self, mock_keystore_adapter, another_mock_keystore_adatper):
+    def test_remove_credentials_calls_delete_password_3_times(self, mock_keystore_adapter, another_mock_keystore_adatper):
         credential_provider = KeystoreCredentialsProvider()
         credential_provider.remove_credentials(MockConjurrcData)
-        another_mock_keystore_adatper.assert_called_once_with(TEST_HOSTNAME)
+        calls = [call(TEST_HOSTNAME, MACHINE),
+                 call(TEST_HOSTNAME, LOGIN),
+                 call(TEST_HOSTNAME, PASSWORD)]
+        another_mock_keystore_adatper.assert_has_calls(calls)
 
     @patch.object(KeystoreAdapter, "delete_password", side_effect=keyring.errors.KeyringError)
     @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
