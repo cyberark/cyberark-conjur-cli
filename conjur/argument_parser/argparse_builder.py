@@ -1,24 +1,40 @@
+"""
+Module For the argparseBuilder
+"""
 import argparse
 from conjur.wrapper import ArgparseWrapper
 from conjur.version import __version__
-from conjur.util.parser_utils import *
+from conjur.util.parser_utils import formatter, header, command_description, \
+    main_epilog, command_epilog, title_formatter, conjur_copyright
 
 
+# pylint: disable=line-too-long
 class ArgParseBuilder:
+    """
+    This class simplify and encapsulate the way we build the parser.
+    It uses a fluent interface pattern where each function return
+    ArgParseBuilder current instance
+    """
 
     def __init__(self):
+        """
+        Method that init the Builder resources
+        """
         self.parser = ArgparseWrapper(
-            description=usage('conjur [global options] <command> <subcommand> [options] [args]'),
+            description=header('conjur [global options] <command> <subcommand> [options] [args]'),
             epilog=main_epilog(),
             usage=argparse.SUPPRESS,
             add_help=False,
-            formatter_class=formatter_class)
-        self.resource_subparsers = self.parser.add_subparsers(dest='resource', title=title("Commands"))
+            formatter_class=formatter)
+        self.resource_subparsers = self.parser.add_subparsers(dest='resource', title=title_formatter("Commands"))
 
     def add_init_parser(self):
+        """
+        Method adds init parser functionality to parser
+        """
         init_name = 'init - Initialize Conjur configuration'
         input_usage = 'conjur [global options] init [options] [args]'
-        # pylint: disable=line-too-long
+
         init_subparser = self.resource_subparsers.add_parser('init',
                                                              help='Initialize Conjur configuration',
                                                              description=command_description(init_name,
@@ -28,9 +44,9 @@ class ArgParseBuilder:
                                                                  'Initializes Conjur configuration and writes to file (.conjurrc)'),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
-                                                             formatter_class=formatter_class)
+                                                             formatter_class=formatter)
 
-        init_options = init_subparser.add_argument_group(title=title("Options"))
+        init_options = init_subparser.add_argument_group(title=title_formatter("Options"))
         init_options.add_argument('-u', '--url', metavar='VALUE',
                                   action='store', dest='url',
                                   help='Provide URL of Conjur server')
@@ -50,9 +66,12 @@ class ArgParseBuilder:
         return self
 
     def add_login_parser(self):
+        """
+        Method adds login parser functionality to parser
+        """
         login_name = 'login - Log in to Conjur server'
         login_usage = 'conjur [global options] login [options] [args]'
-        # pylint: disable=line-too-long
+
         login_subparser = self.resource_subparsers.add_parser('login',
                                                               help='Log in to Conjur server',
                                                               description=command_description(login_name,
@@ -66,9 +85,9 @@ class ArgParseBuilder:
                                                                                     'in the local cache (netrc file)'),
                                                               usage=argparse.SUPPRESS,
                                                               add_help=False,
-                                                              formatter_class=formatter_class)
+                                                              formatter_class=formatter)
 
-        login_options = login_subparser.add_argument_group(title=title("Options"))
+        login_options = login_subparser.add_argument_group(title=title_formatter("Options"))
         login_options.add_argument('-i', '--id', metavar='VALUE',
                                    action='store', dest='identifier',
                                    help='Provide a login name to log into Conjur server')
@@ -80,9 +99,12 @@ class ArgParseBuilder:
         return self
 
     def add_logout_parser(self):
+        """
+        Method adds logout parser functionality to parser
+        """
         logout_name = 'logout - Log out and delete local cache'
         logout_usage = 'conjur [global options] logout [options]'
-        # pylint: disable=line-too-long
+
         logout_subparser = self.resource_subparsers.add_parser('logout',
                                                                help='Log out from Conjur server and clear local cache',
                                                                description=command_description(logout_name,
@@ -92,15 +114,18 @@ class ArgParseBuilder:
                                                                                      'cache (netrc file)'),
                                                                usage=argparse.SUPPRESS,
                                                                add_help=False,
-                                                               formatter_class=formatter_class)
-        logout_options = logout_subparser.add_argument_group(title=title("Options"))
+                                                               formatter_class=formatter)
+        logout_options = logout_subparser.add_argument_group(title=title_formatter("Options"))
         logout_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
     def add_list_parser(self):
+        """
+        Method adds list parser functionality to parser
+        """
         list_name = 'list - List resources within an organization\'s account'
         list_usage = 'conjur [global options] list [options] [args]'
-        # pylint: disable=line-too-long
+
         list_subparser = self.resource_subparsers.add_parser('list',
                                                              help='List all available resources belonging to this account',
                                                              description=command_description(list_name,
@@ -118,9 +143,9 @@ class ArgParseBuilder:
                                                                  'Searches for resources with superuser\n'),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
-                                                             formatter_class=formatter_class)
+                                                             formatter_class=formatter)
 
-        list_options = list_subparser.add_argument_group(title=title("Options"))
+        list_options = list_subparser.add_argument_group(title=title_formatter("Options"))
         list_options.add_argument('-i', '--inspect',
                                   action='store_true', dest='inspect',
                                   help='Optional- list the metadata for resources')
@@ -142,11 +167,14 @@ class ArgParseBuilder:
         list_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         return self
-
+    # pylint: disable=too-many-locals
     def add_policy_parser(self):
+        """
+        Method adds policy parser functionality to parser
+        """
         policy_name = 'policy - Manage policies'
         policy_usage = 'conjur [global options] policy <subcommand> [options] [args]'
-        # pylint: disable=line-too-long
+
         policy_subparser = self.resource_subparsers.add_parser('policy',
                                                                help='Manage policies',
                                                                description=command_description(policy_name,
@@ -162,8 +190,8 @@ class ArgParseBuilder:
                                                                    subcommands=['load', 'replace', 'update']),
                                                                usage=argparse.SUPPRESS,
                                                                add_help=False,
-                                                               formatter_class=formatter_class)
-        policy_subparsers = policy_subparser.add_subparsers(dest='action', title=title("Subcommands"))
+                                                               formatter_class=formatter)
+        policy_subparsers = policy_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
 
         policy_load_name = 'load - Load a policy and create resources'
         policy_load_usage = 'conjur [global options] policy load [options] [args]'
@@ -177,9 +205,9 @@ class ArgParseBuilder:
                                                               'Creates and loads the policy myPolicy.yml under branch backend/dev\n'),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
-                                                          formatter_class=formatter_class)
+                                                          formatter_class=formatter)
 
-        load_options = load_policy_parser.add_argument_group(title=title("Options"))
+        load_options = load_policy_parser.add_argument_group(title=title_formatter("Options"))
         load_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                   help='Provide policy file name')
         load_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
@@ -197,9 +225,9 @@ class ArgParseBuilder:
                                                                  'Replaces the existing policy myPolicy.yml under branch root\n'),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
-                                                             formatter_class=formatter_class)
+                                                             formatter_class=formatter)
 
-        replace_options = replace_policy_parser.add_argument_group(title=title("Options"))
+        replace_options = replace_policy_parser.add_argument_group(title=title_formatter("Options"))
 
         replace_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                      help='Provide policy file name')
@@ -218,8 +246,8 @@ class ArgParseBuilder:
                                                                 'Updates existing resources in the policy /tmp/myPolicy.yml under branch root\n'),
                                                             usage=argparse.SUPPRESS,
                                                             add_help=False,
-                                                            formatter_class=formatter_class)
-        replace_options = update_policy_parser.add_argument_group(title=title("Options"))
+                                                            formatter_class=formatter)
+        replace_options = update_policy_parser.add_argument_group(title=title_formatter("Options"))
 
         replace_options.add_argument('-f', '--file', required=True, metavar='VALUE',
                                      help='Provide policy file name')
@@ -227,12 +255,15 @@ class ArgParseBuilder:
                                      help='Provide the policy branch name')
         replace_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
-        policy_options = policy_subparser.add_argument_group(title=title("Options"))
+        policy_options = policy_subparser.add_argument_group(title=title_formatter("Options"))
         policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         return self
 
     def add_user_parser(self):
+        """
+        Method adds user parser functionality to parser
+        """
         user_name = 'user - Manage users'
         user_usage = 'conjur [global options] user <subcommand> [options] [args]'
         user_subparser = self.resource_subparsers.add_parser('user',
@@ -253,9 +284,9 @@ class ArgParseBuilder:
                                                                               'change-password']),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
-                                                             formatter_class=formatter_class)
+                                                             formatter_class=formatter)
 
-        user_subparsers = user_subparser.add_subparsers(dest='action', title=title("Subcommands"))
+        user_subparsers = user_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
         user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
         user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
         user_rotate_api_key_parser = user_subparsers.add_parser('rotate-api-key',
@@ -270,8 +301,8 @@ class ArgParseBuilder:
                                                                     'Rotates the API key for user joe\n'),
                                                                 usage=argparse.SUPPRESS,
                                                                 add_help=False,
-                                                                formatter_class=formatter_class)
-        user_rotate_api_key_options = user_rotate_api_key_parser.add_argument_group(title=title("Options"))
+                                                                formatter_class=formatter)
+        user_rotate_api_key_options = user_rotate_api_key_parser.add_argument_group(title=title_formatter("Options"))
         user_rotate_api_key_options.add_argument('-i', '--id',
                                                  help='Provide the identifier of the user for whom you want to rotate the API key (Default: logged-in user)')
         user_rotate_api_key_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
@@ -288,18 +319,21 @@ class ArgParseBuilder:
                                                                                 'Changes the password for the logged-in user to Myp@SSw0rds!'),
                                                           usage=argparse.SUPPRESS,
                                                           add_help=False,
-                                                          formatter_class=formatter_class)
+                                                          formatter_class=formatter)
 
-        user_change_password_options = user_change_password.add_argument_group(title=title("Options"))
+        user_change_password_options = user_change_password.add_argument_group(title=title_formatter("Options"))
         user_change_password_options.add_argument('-p', '--password', metavar='VALUE',
                                                   help='Provide the new password for the logged-in user')
         user_change_password_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
-        user_options = user_subparser.add_argument_group(title=title("Options"))
+        user_options = user_subparser.add_argument_group(title=title_formatter("Options"))
         user_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
     def add_host_parser(self):
+        """
+        Method adds host parser functionality to parser
+        """
         host_name = 'host - Manage hosts'
         host_usage = 'conjur [global options] host <subcommand> [options] [args]'
         host_subparser = self.resource_subparsers.add_parser('host',
@@ -313,8 +347,8 @@ class ArgParseBuilder:
                                                                  subcommands=['change-password']),
                                                              usage=argparse.SUPPRESS,
                                                              add_help=False,
-                                                             formatter_class=formatter_class)
-        host_subparsers = host_subparser.add_subparsers(dest='action', title=title("Subcommands"))
+                                                             formatter_class=formatter)
+        host_subparsers = host_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
         host_rotate_api_key_name = 'rotate-api-key - Rotate a host\'s API key'
         host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = host_subparsers.add_parser('rotate-api-key',
@@ -327,17 +361,20 @@ class ArgParseBuilder:
                                                                     'Rotates the API key for host myVM'),
                                                                 usage=argparse.SUPPRESS,
                                                                 add_help=False,
-                                                                formatter_class=formatter_class)
-        host_rotate_api_key = host_rotate_api_key_parser.add_argument_group(title=title("Options"))
+                                                                formatter_class=formatter)
+        host_rotate_api_key = host_rotate_api_key_parser.add_argument_group(title=title_formatter("Options"))
         host_rotate_api_key.add_argument('-i', '--id',
                                          help='Provide host identifier for which you want to rotate the API key')
         host_rotate_api_key.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
-        host_options = host_subparser.add_argument_group(title=title("Options"))
+        host_options = host_subparser.add_argument_group(title=title_formatter("Options"))
         host_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
     def add_variable_parser(self):
+        """
+        Method adds variable parser functionality to parser
+        """
         variable_name = 'variable - Manage variables'
         variable_usage = 'conjur [global options] variable <subcommand> [options] [args]'
 
@@ -356,7 +393,7 @@ class ArgParseBuilder:
                                                                   subcommands=['get', 'set']),
                                                               usage=argparse.SUPPRESS,
                                                               add_help=False,
-                                                              formatter_class=formatter_class)
+                                                              formatter_class=formatter)
 
         variable_get_name = 'get - Get the value of a variable'
         variable_get_usage = 'conjur [global options] variable get [options] [args]'
@@ -374,8 +411,8 @@ class ArgParseBuilder:
                                                                            'Gets the second version of variable secrets/mysecret\n'),
                                                                        usage=argparse.SUPPRESS,
                                                                        add_help=False,
-                                                                       formatter_class=formatter_class)
-        variable_get_options = variable_get_subcommand_parser.add_argument_group(title=title("Options"))
+                                                                       formatter_class=formatter)
+        variable_get_options = variable_get_subcommand_parser.add_argument_group(title=title_formatter("Options"))
         variable_get_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
                                           help='Provide variable identifier', nargs='*', required=True)
         variable_get_options.add_argument('--version', metavar='VALUE',
@@ -393,8 +430,8 @@ class ArgParseBuilder:
                                                                            'Sets the value of variable secrets/mysecret to my_secret_value\n'),
                                                                        usage=argparse.SUPPRESS,
                                                                        add_help=False,
-                                                                       formatter_class=formatter_class)
-        variable_set_options = variable_set_subcommand_parser.add_argument_group(title=title("Options"))
+                                                                       formatter_class=formatter)
+        variable_set_options = variable_set_subcommand_parser.add_argument_group(title=title_formatter("Options"))
 
         variable_set_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
                                           help='Provide variable identifier', required=True)
@@ -402,33 +439,39 @@ class ArgParseBuilder:
                                           help='Set the value of the specified variable', required=True)
         variable_set_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
-        policy_options = variable_parser.add_argument_group(title=title("Options"))
+        policy_options = variable_parser.add_argument_group(title=title_formatter("Options"))
         policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
     def add_whoami_parser(self):
+        """
+        Method adds whoami parser functionality to parser
+        """
         whoami_name = 'whoami - Print information about the current logged-in user'
         whoami_usage = 'conjur [global options] whoami [options]'
-        # pylint: disable=line-too-long
+
         whoami_subparser = self.resource_subparsers.add_parser('whoami',
                                                                help='Provides information about the current logged-in user',
                                                                description=command_description(whoami_name,
                                                                                                whoami_usage),
                                                                usage=argparse.SUPPRESS,
                                                                add_help=False,
-                                                               formatter_class=formatter_class)
-        whoami_options = whoami_subparser.add_argument_group(title=title("Options"))
+                                                               formatter_class=formatter)
+        whoami_options = whoami_subparser.add_argument_group(title=title_formatter("Options"))
 
         whoami_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
         return self
 
     def add_main_screen_options(self):
+        """
+        Method adds main screen options functionality to parser
+        """
         global_optional = self.parser.add_argument_group("Global options")
         global_optional.add_argument('-h', '--help', action='help', help="Display help list")
         global_optional.add_argument('-v', '--version', action='version',
                                      help="Display version number",
                                      version='Conjur CLI version ' + __version__ + "\n"
-                                             + copyright())
+                                             + conjur_copyright())
 
         global_optional.add_argument('-d', '--debug',
                                      help='Enable debugging output',
@@ -441,4 +484,7 @@ class ArgParseBuilder:
         return self
 
     def build(self) -> ArgparseWrapper:
+        """
+        Method that return the final parser
+        """
         return self.parser

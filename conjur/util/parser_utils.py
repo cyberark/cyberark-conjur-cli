@@ -1,11 +1,20 @@
+"""
+This Module holds all the utils needed for the ArgParseBuilder
+"""
+
 import argparse
 
-formatter_class = lambda prog: argparse.RawTextHelpFormatter(prog,
-                                                             max_help_position=100,
-                                                             width=100)
+
+def formatter(prog):
+    """
+    This method format the text of the different parsers.
+    """
+    return argparse.RawTextHelpFormatter(prog,
+                                         max_help_position=100,
+                                         width=100)
 
 
-def usage(*args):
+def header(*args):
     """
     This method builds the header for the main screen.
     """
@@ -51,14 +60,14 @@ def command_epilog(example, command=None, subcommands=None):
     {example}'''
 
 
-def title(title):
+def title_formatter(title):
     """
     This method builds a reusable title for each argument section
     """
     return "\n{}".format(title)
 
 
-def copyright():
+def conjur_copyright():
     """
     This method builds the copyright description
     """

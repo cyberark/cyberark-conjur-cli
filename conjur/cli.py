@@ -8,7 +8,6 @@ module where only the minimal invocation configuration is required.
 """
 
 # Builtins
-import argparse
 import json
 import logging
 import os
@@ -23,7 +22,7 @@ from conjur.api import SSLClient
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
-from conjur.util.util_functions import determine_status_code_specific_error_messages,\
+from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
@@ -45,8 +44,6 @@ class Cli():
     """
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-
-
     # pylint: disable=no-self-use, too-many-locals
     def run(self, *args):
         """
@@ -54,17 +51,17 @@ class Cli():
         test sources. Parses CLI args and invokes the appropriate client command.
         """
 
-        parser = ArgParseBuilder()\
-            .add_login_parser()\
-            .add_init_parser()\
-            .add_logout_parser()\
-            .add_list_parser()\
-            .add_host_parser()\
-            .add_policy_parser()\
-            .add_user_parser()\
-            .add_variable_parser()\
-            .add_whoami_parser()\
-            .add_main_screen_options()\
+        parser = ArgParseBuilder() \
+            .add_login_parser() \
+            .add_init_parser() \
+            .add_logout_parser() \
+            .add_list_parser() \
+            .add_host_parser() \
+            .add_policy_parser() \
+            .add_user_parser() \
+            .add_variable_parser() \
+            .add_whoami_parser() \
+            .add_main_screen_options() \
             .build()
 
         resource, args = Cli._parse_args(parser)
@@ -93,7 +90,8 @@ class Cli():
             sys.exit(1)
         except CertificateVerificationException:
             logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
+            sys.stdout.write(f"Failed to execute command. Reason: "
+                             f"{INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
             if args.debug is False:
                 sys.stdout.write("Run the command again in debug mode for more information.\n")
             sys.exit(1)
@@ -298,7 +296,7 @@ class Cli():
             Cli.handle_host_logic(args, client)
 
     @staticmethod
-    def _parse_args(parser):
+    def _parse_args(parser: ArgparseWrapper):
         args = parser.parse_args()
 
         if not args.resource:
