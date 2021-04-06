@@ -32,9 +32,9 @@ class LoginLogicTest(unittest.TestCase):
     login_logic = LoginLogic(credential_store)
 
     def test_login_logic_controller_constructor(self):
-        mock_credential_store = None
-        login_logic = LoginLogic(mock_credential_store)
-        self.assertEquals(login_logic.credentials_storage, mock_credential_store)
+        mock_credential_provider = None
+        login_logic = LoginLogic(mock_credential_provider)
+        self.assertEquals(login_logic.credentials_provider, mock_credential_provider)
 
     def test_verify_false_invoke_endpoint_and_passes_false(self):
         with patch('conjur.logic.login_logic.invoke_endpoint', return_value=MockClientResponse()) as mock_endpoint:

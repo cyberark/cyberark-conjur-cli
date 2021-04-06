@@ -6,7 +6,7 @@ import keyring
 # Internal
 from conjur.constants import TEST_HOSTNAME, PASSWORD, LOGIN, MACHINE, TEST_KEYRING
 from conjur.data_object import CredentialsData, ConjurrcData
-from conjur.errors import OperationNotCompletedException, CredentialRetrievalException
+from conjur.errors import OperationNotCompletedException, CredentialRetrievalException, KeyringAdapterGeneralError
 from conjur.logic.credential_provider import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreAdapter
 
@@ -18,7 +18,6 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
 
     @patch.object(KeystoreAdapter, 'set_password')
     def test_save_calls_methods_properly(self, mock_store_adapter):
-        # mock_store_adapter.set_password.return_value=None
         credential_provider = KeystoreCredentialsProvider()
         credential_provider.save(MockCredentials)
         calls = [
@@ -90,16 +89,31 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
 
     @patch.object(KeystoreAdapter, "delete_password", return_value=None)
     @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
-    def test_remove_credentials_calls_delete_password(self, mock_keystore_adapter, another_mock_keystore_adatper):
+    def test_remove_credentials_calls_delete_password_for_each_credential(self, mock_keyring_name,
+                                                                          mock_delete_password):
         credential_provider = KeystoreCredentialsProvider()
         credential_provider.remove_credentials(MockConjurrcData)
-        another_mock_keystore_adatper.assert_called_once_with(TEST_HOSTNAME)
+        calls = [call(TEST_HOSTNAME, MACHINE),
+                 call(TEST_HOSTNAME, LOGIN),
+                 call(TEST_HOSTNAME, PASSWORD)]
+        mock_delete_password.assert_has_calls(calls)
 
-    @patch.object(KeystoreAdapter, "delete_password", side_effect=keyring.errors.KeyringError)
+    @patch.object(KeystoreAdapter, "delete_password", side_effect=KeyringAdapterGeneralError)
     @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
     def test_remove_credentials_raises_keyring_error_when_delete_password_raises_keyring_error(self,
                                                                                                mock_keystore_adapter,
                                                                                                another_mock_keystore_adapter):
         credential_provider = KeystoreCredentialsProvider()
-        with self.assertRaises(keyring.errors.KeyringError):
+        with self.assertRaises(Exception):
             credential_provider.remove_credentials(MockConjurrcData)
+
+    @patch.object(KeystoreAdapter, "get_password", return_value="somepassword")
+    @patch.object(KeystoreAdapter, "delete_password", return_value=None)
+    @patch.object(KeystoreAdapter, "get_keyring_name", return_value=TEST_KEYRING)
+    def test_cleanup_calls_delete_for_each_attribute(self, mock_keyring_name, mock_delete_password, mock_get_password):
+        credential_provider = KeystoreCredentialsProvider()
+        credential_provider.remove_credentials(MockConjurrcData)
+        calls = [call(TEST_HOSTNAME, MACHINE),
+                 call(TEST_HOSTNAME, LOGIN),
+                 call(TEST_HOSTNAME, PASSWORD)]
+        mock_delete_password.assert_has_calls(calls)

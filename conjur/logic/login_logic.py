@@ -13,6 +13,7 @@ import logging
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.errors import CertificateVerificationException
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 
 class LoginLogic:
@@ -22,10 +23,9 @@ class LoginLogic:
     This class holds the business logic for populating the
     netrc configuration details needed to login to Conjur
     """
-    credentials_storage = None
 
-    def __init__(self, credentials_storage):
-        self.credentials_storage = credentials_storage
+    def __init__(self, credentials_provider: CredentialsStoreInterface):
+        self.credentials_provider = credentials_provider
 
     @classmethod
     # pylint: disable=line-too-long,logging-fstring-interpolation
@@ -63,4 +63,4 @@ class LoginLogic:
         """
         Method to save credentials during login
         """
-        self.credentials_storage.save(credential_data)
+        self.credentials_provider.save(credential_data)

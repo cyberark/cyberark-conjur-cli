@@ -69,3 +69,21 @@ class CredentialRetrievalException(Exception):
     def __init__(self):
         self.message = FETCH_CREDENTIALS_FAILURE_MESSAGE
         super().__init__(self.message)
+
+class KeyringAdapterGeneralError(Exception):
+    """ General Exception for Keyring Adapter """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
+class KeyringAdapterDeletionError(KeyringAdapterGeneralError):
+    """ Exception for Keyring Adapter when underlying deletion operation failed """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
+class KeyringAdapterSetError(KeyringAdapterGeneralError):
+    """ Exception for Keyring Adapter when underlying set operation failed """
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)

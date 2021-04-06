@@ -60,28 +60,9 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         Method that loads the netrc data.
         Triggered before each CLI action
         """
-        try:
-            if not self.is_exists(conjurrc_conjur_url):
-                raise CredentialRetrievalException
-            # TODO use private function
-            loaded_credentials = {}
-            netrc_auth = ""
-            netrc_obj = netrc.netrc(self.netrc_path)
-
-            logging.debug(f"Retrieving credentials from file '{self.netrc_path}'...")
-            for host in netrc_obj.hosts:
-                if conjurrc_conjur_url in host:
-                    netrc_host_url = host
-                    netrc_auth = netrc_obj.authenticators(netrc_host_url)
-
-            login, _, password = netrc_auth
-            loaded_credentials[MACHINE] = netrc_host_url
-            loaded_credentials[PASSWORD] = password
-            loaded_credentials[LOGIN] = login
-            return CredentialsData.convert_dict_to_obj(loaded_credentials)
-        except netrc.NetrcParseError as netrc_error:
-            raise Exception("Error: netrc is in an invalid format. "
-                            f"Reason: {netrc_error}") from netrc_error
+        if not self.is_exists(conjurrc_conjur_url):
+            raise CredentialRetrievalException
+        return self._get_credentials_from_file(conjurrc_conjur_url)
 
     def is_exists(self, conjurrc_conjur_url) -> bool:
         if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
@@ -124,7 +105,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         # pylint: disable=no-else-return
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
-        elif os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) != 0:
+        elif os.path.getsize(DEFAULT_NETRC_FILE) != 0:
             credential_data = self.load(conjurrc.conjur_url)
 
             netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
@@ -166,3 +147,36 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                             f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
                             "after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
+
+    def _get_credentials_from_file(self, conjurrc_conjur_url):  # pragma: no cover
+        try:
+            loaded_credentials = {}
+            netrc_auth = ""
+            netrc_obj = netrc.netrc(self.netrc_path)
+
+            logging.debug(f"Retrieving credentials from file '{self.netrc_path}'...")
+            for host in netrc_obj.hosts:
+                if conjurrc_conjur_url in host:
+                    netrc_host_url = host
+                    netrc_auth = netrc_obj.authenticators(netrc_host_url)
+                    break
+
+            login, _, password = netrc_auth
+            loaded_credentials[MACHINE] = netrc_host_url
+            loaded_credentials[PASSWORD] = password
+            loaded_credentials[LOGIN] = login
+            return CredentialsData.convert_dict_to_obj(loaded_credentials)
+        except netrc.NetrcParseError as netrc_error:
+            raise Exception("Error: netrc is in an invalid format. "
+                            f"Reason: {netrc_error}") from netrc_error
+
+   # pylint: disable=unnecessary-pass
+    def cleanup_if_exists(self, conjurrc_conjur_url):
+        """
+        Not implemented for netrc for now.
+        """
+        # We use this function to cleanup credentials in case user
+        # did some edit the file manually and left unstable state.
+        # This is more relevant for the Keyring scenario than the
+        # netrc for now.
+        pass
