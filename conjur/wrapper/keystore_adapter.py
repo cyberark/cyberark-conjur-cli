@@ -15,10 +15,14 @@ import logging
 import keyring
 
 # Internals
-from conjur.constants import KEYSTORE_ATTRIBUTES
+from conjur.errors import KeyringAdapterDeletionError, KeyringAdapterGeneralError\
+    , KeyringAdapterSetError
+from conjur.util.util_functions import configure_env_var_with_keyring
 
-# TODO should verify we are using the exact keyring version wanted and
-#  disable insecure keyring such as PlaintextKeyring.
+# Function is called in the module so that before accessing the
+# system’s keyring, the environment will be configured correctly
+configure_env_var_with_keyring()
+
 class KeystoreAdapter:
     """
     KeystoreAdapter
@@ -31,39 +35,55 @@ class KeystoreAdapter:
         """
         Method for setting a password in keyring
         """
-        keyring.set_password(identifier, key, val)
+        try:
+            keyring.set_password(identifier, key, val)
+        except keyring.errors.PasswordSetError as password_error:
+            raise KeyringAdapterSetError(f"Failed to set key '{key}' for identifier "
+                                         f"'{identifier}'") from password_error
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to set '{key}')'") from exception
 
+    # pylint: disable=try-except-raise
     @classmethod
     def get_password(cls, identifier, key):
         """
         Method for getting a password in keyring
         """
-        return keyring.get_password(identifier, key)
+        try:
+            return keyring.get_password(identifier, key)
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to get '{key}')'") from exception
 
-    # TODO add simple delete for one attribute only here in the adapter
-    # TODO do not raise keyring module errors
     # pylint: disable=try-except-raise
     @classmethod
-    def delete_password(cls, identifier):
+    def delete_password(cls, identifier, key):
         """
         Method for deleting a password in keyring
         """
         try:
-            for attr in KEYSTORE_ATTRIBUTES:
-                keyring.delete_password(identifier, attr)
-        # Catches when credentials do not exist in the keyring. If the key does not exist,
-        # the user has already logged out
-        except keyring.errors.PasswordDeleteError:
-            return
-        except keyring.errors.KeyringError:
-            raise
-
+            keyring.delete_password(identifier, key)
+        except keyring.errors.PasswordDeleteError as password_error:
+            raise KeyringAdapterDeletionError(f"Failed to delete key '{key}' for identifier "
+                                              f"'{identifier}'") from password_error
+        except Exception as exception:
+            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+                                                     f"(Failed to delete '{key}')'") from exception
     @classmethod
     def get_keyring_name(cls):
         """
         Method to get the system's keyring name
         """
-        return keyring.get_keyring().name
+        # keyring.get_keyring can throw various types of Exceptions.
+        # Some are OS exceptions and that is the reason we catch general Exceptions.
+        # Note that this is a critical path, if we get error, we will return None and not raise
+        # the exception because we want to write to the netrc and not fail the CLI
+        try:
+            return keyring.get_keyring().name
+        except Exception as err:  # pylint: disable=broad-except
+            logging.debug(err)
+            return None
 
     @classmethod
     def is_keyring_accessible(cls):
@@ -77,7 +97,10 @@ class KeystoreAdapter:
             # not be configured correctly and not available for use. Therefore, false
             # will be returned
             keyring.get_password('test-system', 'test-accessibility')
-        except keyring.errors.KeyringError:
+            # Catch Exception and not a specific type since various exceptions
+            # can be thrown. For example some related to OS and others related to keyring.
+        except Exception as err:  # pylint: disable=broad-except
+            logging.debug(err)
             return False
 
         return True

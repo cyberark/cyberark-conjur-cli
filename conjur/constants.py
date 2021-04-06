@@ -40,3 +40,9 @@ TEST_KEYRING = "SecretService Keyring"
 
 # For user interaction
 LOGIN_IS_REQUIRED = "To start using the CLI, log in to Conjur"
+
+# For keyring environment configuration
+KEYRING_TYPE_ENV_VARIABLE_NAME = "PYTHON_KEYRING_BACKEND"
+MAC_OS_KEYRING_NAME = "keyring.backends.macOS.Keyring"
+LINUX_KEYRING_NAME = "keyring.backends.SecretService.Keyring"
+WINDOWS_KEYRING_NAME = "keyring.backends.Windows.WinVaultKeyring"

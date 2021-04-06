@@ -14,11 +14,14 @@ import uuid
 
 from conjur.data_object import CredentialsData
 from conjur.logic.credential_provider import CredentialStoreFactory, KeystoreCredentialsProvider
+from conjur.util.os_types import OSTypes
+from conjur.util.util_functions import get_current_os
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
-from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE, \
+    KEYRING_TYPE_ENV_VARIABLE_NAME, MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, WINDOWS_KEYRING_NAME
 
 
 class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
@@ -389,6 +392,21 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         utils.setup_cli(self)
         with patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False):
             self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
+
+    '''
+    Validate env variable is set correctly
+    '''
+    @integration_test(True)
+    def test_keyring_locked_after_login_will_raise_error_keyring(self):
+        utils.create_cred_store()
+
+        current_platform = get_current_os()
+        if current_platform == OSTypes.MAC_OS:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == MAC_OS_KEYRING_NAME
+        if current_platform == OSTypes.LINUX:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == LINUX_KEYRING_NAME
+        if current_platform == OSTypes.WINDOWS:
+            assert os.getenv(KEYRING_TYPE_ENV_VARIABLE_NAME) == WINDOWS_KEYRING_NAME
 
     '''
     Validate variable operation with keyring

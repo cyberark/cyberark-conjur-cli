@@ -28,8 +28,7 @@ class CredentialStoreFactory:
         Factory method for determining which store to use
         """
         if KeystoreAdapter.get_keyring_name() in SUPPORTED_BACKENDS:
-            # TODO investigate other errors that would make a keyring not accessible
-            # If the keyring is unlocked then we will use that
+            # If the keyring is unlocked then we will use it
             if KeystoreAdapter.is_keyring_accessible():
                 # pylint: disable=line-too-long
                 return KeystoreCredentialsProvider(), f'{KeystoreAdapter.get_keyring_name()} credential store'
