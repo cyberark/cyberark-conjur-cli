@@ -3,6 +3,7 @@ This Module holds all the utils needed for the ArgParseBuilder
 """
 
 import argparse
+import time
 
 
 def formatter(prog):
@@ -71,7 +72,7 @@ def conjur_copyright():
     """
     This method builds the copyright description
     """
-    return '''
-Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
+    return f'''
+Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
 <www.cyberark.com>
 '''
