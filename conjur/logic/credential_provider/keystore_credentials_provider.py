@@ -91,8 +91,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             # the user has already logged out. we still try to remove other leftovers
             except KeyringAdapterDeletionError:
                 logging.debug(
-                    f"Unable to delete item '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
-                    f"credential store. Item may not exist.\n{traceback.format_exc()}")
+                    f"Unable to delete key '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
+                    f"credential store. Key may not exist.\n{traceback.format_exc()}")
 
         logging.debug("Successfully removed credentials from the "
                       f"'{KeystoreAdapter.get_keyring_name()}' credential store")
@@ -110,5 +110,5 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             # the user has already logged out. we still try to remove other leftovers
             except Exception:  # pylint: disable=broad-except
                 logging.debug(
-                    f"Cleanup failed for item '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
+                    f"Cleanup failed for key '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
                     f"credential store.\n{traceback.format_exc()}")
