@@ -35,9 +35,10 @@ def file_is_missing_or_empty(file):
 
 def configure_env_var_with_keyring():
     """
-    Setup the env variable for the desired keyring.
-    This is important so we will use the exact keyring method desired
-    and that 3rd party library will not choose other keyring option
+    Setup the ENV variable for the desired keyring.
+    This is important so we will use the exact keyring backend required
+    to successfully use the CLI and so that the Third party library will
+    not favor another backend
     """
     current_platform = get_current_os()
     if current_platform == OSTypes.MAC_OS:
@@ -47,7 +48,7 @@ def configure_env_var_with_keyring():
     elif current_platform == OSTypes.WINDOWS:
         os.environ[KEYRING_TYPE_ENV_VARIABLE_NAME] = WINDOWS_KEYRING_NAME
     else:
-        logging.debug("working on an unsupported platform: %s", platform.system())
+        logging.debug(f"Platform {platform.system()} not supported")
 
 def get_current_os() -> OSTypes: # pragma: no cover
     """

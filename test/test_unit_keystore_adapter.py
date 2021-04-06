@@ -1,6 +1,7 @@
 # Builtin
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch
+import importlib
 # Third-Party
 import keyring
 # Internal
@@ -17,12 +18,12 @@ class KeystoreAdapterTest(unittest.TestCase):
         mock_keyring.assert_called_once_with(TEST_HOSTNAME, "key")
 
     @patch.object(keyring, "delete_password", side_effect=keyring.errors.KeyringError)
-    def test_delete_password_raises_keyring_error(self, mock_keyring):
+    def test_delete_password_raises_keyring_error(self, mock_delete_password):
         with self.assertRaises(KeyringAdapterGeneralError):
             KeystoreAdapter.delete_password(TEST_HOSTNAME, "some_key")
 
     @patch.object(keyring, "delete_password", side_effect=keyring.errors.PasswordDeleteError)
-    def test_delete_password_expected_exceptions(self, mock_keyring):
+    def test_delete_password_raises_expected_exceptions(self, mock_delete_password):
         with self.assertRaises(KeyringAdapterDeletionError):
             KeystoreAdapter.delete_password(TEST_HOSTNAME, "some_key")
 
@@ -37,8 +38,9 @@ class KeystoreAdapterTest(unittest.TestCase):
         self.assertEquals(False, KeystoreAdapter.is_keyring_accessible())
 
     @patch.object(util_functions, "configure_env_var_with_keyring")
-    def test_env_variables_set_on_keyring_adapter_import(self, mock_utils):
-        import importlib
+    def test_env_variables_set_on_keyring_adapter_import(self, mock_configure_keyring_env):
+        # We re-import keystore_adapter module to see that
+        # configure_env_var_with_keyring is being invoke in first import
         import conjur.wrapper.keystore_adapter
         importlib.reload(conjur.wrapper.keystore_adapter)
-        mock_utils.assert_called_once()
+        mock_configure_keyring_env.assert_called_once()

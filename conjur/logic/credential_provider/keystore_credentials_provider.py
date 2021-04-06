@@ -92,7 +92,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             except KeyringAdapterDeletionError:
                 logging.debug(
                     f"Unable to delete item '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
-                    "credential store. Item may not exist.\n{traceback.format_exc()}")
+                    f"credential store. Item may not exist.\n{traceback.format_exc()}")
 
         logging.debug("Successfully removed credentials from the "
                       f"'{KeystoreAdapter.get_keyring_name()}' credential store")
