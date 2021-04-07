@@ -4,6 +4,21 @@ The purpose of this file is to be a cross platform tests runner
 for all integration tests
 """
 
+# *************** DEVELOPER NOTE ***************
+# We have the ability to run our tests as a process which means we can run our tests as a user would,
+# without Python on the machine, using the Conjur CLI exec a customer would. Currently, some tests still
+# cannot run as a process. Tests that meet the following criteria cannot be run as a process and are given
+# the integration_test() decorator:
+# 1. any test that contains of error/stderr
+# 2. any test that runs a command that uses getpass (login and user commands)
+# 3. any test that has assertEquals. All new tests should use assertIn
+# 4. any test that uses a tmp file (policy command)
+# 5. any test that uses contents returned from invoke_cli
+# 6. any test that depends on keyring disable (mainly in CliIntegrationTestCredentialsNetrc)
+#
+# The main reason for these limitations is that we run in debug mode and all items that are printed to the
+# screen are captured.
+
 # Builtins
 import sys
 import os
