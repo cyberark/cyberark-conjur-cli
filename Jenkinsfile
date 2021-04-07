@@ -38,6 +38,15 @@ pipeline {
       }
     }
 
+    stage('RHEL8 Integration tests') {
+        agent { label 'executor-v2-rhel-ee' }
+
+        steps {
+            echo '-- execute docker run hello-world
+            sh 'docker run hello-world'
+        }
+    }
+
     stage('Integration tests') {
       steps {
         sh './bin/test_integration'
