@@ -36,8 +36,8 @@ def main_epilog():
     This method builds the footer for the main help screen.
     """
     msg = "To get help on a specific command, see `conjur <command> -h | --help`\n\n"
-    msg += "To start using Conjur with your environment, you must first initialize the configuration. " \
-           "See `conjur init -h` for more information."
+    msg += "To start using Conjur with your environment, you must first initialize " \
+           "the configuration. See `conjur init -h` for more information."
     return msg
 
 
@@ -64,6 +64,6 @@ def conjur_copyright():
     """
     This method builds the copyright description
     """
-    msg = f'Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.\n'
-    msg += "<www.cyberark.com>"
+    msg = f'\nCopyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.\n'
+    msg += "<www.cyberark.com>\n"
     return msg
