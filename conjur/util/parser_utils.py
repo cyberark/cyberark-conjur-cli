@@ -27,24 +27,18 @@ def command_description(example, usage):
     """
     This method builds the header for the main screen.
     """
-    return '''
 
-Name:
-  {}
-
-Usage:
-  {}'''.format(example, usage)
+    return f"\n\n Name:\n  {example}\n\nUsage:\n  {usage}"
 
 
 def main_epilog():
     """
     This method builds the footer for the main help screen.
     """
-    return '''
-To get help on a specific command, see `conjur <command> -h | --help`
-
-To start using Conjur with your environment, you must first initialize the configuration. See `conjur init -h` for more information.
-'''
+    msg = "To get help on a specific command, see `conjur <command> -h | --help`\n\n"
+    msg += "To start using Conjur with your environment, you must first initialize the configuration. " \
+           "See `conjur init -h` for more information."
+    return msg
 
 
 def command_epilog(example, command=None, subcommands=None):
@@ -56,8 +50,7 @@ def command_epilog(example, command=None, subcommands=None):
         res = ""
         res += " -h\n".join(f"conjur {command} {subcommand}" for subcommand in subcommands)
         return f"{refer_to_help}\n{res}"
-    return f'''Examples:
-    {example}'''
+    return f"Examples:\n    {example}"
 
 
 def title_formatter(title):
@@ -71,7 +64,6 @@ def conjur_copyright():
     """
     This method builds the copyright description
     """
-    return f'''
-Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
-<www.cyberark.com>
-'''
+    msg = f'Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.\n'
+    msg += "<www.cyberark.com>"
+    return msg
