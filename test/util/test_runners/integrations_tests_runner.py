@@ -17,8 +17,6 @@ import unittest
 import base64
 import requests
 import logging
-import subprocess as sb
-import shutil
 
 # NOTE do not delete this import even though it seems to not be used. This used to
 # run the integration tests as a process. Otherwise this dependency will not be available
@@ -39,14 +37,10 @@ from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
 from conjur.constants import *
-from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
-from conjur import cli
-from conjur.logic.credential_provider import FileCredentialsProvider
 
 
 def main():
     args = TestRunnerArgs.create_from_args()
-    args.invoke_cli_as_process = False
     runner = TestRunner(args)
     test_to_run_list = [
         CliIntegrationTestCredentialsKeyring,
@@ -77,8 +71,11 @@ class TestRunner:  # pragma: no cover
         for test_module in test_modules:
             res.append(self.__run_test_cases(test_module))
         exit_code = not all(res)
-        if (exit_code != 0):
-            print("Not all passed")
+        if exit_code == 0:
+            print("All tests passed")
+        else:
+            print("Not all tests passed")
+
         sys.exit(exit_code)
 
     def start_env(self):
@@ -90,40 +87,12 @@ class TestRunner:  # pragma: no cover
         """
 
         path_provider = TestRunnerPathProvider(file_helper_dir=self.runner_args.files_folder)
-        self.__create_conjurrc_file()
-        self.__create_netrc_file()
         self.env_params = TestEnvironmentParams(self.runner_args.cli_to_test, self.runner_args.invoke_cli_as_process,
                                                 path_provider)
         self.client_params = ClientParams(url=self.runner_args.hostname, account=self.runner_args.account,
                                           login=self.runner_args.login, api_key=self.api_key)
         if (os.getenv('TEST_ENV') is None):
             os.environ['TEST_ENV'] = 'True'
-
-    def __create_conjurrc_file(self):
-        path_provider = TestRunnerPathProvider.getInstance()
-        proc = sb.Popen(
-            [self.runner_args.cli_to_test, "init", "-a", f"{self.runner_args.account}", "-u",
-             f"{self.runner_args.hostname}",
-             "--force"],
-            stdin=sb.PIPE,
-            stdout=sb.PIPE,
-            stderr=sb.PIPE)
-        output = proc.communicate(input=b'yes\n', timeout=10)[0]
-        if proc.returncode != 0:
-            raise RuntimeError(f"Error Init: {output}")
-        # copy conjurrc from home folder to test folder
-        shutil.copy(path_provider.conjurrc_path, path_provider.test_conjurrc_file_path)
-
-    def __create_netrc_file(self):
-
-        path_provider = TestRunnerPathProvider.getInstance()
-
-        credential_store = CredentialStoreFactory.create_credential_store()[0]
-        cli.Cli.handle_login_logic(credential_store, self.runner_args.login, self.runner_args.password)
-        credentials = credential_store.load(self.runner_args.hostname)
-        FileCredentialsProvider().save(credentials)
-        shutil.copy(path_provider.netrc_path,
-                    os.path.join(path_provider.helpers_files_path, path_provider.netrc_file_name))
 
     def __get_api_key(self):
         url = f"{self.runner_args.hostname}/authn/{self.runner_args.account}/login"
