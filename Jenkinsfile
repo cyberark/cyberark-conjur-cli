@@ -46,7 +46,7 @@ pipeline {
             //sh 'docker run hello-world'
             echo '-- execute docker run rhel8'
             sh 'docker run --name test registry.access.redhat.com/ubi8/ubi:latest'
-            sh 'less /etc/os-release'
+            sh 'docker container ls'
         }
     }
 
