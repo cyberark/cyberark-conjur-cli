@@ -7,7 +7,7 @@ class LogoutParser:
         """
         Method adds logout parser functionality to parser
         """
-        logout_subparser = self._init_login_parser()
+        logout_subparser = self._init_logout_parser()
         LogoutParser._add_logout_options(logout_subparser)
         return self
 
