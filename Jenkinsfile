@@ -45,8 +45,8 @@ pipeline {
             echo '-- execute docker run hello-world'
             //sh 'docker run hello-world'
             echo '-- execute docker run rhel8'
-            sh 'docker run -it registry.redhat.io/ubi8/ubi'
-            sh 'docker ps -ef'
+            sh 'docker run -it --name test registry.access.redhat.com/ubi8/ubi:latest bash'
+            sh 'lsb_release -a'
         }
     }
 
