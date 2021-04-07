@@ -43,7 +43,10 @@ pipeline {
 
         steps {
             echo '-- execute docker run hello-world'
-            sh 'docker run hello-world'
+            //sh 'docker run hello-world'
+            echo '-- execute docker run rhel8'
+            sh 'docker run -it registry.redhat.io/ubi8/ubi'
+            sh 'docker ps -ef'
         }
     }
 
