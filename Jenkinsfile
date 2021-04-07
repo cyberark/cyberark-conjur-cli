@@ -42,7 +42,7 @@ pipeline {
         agent { label 'executor-v2-rhel-ee' }
 
         steps {
-            echo '-- execute docker run hello-world
+            echo '-- execute docker run hello-world'
             sh 'docker run hello-world'
         }
     }
