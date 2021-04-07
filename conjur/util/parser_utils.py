@@ -54,9 +54,8 @@ def command_epilog(example, command=None, subcommands=None):
     refer_to_help = "See more details in each subcommand's help:"
     if subcommands:
         res = ""
-        for subcommand in subcommands:
-            res += "conjur " + command + " " + subcommand + " -h\n"
-        return f'''{refer_to_help}\n{res}'''
+        res += " -h\n".join(f"conjur {command} {subcommand}" for subcommand in subcommands)
+        return f"{refer_to_help}\n{res}"
     return f'''Examples:
     {example}'''
 
@@ -65,7 +64,7 @@ def title_formatter(title):
     """
     This method builds a reusable title for each argument section
     """
-    return "\n{}".format(title)
+    return f"\n{title}"
 
 
 def conjur_copyright():
