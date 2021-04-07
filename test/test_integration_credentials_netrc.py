@@ -73,7 +73,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates that when a user already logged in and reattempts and fails, the previous successful session is not removed
     '''
-    @integration_test(True)
+    @integration_test()
     def test_https_netrc_was_not_overwritten_when_login_failed_but_already_logged_in(self, keystore_disable_mock):
         utils.setup_cli(self)
         successful_run = self.invoke_cli(self.cli_auth_params,
@@ -88,7 +88,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates logout doesn't remove another entry not associated with the current login
     '''
-    @integration_test(True)
+    @integration_test()
     def test_https_logout_successful_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
@@ -106,7 +106,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     Validates when a user attempts to logout after an already 
     successful logout, will fail
     '''
-    @integration_test(True)
+    @integration_test()
     def test_https_logout_twice_returns_could_not_logout_message_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,
@@ -125,7 +125,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validate correct message when try to logout already logout user
     '''
-    @integration_test(True)
+    @integration_test()
     def test_no_netrc_and_logout_returns_successful_logout_message_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         try:
@@ -330,7 +330,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     '''
     Validates logout doesn't remove an irrelevant entry
     '''
-    @integration_test(True)
+    @integration_test()
     def test_https_netrc_does_not_remove_irrelevant_entry_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         creds = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
