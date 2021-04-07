@@ -42,11 +42,11 @@ pipeline {
         agent { label 'executor-v2-rhel-ee' }
 
         steps {
-            echo '-- execute docker run hello-world'
+            //echo '-- execute docker run hello-world'
             //sh 'docker run hello-world'
             echo '-- execute docker run rhel8'
             sh 'docker run --name test registry.access.redhat.com/ubi8/ubi:latest'
-            sh 'lsb_release -a'
+            sh 'less /etc/os-release'
         }
     }
 
