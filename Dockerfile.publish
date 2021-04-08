@@ -1,7 +1,5 @@
 FROM ubuntu:18.04
-
 ENV INSTALL_DIR=/opt/conjur-api-python3
-
 RUN apt-get update && \
   apt-get install -y bash \
                     binutils \
