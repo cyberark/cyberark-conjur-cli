@@ -44,7 +44,7 @@ pipeline {
       agent { label 'executor-v2-rhel-ee' }
 
       steps {
-        sh './bin/test_rhel8_integration'
+        sh './bin/test_integration_rhel8'
       }
 
       post {
