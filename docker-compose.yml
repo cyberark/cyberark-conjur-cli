@@ -78,3 +78,35 @@ services:
       - conjur-https
     volumes:
       - ${PWD}:/opt/conjur-api-python3
+
+  conjur-server:
+    image: registry2.itci.conjur.net/conjur-appliance:12.0.0
+    networks:
+      dap_net:
+        ipv4_address: 12.16.23.11
+    ports:
+      - "444:443"
+    expose:
+      - "443"
+      - "444"
+      - "1999"
+      - "5432"
+    security_opt:
+        - "seccomp:unconfined"
+
+  test-rhel8:
+    privileged: true
+    build:
+      context: .
+      dockerfile: Dockerfile.test.rhel8
+    command: ['sleep', '999d']
+    environment:
+      CONJUR_AUTHN_API_KEY: Null
+      PYTHON_KEYRING_BACKEND: Null
+      DEBUG: Null
+      TEST_ENV: "True"
+    depends_on:
+      - conjur
+      - conjur-https
+    volumes:
+      - ${PWD}:/opt/conjur-api-python3
