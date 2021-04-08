@@ -14,9 +14,9 @@ pipeline {
 
    stages {
     stage('Linting') {
-    agent { label 'executor-v2-rhel-ee' }
       parallel {
         stage('Code') {
+          agent { label 'executor-v2-rhel-ee' }
           steps { sh './bin/test_linting' }
         }
 
