@@ -1,6 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
+RUN cat /etc/os-release
 RUN  yum update && \
      yum install -y bash \
                 binutils \
