@@ -103,7 +103,6 @@ services:
       DEBUG: Null
       TEST_ENV: "True"
     depends_on:
-      - conjur
-      - conjur-https
+      - conjur-server
     volumes:
       - ${PWD}:/opt/conjur-api-python3
