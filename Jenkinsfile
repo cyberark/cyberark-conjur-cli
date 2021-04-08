@@ -28,7 +28,8 @@ pipeline {
 
     stage('Unit tests') {
       steps {
-        sh './bin/test_unit'
+        sh 'echo ./bin/test_unit'
+        //sh './bin/test_unit'
       }
       post {
         always {
@@ -40,13 +41,17 @@ pipeline {
     }
 
     stage('RHEL8 Integration tests') {
-        agent { label 'executor-v2-rhel-ee' }
+      agent { label 'executor-v2-rhel-ee' }
 
-        steps {
-          steps {
-            sh './bin/test_rhel8_integration'
-          }
+      steps {
+        sh './bin/test_rhel8_integration'
+      }
+
+      post {
+        always {
+          junit 'output/**/*.xml'
         }
+      }
     }
 
     stage('Integration tests') {
