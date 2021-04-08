@@ -1,21 +1,20 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
-RUN yum groupinstall -y 'Development Tools'
-RUN yum update && \
-         yum install -y bash \
-                    binutils \
-                    gcc gcc-c++ make \
-                    curl \
-                    git \
-                    jq \
-                    libffi-devel \
-                    openssl \
-                    python3 \
-                    python3-devel \
-                    python3-pip \
-                    gnome-keyring \
-                    dbus-x11
+RUN  yum update && \
+     yum install -y bash \
+                binutils \
+                gcc gcc-c++ make \
+                curl \
+                git \
+                jq \
+                libffi-devel \
+                openssl \
+                python3 \
+                python3-devel \
+                python3-pip \
+                gnome-keyring \
+                dbus-x11
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
