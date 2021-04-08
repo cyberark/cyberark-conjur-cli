@@ -81,9 +81,6 @@ services:
 
   conjur-server:
     image: registry2.itci.conjur.net/conjur-appliance:12.0.0
-    networks:
-      dap_net:
-        ipv4_address: 12.16.23.11
     ports:
       - "444:443"
     expose:
