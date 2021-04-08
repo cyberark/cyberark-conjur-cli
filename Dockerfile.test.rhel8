@@ -4,9 +4,12 @@ ENV INSTALL_DIR=/opt/conjur-api-python3
 RUN cat /etc/os-release
 
 RUN yum update
+RUN  yum install -y yum-utils
+RUN yum-config-manager --enable rhel-8-appstream-rhui-rpms && yum search gnome-keyring
 RUN yum search gnome-keyring
 RUN  yum install -y bash \
                 binutils \
+                yum-utils \
                 gcc gcc-c++ make \
                 curl \
                 git \
