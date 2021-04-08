@@ -64,9 +64,9 @@ pipeline {
           }
         }
       }
-      when {
-        tag "v*"
-      }
+//       when {
+//         tag "v*"
+//       }
     }
 
     stage('Scan Docker image') {
