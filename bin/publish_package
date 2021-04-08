@@ -2,6 +2,7 @@
 
 CURRENT_DIR=$(pwd)
 
+chmod +x $CURRENT_DIR/bin/build_publish_container
 $CURRENT_DIR/bin/build_publish_container
 
 REQUIRED_VARS=( "TWINE_REPOSITORY_URL"
