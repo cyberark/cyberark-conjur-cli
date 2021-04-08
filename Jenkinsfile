@@ -58,7 +58,7 @@ pipeline {
           }
 
           when {
-            branch "master"
+            tag "v*"
           }
         }
 
