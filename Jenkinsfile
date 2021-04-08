@@ -56,21 +56,16 @@ pipeline {
           steps {
             sh 'summon -e production ./bin/publish_package'
           }
-
-          when {
-            branch "master"
-          }
         }
 
         stage('Publish containers') {
           steps {
             sh './bin/publish_container'
           }
-
-          when {
-            branch "master"
-          }
         }
+      }
+      when {
+        tag "v*"
       }
     }
 

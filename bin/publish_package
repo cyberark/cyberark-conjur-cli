@@ -2,7 +2,7 @@
 
 CURRENT_DIR=$(pwd)
 
-$CURRENT_DIR/bin/build_test_container
+$CURRENT_DIR/bin/build_publish_container
 
 REQUIRED_VARS=( "TWINE_REPOSITORY_URL"
                 "TWINE_USERNAME"
@@ -24,13 +24,13 @@ docker run --rm \
            -e TWINE_USERNAME \
            -e TWINE_PASSWORD \
            -v "$(pwd):/opt/conjur-api-python3" \
-           conjur-api-python3-test bash -exc "
+           conjur-api-python3-publish bash -exc "
                echo 'Installing new versions of pip and wheel...'
                /usr/bin/env pip3 install --upgrade pip wheel
 
                if ! ./bin/needs_publishing \$TWINE_REPOSITORY_URL; then
                  echo 'WARN: Publishing skipped!'
-                 exit 0
+                 exit 1
                fi
 
                echo 'Building distributable package...'

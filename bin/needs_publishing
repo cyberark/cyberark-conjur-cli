@@ -13,7 +13,7 @@ echo "Local version: $local_version"
 
 published_version=$(curl -Ls $PYPI_URL/pypi/$package_name/json | jq -r '.info.version' || echo "<not published>")
 echo "Published version on $PYPI_URL: $published_version"
-if [[ "$local_version" == "$current_published_version" ]]; then
+if [[ "$local_version" == "$published_version" ]]; then
   echo "WARN: Local version of $package_name ($local_version) is the same as published version ($published_version)!"
   echo "WARN: Skipping publishing!"
   exit 1
