@@ -42,17 +42,15 @@ pipeline {
         agent { label 'executor-v2-rhel-ee' }
 
         steps {
-            //echo '-- execute docker run hello-world'
-            //sh 'docker run hello-world'
-            echo '-- execute docker run rhel8'
-            sh 'docker run --name test registry.access.redhat.com/ubi8/ubi:latest'
-            sh 'docker container ls'
+          steps {
+            sh './bin/test_rhel8_integration'
+          }
         }
     }
 
     stage('Integration tests') {
       steps {
-        sh './bin/test_integration'
+        //sh './bin/test_integration'
       }
 
       post {
