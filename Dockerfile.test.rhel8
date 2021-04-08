@@ -2,7 +2,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
 RUN cat /etc/os-release
-RUN subscription-manager register
+
 RUN yum update
 RUN yum search gnome-keyring
 RUN  yum install -y bash \
