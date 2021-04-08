@@ -51,6 +51,7 @@ pipeline {
     stage('Integration tests') {
       steps {
         //sh './bin/test_integration'
+        sh 'echo Integration tests'
       }
 
       post {
