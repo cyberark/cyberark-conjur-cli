@@ -26,8 +26,8 @@ and will add this CA to the trusted CAs list so that the CLI will trust the cert
 received from Conjur.
 
 1) Create your own folder to store the CA and open a terminal
-2) Create a rootCA encryption key: `openssl genrsa -des3 -out CA-NAME.key 2048`
-3) Create a rootCA cert:  `openssl req -x509 -new -nodes -key CA-NAME.key -sha256 -days 1825 -out CA-NAME.pem`
+2) Create a root CA encryption key: `openssl genrsa -des3 -out CA-NAME.key 2048`
+3) Create a root CA cert:  `openssl req -x509 -new -nodes -key CA-NAME.key -sha256 -days 1825 -out CA-NAME.pem`
     * Note you will be prompted to provide information about the CA. These values do 
       not effect the integrity of the certificate
 
