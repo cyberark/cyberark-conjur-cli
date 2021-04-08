@@ -22,8 +22,10 @@ import requests
 
 # Internals
 from conjur.api import SSLClient
+from conjur.controller.ui_controller import UIController
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
+from conjur.logic.ui_logic import UiLogic
 from conjur.util.util_functions import determine_status_code_specific_error_messages
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
@@ -527,15 +529,20 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         # *************** UI COMMAND ***************
         ui_name = 'ui - Open browser for the init url conjure UI'
         ui_usage = 'conjur [global options] ui [options]'
-        ui_subparser = resource_subparsers.add_parser('ui',
-                                                      help='Open browser for the init url conjure UI',
-                                                      description=self.command_description(ui_name,
-                                                                                           ui_usage),
-                                                      usage=argparse.SUPPRESS,
-                                                      add_help=False,
-                                                      formatter_class=formatter_class)
-        ui_options = ui_subparser.add_argument_group(title=self.title("Options"))
+        ui_parser = resource_subparsers.add_parser('ui',
+                                                   help='Open browser for the init url conjure UI',
+                                                   description=self.command_description(ui_name,
+                                                                                        ui_usage),
+                                                   usage=argparse.SUPPRESS,
+                                                   add_help=False,
+                                                   formatter_class=formatter_class)
 
+        ui_options = ui_parser.add_argument_group(title=self.title("Options"))
+
+        ui_options.add_argument('-w', '--window',
+                                action='store_true', dest='window',
+                                help='Optional - if set, will open UI in a new window if possible. '
+                                     'if not set will open a new tab')
         ui_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
         # *************** MAIN HELP SCREEN OPTIONS ***************
@@ -711,15 +718,13 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         host_controller.rotate_api_key()
 
     @classmethod
-    def handle_ui_logic(cls):
+    def handle_ui_logic(cls, args):
         """
         Method that wraps the ui call logic
         """
-        url = f"{ConjurrcData.load_from_file().conjur_url}/ui"
-        sys.stdout.write(f"Openenig browser with url {url}\n")
-        webbrowser.open_new_tab(f"{url}")
-        sys.stdout.write("Opened UI in browser\n")
-
+        ui_logic = UiLogic()
+        ui_controller = UIController(ssl_verify=args.ssl_verify, ui_logic=ui_logic)
+        ui_controller.open_ui(args.window)
 
     @staticmethod
     # pylint: disable=too-many-branches
@@ -752,11 +757,11 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
                 Cli.handle_init_logic()
 
             # pylint: disable=line-too-long
-            if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
-                sys.stdout.write("Error: You have not logged in\n")
-                Cli.handle_login_logic(ssl_verify=args.ssl_verify)
-
-        client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
+        #     if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
+        #         sys.stdout.write("Error: You have not logged in\n")
+        #         Cli.handle_login_logic(ssl_verify=args.ssl_verify)
+        #
+        # client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
             list_data = ListData(kind=args.kind, inspect=args.inspect,
@@ -782,7 +787,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             Cli.handle_host_logic(args, client)
 
         elif resource == 'ui':
-            Cli.handle_ui_logic()
+            Cli.handle_ui_logic(args)
 
     @staticmethod
     def _parse_args(parser):
@@ -793,7 +798,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
             sys.exit(0)
 
         # Check whether we are running a command with required additional arguments/options
-        if args.resource not in ['list', 'whoami', 'init', 'login', 'logout','ui']:
+        if args.resource not in ['list', 'whoami', 'init', 'login', 'logout', 'ui']:
             if 'action' not in args or not args.action:
                 parser.print_help()
                 sys.exit(0)
