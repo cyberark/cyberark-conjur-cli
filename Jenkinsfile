@@ -57,9 +57,9 @@ pipeline {
             sh 'summon -e production ./bin/publish_package'
           }
 
-          when {
-            tag "v*"
-          }
+//           when {
+//             tag "v*"
+//           }
         }
 
         stage('Publish containers') {
