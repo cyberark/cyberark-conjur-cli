@@ -51,7 +51,7 @@ function _configure_master {
 
 echo "Starting centos container..."
 docker run -d -t --name centos centos:latest
-docker cp centos:/etc/yum.repos.d/CentOS-Linux-AppStream.repo .
+docker cp centos:/etc/yum.repos.d/CentOS-Linux-AppStream.repo ..
 docker rm -f centos
 
 
