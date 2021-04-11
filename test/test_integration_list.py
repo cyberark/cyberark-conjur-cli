@@ -104,6 +104,12 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'policy'])
         self.assertIn(f'[\n    "{self.client_params.account}:policy:root"\n]\n', output)
 
+    @integration_test()
+    def test_list_kind_policy_returns_policies_insecure(self):
+        self.setup_insecure()
+        output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'policy'])
+        self.assertIn(f'[\n    "{self.client_params.account}:policy:root"\n]\n', output)
+
     @integration_test(True)
     def test_list_kind_short_host_returns_hosts(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'host'])

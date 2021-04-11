@@ -311,3 +311,11 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn(f'{self.client_params.account}', response.get('account'))
         self.assertIn('admin', response.get('username'))
 
+    @integration_test()
+    def test_https_can_get_whoami_insecure(self):
+        self.setup_insecure()
+        output = self.invoke_cli(self.cli_auth_params, ['whoami'])
+        response = json.loads(output)
+        self.assertIn(f'{self.client_params.account}', response.get('account'))
+        self.assertIn('admin', response.get('username'))
+
