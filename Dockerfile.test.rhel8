@@ -1,8 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
-RUN cat /etc/os-release
-
+COPY CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
 RUN yum update \
         && yum install -y bash \
                 binutils \
@@ -16,10 +15,9 @@ RUN yum update \
                 python3 \
                 python3-devel \
                 python3-pip \
-                wget
+                gnome-keyring \
+                dbus-x11
 
-RUN wget http://mirror.centos.org/centos/8/AppStream/aarch64/os/Packages/gnome-keyring-3.28.2-1.el8.aarch64.rpm
-RUN wget http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/dbus-daemon-1.12.8-12.el8_3.x86_64.rpm
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
