@@ -16,15 +16,11 @@ trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cl
 trap 'cleanup' EXIT
 cleanup
 
-echo "Building API container..."
-docker-compose build
-
-echo "Generating certificate..."
-docker-compose up openssl
+#echo "Building API container..."
+#docker-compose build
 
 echo "Starting Conjur..."
 docker-compose up -d conjur-server
-#docker-compose exec -T conjur conjur-server wait
 
 
 echo "Configuring Conjur..."
@@ -52,6 +48,12 @@ function _configure_master {
   docker-compose exec -T conjur-server \
     "$_cmd"
 }
+
+echo "Starting centos container..."
+docker run -d -t --name centos centos:latest
+docker cp centos:/etc/yum.repos.d/CentOS-Linux-AppStream.repo .
+docker rm -f centos
+
 
 echo "Starting test env..."
 docker-compose up -d test-rhel8
