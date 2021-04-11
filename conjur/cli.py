@@ -150,7 +150,7 @@ Copyright (c) 2021 CyberArk Software Ltd. All rights reserved.
         init_options.add_argument('-a', '--account', metavar='VALUE',
                                   action='store', dest='name',
                                   help='Provide Conjur account name. ' \
-                                       'Optional for Conjur Enterprise - overrides the value on the Conjur Enterprise server')
+                                       'Optional for Conjur Enterprise - overrides the value received from the Conjur Enterprise server')
         init_options.add_argument('-c', '--certificate', metavar='VALUE',
                                   action='store', dest='certificate',
                                   help='Optional- provide path to Conjur SSL certificate ' \
