@@ -25,7 +25,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     # *************** HELPERS ***************
 
     def setUp(self):
-        self.setup_cli_params({})
+        if not self.cli_params_initialized:
+            self.setup_cli_params({})
         # Used to configure the CLI and login to run tests
         utils.setup_cli(self)
         self.invoke_cli(self.cli_auth_params,

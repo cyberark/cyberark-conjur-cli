@@ -44,7 +44,6 @@ class IntegrationTestCaseBase(TestCase):
     def setup_insecure(self):
         self.setup_cli_params({"--insecure"})
         # re-doing setup with the --insecure flag
-        # TODO overhead here please comment on PR
         self.setUp()
 
     def invoke_cli(self, *args, exit_code=0) -> str:
