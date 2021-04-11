@@ -90,6 +90,12 @@ services:
       - "5432"
     security_opt:
         - "seccomp:unconfined"
+    volumes:
+      - ${PWD}/test/test_config/https/:/tmp/conf
+      - ${PWD}/test/test_config/https/:/etc/nginx/tls/:ro
+      - ${PWD}/test/test_config/https/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${PWD}/test/test_config/https/conjur.conf:/etc/nginx/sites-enabled/conjur.conf:ro
+      - ${PWD}/test/test_config/https/dhparams.pem:/etc/nginx/dhparams.pem:ro
 
   test-rhel8:
     privileged: true
