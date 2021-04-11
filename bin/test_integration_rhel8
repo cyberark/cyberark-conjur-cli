@@ -25,7 +25,7 @@ docker-compose up openssl
 echo "Starting Conjur..."
 docker-compose up -d conjur-server
 #docker-compose exec -T conjur conjur-server wait
-docker-compose exec -T conjur-server conjurctl server
+
 
 echo "Configuring Conjur..."
 admin_password=P@S5-ITAbXJlxH1MU
