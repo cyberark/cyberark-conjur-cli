@@ -28,8 +28,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
     # *************** HELPERS ***************
 
     def setUp(self):
-        if not self.cli_params_initialized:
-            self.setup_cli_params({})
+        self.setup_cli_params({})
         utils.delete_credentials()
         # Need to configure the CLI and login to perform further commands
         utils.setup_cli(self)

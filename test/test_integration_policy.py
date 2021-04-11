@@ -26,8 +26,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     # *************** HELPERS ***************
 
     def setUp(self):
-        if not self.cli_params_initialized:
-            self.setup_cli_params({})
+        self.setup_cli_params({})
         utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
                                ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("initial")])
