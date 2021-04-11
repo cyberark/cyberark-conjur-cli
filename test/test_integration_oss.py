@@ -21,12 +21,6 @@ class CliIntegrationTestOSS(IntegrationTestCaseBase):
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         utils.remove_file(DEFAULT_CONFIG_FILE)

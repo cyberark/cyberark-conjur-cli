@@ -27,14 +27,9 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
-        self.setup_cli_params({})
+        if not self.cli_params_initialized:
+            self.setup_cli_params({})
         utils.delete_credentials()
         # Need to configure the CLI and login to perform further commands
         utils.setup_cli(self)
@@ -155,6 +150,21 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Successfully changed password for", output)
 
     @integration_test()
+    def test_user_change_password_does_not_provide_password_prompts_input_insecure(self):
+        # Login as user to avoid changing admin password
+        self.setup_insecure()
+        with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
+            some_user_api_key = self.invoke_cli(self.cli_auth_params,
+                                                ['user', 'rotate-api-key', '-i', 'someuser'])
+
+            extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+            self.invoke_cli(self.cli_auth_params,
+                            ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['user', 'change-password'])
+        self.assertIn("Successfully changed password for", output)
+
+    @integration_test()
     def test_user_change_password_not_complex_enough_prompts_input(self):
         # Login as user to avoid changing admin password
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
@@ -198,8 +208,34 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Error: Invalid password", str(mock_log.output))
         self.assertIn("Error: Invalid password", output)
 
+    @integration_test()
+    def test_user_change_password_empty_password_provided_prompts_input_insecure(self):
+        self.setup_insecure()
+        # Login as user to avoid changing admin password
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+                                            ['user', 'rotate-api-key', '-i', 'someuser'])
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            with patch('getpass.getpass', side_effect=['mypassword']):
+                output = self.invoke_cli(self.cli_auth_params,
+                                         ['user', 'change-password'], exit_code=1)
+
+        self.assertIn("Error: Invalid password", str(mock_log.output))
+        self.assertIn("Error: Invalid password", output)
+
     @integration_test(True)
     def test_host_rotate_api_key_without_host_prompts_input(self):
+        with patch('builtins.input', side_effect=['somehost']):
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['host', 'rotate-api-key'])
+            self.assertIn("Successfully rotated API key for 'somehost'", output)
+
+    @integration_test(True)
+    def test_host_rotate_api_key_without_host_prompts_input_insecure(self):
+        self.setup_insecure()
         with patch('builtins.input', side_effect=['somehost']):
             output = self.invoke_cli(self.cli_auth_params,
                                      ['host', 'rotate-api-key'])

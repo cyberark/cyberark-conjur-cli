@@ -28,11 +28,6 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         # Used to configure the CLI and login to run tests
@@ -273,6 +268,27 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
             self.assertIn("Successfully logged in to Conjur", output)
             self.assertIn('Successfully set value for variable \'one/password\'', output)
         os.environ['TEST_ENV'] = 'True'
+
+    @integration_test()
+    @patch('builtins.input', return_value='admin')
+    def test_variable_get_without_user_logged_in_prompts_login_and_performs_get_insecure(self, mock_input):
+        self.setup_insecure()
+        # TEST_ENV is set to False so we will purposely be prompted to login
+        os.environ['TEST_ENV'] = 'False'
+        try:
+            utils.delete_credentials()
+        except OSError:
+            pass
+
+        with patch('getpass.getpass', return_value=self.client_params.env_api_key):
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['variable', 'set', '-i', 'one/password', '-v', 'somevalue'])
+
+            self.assertIn(LOGIN_IS_REQUIRED, output)
+            self.assertIn("Successfully logged in to Conjur", output)
+            self.assertIn('Successfully set value for variable \'one/password\'', output)
+        os.environ['TEST_ENV'] = 'True'
+
 
     @integration_test(True)
     def test_https_cli_can_set_and_get_a_defined_variable_if_verification_disabled(self):

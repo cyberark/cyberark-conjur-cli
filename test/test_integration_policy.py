@@ -25,12 +25,6 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         utils.setup_cli(self)

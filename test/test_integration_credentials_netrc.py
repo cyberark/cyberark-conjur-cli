@@ -30,12 +30,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     def __init__(self, testname, client_params=None, environment_params=None):
         super(CliIntegrationTestCredentialsNetrc, self).__init__(testname, client_params, environment_params)
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         try:
