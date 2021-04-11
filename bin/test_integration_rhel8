@@ -49,12 +49,6 @@ function _configure_master {
     "$_cmd"
 }
 
-echo "Starting centos container..."
-docker run -d -t --name centos centos:latest
-docker cp centos:/etc/yum.repos.d/CentOS-Linux-AppStream.repo ..
-docker rm -f centos
-
-
 echo "Starting test env..."
 docker-compose up -d test-rhel8
 
