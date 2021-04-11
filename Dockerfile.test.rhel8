@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
-COPY CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
+COPY ./CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
 RUN yum update \
         && yum install -y bash \
                 binutils \
