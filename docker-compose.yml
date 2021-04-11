@@ -42,7 +42,7 @@ services:
     depends_on:
       - pg
 
-  conjur-https:
+  conjur-https-oss:
     image: nginx:alpine
     ports:
       - 443
@@ -80,7 +80,7 @@ services:
     volumes:
       - ${PWD}:/opt/conjur-api-python3
 
-  conjur-server:
+  conjur-https:
     image: registry2.itci.conjur.net/conjur-appliance:12.0.0
     ports:
       - "444:443"
@@ -104,6 +104,6 @@ services:
       DEBUG: Null
       TEST_ENV: "True"
     depends_on:
-      - conjur-server
+      - conjur-https
     volumes:
       - ${PWD}:/opt/conjur-api-python3

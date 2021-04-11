@@ -23,7 +23,7 @@ echo "Generating certificate..."
 docker-compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur-server
+docker-compose up -d conjur-https
 
 
 echo "Configuring Conjur..."
@@ -43,8 +43,8 @@ ENV
 function _configure_master {
   _cmd="evoke configure master"
   _cmd="$_cmd --accept-eula"
-  _cmd="$_cmd --hostname conjur-server"
-  _cmd="$_cmd --master-altnames conjur-server"
+  _cmd="$_cmd --hostname conjur-https"
+  _cmd="$_cmd --master-altnames conjur-https"
   _cmd="$_cmd --admin-password $admin_password"
   _cmd="$_cmd test"
 
