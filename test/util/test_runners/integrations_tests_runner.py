@@ -110,6 +110,7 @@ class TestRunner:  # pragma: no cover
             os.environ['TEST_ENV'] = 'True'
 
     def __get_api_key(self):
+        print('Fetching API key for environment setup...')
         url = f"{self.runner_args.hostname}/authn/{self.runner_args.account}/login"
         encode = base64.b64encode(f"{self.runner_args.login}:{self.runner_args.password}".encode('utf-8')).decode(
             'utf-8')
@@ -117,7 +118,7 @@ class TestRunner:  # pragma: no cover
 
         response = requests.request("GET", url, headers=headers, data={},
                                     verify=False)  # verify=False == like --insecure
-
+        print('API key fetched')
         return response.text
 
     def __run_test_cases(self, test_cases_class: IntegrationTestCaseBase):

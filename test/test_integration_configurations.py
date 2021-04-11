@@ -159,6 +159,14 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
         assert "Not overwriting" not in output
 
+    """
+    DEVELOPER NOTE:
+    This test should fail when running against a server with a CA-signed certificate configured.
+    When a certificate can be validated against its own system's store, we don't actually use the 
+    content of cert_file in the conjurrc when sending a request.
+    See issue opened for this here: https://github.com/cyberark/conjur-api-python3/issues/209
+    See flow description issue for more background info: https://github.com/cyberark/conjur-api-python3/issues/198
+    """
     @integration_test(True)
     def test_https_cli_fails_if_cert_is_bad(self):
         # bad conjurrc
@@ -174,6 +182,14 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
 
+    """
+    DEVELOPER NOTE:
+    This test should fail when running against a server with a CA-signed certificate configured.
+    When a certificate can be validated against its own system's store, we don't actually use the 
+    content of cert_file in the conjurrc when sending a request.
+    See issue opened for this here: https://github.com/cyberark/conjur-api-python3/issues/209
+    See flow description issue for more background info: https://github.com/cyberark/conjur-api-python3/issues/198
+    """
     @integration_test(True)
     def test_https_cli_fails_if_cert_is_not_provided(self):
         conjurrc = ConfigFile(account=self.client_params.account, conjur_url=self.client_params.hostname,

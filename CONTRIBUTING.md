@@ -90,6 +90,13 @@ Check it out! Run the following prefix to start seeing changes
 $ ./pkg_bin/conjur <command> <subcommand>
 ```
 
+You can also pack the CLI as an executable for OS you are running on. The artifact 
+will be saved to the `dist` folder of the project.
+
+```
+pyinstaller -F ./pkg_bin/conjur
+```
+
 ## Testing
 
 ### Linting
@@ -175,22 +182,16 @@ This way of testing allows you to run the integration tests outside a containeri
 
 ##### Setup
 
+1. Drop in to the development environment and install required dependencies as described in the above [Development](#development) section.
+
 1. Pack the `integrations_tests_runner.py` using PyInstaller in the platform to run the executable.
 
-  To pack: `pyinstaller -F test/util/test_runners/integration_test_runner.py`. A new executable will be placed 
+  To pack: `pyinstaller -F test/util/test_runners/integrations_tests_runner.py`. A new executable will be placed 
   in the `dist`  folder. Note that you will need to pack each runner in each platform that you want to run the tests.
-
-1. Pack the Conjur CLI using PyInstaller in the platform to run the executable
-
-  To pack: `pyinstaller -F ./pkg_bin/conjur`. Note that you will need to pack each runner in each platform
-  that you want to run the tests. Also note that _only_ for macOS, you should pack the CLI as a directory instead of a
-  single file (using -D instead of -F). This will allow the CLI tests to run quicker.
 
 1. Run the created binary `./integrations_tests_runner`, supplying the below required parameters via the command line.
 
 ##### Required parameters
-
-`--cli-to-test` - path to the packed CLI executable to test against.
 
 `--files-folder` - path to test assets (policy files, etc). This folder is located under `/test` in the
 repo. Copy this executable into every OS you wish to run the CLI integration tests.
@@ -209,8 +210,7 @@ according to the different operating systems so adjustments will be need to be m
   --account someaccount \
   --login somelogin \
   --password Myp@SS0rdsS1! \
-  --files-folder /test \
-  --cli-to-test /conjur
+  --files-folder /test
 ```
 
 ### UX Guidelines
@@ -238,10 +238,10 @@ The following section provides instructions on what is needed to perform a Conju
 
 1. Run tests in supported platforms
 1. Perform security scan
-1. Create release artifacts
-1. Sign artifacts
 1. Update the version, CHANGELOG, and NOTICES
 1. Create Git tag
+1. Create release artifacts
+1. Sign artifacts
    
 1. Add release artifacts to release page
 
@@ -262,22 +262,12 @@ Before each release the following tests will need to be performed:
 
   Note environments used to pack the binary should not be the same environment to run the tests!
 
-- Backwards compatibility - deploy DAP v5.6.3 and OSS v1.2.0 servers and
+- Backwards compatibility - deploy Conjur Enterprise v5.6.3 and OSS v1.2.0 servers and
   [run the integration test](#running-tests-outside-of-a-containerized) from each supported platform.
   
 ### Perform security scan
 
 Scan the project for vulnerabilities.
-
-### Create release artifacts
-
-Currently, packing the client into an executable is a manual process. For Linux and Windows, you will need to
-  pack the client using the different VMs we have available to us. For macOS, you will need to use your local machine.
-See the below section _How to create release artifacts_ for detailed information on how to create CLI binaries.
-
-### Sign artifacts
-
-Sign and notarize the artifacts.
 
 ### Update the version, CHANGELOG, and NOTICES
 
@@ -308,13 +298,25 @@ Sign and notarize the artifacts.
 
 1. Push the tag: `git push vx.y.z` (or `git push origin vx.y.z` if you are working from your local machine).
 
+### Create release artifacts
+
+Currently, packing the client into an executable is a manual process. For Linux and Windows, you will need to
+  pack the client using the different VMs we have available to us. For macOS, you will need to use your local machine.
+See the below section _How to create release artifacts_ for detailed information on how to create CLI binaries.
+
+*Important!* The final artifacts that are delivered to the customer *must* be created from the version tag
+
+### Sign artifacts
+
+Sign and notarize the artifacts.
+
+*Important!* The final artifacts that are delivered to the customer *must* be created from the version tag
+
 ### How to create release artifacts
 
 For all OS types perform the following:
 1. Clone the repo by running `git clone https://github.com/cyberark/conjur-api-python3.git`.
-1. Install [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and
-  [Python](https://realpython.com/installing-python/) if not already on the machine.
-1. Activate [venv](#development) and install the requirements.
+1. Activate the development and install the requirements as described in the above [Development](#development) section.
 1. Run `pip3 install -r requirements.txt` to install all the project's dependencies.
 
 #### RHEL 7/8
@@ -328,7 +330,7 @@ For all OS types perform the following:
 
 1. Run `pyinstaller -D ./pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable in it.
 1. Follow the instructions on how to build the DMG and how to sign and notarize the CLI.
-1. Add the Conjur-CLI.dmg as an asset in the release page.
+1. Add the conjurcli.dmg as an asset in the release page.
 
 NOTE that the macOS executable is packed as a directory instead of a file for performance purposes.
 
@@ -353,5 +355,5 @@ The zips should be called the following:
 conjur-cli-rhel-7.zip
 conjur-cli-rhel-8.zip
 conjur-cli-windows.zip
-Conjur-CLI.dmg
+conjurcli.dmg
 ```

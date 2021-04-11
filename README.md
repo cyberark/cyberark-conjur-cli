@@ -1,8 +1,7 @@
 # conjur-api-python3
 
-Command-line tool and programmatic Python access to the Conjur API to manage your Conjur resources. 
-
-This repository includes both the self-contained Conjur command-line tool (`conjur`) and Python3-based SDK for Conjur.
+This repository includes both the self-contained Conjur command-line tool (`conjur`) and the Python3-based SDK for accessing 
+the Conjur API to manage Conjur resources.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
 
@@ -10,15 +9,16 @@ This repository includes both the self-contained Conjur command-line tool (`conj
 
 ## Certificate level
 
-### CLI
+### Conjur CLI
 
 ![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
 
 The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will securely
-work with CyberArk DAP as documented. In addition, CyberArk offers Enterprise-level support for these features. For
-more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
+work with CyberArk Conjur Enterprise (previously known as DAP) as documented. In addition, CyberArk offers 
+Enterprise-level support for these features. For more detailed information on our certification levels, 
+see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
 
-### SDK
+### Conjur Python SDK
 
 ![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
 
@@ -31,29 +31,28 @@ Are you using this project with [Conjur OSS](https://github.com/cyberark/conjur)
 **strongly** recommend choosing the version of this project to use from the latest [Conjur OSS 
 suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html). 
 Conjur maintainers perform additional testing on the suite release versions to ensure 
-compatibility. When possible, upgrade your Conjur version to match the 
-[latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm); 
-when using integrations, choose the latest suite release that matches your Conjur version. For any 
+compatibility. When possible, upgrade your Conjur OSS version to match the 
+[latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm).
+When using integrations, choose the latest suite release that matches your Conjur OSS version. For any 
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
 ### Supported Services
 
-- Conjur OSS v1.2.0+
-- Conjur Enterprise v5.6.3+
+- Conjur OSS v1.2.0 or later
+- Conjur Enterprise v11.2.1 (v5.6.3) or later
 
 ### Sypported Platforms
 
-- macOS Catalina+
-- Windows 10+
+- macOS Catalina or later
+- Windows 10 or later
 - Red Hat Enterprise Linux 7, 8
 
 ### Installation
 
-#### Install the CLI
+#### Install the Conjur CLI
 
-You can access the latest release of the CLI to install on your machine by navigating to our 
-[release](https://github.com/cyberark/conjur-api-python3/releases) page. For instructions on 
-how to setup and configure the CLI, see our official documentation ***(TODO add link to docs)*** 
+To access the latest release of the Conjur CLI, go to our [release](https://github.com/cyberark/conjur-api-python3/releases) 
+page. For instructions on how to set up and configure the CLI, see our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer/CLI/cli-lp.htm).
 
 #### Install the SDK
 
@@ -82,8 +81,8 @@ $ pip3 install .
 
 ### CLI
 
-For more information on how to setup, configure, and start using the CLI, see our official 
-documentation found here ***(TODO add link to docs)***.
+For more information on how to set up, configure, and start using the Conjur CLI, see our [official 
+documentation](https://docs.conjur.org/Latest/en/Content/Developer/CLI/cli-lp.htm).
 
 ### SDK
 
@@ -114,7 +113,7 @@ print("Variable value is:", new_value.decode('utf-8'))
 
 #### With login ID and API key
 
-Write the code same as in the first example but initialize the Client with the following arguments:
+Write the code as in the first example but initialize the Client with the following arguments:
 
 ```python3
 client = Client(url='https://conjur.myorg.com',
@@ -126,10 +125,10 @@ client = Client(url='https://conjur.myorg.com',
 
 #### Defining the Conjur server endpoint
 
-A configuration file called, `.conjurrc` is used to hold details required to communicate 
+A configuration file called `.conjurrc` is used to hold details required to communicate 
 to the Conjur server. You can provide these details needed to open a connection to the 
-Conjur endpoint in a file called `.conjurrc` instead of passing them in (`url`, `account`, 
-and `ca_bundle`)  during initialization of the Client.
+Conjur endpoint in this file instead of passing them in (`url`, `account`, and `ca_bundle`)  
+during initialization of the Client.
 
 The `.conjurrc` file should be saved to your home directory and should contain `conjur_url`, 
 `conjur_account`, and`cert_file`.
@@ -150,10 +149,11 @@ will favor saving credentials (login ID and password) to the system's credential
 If the detected credential store is not one we support or is not accessible, the 
 credentials will be written to a configuration file, `.netrc`, in plaintext. 
 
-If written to the `.netrc`, it is highly recommended that you remove the file when done.
+If written to the `.netrc`, it is strongly recommended that you log out when not 
+using the Conjur CLI. This removes the credentials from the `.netrc` file.
 
-The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to login the 
-Conjur endpoint and should consist of machine, login, and password.
+The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the 
+Conjur endpoint and should consist of 'machine', 'login', and 'password'.
 
 Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the
 user who has created the file to have read/write permissions on it (`chmod 700 .netrc`).
@@ -190,7 +190,7 @@ returned in a dictionary that maps the variable name to its value.
 
 Sets a variable to a specific value based on its ID.
 
-Note: Policy to create the variable must have been already loaded
+Note: Policy to create the variable must have already been loaded
 otherwise you will get a 404 error during invocation.
 
 #### `load_policy_file(policy_name, policy_file)`
@@ -217,7 +217,7 @@ dictionary object constructed from the returned JSON data.
 Returns a list of all available resources for the current
 account.
 
-The list constraints parameter is optional and should be provided as
+The 'list constraints' parameter is optional and should be provided as
 a dictionary.
 
 For example: `client.list({'kind': 'user', 'inspect': True})`
@@ -244,7 +244,7 @@ Rotates the personal API key of the logged-in user and returns it as a string.
 
 #### `change_personal_password(logged_in_user, current_password, new_password)`
 
-Updates the current, the logged in user's password with the password parameter provided. 
+Updates the current, logged-in user's password with the password parameter provided. 
 
 Note: the new password must meet the Conjur password complexity constraints. It must 
 contain at least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special character.
@@ -253,9 +253,9 @@ contain at least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special cha
 
 _Note: This method requires Conjur v1.9+_
 
-Returns a Python dictionary of information about the client making an
-API request (such as its ip address, user, account,
-token expiration date etc.).
+Returns a Python dictionary of information about the Client making an
+API request (such as its IP address, user, account, token expiration 
+date, etc).
 
 ## Contributing
 
