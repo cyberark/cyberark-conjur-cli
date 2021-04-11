@@ -19,6 +19,7 @@ cleanup
 #echo "Building API container..."
 #docker-compose build
 
+
 echo "Starting Conjur..."
 docker-compose up -d conjur-server
 
