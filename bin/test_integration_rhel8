@@ -19,6 +19,8 @@ cleanup
 #echo "Building API container..."
 #docker-compose build
 
+echo "Generating certificate..."
+docker-compose up openssl
 
 echo "Starting Conjur..."
 docker-compose up -d conjur-server
