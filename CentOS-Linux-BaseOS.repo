@@ -10,6 +10,7 @@
 #
 # This file enables installation of grubby to disable FIPS
 #
+[baseos]
 name=CentOS Linux $releasever - BaseOS
 mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=BaseOS&infra=$infra
 #baseurl=http://mirror.centos.org/$contentdir/$releasever/BaseOS/$basearch/os/
