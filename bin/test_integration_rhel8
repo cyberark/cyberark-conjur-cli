@@ -40,13 +40,20 @@ PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
 DEBUG=$DEBUG
 ENV
 
+function _configure_conjur {
+  _cmd="evoke configure master"
+  _cmd="$_cmd --accept-eula"
+  _cmd="$_cmd --hostname conjur-https"
+  _cmd="$_cmd --master-altnames conjur-https"
+  _cmd="$_cmd --admin-password $admin_password"
+  _cmd="$_cmd test"
+
+  docker-compose exec -T conjur-https \
+    "$_cmd"
+}
+
 echo "Configure Conjur..."
-docker-compose exec conjur-https bash -c "
-  evoke configure master \
-  --accept-eula \
-  -h cconjur-https \
-  -p $admin_password test
-"
+_configure_conjur
 
 echo "Starting test env..."
 docker-compose up -d test-rhel8
