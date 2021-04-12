@@ -19,13 +19,14 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
   source /build_integrations_tests_runner
 
+  echo "Write the test integration executable command to script..."
   _cmd="bash -c ./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
   _cmd="$_cmd --login $LOGIN"
   _cmd="$_cmd --admin-password $CONJUR_AUTHN_API_KEY "
   _cmd="$_cmd -files-folder /test"
-  echo "$cmd" >> /dbus.sh
+  echo "$_cmd" >> /dbus.sh
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
 fi
