@@ -28,7 +28,8 @@ WORKDIR $INSTALL_DIR
 
 COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
-
+RUN grubby --update-kernel=ALL --remove-args=fips=1
+RUN sed -i 's/ fips=1//' /etc/default/grub
 COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
 
 COPY . $INSTALL_DIR
