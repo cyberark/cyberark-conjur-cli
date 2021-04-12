@@ -20,7 +20,7 @@ RUN yum --disableplugin=subscription-manager -y install -y \
             python3-pip \
             gnome-keyring \
             dbus-x11 \
-            procps
+            procps \
          && yum --disableplugin=subscription-manager clean all
 
 RUN mkdir -p $INSTALL_DIR
