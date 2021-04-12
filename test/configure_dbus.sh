@@ -37,7 +37,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
 
   echo "echo fips check..." >> /dbus.sh
   echo "fips-mode-setup --check" >> /dbus.sh
-  echo "disable fips..." >> /dbus.sh
+  echo "echo disable fips..." >> /dbus.sh
   echo "grubby --update-kernel=ALL --remove-args=fips=1" >> /dbus.sh
   echo "sed -i 's/ fips=1//' /etc/default/grub" >> /dbus.sh
   echo "echo fips check..." >> /dbus.sh
