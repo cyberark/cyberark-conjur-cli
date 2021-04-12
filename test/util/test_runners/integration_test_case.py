@@ -32,8 +32,19 @@ class IntegrationTestCaseBase(TestCase):
         """
         self.environment = TestEnvironmentParams() if environment_params is None else environment_params
         self.client_params = ClientParams() if client_params is None else client_params
-
+        self.cli_additional_params = []
         super(IntegrationTestCaseBase, self).__init__(testname)
+
+    def setup_cli_params(self, env_vars, *params):
+        self.cli_auth_params = ['--debug']
+        self.cli_auth_params += self.cli_additional_params
+        self.cli_auth_params += params
+        return self.cli_auth_params
+
+    def setup_insecure(self):
+        self.cli_additional_params.append("--insecure")
+        # re-doing setup with the --insecure flag
+        self.setUp()
 
     def invoke_cli(self, *args, exit_code=0) -> str:
         """

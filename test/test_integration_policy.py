@@ -25,12 +25,6 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         utils.setup_cli(self)
@@ -312,6 +306,14 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_can_get_whoami(self):
         self.setup_cli_params({})
 
+        output = self.invoke_cli(self.cli_auth_params, ['whoami'])
+        response = json.loads(output)
+        self.assertIn(f'{self.client_params.account}', response.get('account'))
+        self.assertIn('admin', response.get('username'))
+
+    @integration_test()
+    def test_insecure_https_can_get_whoami(self):
+        self.setup_insecure()
         output = self.invoke_cli(self.cli_auth_params, ['whoami'])
         response = json.loads(output)
         self.assertIn(f'{self.client_params.account}', response.get('account'))

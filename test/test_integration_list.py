@@ -24,12 +24,6 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** HELPERS ***************
 
-    def setup_cli_params(self, env_vars, *params):
-        self.cli_auth_params = ['--debug']
-        self.cli_auth_params += params
-
-        return self.cli_auth_params
-
     def setUp(self):
         self.setup_cli_params({})
         # Used to configure the CLI and login to run tests
@@ -107,6 +101,12 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test()
     def test_list_kind_policy_returns_policies(self):
+        output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'policy'])
+        self.assertIn(f'[\n    "{self.client_params.account}:policy:root"\n]\n', output)
+
+    @integration_test()
+    def test_list_kind_policy_returns_policies_insecure(self):
+        self.setup_insecure()
         output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'policy'])
         self.assertIn(f'[\n    "{self.client_params.account}:policy:root"\n]\n', output)
 
