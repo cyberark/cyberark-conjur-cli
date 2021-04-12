@@ -17,7 +17,7 @@ if [ "$DEBUG" == "true" ]; then
   echo "bash" >> /dbus.sh
 elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
-  source _build_integrations_tests_runner
+  source ./bin/_build_integrations_tests_runner
 
   _cmd="bash -c ./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
