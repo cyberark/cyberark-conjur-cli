@@ -1,6 +1,9 @@
 #!/bin/bash
 
 echo "Configuring D-bus environment"
+
+echo "#!/bin/basht" /dbus.sh
+echo "# D-bus environment script" /dbus.sh
 echo eval "$(dbus-launch --sh-syntax)" > /dbus.sh
 # Create D-bus keyring directories
 mkdir -p ~/.cache
@@ -27,7 +30,10 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd -files-folder /test"
   echo cmd: "$_cmd"
+
+  echo "echo running tests..." >> /dbus.sh
   echo "$_cmd" >> /dbus.sh
+  echo "echo running tests completed..." >> /dbus.sh
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
 fi
