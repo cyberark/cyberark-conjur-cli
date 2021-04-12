@@ -108,6 +108,6 @@ services:
       TEST_HOSTNAME: Null
       ACCOUNT: Null
     depends_on:
-      - conjur-https
+      - conjur-appliance
     volumes:
       - ${PWD}:/opt/conjur-api-python3
