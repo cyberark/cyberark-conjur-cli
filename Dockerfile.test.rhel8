@@ -29,8 +29,7 @@ WORKDIR $INSTALL_DIR
 COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
 
-COPY ./bin/build_integrations_tests_runner $INSTALL_DIR/
-RUN build_integrations_tests_runner
+COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
 
 COPY . $INSTALL_DIR
 
