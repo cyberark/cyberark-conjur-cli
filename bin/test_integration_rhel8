@@ -41,7 +41,7 @@ DEBUG=$DEBUG
 ENV
 
 echo "Configure Conjur..."
-docker-compose exec conjur-master-1.mycompany.local bash -c "
+docker-compose exec conjur-https bash -c "
   evoke configure master \
   --accept-eula \
   -h cconjur-https \
