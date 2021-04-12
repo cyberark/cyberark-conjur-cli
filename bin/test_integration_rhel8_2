@@ -1,0 +1,94 @@
+#!/bin/bash -ex
+
+cleanup() {
+  echo "Cleaning up..."
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
+}
+
+DEBUG="false"
+if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
+  DEBUG="true"
+  shift
+fi
+
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'cleanup' EXIT
+cleanup
+
+#echo "Building API container..."
+#docker-compose build
+
+echo "Generating certificate..."
+docker-compose up openssl
+
+echo "Starting Conjur..."
+docker-compose up -d conjur-appliance
+
+
+echo "Configuring Conjur..."
+admin_password=P@S5-ITAbXJlxH1MU
+export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
+export DEBUG=$DEBUG
+export CONJUR_AUTHN_API_KEY=$admin_password
+export SERVER_MODE="appliance"
+export ACCOUNT="dev"
+export LOGIN="admin"
+export TEST_HOSTNAME=conjur-appliance
+
+# Docker-compose will pick this file up when starting containers
+# so we will have these variables in the container
+cat <<ENV > .env
+CONJUR_AUTHN_API_KEY=$admin_password
+PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
+DEBUG=$DEBUG
+SERVER_MODE=$SERVER_MODE
+ENV
+
+function _configure_conjur() {
+  _cmd="evoke configure master"
+  _cmd="$_cmd --accept-eula"
+  _cmd="$_cmd --hostname conjur-appliance"
+  _cmd="$_cmd --master-altnames conjur-appliance"
+  _cmd="$_cmd --admin-password $admin_password"
+  _cmd="$_cmd dev"
+
+  docker-compose exec -T conjur-appliance \
+    bash -c "$_cmd"
+}
+
+function _build_test_integration_exec() {
+  echo "Dropping into virtual environment"
+  python3 -m venv venv
+  source venv/bin/activate
+
+  echo "Installing requirements for tests..."
+  pip3 install -r requirements.txt
+
+  pyinstaller -F test/util/test_runners/integrations_tests_runner.py
+  deactivate
+}
+
+echo "Configure Conjur..."
+_configure_conjur
+
+echo "Building the test integration executable..."
+_build_test_integration_exec
+
+echo "Starting test env..."
+docker-compose up -d test-rhel8
+
+rm -rf $CURRENT_DIR/output/*
+
+# Hint: '--privileged' is added here otherwise we will get operation
+# not permitted when attempting to do anything related to dbus
+if [[ "$DEBUG" == "true" ]]; then
+  docker-compose exec --privileged test-rhel8 /bin/sh -c " /dbus.sh" $@
+  exit
+fi
+
+docker-compose run \
+  --rm \
+  --no-deps \
+  test-rhel8 \
+  /bin/sh -c " /dbus.sh" $@
