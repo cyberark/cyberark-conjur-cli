@@ -46,7 +46,7 @@ function _configure_conjur {
   _cmd="$_cmd --hostname conjur-https"
   _cmd="$_cmd --master-altnames conjur-https"
   _cmd="$_cmd --admin-password $admin_password"
-  _cmd="$_cmd test"
+  _cmd="$_cmd dev"
 
   docker-compose exec -T conjur-https \
     bash -c "$_cmd"
