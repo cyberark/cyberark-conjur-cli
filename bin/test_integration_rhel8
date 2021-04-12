@@ -31,6 +31,7 @@ admin_password=P@S5-ITAbXJlxH1MU
 export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
 export DEBUG=$DEBUG
 export CONJUR_AUTHN_API_KEY=$admin_password
+export SERVER_MODE="appliance"
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
@@ -38,9 +39,10 @@ cat <<ENV > .env
 CONJUR_AUTHN_API_KEY=$admin_password
 PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
 DEBUG=$DEBUG
+SERVER_MODE=$SERVER_MODE
 ENV
 
-function _configure_conjur {
+function _configure_conjur() {
   _cmd="evoke configure master"
   _cmd="$_cmd --accept-eula"
   _cmd="$_cmd --hostname conjur-https"
@@ -52,8 +54,23 @@ function _configure_conjur {
     bash -c "$_cmd"
 }
 
+function _build_test_integration_exec() {
+  echo "Dropping into virtual environment"
+  python3 -m venv venv
+  source venv/bin/activate
+
+  echo "Installing requirements for tests..."
+  pip3 install -r requirements.txt
+
+  pyinstaller -F test/util/test_runners/integration_test_runner.py
+  deactivate
+}
+
 echo "Configure Conjur..."
 _configure_conjur
+
+echo "Building the test integration executable..."
+_build_test_integration_exec
 
 echo "Starting test env..."
 docker-compose up -d test-rhel8

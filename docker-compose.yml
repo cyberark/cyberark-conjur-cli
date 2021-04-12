@@ -103,6 +103,7 @@ services:
       PYTHON_KEYRING_BACKEND: Null
       DEBUG: Null
       TEST_ENV: "True"
+      SERVER_MODE: appliance
     depends_on:
       - conjur-https
     volumes:
