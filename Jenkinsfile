@@ -13,17 +13,17 @@ pipeline {
   }
 
    stages {
-    stage('Linting') {
-      parallel {
-        stage('Code') {
-          steps { sh './bin/test_linting' }
-        }
+    //stage('Linting') {
+    //  parallel {
+    //    stage('Code') {
+    //      steps { sh './bin/test_linting' }
+    //    }
 
-        stage('Changelog') {
-          steps { sh './bin/test_changelog' }
-        }
-      }
-    }
+    //    stage('Changelog') {
+    //      steps { sh './bin/test_changelog' }
+    //    }
+    //  }
+    //}
 
     //stage('Unit tests') {
     //  steps {
