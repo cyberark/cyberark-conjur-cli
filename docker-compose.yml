@@ -104,6 +104,10 @@ services:
       DEBUG: Null
       TEST_ENV: "True"
       SERVER_MODE: appliance
+      LOGIN: Null
+      ADMIN_PASSWORD: Null
+      TEST_HOSTNAME: Null
+      ACCOUNT: Null
     depends_on:
       - conjur-https
     volumes:
