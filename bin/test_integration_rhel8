@@ -49,7 +49,7 @@ function _configure_conjur {
   _cmd="$_cmd test"
 
   docker-compose exec -T conjur-https \
-    "$_cmd"
+    "bash -c '$_cmd'"
 }
 
 echo "Configure Conjur..."
