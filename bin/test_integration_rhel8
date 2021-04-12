@@ -65,7 +65,7 @@ function _build_test_integration_exec() {
   echo "Installing requirements for tests..."
   pip3 install -r requirements.txt
 
-  pyinstaller -F test/util/test_runners/integration_test_runner.py
+  pyinstaller -F test/util/test_runners/integration_tests_runner.py
   deactivate
 }
 
