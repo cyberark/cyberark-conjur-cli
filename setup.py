@@ -23,10 +23,10 @@ with open('README.md', 'r') as readme_file:
     long_description = readme_file.read()
 
 setup(
-    name="conjur-client",
+    name="conjur",
     version=VERSION_DATA['__version__'],
     python_requires='>=3.5',
-    packages=find_packages(),
+    packages=find_packages(exclude=("test")),
     zip_safe=True,
 
     scripts=['pkg_bin/conjur'],

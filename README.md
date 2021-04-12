@@ -63,7 +63,7 @@ To avoid unanticipated breaking changes, make sure that you stay up-to-date on o
 latest releases and review the project's [CHANGELOG.md](CHANGELOG.md).
 
 ```
-$ pip3 install conjur-client
+$ pip3 install conjur
 
 $ conjur --help
 ```
@@ -227,7 +227,7 @@ For example: `client.list({'kind': 'user', 'inspect': True})`
 | kind             | Filter resources by specified kind (user, host, layer, group, policy, variable, or webservice) |
 | limit            | Limit list of resources to specified number                  |
 | offset           | Skip specified number of resources                           |
-| role             | Retrieve list of resources that specified role is entitled to see (must specify role’s full ID) |
+| role             | Retrieve list of resources that specified role is entitled to see (must specify role's full ID) |
 | search           | Search for resources based on specified query                |
 | inspect          | List the metadata for resources                              |
 

@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - The CLI and SDK now use a system's native credential store to save credentials instead of a netrc file by default. 
   If a store is not available, the credentials will be saved to the netrc as a fallback. [cyberark/conjur-api-python3#NO]()
-- The invocation of the CLI when installed from Pypi has changed from `conjur-cli` to `conjur`. [cyberark/conjur-api-python3#NO]()
+- The CLI/SDK package pushed to Pypi has changed from `conjur-client` to `conjur`. [cyberark/conjur-api-python3#NO]()
 - The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`.
   Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
   .conjurrc file for use in the SDK and will need to update accordingly.
