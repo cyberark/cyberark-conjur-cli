@@ -15,6 +15,13 @@ echo "export SSH_AUTH_SOCK" >> /dbus.sh
 
 if [[ "$DEBUG" == "true" ]]; then
   echo "bash" >> /dbus.sh
+elif [[ "$SERVER_MODE" == "appliance"]; then
+  echo "bash -c ./dist/integrations_tests_runner \
+      --url https://conjur-server \
+      --account someaccount \
+      --login somelogin \
+      --password Myp@SS0rdsS1! \
+      --files-folder /test"
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
 fi
