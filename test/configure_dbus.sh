@@ -35,11 +35,14 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   _cmd="$_cmd -files-folder /test"
   echo cmd: "$_cmd"
 
+  echo "echo fips check..." >> /dbus.sh
+  echo "fips-mode-setup --check" >> /dbus.sh
   echo "echo running tests..." >> /dbus.sh
   echo "$_cmd" >> /dbus.sh
   echo "echo ->5" >> /dbus.sh
   echo "echo running tests completed..." >> /dbus.sh
   echo "echo ->6" >> /dbus.sh
+  echo 'cat dbus.sh file...'
   cat /dbus.sh
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
