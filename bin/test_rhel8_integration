@@ -57,23 +57,8 @@ function _configure_conjur() {
     bash -c "$_cmd"
 }
 
-function _build_test_integration_exec() {
-  echo "Dropping into virtual environment"
-  python3 -m venv venv
-  source venv/bin/activate
-
-  echo "Installing requirements for tests..."
-  pip3 install -r requirements.txt
-
-  pyinstaller -F test/util/test_runners/integrations_tests_runner.py
-  deactivate
-}
-
 echo "Configure Conjur..."
 _configure_conjur
-
-echo "Building the test integration executable..."
-_build_test_integration_exec
 
 echo "Starting test env..."
 docker-compose up -d test-rhel8
