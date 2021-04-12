@@ -24,7 +24,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
   _cmd="$_cmd --login $LOGIN"
-  _cmd="$_cmd --admin-password $CONJUR_AUTHN_API_KEY "
+  _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd -files-folder /test"
   echo "$_cmd" >> /dbus.sh
 else

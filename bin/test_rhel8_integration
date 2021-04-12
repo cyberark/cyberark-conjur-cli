@@ -27,7 +27,7 @@ docker-compose up -d conjur-appliance
 
 
 echo "Configuring Conjur..."
-admin_password=P@S5-ITAbXJlxH1MU
+export ADMIN_PASSWORD=P@S5-ITAbXJlxH1MU
 export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
 export DEBUG=$DEBUG
 export CONJUR_AUTHN_API_KEY=$admin_password
@@ -44,14 +44,17 @@ PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
 DEBUG=$DEBUG
 SERVER_MODE=$SERVER_MODE
 TEST_HOSTNAME=$TEST_HOSTNAME
+ACCOUNT=$ACCOUNT
+LOGIN=$LOGIN
+ADMIN_PASSWORD=$ADMIN_PASSWORD
 ENV
 
 function _configure_conjur() {
   _cmd="evoke configure master"
   _cmd="$_cmd --accept-eula"
-  _cmd="$_cmd --hostname conjur-appliance"
-  _cmd="$_cmd --master-altnames conjur-appliance"
-  _cmd="$_cmd --admin-password $admin_password"
+  _cmd="$_cmd --hostname $TEST_HOSTNAME"
+  _cmd="$_cmd --master-altnames $TEST_HOSTNAME"
+  _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd dev"
 
   docker-compose exec -T conjur-appliance \
