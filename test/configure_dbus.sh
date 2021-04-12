@@ -16,6 +16,9 @@ echo "export SSH_AUTH_SOCK" >> /dbus.sh
 if [ "$DEBUG" == "true" ]; then
   echo "bash" >> /dbus.sh
 elif [ "$SERVER_MODE" == "appliance" ]; then
+  echo "Building the test integration executable..."
+  source /_build_integrations_tests_runner
+
   _cmd="bash -c ./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
