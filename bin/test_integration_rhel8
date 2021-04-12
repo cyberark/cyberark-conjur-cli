@@ -23,7 +23,7 @@ echo "Generating certificate..."
 docker-compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur-https
+docker-compose up -d conjur-appliance
 
 
 echo "Configuring Conjur..."
@@ -32,6 +32,9 @@ export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
 export DEBUG=$DEBUG
 export CONJUR_AUTHN_API_KEY=$admin_password
 export SERVER_MODE="appliance"
+export ACCOUNT="dev"
+export LOGIN="admin"
+export TEST_HOSTNAME=conjur-appliance
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
@@ -45,12 +48,12 @@ ENV
 function _configure_conjur() {
   _cmd="evoke configure master"
   _cmd="$_cmd --accept-eula"
-  _cmd="$_cmd --hostname conjur-https"
-  _cmd="$_cmd --master-altnames conjur-https"
+  _cmd="$_cmd --hostname conjur-appliance"
+  _cmd="$_cmd --master-altnames conjur-appliance"
   _cmd="$_cmd --admin-password $admin_password"
   _cmd="$_cmd dev"
 
-  docker-compose exec -T conjur-https \
+  docker-compose exec -T conjur-appliance \
     bash -c "$_cmd"
 }
 
