@@ -39,7 +39,7 @@ export TEST_HOSTNAME=conjur-appliance
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
 cat <<ENV > .env
-CONJUR_AUTHN_API_KEY=$admin_password
+CONJUR_AUTHN_API_KEY=$ADMIN_PASSWORD
 PYTHON_KEYRING_BACKEND=$PYTHON_KEYRING_BACKEND
 DEBUG=$DEBUG
 SERVER_MODE=$SERVER_MODE
