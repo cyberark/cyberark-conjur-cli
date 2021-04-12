@@ -2,7 +2,7 @@
 
 echo "Configuring D-bus environment"
 
-echo "#!/bin/basht" /dbus.sh
+echo "#!/bin/bash -ex" >> /dbus.sh
 echo "# D-bus environment script" /dbus.sh
 echo eval "$(dbus-launch --sh-syntax)" > /dbus.sh
 # Create D-bus keyring directories
