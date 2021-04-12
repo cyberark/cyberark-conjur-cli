@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [7.0.1] - 2020-04-12
+
 ### Added
+- The CLI has promoted to GA. The SDK still remains a community level project.
 - The `host` method 'rotate-api-key' is now available in CLI and SDK to manage hosts
   [cyberark/conjur-api-python3#101](https://github.com/cyberark/conjur-api-python3/issues/101)
 - The `user` methods 'rotate-api-key' and 'change-password' are now available in CLI and SDK to manage users
@@ -22,7 +25,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - The CLI and SDK now use a system's native credential store to save credentials instead of a netrc file by default. 
-  If a store is not available, the credentials will be saved to the netrc as a fallback.
+  If a store is not available, the credentials will be saved to the netrc as a fallback. [cyberark/conjur-api-python3#NO]()
+- The invocation of the CLI when installed from Pypi has changed from `conjur-cli` to `conjur`. [cyberark/conjur-api-python3#NO]()
 - The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`.
   Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
   .conjurrc file for use in the SDK and will need to update accordingly.
@@ -91,7 +95,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - The first tagged version.
 
-[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v7.0.1...HEAD
+[7.0.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.1...v7.0.1
 [0.1.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.5...v0.1.0
 [0.0.5]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.4...v0.0.5
