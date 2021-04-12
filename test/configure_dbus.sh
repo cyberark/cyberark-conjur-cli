@@ -27,7 +27,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   source /build_integrations_tests_runner
 
   echo "Write the test integration executable command to script..."
-  _cmd="bash -c ./dist/integrations_tests_runner"
+  _cmd="./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
   _cmd="$_cmd --login $LOGIN"
