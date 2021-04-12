@@ -4,7 +4,6 @@ ENV INSTALL_DIR=/opt/conjur-api-python3
 
 # Copy below repo file to enable installation of gnome-keyring and dbus-x11
 COPY ./CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
-COPY ./CentOS-Linux-BaseOS.repo /etc/yum.repos.d/CentOS-Linux-BaseOS.repo
 
 RUN yum --disableplugin=subscription-manager -y install -y \
             bash \
@@ -21,12 +20,12 @@ RUN yum --disableplugin=subscription-manager -y install -y \
             python3-pip \
             gnome-keyring \
             dbus-x11 \
-            procps \
-            grubby \
+            procps
          && yum --disableplugin=subscription-manager clean all
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
+RUN fips-mode-setup --disable --no-bootcfg
 
 COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
