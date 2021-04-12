@@ -26,6 +26,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   _cmd="$_cmd --login $LOGIN"
   _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd -files-folder /test"
+  echo cmd: "$_cmd"
   echo "$_cmd" >> /dbus.sh
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
