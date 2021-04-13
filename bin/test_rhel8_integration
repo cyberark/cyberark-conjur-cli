@@ -71,7 +71,7 @@ echo "Disable fips mode..."
 docker-compose run \
   --no-deps \
   test-rhel8 \
-  /bin/sh -c "fips-mode-setup --disable --no-bootcfg"
+  --entrypoint "/bin/sh -c 'fips-mode-setup --disable --no-bootcfg'"
 
 echo "Restart container..."
 docker-compos restart test-rhel8
