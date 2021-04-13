@@ -69,6 +69,7 @@ docker-compose up -d test-rhel8
 
 echo "Disable fips mode..."
 docker-compose exec \
+  -T \
   test-rhel8 \
   /bin/sh -c "echo test"
 
