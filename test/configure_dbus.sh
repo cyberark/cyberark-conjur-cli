@@ -3,7 +3,7 @@
 echo "Configuring D-bus environment"
 
 echo "#!/bin/bash -ex" >> /dbus.sh
-echo "# D-bus environment script" /dbus.sh
+echo "# D-bus environment script" >> /dbus.sh
 echo "echo ->0" >> /dbus.sh
 echo eval "$(dbus-launch --sh-syntax)" > /dbus.sh
 echo "echo ->1" >> /dbus.sh
