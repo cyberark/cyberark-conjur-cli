@@ -71,10 +71,16 @@ echo "Disable fips mode..."
 docker-compose run \
   -T \
   test-rhel8 \
-  /bin/sh -c "echo test"
+  /bin/sh -c "fips-mode-setup --disable --no-bootcfg"
 
 echo "Restart container..."
 docker-compose restart test-rhel8
+
+echo "Check fips mode..."
+docker-compose run \
+  -T \
+  test-rhel8 \
+  /bin/sh -c "fips-mode-setup --check"
 
 rm -rf "$CURRENT_DIR"/output/*
 
