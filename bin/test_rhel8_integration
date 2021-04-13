@@ -70,7 +70,7 @@ docker-compose up -d test-rhel8
 echo "Disable fips mode..."
 docker-compose exec \
   test-rhel8 \
-  /bin/sh -c "fips-mode-setup --disable --no-bootcfg"
+  /bin/sh -c "echo test"
 
 echo "Restart container..."
 docker-compose restart test-rhel8
