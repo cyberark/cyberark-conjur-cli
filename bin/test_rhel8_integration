@@ -16,8 +16,8 @@ trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cl
 trap 'cleanup' EXIT
 cleanup
 
-#echo "Building API container..."
-#docker-compose build
+echo "Building API container..."
+docker-compose build
 
 echo "Generating certificate..."
 docker-compose up openssl
