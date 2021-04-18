@@ -25,9 +25,6 @@ import shutil
 # once the test module is packed
 import uuid
 import ssl
-print(ssl.OPENSSL_VERSION)
-ssl.FIPS_mode_set(0)
-print(ssl.FIPS_mode())
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
