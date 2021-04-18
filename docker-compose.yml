@@ -42,7 +42,7 @@ services:
     depends_on:
       - pg
 
-  conjur-https:
+  conjur-https-oss:
     image: nginx:alpine
     ports:
       - 443
