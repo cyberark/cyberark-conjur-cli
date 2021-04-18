@@ -3,9 +3,9 @@
 echo "Configuring D-bus environment"
 
 echo "#!/bin/bash -ex" >> /dbus.sh
-echo "# D-bus environment script" /dbus.sh
+echo "# D-bus environment script" >> /dbus.sh
 echo "echo ->0" >> /dbus.sh
-echo eval "$(dbus-launch --sh-syntax)" > /dbus.sh
+echo eval "$(dbus-launch --sh-syntax)" >> /dbus.sh
 echo "echo ->1" >> /dbus.sh
 # Create D-bus keyring directories
 mkdir -p ~/.cache
@@ -31,19 +31,11 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
   _cmd="$_cmd --login $LOGIN"
-  _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
-  _cmd="$_cmd -files-folder /test"
+  _cmd="$_cmd --password $ADMIN_PASSWORD"
+  _cmd="$_cmd --files-folder /test"
   echo cmd: "$_cmd"
 
-  echo "echo fips check..." >> /dbus.sh
-  echo "fips-mode-setup --check" >> /dbus.sh
-  #echo "echo disable fips..." >> /dbus.sh
-  #echo "fips-mode-setup --disable --no-bootcfg" >> /dbus.sh
-  #echo "grubby --update-kernel=ALL --remove-args=fips=1" >> /dbus.sh
-  #echo "[[ -f /etc/default/grub ]] && sed -i 's/ fips=1//' /etc/default/grub" >> /dbus.sh
-  #echo "echo fips check..." >> /dbus.sh
-  #echo "fips-mode-setup --check" >> /dbus.sh
-  echo "echo running tests..." >> /dbus.sh
+
   echo "$_cmd" >> /dbus.sh
   echo "echo ->5" >> /dbus.sh
   echo "echo running tests completed..." >> /dbus.sh
