@@ -26,6 +26,8 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
   source /build_integrations_tests_runner
 
+  echo "openssl version -a" >> /dbus.sh
+
   echo "Write the test integration executable command to script..."
   _cmd="./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
