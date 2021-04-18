@@ -25,7 +25,7 @@ RUN yum --disableplugin=subscription-manager -y install -y \
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
-
+COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install -r requirements.txt
 
 COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
