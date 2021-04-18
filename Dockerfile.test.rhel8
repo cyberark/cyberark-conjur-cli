@@ -34,5 +34,5 @@ COPY . $INSTALL_DIR
 
 COPY ./test/configure_dbus.sh /configure_dbus.sh
 
-#ENTRYPOINT ["./test/configure_dbus.sh"]
+ENTRYPOINT ["./test/configure_dbus.sh"]
 
