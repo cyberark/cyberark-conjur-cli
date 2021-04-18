@@ -103,7 +103,7 @@ services:
       PYTHON_KEYRING_BACKEND: Null
       DEBUG: Null
       TEST_ENV: "True"
-      SERVER_MODE: appliance
+      SERVER_MODE: Null
       LOGIN: Null
       ADMIN_PASSWORD: Null
       TEST_HOSTNAME: Null
