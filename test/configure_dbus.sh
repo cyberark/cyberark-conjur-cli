@@ -19,18 +19,18 @@ if [ "$DEBUG" == "true" ]; then
   echo "bash" >> /dbus.sh
 elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
-  source /build_integrations_tests_runner
-#  pyinstaller -F /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
+#  source /build_integrations_tests_runner
+  pyinstaller -F /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
 
-  echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
-#  _cmd="./dist/integrations_tests_runner"
-#  _cmd="$_cmd --url https://$TEST_HOSTNAME"
-#  _cmd="$_cmd --account $ACCOUNT"
-#  _cmd="$_cmd --login $LOGIN"
-#  _cmd="$_cmd --password $ADMIN_PASSWORD"
-#  _cmd="$_cmd --files-folder /test"
-#
-#  echo "$_cmd" >> /dbus.sh
+#  echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
+  _cmd="./dist/integrations_tests_runner"
+  _cmd="$_cmd --url https://$TEST_HOSTNAME"
+  _cmd="$_cmd --account $ACCOUNT"
+  _cmd="$_cmd --login $LOGIN"
+  _cmd="$_cmd --password $ADMIN_PASSWORD"
+  _cmd="$_cmd --files-folder /opt/conjur-api-python3/test"
+
+  echo "$_cmd" >> /dbus.sh
 else
   echo "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\"" >> /dbus.sh
 fi
