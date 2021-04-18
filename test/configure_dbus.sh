@@ -15,15 +15,14 @@ echo "export DBUS_SESSION_BUS_ADDRESS" >> /dbus.sh
 echo "export GNOME_KEYRING_CONTROL" >> /dbus.sh
 echo "export SSH_AUTH_SOCK" >> /dbus.sh
 
+echo echo SERVER_MODE: "$SERVER_MODE" >> /dbus.sh
+
 if [ "$DEBUG" == "true" ]; then
   echo "bash" >> /dbus.sh
 elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
   source /build_integrations_tests_runner
 
-  echo "openssl version -a" >> /dbus.sh
-
-  echo "Write the test integration executable command to script..."
   _cmd="./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
