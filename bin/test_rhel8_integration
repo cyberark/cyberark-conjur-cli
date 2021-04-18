@@ -23,7 +23,7 @@ echo "Generating certificate..."
 docker-compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur-appliance
+docker-compose up -d conjur-https
 
 
 echo "Configuring Conjur..."
@@ -57,7 +57,7 @@ function _configure_conjur() {
   _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd dev"
 
-  docker-compose exec -T conjur-appliance \
+  docker-compose exec -T conjur-https \
     bash -c "$_cmd"
 }
 
