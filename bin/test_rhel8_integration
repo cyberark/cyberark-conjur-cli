@@ -57,7 +57,7 @@ function _configure_conjur() {
   _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
   _cmd="$_cmd dev"
 
-  docker-compose exec -T conjur-https \
+  docker-compose exec -T conjur-appliance \
     bash -c "$_cmd"
 }
 
