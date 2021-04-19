@@ -40,7 +40,7 @@ pipeline {
     //}
 
     stage('RHEL8 Integration tests') {
-      agent { label 'executor-v2-rhel-ee' }
+      //agent { label 'executor-v2-rhel-ee' }
 
       steps {
         sh './bin/test_rhel8_integration'
