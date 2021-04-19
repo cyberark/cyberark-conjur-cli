@@ -19,7 +19,7 @@ if [ "$DEBUG" == "true" ]; then
   echo "bash" >> /dbus.sh
 elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
-#  source /build_integrations_tests_runner
+  source /build_integrations_tests_runner
 
   pyinstaller -D /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
 
