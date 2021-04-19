@@ -44,6 +44,7 @@ pipeline {
 
       steps {
         sh './bin/test_rhel8_integration'
+        input 'pause for investigation'
       }
 
       post {
