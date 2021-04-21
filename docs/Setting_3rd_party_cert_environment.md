@@ -45,7 +45,7 @@ source (the CA we created in the previous section) and that Conjur DNS is valid 
 certificate.
 
 1) Create cert key: `openssl genrsa -out CERT-NAME.key 2048`
-    * The CA uses this key to create the certificate. Later on, CA need this file to verify the certificate.
+    * The CA uses this key to create the certificate. Later on, the CA will need this file to verify the certificate.
 2) Generate a CSR (Certificate Signing Request) `openssl req -new -key CERT-NAME.key -out CERT-NAME.csr`
     * Note that you will be prompted for information. The only thing that is important is the common_name section.
     The value for this section should be your Conjur URL.
@@ -78,11 +78,11 @@ In this section we are configuring Conjur server to present the CA-signed upon r
 
 ### Build CLI with your CA included
 
-In this section we add our CA to the CLI trusted CAs. 
+In this section we add our CA to the CLI's trusted CAs. 
 1) Add this CA to the Python trusted CAs
-    * Edit the `cacerts.pem` file (see in _General information_ section where to find it) the 
+    * Edit the `cacerts.pem` file (see in _General information_ section where to find it) with the 
       content of `CA-NAME.pem` file
-2) Build the CLI using Pyinstaller 
+2) Build the CLI using Pyinstaller so it will have that CA available to the executable upon verification 
     * `pyinstaller -F ./pkg_bin/conjur`
 3) You can also build the CLI using Pyinstaller or for testing the different certificate flows
     * `pyinstaller -F ./pkg_bin/conjur or pyinstaller -F test/util/test_runners/integrations_tests_runner.py`
