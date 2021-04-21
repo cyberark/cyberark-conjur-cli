@@ -3,6 +3,11 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
 
 
 class UserParser:
+    """Partial class of the ArgParseBuilder. holds the public function add_user_parser."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
+
     def add_user_parser(self):
         """
         Method adds user parser functionality to parser
@@ -14,6 +19,7 @@ class UserParser:
         self._add_user_options(user_subparser)
 
         return self
+
 
     def _init_user_parser(self):
         user_name = 'user - Manage users'
@@ -38,10 +44,12 @@ class UserParser:
                                                              add_help=False,
                                                              formatter_class=formatter)
 
-
         return user_subparser
 
+
     @staticmethod
+
+
     def _add_rotate_api_parser(sub_parser):
         user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
         user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
@@ -63,6 +71,7 @@ class UserParser:
                                                  help='Provide the identifier of the user for whom you want to rotate the API key (Default: logged-in user)')
         user_rotate_api_key_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
+
     @staticmethod
     def _add_change_password(sub_parser):
         user_change_password_name = 'change-password - Change the password for the logged-in user'
@@ -83,6 +92,7 @@ class UserParser:
         user_change_password_options.add_argument('-p', '--password', metavar='VALUE',
                                                   help='Provide the new password for the logged-in user')
         user_change_password_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
 
     @staticmethod
     def _add_user_options(sub_parser):

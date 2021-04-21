@@ -3,6 +3,10 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
 
 
 class InitParser:
+    """Partial class of the ArgParseBuilder. holds the public function add_init_parser."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
 
     def add_init_parser(self):
         """

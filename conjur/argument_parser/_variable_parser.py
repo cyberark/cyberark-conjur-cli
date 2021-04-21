@@ -3,6 +3,11 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
 
 
 class VariableParser:
+    """Partial class of the ArgParseBuilder. holds the public function add_variable_parser."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
+
     def add_variable_parser(self):
         """
         Method adds variable parser functionality to parser

@@ -3,6 +3,11 @@ from conjur.argument_parser.parser_utils import conjur_copyright
 
 
 class ScreenOptionsParser:
+    """Partial class of the ArgParseBuilder. holds the public function add_main_screen_options."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
+
     def add_main_screen_options(self):
         """
         Method adds main screen options functionality to parser

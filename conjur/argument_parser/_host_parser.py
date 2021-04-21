@@ -3,6 +3,11 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
 
 
 class HostParser:
+    """Partial class of the ArgParseBuilder. holds the public function add_host_parser."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
+
     def add_host_parser(self):
         """
         Method adds host parser functionality to parser
@@ -37,16 +42,16 @@ class HostParser:
         host_rotate_api_key_name = 'rotate-api-key - Rotate a host\'s API key'
         host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = sub_parser.add_parser('rotate-api-key',
-                                                                help='Rotate a host\'s API key',
-                                                                description=command_description(
-                                                                    host_rotate_api_key_name,
-                                                                    host_rotate_api_key_usage),
-                                                                epilog=command_epilog(
-                                                                    'conjur host rotate-api-key -i my_apps/myVM\t\t'
-                                                                    'Rotates the API key for host myVM'),
-                                                                usage=argparse.SUPPRESS,
-                                                                add_help=False,
-                                                                formatter_class=formatter)
+                                                           help='Rotate a host\'s API key',
+                                                           description=command_description(
+                                                               host_rotate_api_key_name,
+                                                               host_rotate_api_key_usage),
+                                                           epilog=command_epilog(
+                                                               'conjur host rotate-api-key -i my_apps/myVM\t\t'
+                                                               'Rotates the API key for host myVM'),
+                                                           usage=argparse.SUPPRESS,
+                                                           add_help=False,
+                                                           formatter_class=formatter)
         host_rotate_api_key = host_rotate_api_key_parser.add_argument_group(title=title_formatter("Options"))
         host_rotate_api_key.add_argument('-i', '--id',
                                          help='Provide host identifier for which you want to rotate the API key')

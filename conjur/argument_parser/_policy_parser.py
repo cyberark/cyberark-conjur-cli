@@ -3,7 +3,11 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
 
 
 class PolicyParser:
-    # pylint: disable=too-many-locals
+    """Partial class of the ArgParseBuilder. holds the public function add_policy_parser."""
+
+    def __init__(self):
+        raise NotImplementedError("this is partial class of ArgParseBuilder")
+
     def add_policy_parser(self):
         """
         Method adds policy parser functionality to parser
@@ -17,6 +21,7 @@ class PolicyParser:
         PolicyParser._add_policy_options(policy_subparser)
 
         return self
+
 
     def _init_policy_parser(self):
         policy_name = 'policy - Manage policies'
@@ -40,7 +45,10 @@ class PolicyParser:
                                                                formatter_class=formatter)
         return policy_subparser
 
+
     @staticmethod
+
+
     def _add_policy_load(policy_subparsers):
         policy_load_name = 'load - Load a policy and create resources'
         policy_load_usage = 'conjur [global options] policy load [options] [args]'
@@ -62,6 +70,7 @@ class PolicyParser:
         load_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
                                   help='Provide the policy branch name')
         load_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
 
     @staticmethod
     def _add_policy_replace(policy_subparsers):
@@ -86,6 +95,7 @@ class PolicyParser:
                                      help='Provide the policy branch name')
         replace_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
 
+
     @staticmethod
     def _add_policy_update(policy_subparsers):
         policy_update_name = 'update - Update existing resources in policy or create new resources'
@@ -103,13 +113,13 @@ class PolicyParser:
         update_options = update_policy_parser.add_argument_group(title=title_formatter("Options"))
 
         update_options.add_argument('-f', '--file', required=True, metavar='VALUE',
-                                     help='Provide policy file name')
+                                    help='Provide policy file name')
         update_options.add_argument('-b', '--branch', required=True, metavar='VALUE',
-                                     help='Provide the policy branch name')
+                                    help='Provide the policy branch name')
         update_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+
 
     @staticmethod
     def _add_policy_options(policy_subparser):
-
         policy_options = policy_subparser.add_argument_group(title=title_formatter("Options"))
         policy_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
