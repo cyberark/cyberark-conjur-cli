@@ -24,7 +24,7 @@ from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, DEFAULT_CE
 All tests require that the Keyring on the system's environment is not accessible. 
 This is required to validate that the CLI operates as expected under such conditions.
 """
-@patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False)
+@patch('conjur.wrapper.keystore_wrapper.KeystoreWrapper.is_keyring_accessible', return_value=False)
 class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     # *************** HELPERS ***************
     def __init__(self, testname, client_params=None, environment_params=None):

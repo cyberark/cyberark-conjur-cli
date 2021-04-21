@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-KeystoreAdapter module
+KeystoreWrapper module
 
 This module is a wrapper for the third-party keyring module used to get and set
 credentials in a system's keyring. This module allows us to easily swap out both
@@ -15,17 +15,17 @@ import logging
 import keyring
 
 # Internals
-from conjur.errors import KeyringAdapterDeletionError, KeyringAdapterGeneralError\
-    , KeyringAdapterSetError
+from conjur.errors import KeyringWrapperDeletionError, KeyringWrapperGeneralError\
+    , KeyringWrapperSetError
 from conjur.util.util_functions import configure_env_var_with_keyring
 
 # Function is called in the module so that before accessing the
 # system’s keyring, the environment will be configured correctly
 configure_env_var_with_keyring()
 
-class KeystoreAdapter:
+class KeystoreWrapper:
     """
-    KeystoreAdapter
+    KeystoreWrapper
 
     A class for wrapping used functionality from the keyring library
     """
@@ -38,10 +38,10 @@ class KeystoreAdapter:
         try:
             keyring.set_password(identifier, key, val)
         except keyring.errors.PasswordSetError as password_error:
-            raise KeyringAdapterSetError(f"Failed to set key '{key}' for identifier "
+            raise KeyringWrapperSetError(f"Failed to set key '{key}' for identifier "
                                          f"'{identifier}'") from password_error
         except Exception as exception:
-            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+            raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to set '{key}')'") from exception
 
     # pylint: disable=try-except-raise
@@ -53,7 +53,7 @@ class KeystoreAdapter:
         try:
             return keyring.get_password(identifier, key)
         except Exception as exception:
-            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+            raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to get '{key}')'") from exception
 
     # pylint: disable=try-except-raise
@@ -65,10 +65,10 @@ class KeystoreAdapter:
         try:
             keyring.delete_password(identifier, key)
         except keyring.errors.PasswordDeleteError as password_error:
-            raise KeyringAdapterDeletionError(f"Failed to delete key '{key}' for identifier "
+            raise KeyringWrapperDeletionError(f"Failed to delete key '{key}' for identifier "
                                               f"'{identifier}'") from password_error
         except Exception as exception:
-            raise KeyringAdapterGeneralError(message=f"General keyring error has occurred "
+            raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to delete '{key}')'") from exception
     @classmethod
     def get_keyring_name(cls):

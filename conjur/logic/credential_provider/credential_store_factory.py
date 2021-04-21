@@ -12,7 +12,7 @@ from conjur.interface.credentials_store_interface import CredentialsStoreInterfa
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
-from conjur.wrapper import KeystoreAdapter
+from conjur.wrapper import KeystoreWrapper
 
 
 # pylint: disable=too-few-public-methods
@@ -27,10 +27,10 @@ class CredentialStoreFactory:
         """
         Factory method for determining which store to use
         """
-        if KeystoreAdapter.get_keyring_name() in SUPPORTED_BACKENDS:
+        if KeystoreWrapper.get_keyring_name() in SUPPORTED_BACKENDS:
             # If the keyring is unlocked then we will use it
-            if KeystoreAdapter.is_keyring_accessible():
+            if KeystoreWrapper.is_keyring_accessible():
                 # pylint: disable=line-too-long
-                return KeystoreCredentialsProvider(), f'{KeystoreAdapter.get_keyring_name()} credential store'
+                return KeystoreCredentialsProvider(), f'{KeystoreWrapper.get_keyring_name()} credential store'
 
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE
