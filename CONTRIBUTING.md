@@ -178,7 +178,7 @@ root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -
 This way of testing allows you to run the integration tests outside a containerized environment and is mainly
   used to test functionality on different platforms before a version release. When run in this way, 
   the integration tests are wrapped in an `integrations_tests_runner` Python module to run in a Python-free environment. 
-  That way tests can be run cross-platform.
+  Once built, tests can be run as an executable without extra dependencies beyond what the CLI requires to run.
 
 ##### Setup
 
@@ -201,7 +201,7 @@ Parameters like --url, --account, --login, --password values, are used before ea
 
 ##### Example
 
-The following is an example of how to run the integration tests cross-platform. Note paths will differ 
+The following is an example of how to run the integration tests. Note paths will differ 
 according to the different operating systems so adjustments will be need to be made accordingly.
 
 ```
@@ -210,7 +210,7 @@ according to the different operating systems so adjustments will be need to be m
   --account someaccount \
   --login somelogin \
   --password Myp@SS0rdsS1! \
-  --files-folder /test
+  --files-folder test
 ```
 
 ### UX Guidelines
@@ -304,13 +304,15 @@ Currently, packing the client into an executable is a manual process. For Linux 
   pack the client using the different VMs we have available to us. For macOS, you will need to use your local machine.
 See the below section _How to create release artifacts_ for detailed information on how to create CLI binaries.
 
-*Important!* The final artifacts that are delivered to the customer *must* be created from the version tag
+*Important!* The final artifacts that are delivered to the customer should be created from the master branch
 
 ### Sign artifacts
 
-Sign and notarize the artifacts.
+- Sign Windows executable
 
-*Important!* The final artifacts that are delivered to the customer *must* be created from the version tag
+- Sign and notarize the ConjurCLI app for macOS 
+
+*Important!* The final artifacts that are delivered to the customer should be created from the master branch
 
 ### How to create release artifacts
 
