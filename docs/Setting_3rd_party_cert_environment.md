@@ -74,7 +74,8 @@ In this section we are configuring Conjur server to present the CA-signed upon r
 2) In Conjur server run the following: 
     * `evoke ca import -f --root CA-NAME.pem`
     * `evoke ca import --key CERT-NAME.key --set CERT-NAME.crt`
-    * More on this in [docs](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Deployment/DAP/dap-deploy-dap.htm)
+    * More on this in 
+      [docs](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Deployment/DAP/dap-deploy-dap.htm)
 
 ### Build CLI with your CA included
 
