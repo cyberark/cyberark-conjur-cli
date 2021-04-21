@@ -1,9 +1,13 @@
+"""
+Module For the ScreenOptionsParser
+"""
 from conjur.version import __version__
 from conjur.argument_parser.parser_utils import conjur_copyright
 
 
 class ScreenOptionsParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_main_screen_options."""
+    """Partial class of the ArgParseBuilder.
+    This class add the ScreenOptions subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")

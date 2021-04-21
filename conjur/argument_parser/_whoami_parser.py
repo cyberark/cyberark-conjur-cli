@@ -1,9 +1,14 @@
+"""
+Module For the WhoamiParser
+"""
+
 import argparse
 from conjur.argument_parser.parser_utils import command_description, formatter, title_formatter
 
 
 class WhoamiParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_whoami_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the Whoami subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,11 +17,11 @@ class WhoamiParser:
         """
         Method adds whoami parser functionality to parser
         """
-        whoami_subparser = self._init_whoami_parser()
-        WhoamiParser._add_whoami_options(whoami_subparser)
+        whoami_subparser = self._create_whoami_parser()
+        self._add_whoami_options(whoami_subparser)
         return self
 
-    def _init_whoami_parser(self):
+    def _create_whoami_parser(self):
         whoami_name = 'whoami - Print information about the current logged-in user'
         whoami_usage = 'conjur [global options] whoami [options]'
 

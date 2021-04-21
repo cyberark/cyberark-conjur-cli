@@ -1,9 +1,13 @@
+"""
+Module For the PolicyParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class PolicyParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_policy_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the Policy subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,18 +16,17 @@ class PolicyParser:
         """
         Method adds policy parser functionality to parser
         """
-        policy_subparser = self._init_policy_parser()
+        policy_subparser = self._create_policy_parser()
 
         policy_subparsers = policy_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
-        PolicyParser._add_policy_load(policy_subparsers)
-        PolicyParser._add_policy_replace(policy_subparsers)
-        PolicyParser._add_policy_update(policy_subparsers)
-        PolicyParser._add_policy_options(policy_subparser)
+        self._add_policy_load(policy_subparsers)
+        self._add_policy_replace(policy_subparsers)
+        self._add_policy_update(policy_subparsers)
+        self._add_policy_options(policy_subparser)
 
         return self
 
-
-    def _init_policy_parser(self):
+    def _create_policy_parser(self):
         policy_name = 'policy - Manage policies'
         policy_usage = 'conjur [global options] policy <subcommand> [options] [args]'
 

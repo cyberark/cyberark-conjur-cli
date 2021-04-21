@@ -1,9 +1,13 @@
+"""
+Module For the LoginParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class LoginParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_login_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the Login subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,12 +16,12 @@ class LoginParser:
         """
         Method adds login parser functionality to parser
         """
-        login_subparser = self._init_login_parser()
-        LoginParser._add_login_options(login_subparser)
+        login_subparser = self._create_login_parser()
+        self._add_login_options(login_subparser)
 
         return self
 
-    def _init_login_parser(self):
+    def _create_login_parser(self):
         login_name = 'login - Log in to Conjur server'
         login_usage = 'conjur [global options] login [options] [args]'
 

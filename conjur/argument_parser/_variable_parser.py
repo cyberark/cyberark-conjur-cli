@@ -1,9 +1,13 @@
+"""
+Module For the VariableParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class VariableParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_variable_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the Variable subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,16 +16,16 @@ class VariableParser:
         """
         Method adds variable parser functionality to parser
         """
-        variable_parser = self._init_variable_parser()
+        variable_parser = self._create_variable_parser()
         variable_subparser = variable_parser.add_subparsers(title="Subcommand", dest='action')
 
-        VariableParser._add_variable_get(variable_subparser)
-        VariableParser._add_variable_set(variable_subparser)
-        VariableParser._add_variable_options(variable_parser)
+        self._add_variable_get(variable_subparser)
+        self._add_variable_set(variable_subparser)
+        self._add_variable_options(variable_parser)
 
         return self
 
-    def _init_variable_parser(self):
+    def _create_variable_parser(self):
         variable_name = 'variable - Manage variables'
         variable_usage = 'conjur [global options] variable <subcommand> [options] [args]'
 

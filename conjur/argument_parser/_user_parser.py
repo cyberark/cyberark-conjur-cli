@@ -1,9 +1,13 @@
+"""
+Module For the UserParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class UserParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_user_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the User subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,7 +16,7 @@ class UserParser:
         """
         Method adds user parser functionality to parser
         """
-        user_subparser = self._init_user_parser()
+        user_subparser = self._create_user_parser()
         user_subparsers = user_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
         self._add_rotate_api_parser(user_subparsers)
         self._add_change_password(user_subparsers)
@@ -21,7 +25,7 @@ class UserParser:
         return self
 
 
-    def _init_user_parser(self):
+    def _create_user_parser(self):
         user_name = 'user - Manage users'
         user_usage = 'conjur [global options] user <subcommand> [options] [args]'
         user_subparser = self.resource_subparsers.add_parser('user',

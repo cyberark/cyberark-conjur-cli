@@ -29,10 +29,11 @@ class ArgParseBuilder(InitParser,
                       WhoamiParser,
                       ScreenOptionsParser):
     """
-    This class simplify and encapsulate the way we build the parser.
+    This class simplifies and encapsulates the way we build the help screens.
     It uses a fluent interface pattern where each function return
     ArgParseBuilder current instance.
-    This class is also split into separate files due to the fact it has a lot of code
+    This class is split into separate subclass file to avoid creating a single big file
+    with a lot of code.
     """
 
     def __init__(self):

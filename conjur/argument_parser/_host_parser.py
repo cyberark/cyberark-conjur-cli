@@ -1,9 +1,13 @@
+"""
+Module For the HostParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class HostParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_host_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the Host subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,14 +16,14 @@ class HostParser:
         """
         Method adds host parser functionality to parser
         """
-        host_subparser = self._init_host_parser()
+        host_subparser = self._create_host_parser()
         host_subparsers = host_subparser.add_subparsers(dest='action', title=title_formatter("Subcommands"))
-        HostParser._host_rotate_api_key_parser(host_subparsers)
-        HostParser._add_host_options(host_subparser)
+        self._host_rotate_api_key_parser(host_subparsers)
+        self._add_host_options(host_subparser)
 
         return self
 
-    def _init_host_parser(self):
+    def _create_host_parser(self):
         host_name = 'host - Manage hosts'
         host_usage = 'conjur [global options] host <subcommand> [options] [args]'
         host_subparser = self.resource_subparsers.add_parser('host',

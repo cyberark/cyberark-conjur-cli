@@ -1,9 +1,13 @@
+"""
+Module For the ListParser
+"""
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
 
 
 class ListParser:
-    """Partial class of the ArgParseBuilder. holds the public function add_list_parser."""
+    """Partial class of the ArgParseBuilder.
+    This class add the List subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
         raise NotImplementedError("this is partial class of ArgParseBuilder")
@@ -12,12 +16,12 @@ class ListParser:
         """
         Method adds list parser functionality to parser
         """
-        list_subparser = self._init_list_parser()
-        ListParser.add_list_options(list_subparser)
+        list_subparser = self._create_list_parser()
+        self.add_list_options(list_subparser)
 
         return self
 
-    def _init_list_parser(self):
+    def _create_list_parser(self):
         list_name = 'list - List resources within an organization\'s account'
         list_usage = 'conjur [global options] list [options] [args]'
 
