@@ -36,6 +36,8 @@ class ArgParseBuilder(InitParser,
     with a lot of code.
     """
 
+    # pylint: disable=super-init-not-called
+    # pylint: disable=too-many-ancestors
     def __init__(self):
         """
         Method that init the Builder resources

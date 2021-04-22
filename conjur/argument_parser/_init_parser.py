@@ -2,14 +2,17 @@
 Module For the InitParser
 """
 import argparse
-from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, title_formatter
+from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
+    title_formatter
 
 
+# pylint: disable=too-few-public-methods
 class InitParser:
     """Partial class of the ArgParseBuilder.
     This class add the Init subparser to the ArgParseBuilder parser."""
 
     def __init__(self):
+        self.resource_subparsers = None  # here to reduce warnings on resource_subparsers not exist
         raise NotImplementedError("this is partial class of ArgParseBuilder")
 
     def add_init_parser(self):
@@ -24,16 +27,17 @@ class InitParser:
         init_name = 'init - Initialize Conjur configuration'
         input_usage = 'conjur [global options] init [options] [args]'
 
-        init_subparser = self.resource_subparsers.add_parser('init',
-                                                             help='Initialize Conjur configuration',
-                                                             description=command_description(init_name,
-                                                                                             input_usage),
-                                                             epilog=command_epilog(
-                                                                 'conjur init -a my_org -u https://conjur-server\t'
-                                                                 'Initializes Conjur configuration and writes to file (.conjurrc)'),
-                                                             usage=argparse.SUPPRESS,
-                                                             add_help=False,
-                                                             formatter_class=formatter)
+        init_subparser = self.resource_subparsers \
+            .add_parser('init',
+                        help='Initialize Conjur configuration',
+                        description=command_description(init_name,
+                                                        input_usage),
+                        epilog=command_epilog(
+                            'conjur init -a my_org -u https://conjur-server\t'
+                            'Initializes Conjur configuration and writes to file (.conjurrc)'),
+                        usage=argparse.SUPPRESS,
+                        add_help=False,
+                        formatter_class=formatter)
         return init_subparser
 
     @staticmethod
@@ -44,13 +48,16 @@ class InitParser:
                                   help='Provide URL of Conjur server')
         init_options.add_argument('-a', '--account', metavar='VALUE',
                                   action='store', dest='name',
-                                  help='Provide Conjur account name. ' \
-                                       'Optional for Conjur Enterprise - overrides the value on the Conjur Enterprise server')
+                                  help='Provide Conjur account name. '
+                                       'Optional for Conjur Enterprise - overrides '
+                                       'the value on the Conjur Enterprise server')
         init_options.add_argument('-c', '--certificate', metavar='VALUE',
                                   action='store', dest='certificate',
-                                  help='Optional- provide path to Conjur SSL certificate ' \
-                                       '(obtained from Conjur server unless provided by this option)')
+                                  help='Optional- provide path to Conjur SSL certificate '
+                                       '(obtained from Conjur server '
+                                       'unless provided by this option)')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Optional- force overwrite of existing files')
-        init_options.add_argument('-h', '--help', action='help', help='Display help screen and exit')
+        init_options.add_argument('-h', '--help', action='help',
+                                  help='Display help screen and exit')
