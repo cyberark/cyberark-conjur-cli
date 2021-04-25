@@ -15,9 +15,9 @@ import traceback
 from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
 from conjur.data_object import CredentialsData
 from conjur.errors import OperationNotCompletedException, \
-    CredentialRetrievalException, KeyringAdapterDeletionError
+    CredentialRetrievalException, KeyringWrapperDeletionError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
-from conjur.wrapper import KeystoreAdapter
+from conjur.wrapper import KeystoreWrapper
 
 
 # pylint: disable=logging-fstring-interpolation
@@ -38,13 +38,13 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         Method for saving user credentials in the system's keyring
         """
         logging.debug("Attempting to save credentials to the system's credential store "
-                      f"'{KeystoreAdapter.get_keyring_name()}'...")
+                      f"'{KeystoreWrapper.get_keyring_name()}'...")
         credential_id = credential_data.machine
         try:
-            KeystoreAdapter.set_password(credential_id, MACHINE, credential_data.machine)
-            KeystoreAdapter.set_password(credential_id, LOGIN, credential_data.login)
-            KeystoreAdapter.set_password(credential_id, PASSWORD, credential_data.password)
-            logging.debug(f"Credentials saved to the '{KeystoreAdapter.get_keyring_name()}' credential store")
+            KeystoreWrapper.set_password(credential_id, MACHINE, credential_data.machine)
+            KeystoreWrapper.set_password(credential_id, LOGIN, credential_data.login)
+            KeystoreWrapper.set_password(credential_id, PASSWORD, credential_data.password)
+            logging.debug(f"Credentials saved to the '{KeystoreWrapper.get_keyring_name()}' credential store")
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
@@ -57,12 +57,12 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             raise CredentialRetrievalException
 
         for attr in KEYSTORE_ATTRIBUTES:
-            loaded_credentials[attr] = KeystoreAdapter.get_password(conjurrc_conjur_url, attr)
+            loaded_credentials[attr] = KeystoreWrapper.get_password(conjurrc_conjur_url, attr)
         return CredentialsData.convert_dict_to_obj(loaded_credentials)
 
     def is_exists(self, conjurrc_conjur_url) -> bool:
         for attr in KEYSTORE_ATTRIBUTES:
-            if KeystoreAdapter.get_password(conjurrc_conjur_url, attr) is None:
+            if KeystoreWrapper.get_password(conjurrc_conjur_url, attr) is None:
                 return False
         return True
 
@@ -71,9 +71,9 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         Method for updating user credentials in the system's keyring
         """
         try:
-            KeystoreAdapter.set_password(credential_data.machine, MACHINE, credential_data.machine)
-            KeystoreAdapter.set_password(credential_data.machine, LOGIN, user_to_update)
-            KeystoreAdapter.set_password(credential_data.machine, PASSWORD, new_api_key)
+            KeystoreWrapper.set_password(credential_data.machine, MACHINE, credential_data.machine)
+            KeystoreWrapper.set_password(credential_data.machine, LOGIN, user_to_update)
+            KeystoreWrapper.set_password(credential_data.machine, PASSWORD, new_api_key)
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
@@ -83,19 +83,19 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         Method for removing user credentials in the system's keyring
         """
         logging.debug("Attempting to remove credentials from "
-                      f"the '{KeystoreAdapter.get_keyring_name()}' credential store...")
+                      f"the '{KeystoreWrapper.get_keyring_name()}' credential store...")
         for attr in KEYSTORE_ATTRIBUTES:
             try:
-                KeystoreAdapter.delete_password(conjurrc.conjur_url, attr)
+                KeystoreWrapper.delete_password(conjurrc.conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
-            except KeyringAdapterDeletionError:
+            except KeyringWrapperDeletionError:
                 logging.debug(
-                    f"Unable to delete key '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
+                    f"Unable to delete key '{attr}' from the '{KeystoreWrapper.get_keyring_name()}' "
                     f"credential store. Key may not exist.\n{traceback.format_exc()}")
 
         logging.debug("Successfully removed credentials from the "
-                      f"'{KeystoreAdapter.get_keyring_name()}' credential store")
+                      f"'{KeystoreWrapper.get_keyring_name()}' credential store")
 
     def cleanup_if_exists(self, conjurrc_conjur_url):
         """
@@ -104,11 +104,11 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         """
         for attr in KEYSTORE_ATTRIBUTES:
             try:
-                if KeystoreAdapter.get_password(conjurrc_conjur_url, attr) is not None:
-                    KeystoreAdapter.delete_password(conjurrc_conjur_url, attr)
+                if KeystoreWrapper.get_password(conjurrc_conjur_url, attr) is not None:
+                    KeystoreWrapper.delete_password(conjurrc_conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
             except Exception:  # pylint: disable=broad-except
                 logging.debug(
-                    f"Cleanup failed for key '{attr}' from the '{KeystoreAdapter.get_keyring_name()}' "
+                    f"Cleanup failed for key '{attr}' from the '{KeystoreWrapper.get_keyring_name()}' "
                     f"credential store.\n{traceback.format_exc()}")

@@ -384,7 +384,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     @integration_test(True)
     def test_keyring_locked_after_login_will_raise_error_keyring(self):
         utils.setup_cli(self)
-        with patch('conjur.wrapper.keystore_adapter.KeystoreAdapter.is_keyring_accessible', return_value=False):
+        with patch('conjur.wrapper.keystore_wrapper.KeystoreWrapper.is_keyring_accessible', return_value=False):
             self.invoke_cli(self.cli_auth_params, ['list'], exit_code=1)
 
     '''
