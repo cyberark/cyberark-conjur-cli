@@ -19,6 +19,7 @@ import requests
 
 # Internals
 from conjur.api import SSLClient
+from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
