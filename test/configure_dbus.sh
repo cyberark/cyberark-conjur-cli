@@ -21,9 +21,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
   echo "Building the test integration executable..."
   source /build_integrations_tests_runner
 
-  pyinstaller -D /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
-
-  _cmd="/dist/integrations_tests_runner/integrations_tests_runner"
+  _cmd="./dist/integrations_tests_runner"
   _cmd="$_cmd --url https://$TEST_HOSTNAME"
   _cmd="$_cmd --account $ACCOUNT"
   _cmd="$_cmd --login $LOGIN"
