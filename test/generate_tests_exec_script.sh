@@ -4,7 +4,7 @@
 # Docker image entry point script #
 ###################################
 
-script_file=tests_executor.sh
+script_file=/tests_executor.sh
 
 # Write the tests runner script that configures DBUS and runs
 # the tests.
@@ -58,9 +58,6 @@ else
   # Add nose2 command
   append_to_file "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\""
 fi
-
-echo @@@print $script_file
-cat $script_file
 
 chmod 755 $script_file
 
