@@ -6,6 +6,9 @@
 
 script_file=/tests_executor.sh
 
+mkdir -p ~/.cache
+mkdir -p ~/.local/share/keyrings
+
 # Write the tests runner script that configures DBUS and runs
 # the tests.
 cat > $script_file <<'endmsg'
@@ -41,18 +44,11 @@ function append_to_file() {
 if [ "$DEBUG" == "true" ]; then
   echo "bash" >> $script_file
 elif [ "$SERVER_MODE" == "appliance" ]; then
-  if [ -z "$TEST_HOSTNAME" ]; then
-    msg="Environment variable: 'TEST_HOSTNAME' is undefined. Script will terminate."
-    append_to_file "$msg"
-    append_to_file 'exit 1'
-    echo "$msg"
-  else
     # Server mode is Conjur Appliance
     # Add tests runner executable command
     echo "SERVER_MODE is appliance, building the test integration executable..."
     source /build_integrations_tests_runner
     append_to_file "$(_tests_runner_cmd)"
- fi
 else
   # Server mode is Conjur OSS
   # Add nose2 command
