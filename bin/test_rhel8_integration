@@ -25,9 +25,18 @@ docker-compose up openssl
 echo "Starting Conjur..."
 docker-compose up -d conjur-appliance
 
+function _random_password() {
+   chars='@#$%&_+='
+  { </dev/urandom LC_ALL=C grep -ao '[A-Za-z0-9]' \
+        | head -n$((RANDOM % 12 + 9))
+    echo ${chars:$((RANDOM % ${#chars})):1}   # Random special char.
+  } \
+    | shuf \
+    | tr -d '\n'
+}
 
 echo "Configuring Conjur..."
-export ADMIN_PASSWORD=P@S5-ITAbXJlxH1MU
+export ADMIN_PASSWORD=$(_random_password)
 export PYTHON_KEYRING_BACKEND=keyring.backends.SecretService.Keyring
 export DEBUG=$DEBUG
 export CONJUR_AUTHN_API_KEY=P@S5-ITAbXJlxH1MU
