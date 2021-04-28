@@ -38,7 +38,7 @@ function _random_password() {
 echo "Configuring Conjur..."
 export ADMIN_PASSWORD=$(_random_password)
 export DEBUG=$DEBUG
-export CONJUR_AUTHN_API_KEY=P@S5-ITAbXJlxH1MU
+export CONJUR_AUTHN_API_KEY=$ADMIN_PASSWORD
 export SERVER_MODE="appliance"
 export ACCOUNT="dev"
 export LOGIN="admin"
