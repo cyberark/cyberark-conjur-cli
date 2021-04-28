@@ -59,6 +59,9 @@ else
   append_to_file "bash -c \"nose2 -v -X --config integration_test.cfg -A 'integration'\""
 fi
 
+echo @@@print $script_file
+cat $script_file
+
 chmod 755 $script_file
 
 # exec "$@" is typically used to make the entrypoint a pass through that then runs the docker command
