@@ -52,6 +52,8 @@ class Cli():
         test sources. Parses CLI args and invokes the appropriate client command.
         """
 
+        # The following block of code implements the fluent interface technique
+        # https://en.wikipedia.org/wiki/Fluent_interface
         parser = ArgParseBuilder() \
             .add_login_parser() \
             .add_init_parser() \

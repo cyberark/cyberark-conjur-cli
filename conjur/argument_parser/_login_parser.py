@@ -40,9 +40,9 @@ class LoginParser:
                                               'Prompts for password of the admin user '
                                               'to log in to Conjur server\n'
                                               '    conjur login -i admin -p Myp@SSw0rds!\t'
-                                              'Logs the admin user in to Conjur server and '
-                                              'saves the user and password '
-                                              'in the local cache (netrc file)'),
+                                              "Logs the admin user in to Conjur server and "
+                                              "saves the login name and password in either "
+                                              "the system's credential store or netrc"),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
