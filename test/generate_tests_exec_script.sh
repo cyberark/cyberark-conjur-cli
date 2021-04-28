@@ -6,8 +6,8 @@
 
 script_file=/tests_executor.sh
 
-#mkdir -p ~/.cache
-#mkdir -p ~/.local/share/keyrings
+mkdir -p ~/.cache
+mkdir -p ~/.local/share/keyrings
 
 # Write the tests runner script that configures DBUS and runs
 # the tests.
