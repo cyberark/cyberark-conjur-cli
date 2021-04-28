@@ -49,7 +49,7 @@ rm -rf $CURRENT_DIR/output/*
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test /bin/sh -c " /dbus.sh" $@
+  docker-compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
 
@@ -57,4 +57,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  /bin/sh -c " /dbus.sh" $@
+  /bin/sh -c " /tests_executor.sh" $@

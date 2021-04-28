@@ -32,7 +32,7 @@ COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
 
 COPY . $INSTALL_DIR
 
-COPY ./test/configure_dbus.sh /configure_dbus.sh
+COPY ./test/generate_tests_exec_script.sh /generate_tests_exec_script.sh
 
-ENTRYPOINT ["./test/configure_dbus.sh"]
+ENTRYPOINT ["./test/generate_tests_exec_script.sh"]
 
