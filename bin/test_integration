@@ -32,6 +32,7 @@ export CONJUR_AUTHN_API_KEY=$admin_api_key
 export DEBUG=$DEBUG
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
+export TEST_HOSTNAME=conjur-https
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
