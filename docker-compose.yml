@@ -99,7 +99,6 @@ services:
     command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
-      PYTHON_KEYRING_BACKEND: Null
       DEBUG: Null
       TEST_ENV: "True"
       SERVER_MODE: Null
