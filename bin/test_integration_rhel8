@@ -17,7 +17,7 @@ trap 'cleanup' EXIT
 cleanup
 
 echo "Building API container..."
-docker-compose build
+docker-compose build test-rhel8
 
 echo "Generating certificate..."
 docker-compose up openssl
