@@ -80,7 +80,7 @@ services:
       - ${PWD}:/opt/conjur-api-python3
 
   conjur-appliance:
-    image: registry2.itci.conjur.net/conjur-appliance:stable
+    image: registry2.itci.conjur.net/conjur-appliance:5.0-stable
     ports:
       - "444:443"
     expose:
