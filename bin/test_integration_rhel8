@@ -26,10 +26,9 @@ echo "Starting Conjur..."
 docker-compose up -d conjur-appliance
 
 function _random_password() {
-   chars='@'
   { </dev/urandom LC_ALL=C grep -ao '[A-Za-z0-9]' \
         | head -n$((RANDOM % 12 + 9))
-    echo ${chars:$((RANDOM % ${#chars})):1}   # Random special char.
+    echo "@"   # add a special char.
   } \
     | shuf \
     | tr -d '\n'
