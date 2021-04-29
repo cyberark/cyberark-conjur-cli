@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+function _build_test_integration_exec() {
+  echo "Dropping into virtual environment..."
+  python3 -m venv venv
+  source venv/bin/activate
+
+  echo "Installing requirements for tests..."
+  pip3 install -r requirements.txt
+
+  pyinstaller -F /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
+  deactivate
+}
+
+_build_test_integration_exec

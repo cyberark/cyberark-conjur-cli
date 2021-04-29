@@ -49,6 +49,18 @@ pipeline {
         }
       }
     }
+
+    stage('RHEL8 Integration tests') {
+      steps {
+        sh './bin/test_integration_rhel8'
+      }
+
+      post {
+        always {
+          junit 'output/**/*.xml'
+        }
+      }
+    }
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {

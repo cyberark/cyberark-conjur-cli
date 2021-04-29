@@ -17,7 +17,7 @@ trap 'cleanup' EXIT
 cleanup
 
 echo "Building API container..."
-docker-compose build
+docker-compose build test
 
 echo "Generating certificate..."
 docker-compose up openssl
@@ -32,6 +32,7 @@ export CONJUR_AUTHN_API_KEY=$admin_api_key
 export DEBUG=$DEBUG
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
+export TEST_HOSTNAME=conjur-https
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
@@ -48,7 +49,7 @@ rm -rf $CURRENT_DIR/output/*
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test /bin/sh -c " /dbus.sh" $@
+  docker-compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
 
@@ -56,4 +57,4 @@ docker-compose run \
   --rm \
   --no-deps \
   test \
-  /bin/sh -c " /dbus.sh" $@
+  /bin/sh -c " /tests_executor.sh" $@

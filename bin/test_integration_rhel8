@@ -1,0 +1,89 @@
+#!/bin/bash -ex
+
+cleanup() {
+  echo "Cleaning up..."
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
+}
+
+DEBUG="false"
+if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
+  DEBUG="true"
+  shift
+fi
+
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'cleanup' EXIT
+cleanup
+
+echo "Building API container..."
+docker-compose build test-rhel8
+
+echo "Generating certificate..."
+docker-compose up openssl
+
+echo "Starting Conjur..."
+docker-compose up -d conjur-appliance
+
+function _random_password() {
+  { </dev/urandom LC_ALL=C grep -ao '[A-Za-z0-9]' \
+        | head -n$((RANDOM % 12 + 9))
+    echo "@1"   # add a special char and digit.
+  } \
+    | shuf \
+    | tr -d '\n'
+}
+
+echo "Configuring Conjur..."
+export ADMIN_PASSWORD=$(_random_password)
+export DEBUG=$DEBUG
+export CONJUR_AUTHN_API_KEY=$ADMIN_PASSWORD
+export SERVER_MODE="appliance"
+export ACCOUNT="dev"
+export LOGIN="admin"
+export TEST_HOSTNAME=conjur-appliance
+
+# Docker-compose will pick this file up when starting containers
+# so we will have these variables in the container
+cat <<ENV > .env
+CONJUR_AUTHN_API_KEY=$ADMIN_PASSWORD
+DEBUG=$DEBUG
+SERVER_MODE=$SERVER_MODE
+TEST_HOSTNAME=$TEST_HOSTNAME
+ACCOUNT=$ACCOUNT
+LOGIN=$LOGIN
+ADMIN_PASSWORD=$ADMIN_PASSWORD
+ENV
+
+function _configure_conjur() {
+  _cmd="evoke configure master"
+  _cmd="$_cmd --accept-eula"
+  _cmd="$_cmd --hostname $TEST_HOSTNAME"
+  _cmd="$_cmd --master-altnames $TEST_HOSTNAME"
+  _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
+  _cmd="$_cmd dev"
+
+  docker-compose exec -T conjur-appliance \
+    bash -c "$_cmd"
+}
+
+echo "Configure Conjur..."
+_configure_conjur
+
+echo "Starting test env..."
+docker-compose up -d test-rhel8
+
+rm -rf "$CURRENT_DIR"/output/*
+
+# Hint: '--privileged' is added here otherwise we will get operation
+# not permitted when attempting to do anything related to dbus
+if [[ "$DEBUG" == "true" ]]; then
+  docker-compose exec --privileged test-rhel8 /bin/sh -c " /tests_executor.sh" "$@"
+  exit
+fi
+
+docker-compose run \
+  --rm \
+  --no-deps \
+  test-rhel8 \
+  /bin/sh -c " /tests_executor.sh" "$@"

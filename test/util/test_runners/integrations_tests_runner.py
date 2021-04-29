@@ -37,7 +37,7 @@ import logging
 # run the integration tests as a process. Otherwise this dependency will not be available
 # once the test module is packed
 import uuid
-
+import ssl
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
