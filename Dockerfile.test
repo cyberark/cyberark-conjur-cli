@@ -25,4 +25,4 @@ COPY . $INSTALL_DIR
 
 COPY ./test/generate_tests_exec_script.sh /generate_tests_exec_script.sh
 
-ENTRYPOINT ["./test/generate_tests_exec_script.sh"]
+ENTRYPOINT ["./test/configure_test_executor.sh"]
