@@ -1,8 +1,10 @@
 #!/bin/bash
 
-###################################
-# Docker image entry point script #
-###################################
+###########################################################
+# Docker image entry point script                         #
+# Generates the script that configures DBUS and runs the  #
+# tests according the SERVER_MODE (appliance/oss)         #
+###########################################################
 
 script_file=/tests_executor.sh
 
@@ -44,9 +46,8 @@ function append_to_file() {
 if [ "$DEBUG" == "true" ]; then
   echo "bash" >> $script_file
 elif [ "$SERVER_MODE" == "appliance" ]; then
-    # Server mode is Conjur Appliance
+    echo "Running testing against $SERVER_MODE. Building the test integration executable..."
     # Add tests runner executable command
-    echo "SERVER_MODE is appliance, building the test integration executable..."
     source /build_integrations_tests_runner
     append_to_file "$(_tests_runner_cmd)"
 else
