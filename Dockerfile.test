@@ -23,6 +23,6 @@ RUN pip3 install -r requirements.txt
 
 COPY . $INSTALL_DIR
 
-COPY ./test/generate_tests_exec_script.sh /generate_tests_exec_script.sh
+COPY ./test/configure_test_executor.sh /configure_test_executor.sh
 
 ENTRYPOINT ["./test/configure_test_executor.sh"]
