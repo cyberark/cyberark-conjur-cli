@@ -80,7 +80,7 @@ services:
       - ${PWD}:/opt/conjur-api-python3
 
   conjur-appliance:
-    image: registry2.itci.conjur.net/conjur-appliance:latest
+    image: registry2.itci.conjur.net/conjur-appliance:stable
     ports:
       - "444:443"
     expose:
@@ -99,6 +99,7 @@ services:
     command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
+      PYTHON_KEYRING_BACKEND: Null
       DEBUG: Null
       TEST_ENV: "True"
       SERVER_MODE: Null
