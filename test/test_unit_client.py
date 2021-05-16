@@ -28,7 +28,7 @@ class MockApiConfig(object):
 # ApiConfig mocking class
 class EmptyMockApiConfig(object):
     def __init__(self):
-        raise ConfigurationMissingException("oops!")
+        raise ConfigurationMissingException
 
 # ApiConfig mocking class
 class MockApiConfigNoCert(object):
@@ -58,7 +58,7 @@ class MissingMockApiConfig(object):
 class ConfigErrorTest(unittest.TestCase):
     def test_config_exception_wrapper_exists(self):
         with self.assertRaises(ConfigurationMissingException):
-            raise ConfigurationMissingException('abc')
+            raise ConfigurationMissingException
 
 
 class ClientTest(unittest.TestCase):

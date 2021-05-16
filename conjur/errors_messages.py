@@ -20,3 +20,11 @@ MISMATCH_HOSTNAME_MESSAGE = "The machine's hostname did not match any names on t
                             "Make sure the names on the certificate (common name or SANs) match the machine's hostname."
 
 FETCH_CREDENTIALS_FAILURE_MESSAGE = "Failed to fetch credentials. Log in again and rerun the command."
+
+FETCH_CONFIGURATION_FAILURE_MESSAGE = "The conjurrc configuration file is either invalid or missing parameters. "\
+                                      "Reinitialize the client and make sure that the conjurrc contains "\
+                                      "'conjur_account', 'conjur_url', and 'cert_file'."
+
+CONFIGURATION_MISSING_FAILURE_MESSAGE = "The conjurrc configuration file content is empty. Reinitialize "\
+                                        "the client and make sure that the conjurrc contains "\
+                                        "'conjur_account', 'conjur_url', and 'cert_file'."

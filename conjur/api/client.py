@@ -101,13 +101,9 @@ class Client():
                                                        solution="To continue communicating with the server insecurely, run the command "
                                                                 "again with ssl_verify = False. Otherwise, reinitialize the client.") from cert_verify
             except ConfigurationMissingException as missing_config_exec:
-                raise ConfigurationMissingException("The conjurrc configuration file content is empty. Reinitialize "
-                                                   "the client and make sure that the conjurrc contains "
-                                                   "'conjur_account', 'conjur_url', and 'cert_file'.") from missing_config_exec
+                raise ConfigurationMissingException from missing_config_exec
             except InvalidConfigurationException as invalid_config_exec:
-                raise InvalidConfigurationException("The conjurrc configuration file is either invalid or missing parameters. "
-                                                    "Reinitialize the client and make sure that the conjurrc contains "
-                                                    "'conjur_account', 'conjur_url', and 'cert_file'.") from invalid_config_exec
+                raise InvalidConfigurationException from invalid_config_exec
             except Exception:
                 raise
 
