@@ -63,9 +63,9 @@ To avoid unanticipated breaking changes, make sure that you stay up-to-date on o
 latest releases and review the project's [CHANGELOG.md](CHANGELOG.md).
 
 ```
-$ pip3 install conjur
+pip3 install conjur
 
-$ conjur --help
+conjur --help
 ```
 
 Alternatively, you can install the library from the source. Note that this will install the latest work from the
@@ -74,7 +74,7 @@ cloned source and not necessarily an official release.
 Clone the project and run:
 
 ```
-$ pip3 install .
+pip3 install .
 ```
 
 ## Usage

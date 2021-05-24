@@ -29,7 +29,7 @@ any additional information for contributing code to this project.
 ### Static/portable CLI binary
 
 ```
-$ ./bin/build_binary
+./bin/build_binary
 ```
  
 NOTE that the executable will be saved to the `dist` directory of the project and can only be run in Ubuntu
@@ -38,7 +38,7 @@ NOTE that the executable will be saved to the `dist` directory of the project an
 ### Egg format
 
 ```
-$ ./bin/build
+./bin/build
 ```
 
 ## Development
@@ -52,42 +52,42 @@ To setup a development environment follow the instructions in this section. Once
 macOS:
 
 ```
-$ python3 -m venv venv
+python3 -m venv venv
 ```
 
 Windows:
 
 ```
-$ py -m venv venv
+py -m venv venv
 ```
 
-1. Enable your terminal to use those files with this command. Note that this command will need to run each
+2. Enable your terminal to use those files with this command. Note that this command will need to run each
 time you want to return to your virtual environment.
 
 macOS:
 
 ```
-$ source venv/bin/activate
+source venv/bin/activate
 ```
 
 Windows:
 
 ```
-$ venv\Scripts\activate.bat
+venv\Scripts\activate.bat
 ```
 
-1. Install requirements
+3. Install requirements
 
 ```
-$ pip3 install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
-1. You can now run the tests and the CLI with modifiable files.
+4. You can now run the tests and the CLI with modifiable files.
 
 Check it out! Run the following prefix to start seeing changes
 
 ```
-$ ./pkg_bin/conjur <command> <subcommand>
+./pkg_bin/conjur <command> <subcommand>
 ```
 
 You can also pack the CLI as an executable for OS you are running on. The artifact 
@@ -104,7 +104,7 @@ pyinstaller -F ./pkg_bin/conjur
 In the project a linter is used to help enforce coding standards and provides refactoring suggestions.
 
 ```
-$ ./bin/test_linting
+./bin/test_linting
 ```
 
 ### Unit and integration tests
@@ -127,7 +127,7 @@ this way during development. When run in a containerized environment, it is poss
 To run both unit and integration tests as a full test suite run:
 
 ```
-$ ./bin/test
+./bin/test
 ```
 
 Or to run just the full unit test suite:
@@ -141,10 +141,9 @@ To run specific unit/integration tests, perform the following:
 1. Drop into a test container
 
 ```
-$ ./bin/test_integration -d
+./bin/test_integration -d
 ```
-
-1. Under the individual test add an identifier of your choosing
+2. Under the individual test add an identifier of your choosing
 
 ```
 # Example test function
@@ -154,7 +153,7 @@ def my-integration-test()
 my-integration-test.someidentifier=True
 ```
 
-1. Add the identifier to the following command:
+3. Add the identifier to the following command:
 
 ```
 # For unit tests
@@ -170,7 +169,7 @@ root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -
 root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A 'someidentifier'
 ```
 
-1. You should see that only that specific test is run. Every change made locally can be seen in the container. 
+4. You should see that only that specific test is run. Every change made locally can be seen in the container. 
    Therefore, you _do not_ need to rebuild before running these tests again.
 
 #### Running tests outside of a containerized
