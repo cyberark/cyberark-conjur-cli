@@ -55,14 +55,14 @@ class CertificateHostnameMismatchException(Exception):
 
 class InvalidConfigurationException(Exception):
     """ Exception for when configuration file (from .conjurrc) is in invalid format """
-    def __init__(self):
-        self.message = FETCH_CONFIGURATION_FAILURE_MESSAGE
+    def __init__(self, message=FETCH_CONFIGURATION_FAILURE_MESSAGE):
+        self.message = message
         super().__init__(self.message)
 
 class ConfigurationMissingException(Exception):
     """ Exception for when configuration is missing """
-    def __init__(self):
-        self.message = CONFIGURATION_MISSING_FAILURE_MESSAGE
+    def __init__(self, message=CONFIGURATION_MISSING_FAILURE_MESSAGE):
+        self.message = message
         super().__init__(self.message)
 
 class CredentialRetrievalException(Exception):
