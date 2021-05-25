@@ -7,6 +7,7 @@ This module represents an object that holds conjurrc data
 """
 # pylint: disable=too-few-public-methods
 from yaml import load as yaml_load
+
 try:
     from yaml import CLoader as YamlLoader
 except ImportError: # pragma: no cover
@@ -14,6 +15,7 @@ except ImportError: # pragma: no cover
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.errors import InvalidConfigurationException
 
 class ConjurrcData:
     """
@@ -29,11 +31,14 @@ class ConjurrcData:
         """
         Method that loads the conjurrc into an object
         """
-        with open(conjurrc_path, 'r') as conjurrc:
-            loaded_conjurrc = yaml_load(conjurrc, Loader=YamlLoader)
-            return ConjurrcData(loaded_conjurrc['conjur_url'],
-                                loaded_conjurrc['conjur_account'],
-                                loaded_conjurrc['cert_file'])
+        try:
+            with open(conjurrc_path, 'r') as conjurrc:
+                loaded_conjurrc = yaml_load(conjurrc, Loader=YamlLoader)
+                return ConjurrcData(loaded_conjurrc['conjur_url'],
+                                    loaded_conjurrc['conjur_account'],
+                                    loaded_conjurrc['cert_file'])
+        except KeyError as key_error:
+            raise InvalidConfigurationException from key_error
 
     # pylint: disable=line-too-long
     def __repr__(self):

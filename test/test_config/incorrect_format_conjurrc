@@ -1,0 +1,6 @@
+---
+account: accountname
+plugins: []
+appliance_url: https://someurl/somepath
+cert_file: "/cert/file/location"
+version: 4
