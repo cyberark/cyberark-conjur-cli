@@ -7,12 +7,13 @@ This test file handles the configuration test flows when running
 `conjur init`
 """
 import os
+import shutil
 from unittest.mock import patch
 
 import requests
 
 from conjur.data_object import CredentialsData
-from conjur.logic.credential_provider import CredentialStoreFactory
+from conjur.errors_messages import FETCH_CONFIGURATION_FAILURE_MESSAGE
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
@@ -203,3 +204,16 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.setup_cli_params({})
 
         self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+
+    """
+    This test checks that a conjurrc in an improper format (v4 format) fails on the proper, 
+    comprehensible error
+    """
+    @integration_test(True)
+    def test_https_cli_can_fail_on_conjurrc_format_error(self):
+        self.setup_cli_params({})
+        shutil.copy(self.environment.path_provider.test_incorrect_format_conjurrc, self.environment.path_provider.conjurrc_path)
+        print(self.environment.path_provider.conjurrc_path)
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['list'], exit_code=1)
+        self.assertRegex(output, FETCH_CONFIGURATION_FAILURE_MESSAGE)

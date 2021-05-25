@@ -37,8 +37,8 @@ class ConjurrcData:
                 return ConjurrcData(loaded_conjurrc['conjur_url'],
                                     loaded_conjurrc['conjur_account'],
                                     loaded_conjurrc['cert_file'])
-        except KeyError:
-            raise InvalidConfigurationException
+        except KeyError as key_error:
+            raise InvalidConfigurationException from key_error
 
     # pylint: disable=line-too-long
     def __repr__(self):
