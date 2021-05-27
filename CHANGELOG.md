@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   See [design guidelines](https://ljfz3b.axshare.com/#id=x8ktq8&p=conjur_help__init&g=1)
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
-- Directory structure has been refactored. See [design document](https://github.com/cyberark/conjur-api-python3/blob/master/design/general_refactorings.md) for more details.
+- Directory structure has been refactored. See [design document](https://github.com/cyberark/conjur-api-python3/blob/main/design/general_refactorings.md) for more details.
   This is a breaking change. Users who import the SDK in their projects should change their import statement from
   `from conjur.client import Client` to `from conjur.api import Client`
   [cyberark/conjur-api-python3#121](https://github.com/cyberark/conjur-api-python3/issues/121)

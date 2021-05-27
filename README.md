@@ -11,19 +11,19 @@ the Conjur API to manage Conjur resources.
 
 ### Conjur CLI
 
-![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
+![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
 The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will securely
 work with CyberArk Conjur Enterprise (previously known as DAP) as documented. In addition, CyberArk offers 
 Enterprise-level support for these features. For more detailed information on our certification levels, 
-see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
+see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
 ### Conjur Python SDK
 
-![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
+![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
 The Conjur Python SDK is a **Community** level project. It's a community contributed project that **is not reviewed or supported
-by CyberArk**. For more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community).
+by CyberArk**. For more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
 ### Using conjur-api-python3 with Conjur OSS 
 

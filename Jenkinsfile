@@ -78,7 +78,7 @@ pipeline {
             sh './bin/publish_container'
           }
           when {
-            branch "master"
+            branch "main"
           }
         }
       }
@@ -100,7 +100,7 @@ pipeline {
       }
 
       when {
-        branch "master"
+        branch "main"
       }
     }
   }

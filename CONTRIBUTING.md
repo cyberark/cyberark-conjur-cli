@@ -1,7 +1,7 @@
 # Contributing
 
 For general contribution and community guidelines, please see the [community repo](https://github.com/cyberark/community).
-In particular, before contributing please review our [contributor licensing guide](https://github.com/cyberark/community/blob/master/CONTRIBUTING.md#when-the-repo-does-not-include-the-cla)
+In particular, before contributing please review our [contributor licensing guide](https://github.com/cyberark/community/blob/main/CONTRIBUTING.md#when-the-repo-does-not-include-the-cla)
 to ensure your contribution is compliant with our contributor license agreements.
 
 ## Table of Contents
@@ -223,7 +223,7 @@ See [here](guidelines/python-cli-ux-guidelines.md) for full UX guidelines to fol
 2. Select an existing issue or open an issue to propose changes or fixes
 3. Add any relevant labels as you work on it
 4. Run tests as described in the
-  [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/master/CONTRIBUTING.md#testing),
+  [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#testing),
   ensuring they pass
 5. Submit a pull request, linking the issue in the description
 6. Adjust labels as-needed on the issue. Ask another contributor to review and merge your code if there are delays in
@@ -288,7 +288,7 @@ Scan the project for vulnerabilities.
 
 ### Add a Git tag
 
-1. Once your changes have been reviewed and merged into master, tag the version using `git tag -s v0.1.1`
+1. Once your changes have been reviewed and merged into main, tag the version using `git tag -s v0.1.1`
   for example. Note this requires you to be able to sign releases. Consult
   the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification)
   on how to set this up. 
@@ -303,7 +303,7 @@ Currently, packing the client into an executable is a manual process. For Linux 
   pack the client using the different VMs we have available to us. For macOS, you will need to use your local machine.
 See the below section _How to create release artifacts_ for detailed information on how to create CLI binaries.
 
-*Important!* The final artifacts that are delivered to the customer should be created from the master branch
+*Important!* The final artifacts that are delivered to the customer should be created from the main branch
 
 ### Sign artifacts
 
@@ -311,7 +311,7 @@ See the below section _How to create release artifacts_ for detailed information
 
 - Sign and notarize the ConjurCLI app for macOS 
 
-*Important!* The final artifacts that are delivered to the customer should be created from the master branch
+*Important!* The final artifacts that are delivered to the customer should be created from the main branch
 
 ### How to create release artifacts
 
