@@ -6,7 +6,7 @@ import argparse
 import time
 
 
-def formatter(prog):
+def formatter(prog:str):
     """
     This method format the text of the different parsers.
     """
@@ -23,11 +23,10 @@ def header(*args):
   {}'''.format(*args)
 
 
-def command_description(example, usage):
+def command_description(example:str, usage:str):
     """
     This method builds the header for the main screen.
     """
-
     return f"\n\n Name:\n  {example}\n\nUsage:\n  {usage}"
 
 
@@ -41,7 +40,7 @@ def main_epilog():
     return msg
 
 
-def command_epilog(example, command=None, subcommands=None):
+def command_epilog(example:str, command:str=None, subcommands:list=None):
     """
     This method builds the footer for each command help screen.
     """
@@ -53,7 +52,7 @@ def command_epilog(example, command=None, subcommands=None):
     return f"Examples:\n    {example}"
 
 
-def title_formatter(title):
+def title_formatter(title:str):
     """
     This method builds a reusable title for each argument section
     """

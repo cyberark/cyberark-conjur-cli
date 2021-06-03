@@ -31,7 +31,7 @@ class KeystoreWrapper:
     """
 
     @classmethod
-    def set_password(cls, identifier, key, val):
+    def set_password(cls, identifier:str, key:str, val:str):
         """
         Method for setting a password in keyring
         """
@@ -46,7 +46,7 @@ class KeystoreWrapper:
 
     # pylint: disable=try-except-raise
     @classmethod
-    def get_password(cls, identifier, key):
+    def get_password(cls, identifier:str, key:str):
         """
         Method for getting a password in keyring
         """
@@ -58,7 +58,7 @@ class KeystoreWrapper:
 
     # pylint: disable=try-except-raise
     @classmethod
-    def delete_password(cls, identifier, key):
+    def delete_password(cls, identifier:str, key:str):
         """
         Method for deleting a password in keyring
         """

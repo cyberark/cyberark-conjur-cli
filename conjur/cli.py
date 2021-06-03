@@ -36,16 +36,17 @@ from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, 
 from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
 
-
 # pylint: disable=too-many-statements
 class Cli():
     """
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
     """
+
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    # pylint: disable=no-self-use, too-many-locals
+
+        # pylint: disable=no-self-use, too-many-locals
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
@@ -110,7 +111,7 @@ class Cli():
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url=None, account=None, cert=None, force=None, ssl_verify=True):
+    def handle_init_logic(cls, url:str=None, account:str=None, cert:str=None, force:bool=None, ssl_verify:bool=True):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file
@@ -129,7 +130,7 @@ class Cli():
 
     @classmethod
     # pylint: disable=line-too-long
-    def handle_login_logic(cls, credential_provider, identifier=None, password=None, ssl_verify=True):
+    def handle_login_logic(cls, credential_provider, identifier:str=None, password:str=None, ssl_verify:bool=True):
         """
         Method that wraps the login call logic
         """
@@ -144,7 +145,7 @@ class Cli():
         sys.stdout.write("Successfully logged in to Conjur\n")
 
     @classmethod
-    def handle_logout_logic(cls, credential_provider, ssl_verify=True):
+    def handle_logout_logic(cls, credential_provider, ssl_verify:bool=True):
         """
         Method that wraps the logout call logic
         """

@@ -20,13 +20,11 @@ from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
 
-
 class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
     when all the needed arguments and parameters are well-known
     """
-
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
     API_TOKEN_DURATION = 5
 
@@ -96,7 +94,6 @@ class Api():
         to retrieve an api key from the server that can be later used to
         retrieve short-lived api tokens.
         """
-
         if not login_id or not password:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
@@ -162,7 +159,7 @@ class Api():
         # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
-    def get_variable(self, variable_id, version=None):
+    def get_variable(self, variable_id:str, version:str=None):
         """
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
@@ -224,12 +221,11 @@ class Api():
 
         return remapped_keys_dict
 
-    def set_variable(self, variable_id, value):
+    def set_variable(self, variable_id:str, value:str):
         """
         This method is used to set a secret (aka "variable") to a value of
         your choosing.
         """
-
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': variable_id,
@@ -240,12 +236,11 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-    def _load_policy_file(self, policy_id, policy_file, http_verb):
+    def _load_policy_file(self, policy_id:str, policy_file:str, http_verb:HttpVerb):
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
         """
-
         params = {
             'identifier': policy_id,
         }
@@ -262,15 +257,14 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def load_policy_file(self, policy_id, policy_file):
+    def load_policy_file(self, policy_id:str, policy_file:str):
         """
         This method is used to load a file-based policy into the desired
         name.
         """
-
         return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
-    def replace_policy_file(self, policy_id, policy_file):
+    def replace_policy_file(self, policy_id:str, policy_file:str):
         """
         This method is used to replace a file-based policy into the desired
         policy ID.
@@ -278,12 +272,11 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def update_policy_file(self, policy_id, policy_file):
+    def update_policy_file(self, policy_id:str, policy_file:str):
         """
         This method is used to update a file-based policy into the desired
         policy ID.
         """
-
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
     def rotate_other_api_key(self, resource: Resource):
@@ -305,7 +298,7 @@ class Api():
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, logged_in_user, current_password):
+    def rotate_personal_api_key(self, logged_in_user:str, current_password:str):
         """
         This method is used to rotate a personal API key
         """
@@ -316,7 +309,7 @@ class Api():
                                    ssl_verify=self._ssl_verify).text
         return response
 
-    def change_personal_password(self, logged_in_user, current_password, new_password):
+    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str):
         """
         This method is used to change own password
         """

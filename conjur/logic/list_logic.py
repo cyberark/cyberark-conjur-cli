@@ -8,7 +8,6 @@ This module is the business logic for executing the list command
 # pylint: disable=too-few-public-methods
 import logging
 
-
 class ListLogic:
     """
     ListLogic

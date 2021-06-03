@@ -20,7 +20,6 @@ from conjur.config import Config as ApiConfig
 from conjur.resource import Resource
 from conjur.wrapper import KeystoreWrapper
 
-
 # pylint: disable=pointless-string-statement
 """
 *************** DEVELOPER NOTE ***************
@@ -49,15 +48,15 @@ class Client():
     # what parameters are allowed
     # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,try-except-raise,too-many-statements
     def __init__(self,
-                 account=None,
+                 account:str=None,
                  api_key=None,
                  ca_bundle=None,
-                 debug=False,
+                 debug:bool=False,
                  http_debug=False,
-                 login_id=None,
-                 password=None,
-                 ssl_verify=True,
-                 url=None):
+                 login_id:str=None,
+                 password:str=None,
+                 ssl_verify:bool=True,
+                 url:str=None):
 
         if ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -139,7 +138,7 @@ class Client():
 
         logging.debug("Client initialized")
 
-    def setup_logging(self, debug):
+    def setup_logging(self, debug:bool):
         """
         Configures the logging for the client
         """
@@ -166,7 +165,7 @@ class Client():
         """
         return self._api.resources_list(list_constraints)
 
-    def get(self, variable_id, version=None):
+    def get(self, variable_id:str, version:str=None):
         """
         Gets a variable value based on its ID
         """
@@ -179,25 +178,25 @@ class Client():
         """
         return self._api.get_variables(*variable_ids)
 
-    def set(self, variable_id, value):
+    def set(self, variable_id:str, value:str):
         """
         Sets a variable to a specific value based on its ID
         """
         self._api.set_variable(variable_id, value)
 
-    def load_policy_file(self, policy_name, policy_file):
+    def load_policy_file(self, policy_name:str, policy_file:str):
         """
         Applies a file-based policy to the Conjur instance
         """
         return self._api.load_policy_file(policy_name, policy_file)
 
-    def replace_policy_file(self, policy_name, policy_file):
+    def replace_policy_file(self, policy_name:str, policy_file:str):
         """
         Replaces a file-based policy defined in the Conjur instance
         """
         return self._api.replace_policy_file(policy_name, policy_file)
 
-    def update_policy_file(self, policy_name, policy_file):
+    def update_policy_file(self, policy_name:str, policy_file:str):
         """
         Replaces a file-based policy defined in the Conjur instance
         """
@@ -209,13 +208,13 @@ class Client():
         """
         return self._api.rotate_other_api_key(resource)
 
-    def rotate_personal_api_key(self, logged_in_user, current_password):
+    def rotate_personal_api_key(self, logged_in_user:str, current_password:str):
         """
         Rotates personal API keys and returns new API key
         """
         return self._api.rotate_personal_api_key(logged_in_user, current_password)
 
-    def change_personal_password(self, logged_in_user, current_password, new_password):
+    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str):
         """
         Change personal password of logged-in user
         """

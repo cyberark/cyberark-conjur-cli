@@ -29,7 +29,7 @@ class InitController:
     conjurrc_data = None
     init_logic = None
 
-    def __init__(self, conjurrc_data, init_logic, force, ssl_verify):
+    def __init__(self, conjurrc_data, init_logic, force:bool, ssl_verify:bool):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -145,7 +145,7 @@ class InitController:
                 else:
                     raise
 
-    def write_certificate(self, fetched_certificate):
+    def write_certificate(self, fetched_certificate:str):
         """
         Method to write the certificate fetched from the Conjur endpoint on the user's machine
         """

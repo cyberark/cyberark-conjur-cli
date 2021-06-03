@@ -14,7 +14,6 @@ import requests
 from conjur.errors import OperationNotCompletedException
 from conjur.resource import Resource
 
-
 class UserLogic:
     """
     UserLogic

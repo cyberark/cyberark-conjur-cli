@@ -48,7 +48,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
-    def load(self, conjurrc_conjur_url) -> CredentialsData:
+    def load(self, conjurrc_conjur_url:str) -> CredentialsData:
         """
         Method for fetching user credentials from the system's keyring
         """
@@ -66,7 +66,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 return False
         return True
 
-    def update_api_key_entry(self, user_to_update, credential_data, new_api_key):
+    def update_api_key_entry(self, user_to_update:str, credential_data, new_api_key:str):
         """
         Method for updating user credentials in the system's keyring
         """
@@ -97,7 +97,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         logging.debug("Successfully removed credentials from the "
                       f"'{KeystoreWrapper.get_keyring_name()}' credential store")
 
-    def cleanup_if_exists(self, conjurrc_conjur_url):
+    def cleanup_if_exists(self, conjurrc_conjur_url:str):
         """
         For each credential attribute, check if exists for
         the conjurrc_conjur_url identifier and delete if exists

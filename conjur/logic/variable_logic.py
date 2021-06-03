@@ -9,6 +9,7 @@ This module is the business logic for executing the VARIABLE command
 # Builtins
 import json
 import logging
+import inspect
 
 # pylint: disable=too-few-public-methods
 class VariableLogic:
@@ -18,6 +19,7 @@ class VariableLogic:
     This class holds the business logic for executing and manipulating
     returned data
     """
+
     def __init__(self, client):
         self.client = client
 

@@ -15,7 +15,7 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.errors import CertificateVerificationException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
-
+import inspect
 class LoginLogic:
     """
     LoginLogic
@@ -23,13 +23,12 @@ class LoginLogic:
     This class holds the business logic for populating the
     netrc configuration details needed to login to Conjur
     """
-
     def __init__(self, credentials_provider: CredentialsStoreInterface):
         self.credentials_provider = credentials_provider
 
     @classmethod
     # pylint: disable=line-too-long,logging-fstring-interpolation
-    def get_api_key(cls, ssl_verify, credential_data, password, conjurrc):
+    def get_api_key(cls, ssl_verify:bool, credential_data, password:str, conjurrc):
         """
         Method to fetch the user/host's API key from Conjur
         """

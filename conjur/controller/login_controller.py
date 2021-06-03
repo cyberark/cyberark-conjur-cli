@@ -20,7 +20,7 @@ class LoginController:
     This class represents the Presentation Layer for the LOGIN command
     """
 
-    def __init__(self, ssl_verify, user_password, credential_data, login_logic):
+    def __init__(self, ssl_verify:bool, user_password, credential_data, login_logic):
         """
         For init/login commands, the client (client.py) is not initialized
         because we don't yet have enough user-specific information to

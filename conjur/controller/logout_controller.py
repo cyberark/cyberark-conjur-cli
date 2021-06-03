@@ -19,7 +19,7 @@ class LogoutController:
 
     This class represents the Presentation Layer for the LOGOUT command
     """
-    def __init__(self, ssl_verify, logout_logic, credentials_provider: CredentialsStoreInterface):
+    def __init__(self, ssl_verify:bool, logout_logic, credentials_provider: CredentialsStoreInterface):
         self.ssl_verify = ssl_verify
         self.logout_logic = logout_logic
         self.credentials_provider = credentials_provider

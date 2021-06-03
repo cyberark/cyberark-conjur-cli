@@ -21,7 +21,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
 
     ARG_ERROR_FORMAT = 'unrecognized arguments: %s'
 
-    def error(self, message):
+    def error(self, message:str):
         """
         This method handles the errors that originate from incorrect
         commands.
@@ -31,7 +31,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
         sys.exit(1)
 
     @staticmethod
-    def _subcommand_error(message, help_screen):
+    def _subcommand_error(message:str, help_screen:str):
         """
         This method handles the errors that originate from incorrect
         subcommands/flags.

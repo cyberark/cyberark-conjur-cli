@@ -9,7 +9,7 @@ class Resource:
     """
     Used for representing Conjur resources
     """
-    def __init__(self, type_, name):
+    def __init__(self, type_:type, name:str):
         self.type = type_
         self.name = name
 
