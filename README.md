@@ -74,7 +74,7 @@ cloned source and not necessarily an official release.
 Clone the project and run:
 
 ```
-pip3 install .
+pip3 install 
 ```
 
 ## Usage
