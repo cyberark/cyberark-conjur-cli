@@ -5,6 +5,7 @@ CredentialsData module
 
 This module represents the DTO that holds credential data
 """
+
 # pylint: disable=too-few-public-methods
 class CredentialsData:
     """

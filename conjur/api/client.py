@@ -49,8 +49,8 @@ class Client():
     # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,try-except-raise,too-many-statements
     def __init__(self,
                  account:str=None,
-                 api_key=None,
-                 ca_bundle=None,
+                 api_key:str=None,
+                 ca_bundle:str=None,
                  debug:bool=False,
                  http_debug=False,
                  login_id:str=None,

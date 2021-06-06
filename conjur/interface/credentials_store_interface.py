@@ -16,6 +16,7 @@ class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
     CredentialsStoreInterface
     This class is an interface that outlines a shared interface for credential stores
     """
+
     @abc.abstractmethod
     def save(self, credential_data: CredentialsData):
         """

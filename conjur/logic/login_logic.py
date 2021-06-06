@@ -15,6 +15,7 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.errors import CertificateVerificationException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
+
 class LoginLogic:
     """
     LoginLogic
