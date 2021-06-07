@@ -93,8 +93,7 @@ class InitLogic:
         return is_written
 
     @classmethod
-    def write_conjurrc(cls, conjurrc_file_path:str, conjurrc_data:ConjurrcData,
-            force_overwrite_flag:bool):
+    def write_conjurrc(cls, conjurrc_file_path:str, conjurrc_data, force_overwrite_flag:bool):
         """
         Method for writing the conjurrc configuration
         details needed to create a connection to Conjur

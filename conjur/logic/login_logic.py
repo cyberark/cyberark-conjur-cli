@@ -16,8 +16,6 @@ from conjur.errors import CertificateVerificationException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.data_object.credentials_data import CredentialsData
-#pylint: disable=undefined-variable
-from conjur.data_object.conjurrc_data import ConjurrcData
 
 class LoginLogic:
     """
