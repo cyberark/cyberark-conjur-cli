@@ -15,7 +15,7 @@ import requests
 import urllib3
 
 from conjur.errors import CertificateHostnameMismatchException
-
+from conjur.api.endpoints import ConjurEndpoint
 
 class HttpVerb(Enum):
     """
@@ -32,8 +32,9 @@ class HttpVerb(Enum):
 #pylint: disable=too-many-locals
 # ssl_verify can accept Boolean or String as per requests docs
 # https://requests.readthedocs.io/en/master/api/#main-interface
-def invoke_endpoint(http_verb:HttpVerb, endpoint, params:dict, *args, check_errors:bool=True,
-                    ssl_verify:bool=True, auth:tuple=None, api_token:str=None, query:dict=None):
+def invoke_endpoint(http_verb:HttpVerb, endpoint:ConjurEndpoint, params:dict, *args,
+        check_errors:bool=True, ssl_verify:bool=True, auth:tuple=None, api_token:str=None,
+        query:dict=None):
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -89,7 +90,8 @@ def invoke_endpoint(http_verb:HttpVerb, endpoint, params:dict, *args, check_erro
 
     return response
 
-def invoke_request(http_verb:HttpVerb, url:str, *args, query:dict, ssl_verify:bool, auth:tuple, headers:dict):
+def invoke_request(http_verb:HttpVerb, url:str, *args, query:dict, ssl_verify:bool, auth:tuple,
+        headers:dict):
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages

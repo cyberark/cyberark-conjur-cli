@@ -76,7 +76,8 @@ class InitLogic:
                       "successfully fetched from the Conjur server")
 
     @classmethod
-    def write_certificate_to_file(cls, fetched_certificate:str, cert_file_path:str, force_overwrite_flag:bool):
+    def write_certificate_to_file(cls, fetched_certificate:str, cert_file_path:str,
+            force_overwrite_flag:bool):
         """
         Method for writing certificate to a file on the user's machine
         """

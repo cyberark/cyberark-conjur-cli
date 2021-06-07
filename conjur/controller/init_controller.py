@@ -13,11 +13,13 @@ import sys
 
 # Third party
 from urllib.parse import urlparse
+from urllib.parse import ParseResult
 
 # Internals
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
+from conjur.data_object import ConjurrcData
 
 class InitController:
     """
@@ -29,7 +31,7 @@ class InitController:
     conjurrc_data = None
     init_logic = None
 
-    def __init__(self, conjurrc_data, init_logic, force:bool, ssl_verify:bool):
+    def __init__(self, conjurrc_data:ConjurrcData, init_logic, force:bool, ssl_verify:bool):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -96,7 +98,7 @@ class InitController:
                    f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
-    def get_server_certificate(self, conjur_url):
+    def get_server_certificate(self, conjur_url:ParseResult):
         """
         Get the certificate from the specified conjur_url
 
@@ -124,7 +126,7 @@ class InitController:
         return fetched_certificate
 
     # pylint: disable=line-too-long,logging-fstring-interpolation,broad-except,raise-missing-from
-    def get_account_info(self, conjurrc_data):
+    def get_account_info(self, conjurrc_data:ParseResult):
         """
         Method to fetch the account from the user
         """

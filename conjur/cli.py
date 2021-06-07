@@ -111,7 +111,8 @@ class Cli():
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url:str=None, account:str=None, cert:str=None, force:bool=None, ssl_verify:bool=True):
+    def handle_init_logic(cls, url:str=None, account:str=None, cert:str=None, force:bool=None,
+            ssl_verify:bool=True):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file

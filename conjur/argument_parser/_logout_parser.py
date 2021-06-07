@@ -4,6 +4,7 @@ Module For the LogoutParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 
 # pylint: disable=too-few-public-methods
@@ -42,7 +43,7 @@ class LogoutParser:
         return logout_subparser
 
     @staticmethod
-    def _add_logout_options(logout_subparser):
+    def _add_logout_options(logout_subparser:ArgparseWrapper):
         logout_options = logout_subparser.add_argument_group(title=title_formatter("Options"))
         logout_options.add_argument('-h', '--help', action='help'
                                     , help='Display help screen and exit')
