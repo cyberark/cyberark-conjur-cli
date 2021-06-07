@@ -18,7 +18,6 @@ from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_client import SSLClient
-from conjur.data_object.conjurrc_data import ConjurrcData
 
 DEFAULT_PORT = 443
 
@@ -49,7 +48,7 @@ class InitLogic:
         return fingerprint, readable_certificate
 
     @classmethod
-    def fetch_account_from_server(cls, conjurrc_data:ConjurrcData):
+    def fetch_account_from_server(cls, conjurrc_data):
         """
         Fetches the account from the Conjur Enterprise server by making a
         request to the /info endpoint. This endpoint only exists in the
@@ -94,7 +93,8 @@ class InitLogic:
         return is_written
 
     @classmethod
-    def write_conjurrc(cls, conjurrc_file_path:str, conjurrc_data:ConjurrcData, force_overwrite_flag:bool):
+    def write_conjurrc(cls, conjurrc_file_path:str, conjurrc_data:ConjurrcData,
+            force_overwrite_flag:bool):
         """
         Method for writing the conjurrc configuration
         details needed to create a connection to Conjur
