@@ -15,6 +15,8 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.errors import CertificateVerificationException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
+from conjur.data_object.credentials_data import CredentialsData
+from conjur.data_object.conjurrc_data import ConjurrcData
 
 class LoginLogic:
     """
@@ -28,7 +30,7 @@ class LoginLogic:
 
     @classmethod
     # pylint: disable=line-too-long,logging-fstring-interpolation
-    def get_api_key(cls, ssl_verify:bool, credential_data, password:str, conjurrc):
+    def get_api_key(cls, ssl_verify:bool, credential_data:CredentialsData, password:str, conjurrc):
         """
         Method to fetch the user/host's API key from Conjur
         """
@@ -58,7 +60,7 @@ class LoginLogic:
         logging.debug("API key retrieved from Conjur")
         return api_key
 
-    def save(self, credential_data):
+    def save(self, credential_data:CredentialsData):
         """
         Method to save credentials during login
         """

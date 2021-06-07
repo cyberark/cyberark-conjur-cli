@@ -18,7 +18,7 @@ from conjur.errors import OperationNotCompletedException, \
     CredentialRetrievalException, KeyringWrapperDeletionError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper import KeystoreWrapper
-
+from conjur.data_object.conjurrc_data import ConjurrcData
 
 # pylint: disable=logging-fstring-interpolation
 class KeystoreCredentialsProvider(CredentialsStoreInterface):
@@ -66,7 +66,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 return False
         return True
 
-    def update_api_key_entry(self, user_to_update:str, credential_data, new_api_key:str):
+    def update_api_key_entry(self, user_to_update:str, credential_data:CredentialsData, new_api_key:str):
         """
         Method for updating user credentials in the system's keyring
         """
@@ -78,7 +78,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
-    def remove_credentials(self, conjurrc):
+    def remove_credentials(self, conjurrc:ConjurrcData):
         """
         Method for removing user credentials in the system's keyring
         """

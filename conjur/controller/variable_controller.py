@@ -7,6 +7,8 @@ This module is the controller that facilitates all list actions
 required to successfully execute the VARIABLE command
 """
 import sys
+from conjur.logic.variable_logic import VariableLogic
+from conjur.data_object.variable_data import VariableData
 
 # pylint: disable=too-few-public-methods
 class VariableController:
@@ -15,7 +17,7 @@ class VariableController:
 
     This class represents the Presentation Layer for the VARIABLE command
     """
-    def __init__(self, variable_logic, variable_data):
+    def __init__(self, variable_logic:VariableLogic, variable_data:VariableData):
         self.variable_logic = variable_logic
         self.variable_data = variable_data
 
