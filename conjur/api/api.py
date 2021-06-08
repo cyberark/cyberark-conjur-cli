@@ -244,7 +244,8 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-    def _load_policy_file(self, policy_id:str, policy_file:str, http_verb:HttpVerb) -> requests.Response :
+    def _load_policy_file(self, policy_id:str, policy_file:str,
+                          http_verb:HttpVerb) -> requests.Response :
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
@@ -310,7 +311,8 @@ class Api():
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, logged_in_user:str, current_password:str) -> requests.Response :
+    def rotate_personal_api_key(self, logged_in_user:str,
+                                current_password:str) -> requests.Response :
         """
         This method is used to rotate a personal API key
         """
@@ -322,7 +324,8 @@ class Api():
                                    ssl_verify=self._ssl_verify).text
         return response
 
-    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str) -> requests.Response :
+    def change_personal_password(self, logged_in_user:str, current_password:str,
+                                 new_password:str) -> requests.Response :
         """
         This method is used to change own password
         """
