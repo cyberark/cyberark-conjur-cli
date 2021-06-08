@@ -27,7 +27,7 @@ def get_insecure_warning_in_debug():
     logging.debug("Warning: Running the command with '--insecure' "
                   "makes your system vulnerable to security attacks")
 
-def determine_status_code_specific_error_messages(server_error):
+def determine_status_code_specific_error_messages(server_error) -> str :
     """ Method for returning status code-specific error messages """
     if str(server_error.response.status_code) == '401':
         return "Failed to log in to Conjur. Unable to authenticate with Conjur. " \

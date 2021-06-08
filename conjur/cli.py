@@ -301,7 +301,7 @@ class Cli():
             Cli.handle_host_logic(args, client)
 
     @staticmethod
-    def _parse_args(parser: ArgparseWrapper):
+    def _parse_args(parser: ArgparseWrapper) -> ArgparseWrapper:
         args = parser.parse_args()
 
         if not args.resource:

@@ -9,6 +9,7 @@ the Conjur server
 
 # Builtins
 import logging
+import requests
 
 # Internals
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
@@ -152,51 +153,51 @@ class Client():
 
     ### API passthrough
 
-    def whoami(self):
+    def whoami(self) -> dict :
         """
         Provides dictionary of information about the user making an API request
         """
         return self._api.whoami()
 
     # Constraints remain an optional parameter for backwards compatibility in the SDK
-    def list(self, list_constraints=None):
+    def list(self, list_constraints=None) -> dict :
         """
         Lists all available resources
         """
         return self._api.resources_list(list_constraints)
 
-    def get(self, variable_id:str, version:str=None):
+    def get(self, variable_id:str, version:str=None)   -> requests.Response :
         """
         Gets a variable value based on its ID
         """
         return self._api.get_variable(variable_id, version)
 
-    def get_many(self, *variable_ids):
+    def get_many(self, *variable_ids)   -> requests.Response :
         """
         Gets multiple variable values based on their IDs. Returns a
         dictionary of mapped values.
         """
         return self._api.get_variables(*variable_ids)
 
-    def set(self, variable_id:str, value:str):
+    def set(self, variable_id:str, value:str)  -> requests.Response :
         """
         Sets a variable to a specific value based on its ID
         """
         self._api.set_variable(variable_id, value)
 
-    def load_policy_file(self, policy_name:str, policy_file:str):
+    def load_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
         """
         Applies a file-based policy to the Conjur instance
         """
         return self._api.load_policy_file(policy_name, policy_file)
 
-    def replace_policy_file(self, policy_name:str, policy_file:str):
+    def replace_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
         """
         Replaces a file-based policy defined in the Conjur instance
         """
         return self._api.replace_policy_file(policy_name, policy_file)
 
-    def update_policy_file(self, policy_name:str, policy_file:str):
+    def update_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
         """
         Replaces a file-based policy defined in the Conjur instance
         """
@@ -208,13 +209,13 @@ class Client():
         """
         return self._api.rotate_other_api_key(resource)
 
-    def rotate_personal_api_key(self, logged_in_user:str, current_password:str):
+    def rotate_personal_api_key(self, logged_in_user:str, current_password:str)  -> requests.Response :
         """
         Rotates personal API keys and returns new API key
         """
         return self._api.rotate_personal_api_key(logged_in_user, current_password)
 
-    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str):
+    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str)  -> requests.Response :
         """
         Change personal password of logged-in user
         """

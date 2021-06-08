@@ -76,7 +76,7 @@ class InitController:
                 raise RuntimeError("Error: URL is required")
 
     # TODO: Factor out the following URL validation to ConjurrcData class
-    def format_conjur_url(self):
+    def format_conjur_url(self) -> tuple:
         """
         Method for formatting the Conjur server URL to
         break down the URL into segments

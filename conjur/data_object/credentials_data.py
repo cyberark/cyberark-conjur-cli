@@ -12,7 +12,7 @@ class CredentialsData:
     Used for setting user input data to login to Conjur
     """
 
-    def __init__(self, machine:str=None, login:str=None, password:str=None):
+    def __init__(self, machine:str=None, login:str=None, password:str=None) -> str :
         self.machine = machine
         self.login = login
         self.password = password

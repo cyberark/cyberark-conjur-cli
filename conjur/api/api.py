@@ -8,6 +8,7 @@ Provides high-level interface for programmatic API interactions
 # Builtins
 import json
 import logging
+import requests
 
 # Third party
 from datetime import datetime, timedelta
@@ -78,7 +79,7 @@ class Api():
 
     @property
     # pylint: disable=missing-docstring
-    def api_token(self):
+    def api_token(self) -> str :
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.debug("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
@@ -108,7 +109,7 @@ class Api():
 
         return self.api_key
 
-    def authenticate(self):
+    def authenticate(self) -> requests.Response:
         """
         Authenticate uses the api_key to fetch a short-lived api token that
         for a limited time will allow you to interact fully with the Conjur
@@ -128,7 +129,7 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
-    def resources_list(self, list_constraints=None):
+    def resources_list(self, list_constraints=None) -> requests.Response:
         """
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
@@ -163,7 +164,7 @@ class Api():
         # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
-    def get_variable(self, variable_id:str, version:str=None):
+    def get_variable(self, variable_id:str, version:str=None) -> requests.Response:
         """
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
@@ -227,7 +228,7 @@ class Api():
 
         return remapped_keys_dict
 
-    def set_variable(self, variable_id:str, value:str):
+    def set_variable(self, variable_id:str, value:str) -> requests.Response:
         """
         This method is used to set a secret (aka "variable") to a value of
         your choosing.
@@ -243,7 +244,7 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-    def _load_policy_file(self, policy_id:str, policy_file:str, http_verb:HttpVerb):
+    def _load_policy_file(self, policy_id:str, policy_file:str, http_verb:HttpVerb) -> requests.Response :
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
@@ -265,7 +266,7 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def load_policy_file(self, policy_id:str, policy_file:str):
+    def load_policy_file(self, policy_id:str, policy_file:str) -> str :
         """
         This method is used to load a file-based policy into the desired
         name.
@@ -273,7 +274,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
-    def replace_policy_file(self, policy_id:str, policy_file:str):
+    def replace_policy_file(self, policy_id:str, policy_file:str) -> str :
         """
         This method is used to replace a file-based policy into the desired
         policy ID.
@@ -281,7 +282,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def update_policy_file(self, policy_id:str, policy_file:str):
+    def update_policy_file(self, policy_id:str, policy_file:str) -> str :
         """
         This method is used to update a file-based policy into the desired
         policy ID.
@@ -289,7 +290,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
-    def rotate_other_api_key(self, resource: Resource):
+    def rotate_other_api_key(self, resource: Resource) -> requests.Response :
         """
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
@@ -309,7 +310,7 @@ class Api():
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, logged_in_user:str, current_password:str):
+    def rotate_personal_api_key(self, logged_in_user:str, current_password:str) -> requests.Response :
         """
         This method is used to rotate a personal API key
         """
@@ -321,7 +322,7 @@ class Api():
                                    ssl_verify=self._ssl_verify).text
         return response
 
-    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str):
+    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str) -> requests.Response :
         """
         This method is used to change own password
         """
@@ -335,7 +336,7 @@ class Api():
                                    ).text
         return response
 
-    def whoami(self):
+    def whoami(self) -> requests.Response :
         """
         This method provides dictionary of information about the user making an API request.
         """

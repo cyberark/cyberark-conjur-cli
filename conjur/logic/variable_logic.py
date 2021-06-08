@@ -24,7 +24,7 @@ class VariableLogic:
         self.client = client
 
     # pylint: disable=logging-fstring-interpolation
-    def get_variable(self, variable_data:VariableData):
+    def get_variable(self, variable_data:VariableData) -> VariableData:
         """
         Method to handle all get action activity
         """
@@ -39,7 +39,7 @@ class VariableLogic:
             return json.dumps(variable_values, indent=4)
 
     # pylint: disable=logging-fstring-interpolation
-    def set_variable(self, variable_data:VariableData):
+    def set_variable(self, variable_data:VariableData) -> VariableData:
         """
         Method to handle all set action activity
         """

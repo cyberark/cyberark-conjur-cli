@@ -69,7 +69,7 @@ class LoginController:
             while self.user_password == '':
                 self.user_password = getpass.getpass(prompt="Invalid format. Enter your password or API key (this will not be echoed): ")
 
-    def load_conjurrc_data(self):
+    def load_conjurrc_data(self) -> ConjurrcData:
         """
         Method to load the conjurrc data because it is needed to fill in netrc
         properties and to send a login request to Conjur

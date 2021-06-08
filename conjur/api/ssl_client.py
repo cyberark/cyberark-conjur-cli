@@ -28,16 +28,10 @@ class SSLClient:
     and fetching the certificate
     """
     @classmethod
-    def get_certificate(cls, hostname, port):
+    def get_certificate(cls, hostname:str, port:int):
         """
         Method for connecting to Conjur to fetch the certificate chain
         """
-        with open("/tmp/strong.log", "a") as log_file:
-            log_file.writelines("hostname")
-            log_file.writelines(str(type(hostname)))
-            log_file.writelines("port")
-            log_file.writelines(str(type(port)))
-            log_file.writelines("\n")
         sock = cls.__connect(hostname, port)
         chain = sock.get_peer_cert_chain()
         fingerprint = chain[0].digest("sha1").decode("utf-8")
@@ -47,7 +41,7 @@ class SSLClient:
         return fingerprint, readable_certificate
 
     @classmethod
-    def __connect(cls, hostname, port):
+    def __connect(cls, hostname:str, port:int):
         """
         Method for opening a socket to the Conjur server
         """

@@ -34,7 +34,7 @@ class HttpVerb(Enum):
 # https://requests.readthedocs.io/en/master/api/#main-interface
 def invoke_endpoint(http_verb:HttpVerb, endpoint:ConjurEndpoint, params:dict, *args,
         check_errors:bool=True, ssl_verify:bool=True, auth:tuple=None, api_token:str=None,
-        query:dict=None):
+        query:dict=None)  -> requests.Response :
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -91,7 +91,7 @@ def invoke_endpoint(http_verb:HttpVerb, endpoint:ConjurEndpoint, params:dict, *a
     return response
 
 def invoke_request(http_verb:HttpVerb, url:str, *args, query:dict, ssl_verify:bool, auth:tuple,
-        headers:dict):
+        headers:dict)  -> requests.Response :
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages

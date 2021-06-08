@@ -18,7 +18,7 @@ class ListLogic:
     def __init__(self, client):
         self.client = client
 
-    def list(self, list_data):
+    def list(self, list_data) -> str :
         """
         Method for calling list from the client service
         """
@@ -26,7 +26,7 @@ class ListLogic:
         return self.client.list(list_constraints)
 
     @classmethod
-    def build_constraints(cls, list_data):
+    def build_constraints(cls, list_data) -> str :
         """
         Method to accumulate the constraints on list request
         """
