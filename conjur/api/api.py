@@ -8,10 +8,10 @@ Provides high-level interface for programmatic API interactions
 # Builtins
 import json
 import logging
-import requests
 
 # Third party
 from datetime import datetime, timedelta
+import requests
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
