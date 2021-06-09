@@ -18,7 +18,6 @@ from conjur.interface.credentials_store_interface import CredentialsStoreInterfa
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.data_object.credentials_data import CredentialsData
 
-
 class LoginLogic:
     """
     LoginLogic
@@ -26,14 +25,12 @@ class LoginLogic:
     This class holds the business logic for populating the
     netrc configuration details needed to login to Conjur
     """
-
     def __init__(self, credentials_provider: CredentialsStoreInterface):
         self.credentials_provider = credentials_provider
 
     @classmethod
     # pylint: disable=line-too-long,logging-fstring-interpolation
-    def get_api_key(cls, ssl_verify: bool, credential_data: CredentialsData, password: str,
-                    conjurrc) -> requests.Response:
+    def get_api_key(cls, ssl_verify:bool, credential_data:CredentialsData, password:str, conjurrc) -> requests.Response :
         """
         Method to fetch the user/host's API key from Conjur
         """
@@ -63,7 +60,7 @@ class LoginLogic:
         logging.debug("API key retrieved from Conjur")
         return api_key
 
-    def save(self, credential_data: CredentialsData) -> CredentialsData:
+    def save(self, credential_data:CredentialsData) -> CredentialsData:
         """
         Method to save credentials during login
         """

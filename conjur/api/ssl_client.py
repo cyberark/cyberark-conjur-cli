@@ -14,6 +14,7 @@ import socket
 from OpenSSL import SSL
 from OpenSSL.crypto import FILETYPE_PEM, dump_certificate
 
+
 _conjur_tls_methods = {
     "1.0": SSL.TLSv1_METHOD,
     "1.1": SSL.TLSv1_1_METHOD,

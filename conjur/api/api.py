@@ -17,9 +17,9 @@ import requests
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 
-
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
+
 
 class Api():
     """
@@ -40,13 +40,13 @@ class Api():
     # class but this might not be needed in the future
     # pylint: disable=unused-argument,too-many-arguments
     def __init__(self,
-                 account='default',
-                 api_key=None,
-                 ca_bundle=None,
+                 account: str = 'default',
+                 api_key: str = None,
+                 ca_bundle: str = None,
                  http_debug=False,
-                 login_id=None,
-                 ssl_verify=True,
-                 url=None):
+                 login_id: str = None,
+                 ssl_verify: bool = True,
+                 url: str = None):
 
         self._url = url
         self._ca_bundle = ca_bundle
@@ -79,7 +79,7 @@ class Api():
 
     @property
     # pylint: disable=missing-docstring
-    def api_token(self)  -> requests.Response:
+    def api_token(self) -> requests.Response:
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.debug("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
@@ -147,9 +147,9 @@ class Api():
                                             ssl_verify=self._ssl_verify).content
         else:
             json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
-                                params,
-                                api_token=self.api_token,
-                                ssl_verify=self._ssl_verify).content
+                                            params,
+                                            api_token=self.api_token,
+                                            ssl_verify=self._ssl_verify).content
 
         resources = json.loads(json_response.decode('utf-8'))
 
@@ -164,7 +164,7 @@ class Api():
         # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
-    def get_variable(self, variable_id:str, version:str=None) -> requests.Response:
+    def get_variable(self, variable_id: str, version: str = None) -> requests.Response:
         """
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
@@ -228,7 +228,7 @@ class Api():
 
         return remapped_keys_dict
 
-    def set_variable(self, variable_id:str, value:str) -> requests.Response:
+    def set_variable(self, variable_id: str, value: str) -> requests.Response:
         """
         This method is used to set a secret (aka "variable") to a value of
         your choosing.
@@ -244,8 +244,8 @@ class Api():
                                value, api_token=self.api_token,
                                ssl_verify=self._ssl_verify).text
 
-    def _load_policy_file(self, policy_id:str, policy_file:str,
-                          http_verb:HttpVerb) -> requests.Response :
+    def _load_policy_file(self, policy_id: str, policy_file: str,
+                          http_verb: HttpVerb) -> requests.Response:
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
@@ -267,7 +267,7 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def load_policy_file(self, policy_id:str, policy_file:str) -> str :
+    def load_policy_file(self, policy_id: str, policy_file: str) -> str:
         """
         This method is used to load a file-based policy into the desired
         name.
@@ -275,7 +275,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
-    def replace_policy_file(self, policy_id:str, policy_file:str) -> str :
+    def replace_policy_file(self, policy_id: str, policy_file: str) -> str:
         """
         This method is used to replace a file-based policy into the desired
         policy ID.
@@ -283,7 +283,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def update_policy_file(self, policy_id:str, policy_file:str) -> str :
+    def update_policy_file(self, policy_id: str, policy_file: str) -> str:
         """
         This method is used to update a file-based policy into the desired
         policy ID.
@@ -291,7 +291,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
-    def rotate_other_api_key(self, resource: Resource) -> requests.Response :
+    def rotate_other_api_key(self, resource: Resource) -> requests.Response:
         """
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
@@ -311,8 +311,8 @@ class Api():
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, logged_in_user:str,
-                                current_password:str) -> requests.Response :
+    def rotate_personal_api_key(self, logged_in_user: str,
+                                current_password: str) -> requests.Response:
         """
         This method is used to rotate a personal API key
         """
@@ -324,8 +324,8 @@ class Api():
                                    ssl_verify=self._ssl_verify).text
         return response
 
-    def change_personal_password(self, logged_in_user:str, current_password:str,
-                                 new_password:str) -> requests.Response :
+    def change_personal_password(self, logged_in_user: str, current_password: str,
+                                 new_password: str) -> requests.Response:
         """
         This method is used to change own password
         """
@@ -339,7 +339,7 @@ class Api():
                                    ).text
         return response
 
-    def whoami(self) -> requests.Response :
+    def whoami(self) -> requests.Response:
         """
         This method provides dictionary of information about the user making an API request.
         """
