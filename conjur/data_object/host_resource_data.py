@@ -16,7 +16,7 @@ class HostResourceData:
         self.action = arg_params['action']
         self.host_to_update = arg_params['host_to_update']
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         result = []
         # pylint: disable=multiple-statements
         if self.action: result.append(f"'action': '{self.action}'")

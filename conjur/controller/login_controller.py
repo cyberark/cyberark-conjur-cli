@@ -80,7 +80,7 @@ class LoginController:
         return conjurrc
 
     # pylint: disable=line-too-long
-    def get_api_key(self, conjurrc):
+    def get_api_key(self, conjurrc: ConjurrcData):
         """
         Method to fetch the user/host's API key from Conjur which is to be added to the netrc
         """

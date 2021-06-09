@@ -31,6 +31,7 @@ use these parameters defined in this class to initialize our Python
 SDK in their code.
 """
 
+
 # pylint: disable=logging-fstring-interpolation,line-too-long
 class Client():
     """
@@ -49,15 +50,15 @@ class Client():
     # what parameters are allowed
     # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,try-except-raise,too-many-statements
     def __init__(self,
-                 account:str=None,
-                 api_key:str=None,
-                 ca_bundle:str=None,
-                 debug:bool=False,
+                 account: str = None,
+                 api_key: str = None,
+                 ca_bundle: str = None,
+                 debug: bool = False,
                  http_debug=False,
-                 login_id:str=None,
-                 password:str=None,
-                 ssl_verify:bool=True,
-                 url:str=None):
+                 login_id: str = None,
+                 password: str = None,
+                 ssl_verify: bool = True,
+                 url: str = None):
 
         if ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -96,10 +97,11 @@ class Client():
                               f"'conjur_url': {loaded_config['url']}, "
                               f"'cert_file': {loaded_config['ca_bundle']}}}")
             except CertificateVerificationException as cert_verify:
-                raise CertificateVerificationException(cause="The client was initialized without certificate verification, "
-                                                             "even though the command was ran with certificate verification enabled.",
-                                                       solution="To continue communicating with the server insecurely, run the command "
-                                                                "again with ssl_verify = False. Otherwise, reinitialize the client.") from cert_verify
+                raise CertificateVerificationException(
+                    cause="The client was initialized without certificate verification, "
+                          "even though the command was ran with certificate verification enabled.",
+                    solution="To continue communicating with the server insecurely, run the command "
+                             "again with ssl_verify = False. Otherwise, reinitialize the client.") from cert_verify
             except ConfigurationMissingException as missing_config_exec:
                 raise ConfigurationMissingException from missing_config_exec
             except InvalidConfigurationException as invalid_config_exec:
@@ -139,7 +141,7 @@ class Client():
 
         logging.debug("Client initialized")
 
-    def setup_logging(self, debug:bool):
+    def setup_logging(self, debug: bool):
         """
         Configures the logging for the client
         """
@@ -153,69 +155,70 @@ class Client():
 
     ### API passthrough
 
-    def whoami(self) -> dict :
+    def whoami(self) -> dict:
         """
         Provides dictionary of information about the user making an API request
         """
         return self._api.whoami()
 
     # Constraints remain an optional parameter for backwards compatibility in the SDK
-    def list(self, list_constraints=None) -> dict :
+    def list(self, list_constraints: dict = None) -> dict:
         """
         Lists all available resources
         """
         return self._api.resources_list(list_constraints)
 
-    def get(self, variable_id:str, version:str=None)   -> requests.Response :
+    def get(self, variable_id: str, version: str = None) -> requests.Response:
         """
         Gets a variable value based on its ID
         """
         return self._api.get_variable(variable_id, version)
 
-    def get_many(self, *variable_ids)   -> requests.Response :
+    def get_many(self, *variable_ids) -> requests.Response:
         """
         Gets multiple variable values based on their IDs. Returns a
         dictionary of mapped values.
         """
         return self._api.get_variables(*variable_ids)
 
-    def set(self, variable_id:str, value:str)  -> requests.Response :
+    def set(self, variable_id: str, value: str) -> requests.Response:
         """
         Sets a variable to a specific value based on its ID
         """
         self._api.set_variable(variable_id, value)
 
-    def load_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
+    def load_policy_file(self, policy_name: str, policy_file: str) -> requests.Response:
         """
         Applies a file-based policy to the Conjur instance
         """
         return self._api.load_policy_file(policy_name, policy_file)
 
-    def replace_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
+    def replace_policy_file(self, policy_name: str, policy_file: str) -> requests.Response:
         """
         Replaces a file-based policy defined in the Conjur instance
         """
         return self._api.replace_policy_file(policy_name, policy_file)
 
-    def update_policy_file(self, policy_name:str, policy_file:str)  -> requests.Response :
+    def update_policy_file(self, policy_name: str, policy_file: str) -> requests.Response:
         """
         Replaces a file-based policy defined in the Conjur instance
         """
         return self._api.update_policy_file(policy_name, policy_file)
 
-    def rotate_other_api_key(self, resource: Resource):
+    def rotate_other_api_key(self, resource: Resource) -> requests.Response:
         """
         Rotates a API keys and returns new API key
         """
         return self._api.rotate_other_api_key(resource)
 
-    def rotate_personal_api_key(self, logged_in_user:str, current_password:str)  -> requests.Response :
+    def rotate_personal_api_key(self, logged_in_user: str, current_password: str) -> requests.Response:
         """
         Rotates personal API keys and returns new API key
         """
         return self._api.rotate_personal_api_key(logged_in_user, current_password)
 
-    def change_personal_password(self, logged_in_user:str, current_password:str, new_password:str)  -> requests.Response :
+    def change_personal_password(self, logged_in_user: str, current_password: str,
+                                 new_password: str) -> requests.Response:
         """
         Change personal password of logged-in user
         """

@@ -27,7 +27,7 @@ class ConjurrcData:
         self.cert_file = cert_file
 
     @classmethod
-    def load_from_file(cls, conjurrc_path=DEFAULT_CONFIG_FILE):
+    def load_from_file(cls, conjurrc_path:str=DEFAULT_CONFIG_FILE):
         """
         Method that loads the conjurrc into an object
         """
@@ -41,6 +41,6 @@ class ConjurrcData:
             raise InvalidConfigurationException from key_error
 
     # pylint: disable=line-too-long
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{{'conjur_url': '{self.conjur_url}', 'conjur_account': '{self.conjur_account}', " \
                f"'cert_file': '{self.cert_file}'}}"

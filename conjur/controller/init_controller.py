@@ -16,6 +16,7 @@ from urllib.parse import urlparse
 from urllib.parse import ParseResult
 
 # Internals
+from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
@@ -76,7 +77,7 @@ class InitController:
                 raise RuntimeError("Error: URL is required")
 
     # TODO: Factor out the following URL validation to ConjurrcData class
-    def format_conjur_url(self) -> tuple:
+    def format_conjur_url(self) -> Tuple[str, str]:
         """
         Method for formatting the Conjur server URL to
         break down the URL into segments
@@ -98,7 +99,7 @@ class InitController:
                    f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
-    def get_server_certificate(self, conjur_url:ParseResult):
+    def get_server_certificate(self, conjur_url:ParseResult) -> Optional[str]:
         """
         Get the certificate from the specified conjur_url
 

@@ -27,7 +27,7 @@ class HostParser:
 
         return self
 
-    def _create_host_parser(self):
+    def _create_host_parser(self) -> argparse.ArgumentParser :
         host_name = 'host - Manage hosts'
         host_usage = 'conjur [global options] host <subcommand> [options] [args]'
         host_subparser = self.resource_subparsers \
@@ -47,7 +47,7 @@ class HostParser:
         return host_subparser
 
     @staticmethod
-    def _host_rotate_api_key_parser(sub_parser):
+    def _host_rotate_api_key_parser(sub_parser:argparse.ArgumentParser):
         host_rotate_api_key_name = 'rotate-api-key - Rotate a host\'s API key'
         host_rotate_api_key_usage = 'conjur [global options] host rotate-api-key [options] [args]'
         host_rotate_api_key_parser = \
@@ -71,7 +71,7 @@ class HostParser:
                                          help='Display help screen and exit')
 
     @staticmethod
-    def _add_host_options(host_subparser):
+    def _add_host_options(host_subparser:argparse.ArgumentParser):
         host_options = host_subparser.add_argument_group(title=title_formatter("Options"))
         host_options.add_argument('-h', '--help', action='help'
                                   , help='Display help screen and exit')

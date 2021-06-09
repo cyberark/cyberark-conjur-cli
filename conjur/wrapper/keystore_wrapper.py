@@ -86,7 +86,7 @@ class KeystoreWrapper:
             return None
 
     @classmethod
-    def is_keyring_accessible(cls):
+    def is_keyring_accessible(cls) -> bool:
         """
         Method to check if the keyring is accessible
         """

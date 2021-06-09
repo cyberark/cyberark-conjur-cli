@@ -17,7 +17,7 @@ class UserInputData:
         self.user_id = arg_params['id']
         self.new_password = arg_params['new_password']
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         result = []
         # pylint: disable=multiple-statements
         if self.action: result.append(f"'action': '{self.action}'")

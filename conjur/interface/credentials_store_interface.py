@@ -9,7 +9,7 @@ This class describes a shared interface for accessing user credentials
 import abc
 
 # Internals
-from conjur.data_object import CredentialsData
+from conjur.data_object import CredentialsData, ConjurrcData
 
 class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
     """
@@ -39,7 +39,7 @@ class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def remove_credentials(self, conjurrc):
+    def remove_credentials(self, conjurrc:ConjurrcData):
         """
         Method to remove credentials from a store
         """

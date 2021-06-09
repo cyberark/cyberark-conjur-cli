@@ -4,7 +4,6 @@ Module For the UserParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
-from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 
 # pylint: disable=too-few-public-methods
@@ -109,7 +108,7 @@ class UserParser:
                                                   help='Display help screen and exit')
 
     @staticmethod
-    def _add_user_options(sub_parser:ArgparseWrapper):
+    def _add_user_options(sub_parser: argparse.ArgumentParser):
         user_options = sub_parser.add_argument_group(title=title_formatter("Options"))
         user_options.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')

@@ -6,7 +6,7 @@ import argparse
 import time
 
 
-def formatter(prog:str):
+def formatter(prog: str) -> argparse.RawTextHelpFormatter:
     """
     This method format the text of the different parsers.
     """
@@ -15,7 +15,7 @@ def formatter(prog:str):
                                          width=100)
 
 
-def header(*args):
+def header(*args) -> str:
     """
     This method builds the header for the main screen.
     """
@@ -23,14 +23,14 @@ def header(*args):
   {}'''.format(*args)
 
 
-def command_description(example:str, usage:str):
+def command_description(example: str, usage: str) -> str:
     """
     This method builds the header for the main screen.
     """
     return f"\n\n Name:\n  {example}\n\nUsage:\n  {usage}"
 
 
-def main_epilog():
+def main_epilog() -> str:
     """
     This method builds the footer for the main help screen.
     """
@@ -40,7 +40,7 @@ def main_epilog():
     return msg
 
 
-def command_epilog(example:str, command:str=None, subcommands:list=None):
+def command_epilog(example: str, command: str = None, subcommands: list = None) -> str:
     """
     This method builds the footer for each command help screen.
     """
@@ -52,14 +52,14 @@ def command_epilog(example:str, command:str=None, subcommands:list=None):
     return f"Examples:\n    {example}"
 
 
-def title_formatter(title:str):
+def title_formatter(title: str) -> str:
     """
     This method builds a reusable title for each argument section
     """
     return f"\n{title}"
 
 
-def conjur_copyright():
+def conjur_copyright() -> str:
     """
     This method builds the copyright description
     """

@@ -5,6 +5,8 @@ SSLClient module
 
 This module is for all SSL operations
 """
+# Builtin
+from typing import Tuple
 # Third party
 import logging
 import os
@@ -19,6 +21,7 @@ _conjur_tls_methods = {
     "1.3": SSL.SSLv23_METHOD
 }
 
+
 # pylint: disable=too-few-public-methods
 class SSLClient:
     """
@@ -27,8 +30,9 @@ class SSLClient:
     This class is a service for connecting to the Conjur socket
     and fetching the certificate
     """
+
     @classmethod
-    def get_certificate(cls, hostname:str, port:int):
+    def get_certificate(cls, hostname: str, port: int) -> Tuple[str, str]:
         """
         Method for connecting to Conjur to fetch the certificate chain
         """
@@ -41,11 +45,11 @@ class SSLClient:
         return fingerprint, readable_certificate
 
     @classmethod
-    def __connect(cls, hostname:str, port:int):
+    def __connect(cls, hostname: str, port: int) -> SSL.Connection:
         """
         Method for opening a socket to the Conjur server
         """
-        tls_version=os.getenv('CONJUR_TLS_VERSION')
+        tls_version = os.getenv('CONJUR_TLS_VERSION')
         # Makes the TLS version configurable through an ENV variable
         if tls_version in _conjur_tls_methods:
             # pylint: disable=logging-fstring-interpolation
@@ -81,7 +85,7 @@ class SSLClient:
         return conjur_sock
 
     @classmethod
-    def disable_tls_versions(cls, ctx, support_1_3=False):
+    def disable_tls_versions(cls, ctx: SSL.Context, support_1_3: bool = False):
         """
         Method for disabling TLS/SSL versions
         """

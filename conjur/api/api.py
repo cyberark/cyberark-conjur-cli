@@ -79,7 +79,7 @@ class Api():
 
     @property
     # pylint: disable=missing-docstring
-    def api_token(self) -> str :
+    def api_token(self)  -> requests.Response:
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.debug("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
@@ -192,7 +192,7 @@ class Api():
                                    api_token=self.api_token,
                                    ssl_verify=self._ssl_verify).content
 
-    def get_variables(self, *variable_ids):
+    def get_variables(self, *variable_ids) -> dict:
         """
         This method is used to fetch multiple secret's (aka "variable") values from
         Conjur vault.

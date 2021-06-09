@@ -9,6 +9,7 @@ This module is the business logic for logging out of the Conjur CLI
 from conjur.data_object import ConjurrcData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
+
 # pylint: disable=too-few-public-methods
 class LogoutLogic:
     """
@@ -16,6 +17,7 @@ class LogoutLogic:
 
     This class holds the business logic for logging out of Conjur
     """
+
     def __init__(self, credentials_provider: CredentialsStoreInterface):
         self.credentials_provider = credentials_provider
 
