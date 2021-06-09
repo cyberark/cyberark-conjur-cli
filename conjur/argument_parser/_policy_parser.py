@@ -55,7 +55,7 @@ class PolicyParser:
         return policy_subparser
 
     @staticmethod
-    def _add_policy_load(policy_subparsers):
+    def _add_policy_load(policy_subparsers: argparse.ArgumentParser):
         policy_load_name = 'load - Load a policy and create resources'
         policy_load_usage = 'conjur [global options] policy load [options] [args]'
 
@@ -80,7 +80,7 @@ class PolicyParser:
                                   help='Display help screen and exit')
 
     @staticmethod
-    def _add_policy_replace(policy_subparsers):
+    def _add_policy_replace(policy_subparsers: argparse.ArgumentParser):
         policy_replace_name = 'replace - Fully replace an existing policy'
         policy_replace_usage = 'conjur [global options] policy replace [options] [args]'
         replace_policy_parser = policy_subparsers \
@@ -105,7 +105,7 @@ class PolicyParser:
                                      help='Display help screen and exit')
 
     @staticmethod
-    def _add_policy_update(policy_subparsers):
+    def _add_policy_update(policy_subparsers: argparse.ArgumentParser):
         policy_update_name = 'update - Update existing resources in policy or create new resources'
         policy_update_usage = 'conjur [global options] policy update [options] [args]'
         update_policy_parser = policy_subparsers \
@@ -130,7 +130,7 @@ class PolicyParser:
                                     help='Display help screen and exit')
 
     @staticmethod
-    def _add_policy_options(policy_subparser):
+    def _add_policy_options(policy_subparser: argparse.ArgumentParser):
         policy_options = policy_subparser.add_argument_group(title=title_formatter("Options"))
         policy_options.add_argument('-h', '--help', action='help',
                                     help='Display help screen and exit')

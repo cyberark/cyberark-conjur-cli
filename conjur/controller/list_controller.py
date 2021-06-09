@@ -10,6 +10,9 @@ required to successfully execute the LIST command
 import json
 import sys
 
+from conjur.logic.list_logic import ListLogic
+from conjur.data_object.list_data import ListData
+
 
 class ListController:
     """
@@ -18,7 +21,7 @@ class ListController:
     This class represents the Presentation Layer for the LIST command
     """
 
-    def __init__(self, list_logic, list_data):
+    def __init__(self, list_logic: ListLogic, list_data: ListData):
         self.list_logic = list_logic
         self.list_data = list_data
 
@@ -30,7 +33,7 @@ class ListController:
         self.print_json_result(result)
 
     @classmethod
-    def print_json_result(cls, result):
+    def print_json_result(cls, result: list):
         """
         Method to print the JSON of the returned result
         """

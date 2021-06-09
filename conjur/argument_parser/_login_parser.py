@@ -50,7 +50,7 @@ class LoginParser:
         return login_subparser
 
     @staticmethod
-    def _add_login_options(login_subparser:ArgparseWrapper):
+    def _add_login_options(login_subparser: ArgparseWrapper):
         login_options = login_subparser.add_argument_group(title=title_formatter("Options"))
         login_options.add_argument('-i', '--id', metavar='VALUE',
                                    action='store', dest='identifier',

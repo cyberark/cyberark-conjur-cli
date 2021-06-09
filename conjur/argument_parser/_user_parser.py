@@ -55,7 +55,7 @@ class UserParser:
         return user_subparser
 
     @staticmethod
-    def _add_rotate_api_parser(sub_parser):
+    def _add_rotate_api_parser(sub_parser: argparse.ArgumentParser):
         user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
         user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
         user_rotate_api_key_parser = sub_parser \
@@ -82,7 +82,7 @@ class UserParser:
                                                  help='Display help screen and exit')
 
     @staticmethod
-    def _add_change_password(sub_parser):
+    def _add_change_password(sub_parser: argparse.ArgumentParser):
         user_change_password_name = 'change-password - Change the password for the logged-in user'
         user_change_password_usage = 'conjur [global options] user change-password [options] [args]'
         user_change_password = sub_parser \

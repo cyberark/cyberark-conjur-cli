@@ -43,7 +43,7 @@ class LogoutParser:
         return logout_subparser
 
     @staticmethod
-    def _add_logout_options(logout_subparser:ArgparseWrapper):
+    def _add_logout_options(logout_subparser: ArgparseWrapper):
         logout_options = logout_subparser.add_argument_group(title=title_formatter("Options"))
         logout_options.add_argument('-h', '--help', action='help'
                                     , help='Display help screen and exit')

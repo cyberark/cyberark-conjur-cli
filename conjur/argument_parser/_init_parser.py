@@ -41,7 +41,7 @@ class InitParser:
         return init_subparser
 
     @staticmethod
-    def _add_init_options(sub_parser):
+    def _add_init_options(sub_parser: argparse.ArgumentParser):
         init_options = sub_parser.add_argument_group(title=title_formatter("Options"))
         init_options.add_argument('-u', '--url', metavar='VALUE',
                                   action='store', dest='url',

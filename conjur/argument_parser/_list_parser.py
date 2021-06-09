@@ -51,7 +51,7 @@ class ListParser:
         return list_subparser
 
     @staticmethod
-    def _add_list_options(list_subparser):
+    def _add_list_options(list_subparser: argparse.ArgumentParser):
         list_options = list_subparser.add_argument_group(title=title_formatter("Options"))
         list_options.add_argument('-i', '--inspect',
                                   action='store_true', dest='inspect',

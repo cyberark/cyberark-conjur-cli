@@ -21,6 +21,7 @@ from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALI
 from conjur.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
+from conjur.logic.init_logic import InitLogic
 
 class InitController:
     """
@@ -32,7 +33,8 @@ class InitController:
     conjurrc_data = None
     init_logic = None
 
-    def __init__(self, conjurrc_data:ConjurrcData, init_logic, force:bool, ssl_verify:bool):
+    def __init__(self, conjurrc_data:ConjurrcData, init_logic:InitLogic, force:bool,
+                 ssl_verify:bool):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -88,7 +90,7 @@ class InitController:
 
         return urlparse(self.conjurrc_data.conjur_url)
 
-    def validate_conjur_url(self, conjur_url):
+    def validate_conjur_url(self, conjur_url:ParseResult):
         """
         Validates the specified url
 
