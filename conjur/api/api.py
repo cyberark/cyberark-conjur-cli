@@ -90,7 +90,7 @@ class Api():
         logging.debug("Using cached API token...")
         return self._api_token
 
-    def login(self, login_id: str = None, password: str = None) -> requests.Response:
+    def login(self, login_id: str = None, password: str = None) -> str:
         """
         This method uses the basic auth login id (username) and password
         to retrieve an api key from the server that can be later used to
@@ -109,7 +109,7 @@ class Api():
 
         return self.api_key
 
-    def authenticate(self) -> requests.Response:
+    def authenticate(self) -> str:
         """
         Authenticate uses the api_key to fetch a short-lived api token that
         for a limited time will allow you to interact fully with the Conjur
@@ -229,7 +229,7 @@ class Api():
 
         return remapped_keys_dict
 
-    def set_variable(self, variable_id: str, value: str) -> requests.Response:
+    def set_variable(self, variable_id: str, value: str) -> str:
         """
         This method is used to set a secret (aka "variable") to a value of
         your choosing.
@@ -292,7 +292,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
-    def rotate_other_api_key(self, resource: Resource) -> requests.Response:
+    def rotate_other_api_key(self, resource: Resource) -> str:
         """
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
@@ -313,7 +313,7 @@ class Api():
         return response
 
     def rotate_personal_api_key(self, logged_in_user: str,
-                                current_password: str) -> requests.Response:
+                                current_password: str) -> str:
         """
         This method is used to rotate a personal API key
         """
@@ -326,7 +326,7 @@ class Api():
         return response
 
     def change_personal_password(self, logged_in_user: str, current_password: str,
-                                 new_password: str) -> requests.Response:
+                                 new_password: str) -> str:
         """
         This method is used to change own password
         """

@@ -9,7 +9,6 @@ information to the user's machine
 
 # Builtins
 import logging
-import requests
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
@@ -31,7 +30,7 @@ class LoginLogic:
     @classmethod
     # pylint: disable=line-too-long,logging-fstring-interpolation
     def get_api_key(cls, ssl_verify:bool, credential_data:CredentialsData,
-                    password:str, conjurrc:ConjurrcData) -> requests.Response :
+                    password:str, conjurrc:ConjurrcData) -> str :
         """
         Method to fetch the user/host's API key from Conjur
         """

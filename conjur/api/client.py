@@ -181,7 +181,7 @@ class Client():
         """
         return self._api.get_variables(*variable_ids)
 
-    def set(self, variable_id: str, value: str) -> requests.Response:
+    def set(self, variable_id: str, value: str) -> str:
         """
         Sets a variable to a specific value based on its ID
         """
@@ -205,20 +205,20 @@ class Client():
         """
         return self._api.update_policy_file(policy_name, policy_file)
 
-    def rotate_other_api_key(self, resource: Resource) -> requests.Response:
+    def rotate_other_api_key(self, resource: Resource) -> str:
         """
         Rotates a API keys and returns new API key
         """
         return self._api.rotate_other_api_key(resource)
 
-    def rotate_personal_api_key(self, logged_in_user: str, current_password: str) -> requests.Response:
+    def rotate_personal_api_key(self, logged_in_user: str, current_password: str) -> str:
         """
         Rotates personal API keys and returns new API key
         """
         return self._api.rotate_personal_api_key(logged_in_user, current_password)
 
     def change_personal_password(self, logged_in_user: str, current_password: str,
-                                 new_password: str) -> requests.Response:
+                                 new_password: str) -> str:
         """
         Change personal password of logged-in user
         """
