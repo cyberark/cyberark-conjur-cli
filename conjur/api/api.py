@@ -11,7 +11,6 @@ import logging
 from typing import Optional
 # Third party
 from datetime import datetime, timedelta
-import requests
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
