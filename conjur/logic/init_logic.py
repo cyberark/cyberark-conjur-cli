@@ -19,6 +19,8 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_client import SSLClient
 from conjur.data_object import ConjurrcData
+from conjur.errors import ConnectionToConjurFailedException,RetrieveCertificateException
+
 
 DEFAULT_PORT = 443
 
@@ -43,13 +45,14 @@ class InitLogic:
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
         except socket.gaierror as error:
-            raise ConnectionToConjurFailedException(f"Unable to resolve server DNS {hostnme}:{port}. "
+            raise ConnectionToConjurFailedException(f"Unable to resolve server DNS. "
                             f"Reason: {str(error)}") from error
         except socket.timeout as error:
-            raise ConnectionToConjurFailedException(f"Unable to connect to server {hostnme}:{port}. "
+            raise ConnectionToConjurFailedException(f"Unable to connect to server. "
                             f"Reason: {str(error)}") from error
         except Exception as error:
-            raise RetrieveCertificateException(f"Unable to retrieve certificate from {hostname}:{port}. "
+            raise RetrieveCertificateException(f"Unable to retrieve certificate"
+                            f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
 
         return fingerprint, readable_certificate

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
-
+from conjur.errors import MissingParametersException, InvalidResourceException
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
 
@@ -72,7 +72,7 @@ class Api():
 
         # Sanity checks
         if not self._url:
-            raise MissingParametersException("Error: API instantiation parameter 'url' cannot be empty!")
+            raise MissingParametersException("Error: API instantiation 'url' cannot be empty!")
 
     @property
     # pylint: disable=missing-docstring

@@ -13,6 +13,7 @@ import getpass
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.data_object.credentials_data import CredentialsData
+from conjur.errors import MissingRequiredParameterException
 
 class LoginController:
     """

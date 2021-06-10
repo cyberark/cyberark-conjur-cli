@@ -11,6 +11,7 @@ required to successfully logout
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+from conjur.errors import NotLoggedInException, LoggedOutFailedException
 
 # pylint: disable=too-few-public-methods
 class LogoutController:

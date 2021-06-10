@@ -16,7 +16,7 @@ import stat
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
 from conjur.data_object import CredentialsData, ConjurrcData
-from conjur.errors import CredentialRetrievalException
+from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
 

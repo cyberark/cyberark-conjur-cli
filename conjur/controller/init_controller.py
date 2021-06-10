@@ -18,7 +18,8 @@ from urllib.parse import ParseResult
 # Internals
 from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import CertificateHostnameMismatchException
+from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
+                            CertificateNotTrust, MissingParametersException, ConfirmationException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -97,7 +98,8 @@ class InitController:
         Raises a RuntimeError in case of an invalid url format
         """
         if conjur_url.scheme != 'https':
-            raise InvalidURLFormatException(f"Error: undefined behavior. Reason: The Conjur URL format provided "
+            raise InvalidURLFormatException(f"Error: undefined behavior. "
+                               f" Reason: The Conjur URL format provided "
                                f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
