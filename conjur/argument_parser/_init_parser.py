@@ -4,7 +4,7 @@ Module For the InitParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
-
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 # pylint: disable=too-few-public-methods
 class InitParser:
@@ -41,7 +41,7 @@ class InitParser:
         return init_subparser
 
     @staticmethod
-    def _add_init_options(sub_parser):
+    def _add_init_options(sub_parser: ArgparseWrapper):
         init_options = sub_parser.add_argument_group(title=title_formatter("Options"))
         init_options.add_argument('-u', '--url', metavar='VALUE',
                                   action='store', dest='url',

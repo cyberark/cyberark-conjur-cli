@@ -8,7 +8,6 @@ This module is the business logic for executing the list command
 # pylint: disable=too-few-public-methods
 import logging
 
-
 class ListLogic:
     """
     ListLogic
@@ -19,7 +18,7 @@ class ListLogic:
     def __init__(self, client):
         self.client = client
 
-    def list(self, list_data):
+    def list(self, list_data) -> str :
         """
         Method for calling list from the client service
         """
@@ -27,7 +26,7 @@ class ListLogic:
         return self.client.list(list_constraints)
 
     @classmethod
-    def build_constraints(cls, list_data):
+    def build_constraints(cls, list_data:list) -> dict :
         """
         Method to accumulate the constraints on list request
         """

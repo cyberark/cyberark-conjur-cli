@@ -10,7 +10,7 @@ from yaml import load as yaml_load
 
 try:
     from yaml import CLoader as YamlLoader
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     from yaml import Loader as YamlLoader
 
 # Internals
@@ -21,13 +21,13 @@ class ConjurrcData:
     """
     Used for setting user input data
     """
-    def __init__(self, conjur_url=None, account=None, cert_file=None):
+    def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
         self.conjur_url = conjur_url
         self.conjur_account = account
         self.cert_file = cert_file
 
     @classmethod
-    def load_from_file(cls, conjurrc_path=DEFAULT_CONFIG_FILE):
+    def load_from_file(cls, conjurrc_path: str = DEFAULT_CONFIG_FILE):
         """
         Method that loads the conjurrc into an object
         """
@@ -41,6 +41,6 @@ class ConjurrcData:
             raise InvalidConfigurationException from key_error
 
     # pylint: disable=line-too-long
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{{'conjur_url': '{self.conjur_url}', 'conjur_account': '{self.conjur_account}', " \
                f"'cert_file': '{self.cert_file}'}}"

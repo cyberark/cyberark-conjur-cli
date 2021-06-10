@@ -6,9 +6,11 @@ Config module
 This module provides high-level parsing and setting of configuration
 variables needed for the API to be used with minimal effort
 """
-
+# Builtin
 import logging
+from typing import Union
 
+# Third Party
 from yaml import load, dump
 
 try:
@@ -54,7 +56,7 @@ class Config():
             setattr(self, attribute_name, config[config_field_name])
             self._config[attribute_name] = getattr(self, attribute_name)
 
-    def __repr__(self):
+    def __repr__(self) -> Union[str,bytes]:
         return dump({'config': self._config}, Dumper=Dumper, indent=4)
 
     def __iter__(self):

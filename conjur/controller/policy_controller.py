@@ -12,7 +12,8 @@ import sys
 import requests
 
 from conjur.errors import InvalidFormatException
-
+from conjur.logic.policy_logic import PolicyLogic
+from conjur.data_object.policy_data import PolicyData
 
 class PolicyController:
     """
@@ -20,7 +21,7 @@ class PolicyController:
 
     This class represents the Presentation Layer for the POLICY command
     """
-    def __init__(self, policy_logic, policy_data):
+    def __init__(self, policy_logic :PolicyLogic, policy_data:PolicyData):
         self.policy_logic = policy_logic
         self.policy_data = policy_data
 

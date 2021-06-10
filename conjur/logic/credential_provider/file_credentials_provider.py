@@ -15,7 +15,7 @@ import stat
 
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
-from conjur.data_object import CredentialsData
+from conjur.data_object import CredentialsData, ConjurrcData
 from conjur.errors import CredentialRetrievalException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
@@ -32,7 +32,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
         self.netrc_path = netrc_path
 
-    def save(self, credential_data):
+    def save(self, credential_data: CredentialsData):
         """
         Method that writes user data to a netrc file
         and updates permissions on the file
@@ -55,7 +55,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         os.chmod(self.netrc_path, stat.S_IRWXU)
         logging.debug(f"Credentials written to '{DEFAULT_NETRC_FILE}'")
 
-    def load(self, conjurrc_conjur_url):
+    def load(self, conjurrc_conjur_url: str) -> CredentialsData:
         """
         Method that loads the netrc data.
         Triggered before each CLI action
@@ -64,7 +64,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             raise CredentialRetrievalException
         return self._get_credentials_from_file(conjurrc_conjur_url)
 
-    def is_exists(self, conjurrc_conjur_url) -> bool:
+    def is_exists(self, conjurrc_conjur_url: str) -> bool:
         if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
             return False
 
@@ -88,7 +88,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
         return True
 
-    def update_api_key_entry(self, user_to_update, credential_data, new_api_key):
+    def update_api_key_entry(self, user_to_update: str, credential_data: CredentialsData, new_api_key: str):
         """
         Method to update the API key from the described entry in the netrc
         """
@@ -97,7 +97,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         hosts[credential_data.machine] = (user_to_update, None, new_api_key)
         self.build_netrc(netrc_obj)
 
-    def remove_credentials(self, conjurrc):
+    def remove_credentials(self, conjurrc: ConjurrcData):
         """
         Method that removes the described login entry from netrc
         """
@@ -122,7 +122,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
     # TODO check if we are using outside of this class. if not make private
     @classmethod
-    def build_netrc(cls, netrc_obj):
+    def build_netrc(cls, netrc_obj: netrc.netrc):
         """
         Method to rewrite the netrc with contents from the netrc object
         """
@@ -148,7 +148,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                             "after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
-    def _get_credentials_from_file(self, conjurrc_conjur_url):  # pragma: no cover
+    def _get_credentials_from_file(self, conjurrc_conjur_url: str) -> CredentialsData:  # pragma: no cover
         try:
             loaded_credentials = {}
             netrc_auth = ""
@@ -170,8 +170,8 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             raise Exception("Error: netrc is in an invalid format. "
                             f"Reason: {netrc_error}") from netrc_error
 
-   # pylint: disable=unnecessary-pass
-    def cleanup_if_exists(self, conjurrc_conjur_url):
+    # pylint: disable=unnecessary-pass
+    def cleanup_if_exists(self, conjurrc_conjur_url: str):
         """
         Not implemented for netrc for now.
         """

@@ -20,6 +20,7 @@ import requests
 # Internals
 from conjur.api import SSLClient
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
@@ -36,16 +37,17 @@ from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, 
 from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
 
-
 # pylint: disable=too-many-statements
 class Cli():
     """
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
     """
+
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    # pylint: disable=no-self-use, too-many-locals
+
+        # pylint: disable=no-self-use, too-many-locals
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
@@ -110,7 +112,8 @@ class Cli():
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url=None, account=None, cert=None, force=None, ssl_verify=True):
+    def handle_init_logic(cls, url:str=None, account:str=None, cert:str=None, force:bool=None,
+            ssl_verify:bool=True):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file
@@ -129,7 +132,7 @@ class Cli():
 
     @classmethod
     # pylint: disable=line-too-long
-    def handle_login_logic(cls, credential_provider, identifier=None, password=None, ssl_verify=True):
+    def handle_login_logic(cls, credential_provider:CredentialsStoreInterface, identifier:str=None, password:str=None, ssl_verify:bool=True):
         """
         Method that wraps the login call logic
         """
@@ -144,7 +147,8 @@ class Cli():
         sys.stdout.write("Successfully logged in to Conjur\n")
 
     @classmethod
-    def handle_logout_logic(cls, credential_provider, ssl_verify=True):
+    def handle_logout_logic(cls, credential_provider:CredentialsStoreInterface,
+                            ssl_verify:bool=True):
         """
         Method that wraps the logout call logic
         """
@@ -155,7 +159,7 @@ class Cli():
         logout_controller.remove_credentials()
 
     @classmethod
-    def handle_list_logic(cls, list_data=None, client=None):
+    def handle_list_logic(cls, list_data:ListData=None, client=None):
         """
         Method that wraps the list call logic
         """
@@ -165,7 +169,7 @@ class Cli():
         list_controller.load()
 
     @classmethod
-    def handle_variable_logic(cls, args=None, client=None):
+    def handle_variable_logic(cls, args:list=None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -184,7 +188,7 @@ class Cli():
             variable_controller.set_variable()
 
     @classmethod
-    def handle_policy_logic(cls, policy_data=None, client=None):
+    def handle_policy_logic(cls, policy_data:PolicyData=None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -194,7 +198,8 @@ class Cli():
         policy_controller.load()
 
     @classmethod
-    def handle_user_logic(cls, credential_provider, args=None, client=None):
+    def handle_user_logic(cls, credential_provider:CredentialsStoreInterface,
+                          args=None, client=None):
         """
         Method that wraps the user call logic
         """
@@ -226,7 +231,7 @@ class Cli():
 
     @staticmethod
     # pylint: disable=too-many-branches,logging-fstring-interpolation
-    def run_action(resource, args):
+    def run_action(resource:str, args):
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
@@ -320,7 +325,6 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
-
 
 if __name__ == '__main__':
     # Not coverage-tested since the integration tests do this

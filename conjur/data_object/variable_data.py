@@ -19,7 +19,7 @@ class VariableData:
         self.variable_version = arg_params['variable_version'] if arg_params['variable_version'] else None
         self.value = arg_params['value'] if arg_params['value'] else None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         result = []
         # pylint: disable=multiple-statements
         if self.action == 'get': result.append(f"Getting variable values for: '{self.variable_id}'")

@@ -10,6 +10,7 @@ library and functionality should we need to do so in the future.
 
 # Builtins
 import logging
+from typing import Optional
 
 # Third party
 import keyring
@@ -31,7 +32,7 @@ class KeystoreWrapper:
     """
 
     @classmethod
-    def set_password(cls, identifier, key, val):
+    def set_password(cls, identifier:str, key:str, val:str):
         """
         Method for setting a password in keyring
         """
@@ -46,7 +47,7 @@ class KeystoreWrapper:
 
     # pylint: disable=try-except-raise
     @classmethod
-    def get_password(cls, identifier, key):
+    def get_password(cls, identifier:str, key:str):
         """
         Method for getting a password in keyring
         """
@@ -58,7 +59,7 @@ class KeystoreWrapper:
 
     # pylint: disable=try-except-raise
     @classmethod
-    def delete_password(cls, identifier, key):
+    def delete_password(cls, identifier:str, key:str):
         """
         Method for deleting a password in keyring
         """
@@ -71,7 +72,7 @@ class KeystoreWrapper:
             raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to delete '{key}')'") from exception
     @classmethod
-    def get_keyring_name(cls):
+    def get_keyring_name(cls) -> Optional[str]:
         """
         Method to get the system's keyring name
         """
@@ -86,7 +87,7 @@ class KeystoreWrapper:
             return None
 
     @classmethod
-    def is_keyring_accessible(cls):
+    def is_keyring_accessible(cls) -> bool:
         """
         Method to check if the keyring is accessible
         """

@@ -15,6 +15,7 @@ import requests
 import urllib3
 
 from conjur.errors import CertificateHostnameMismatchException
+from conjur.api.endpoints import ConjurEndpoint
 
 
 class HttpVerb(Enum):
@@ -29,11 +30,13 @@ class HttpVerb(Enum):
     PATCH = 5
 
 
-#pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
 # ssl_verify can accept Boolean or String as per requests docs
 # https://requests.readthedocs.io/en/master/api/#main-interface
-def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
-                    ssl_verify=True, auth=None, api_token=None, query=None):
+def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
+                    check_errors: bool = True, ssl_verify: bool = True,
+                    auth: tuple = None, api_token: str = None,
+                    query: dict = None) -> requests.Response:
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -57,7 +60,7 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
     # By default, on each request the certificate will be verified. If there is
     # a failure in verification, the fallback solution will be passing in the
     # server pem received during initialization of the client
-    #pylint: disable=not-callable
+    # pylint: disable=not-callable
     try:
         response = invoke_request(http_verb,
                                   url, *args,
@@ -89,7 +92,9 @@ def invoke_endpoint(http_verb, endpoint, params, *args, check_errors=True,
 
     return response
 
-def invoke_request(http_verb, url, *args, query, ssl_verify, auth, headers):
+
+def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify: bool, auth: tuple,
+                   headers: dict) -> requests.Response:
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages
@@ -111,7 +116,7 @@ def invoke_request(http_verb, url, *args, query, ssl_verify, auth, headers):
 
 # Not coverage tested since this code should never be hit
 # from checked-in code
-def enable_http_logging(): #pragma: no cover
+def enable_http_logging():  # pragma: no cover
     """
     This method enables verbose http logging, which may be useful
     for debugging problems with invocation code.
@@ -128,7 +133,7 @@ def enable_http_logging(): #pragma: no cover
                        "is removed, the PR should not be approved")
 
     # pylint: disable=unreachable,import-outside-toplevel
-    #pylint: disable=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
     from http.client import HTTPConnection
     HTTPConnection.debuglevel = 1
 

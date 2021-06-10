@@ -4,6 +4,7 @@ Module For the VariableParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 
 # pylint: disable=too-few-public-methods
@@ -52,7 +53,7 @@ class VariableParser:
         return variable_parser
 
     @staticmethod
-    def _add_variable_get(variable_subparser):
+    def _add_variable_get(variable_subparser: ArgparseWrapper):
         variable_get_name = 'get - Get the value of a variable'
         variable_get_usage = 'conjur [global options] variable get [options] [args]'
 
@@ -83,7 +84,7 @@ class VariableParser:
                                           help='Display help screen and exit')
 
     @staticmethod
-    def _add_variable_set(variable_subparser):
+    def _add_variable_set(variable_subparser: ArgparseWrapper):
         variable_set_name = 'set - Set the value of a variable'
         variable_set_usage = 'conjur [global options] variable set [options] [args]'
         variable_set_subcommand_parser = variable_subparser \
@@ -109,7 +110,7 @@ class VariableParser:
                                           help='Display help screen and exit')
 
     @staticmethod
-    def _add_variable_options(variable_parser):
+    def _add_variable_options(variable_parser: ArgparseWrapper):
         policy_options = variable_parser.add_argument_group(title=title_formatter("Options"))
         policy_options.add_argument('-h', '--help', action='help',
                                     help='Display help screen and exit')

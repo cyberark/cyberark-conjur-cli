@@ -11,14 +11,13 @@ class CredentialsData:
     """
     Used for setting user input data to login to Conjur
     """
-
-    def __init__(self, machine=None, login=None, password=None):
+    def __init__(self, machine: str = None, login: str = None, password: str = None):
         self.machine = machine
         self.login = login
         self.password = password
 
     @classmethod
-    def convert_dict_to_obj(cls, dic):
+    def convert_dict_to_obj(cls, dic: dict):
         """
         Method to convert dictionary to object
         """
@@ -28,7 +27,7 @@ class CredentialsData:
     def __repr__(self):
         return f"{{'machine': '{self.machine}', 'login': '{self.login}', 'password': '****'}}"
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """
         Method for comparing resources by their values and not by reference
         """
