@@ -58,7 +58,7 @@ class LoginController:
             self.credential_data.login = input("Enter your username: ").strip()
             if self.credential_data.login == '':
                 # pylint: disable=raise-missing-from
-                raise RuntimeError("Error: Login name is required")
+                raise MissingRequiredParameterException("Error: Login name is required")
 
     def get_password(self):
         """

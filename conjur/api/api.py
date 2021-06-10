@@ -50,7 +50,7 @@ class Api():
 
         self._account = account
         if not self._account:
-            raise RuntimeError("Account cannot be empty!")
+            raise MissingParametersException("Account cannot be empty!")
 
         self._ssl_verify = ssl_verify
         if ca_bundle:
@@ -72,7 +72,7 @@ class Api():
 
         # Sanity checks
         if not self._url:
-            raise Exception("Error: API instantiation parameter 'url' cannot be empty!")
+            raise MissingParametersException("Error: API instantiation parameter 'url' cannot be empty!")
 
     @property
     # pylint: disable=missing-docstring
@@ -95,7 +95,7 @@ class Api():
         """
         if not login_id or not password:
             # TODO: Use custom error
-            raise RuntimeError("Missing parameters in login invocation!")
+            raise MissingParametersException("Missing parameters in login invocation!")
 
         logging.debug("Logging in to %s...", self._url)
         self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
@@ -113,7 +113,7 @@ class Api():
         """
         if not self.login_id or not self.api_key:
             # TODO: Use custom error
-            raise RuntimeError("Missing parameters in authentication invocation!")
+            raise MissingParametersException("Missing parameters in authentication invocation!")
 
         params = {
             'login': self.login_id
@@ -285,7 +285,7 @@ class Api():
         To rotate API key of the current user use rotate_personal_api_key
         """
         if resource.type not in ('user', 'host'):
-            raise Exception("Error: Invalid resource type")
+            raise InvalidResourceException("Error: Invalid resource type")
 
         # Attach the resource type (user or host)
         query_params = {

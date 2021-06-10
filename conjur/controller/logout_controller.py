@@ -36,8 +36,8 @@ class LogoutController:
                 # not left in a partial state. For example, if user deleted
                 # their username or password manually.
                 self.logout_logic.cleanup_credentials(loaded_conjurrc)
-                raise Exception("You are already logged out.")
+                raise NotLoggedInException("You are already logged out.")
             self.logout_logic.remove_credentials(loaded_conjurrc)
         except Exception as error:
             # pylint: disable=raise-missing-from
-            raise Exception(f"Failed to log out. {error}")
+            raise LoggedOutFailedException(f"Failed to log out. {error}")
