@@ -114,7 +114,6 @@ def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify
             raise CertificateHostnameMismatchException from ssl_error
         raise ssl_error
 
-
 # Not coverage tested since this code should never be hit
 # from checked-in code
 def enable_http_logging():  # pragma: no cover

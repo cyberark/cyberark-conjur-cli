@@ -14,7 +14,6 @@ import sys
 # Third party
 import argparse
 
-
 class ArgparseWrapper(argparse.ArgumentParser):
     """
     Wrapper to override default behavior of the argparse module.

@@ -7,13 +7,11 @@ This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the list request
 """
 
-
 # pylint: disable=too-few-public-methods
 class ListData:
     """
     Used for organizing the the params the user passed in to execute the list command
     """
-
     def __init__(self, **argParams):
         self.kind = argParams['kind']
         self.inspect = argParams['inspect']

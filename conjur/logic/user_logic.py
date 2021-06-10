@@ -18,7 +18,6 @@ from conjur.resource import Resource
 from conjur.data_object import ConjurrcData, CredentialsData
 
 
-
 class UserLogic:
     """
     UserLogic

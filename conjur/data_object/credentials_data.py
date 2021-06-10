@@ -6,13 +6,11 @@ CredentialsData module
 This module represents the DTO that holds credential data
 """
 
-
 # pylint: disable=too-few-public-methods
 class CredentialsData:
     """
     Used for setting user input data to login to Conjur
     """
-
     def __init__(self, machine: str = None, login: str = None, password: str = None):
         self.machine = machine
         self.login = login

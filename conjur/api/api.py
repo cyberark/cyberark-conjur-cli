@@ -20,13 +20,11 @@ from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
 
-
 class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
     when all the needed arguments and parameters are well-known
     """
-
     # Tokens should only be reused for 5 minutes (max lifetime is 8 minutes)
     API_TOKEN_DURATION = 5
 
@@ -96,7 +94,6 @@ class Api():
         to retrieve an api key from the server that can be later used to
         retrieve short-lived api tokens.
         """
-
         if not login_id or not password:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in login invocation!")
@@ -115,7 +112,6 @@ class Api():
         for a limited time will allow you to interact fully with the Conjur
         vault.
         """
-
         if not self.login_id or not self.api_key:
             # TODO: Use custom error
             raise RuntimeError("Missing parameters in authentication invocation!")
@@ -134,7 +130,6 @@ class Api():
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
         """
-
         params = {
             'account': self._account
         }
@@ -170,7 +165,6 @@ class Api():
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
         """
-
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': variable_id,
@@ -198,7 +192,6 @@ class Api():
         This method is used to fetch multiple secret's (aka "variable") values from
         Conjur vault.
         """
-
         assert variable_ids, 'Variable IDs must not be empty!'
 
         full_variable_ids = []
@@ -234,7 +227,6 @@ class Api():
         This method is used to set a secret (aka "variable") to a value of
         your choosing.
         """
-
         params = {
             'kind': self.KIND_VARIABLE,
             'identifier': variable_id,
@@ -251,7 +243,6 @@ class Api():
         This method is used to load, replace or update a file-based policy into the desired
         name.
         """
-
         params = {
             'identifier': policy_id,
         }
@@ -273,7 +264,6 @@ class Api():
         This method is used to load a file-based policy into the desired
         name.
         """
-
         return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
     def replace_policy_file(self, policy_id: str, policy_file: str) -> dict:
@@ -281,7 +271,6 @@ class Api():
         This method is used to replace a file-based policy into the desired
         policy ID.
         """
-
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
     def update_policy_file(self, policy_id: str, policy_file: str) -> dict:
@@ -289,7 +278,6 @@ class Api():
         This method is used to update a file-based policy into the desired
         policy ID.
         """
-
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PATCH)
 
     def rotate_other_api_key(self, resource: Resource) -> str:
@@ -297,7 +285,6 @@ class Api():
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
         """
-
         if resource.type not in ('user', 'host'):
             raise Exception("Error: Invalid resource type")
 
@@ -317,7 +304,6 @@ class Api():
         """
         This method is used to rotate a personal API key
         """
-
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    api_token=self.api_token,
@@ -330,7 +316,6 @@ class Api():
         """
         This method is used to change own password
         """
-
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
                                    self._default_params,
                                    new_password,

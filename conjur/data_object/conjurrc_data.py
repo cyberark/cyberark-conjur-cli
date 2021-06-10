@@ -17,12 +17,10 @@ except ImportError:  # pragma: no cover
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException
 
-
 class ConjurrcData:
     """
     Used for setting user input data
     """
-
     def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
         self.conjur_url = conjur_url
         self.conjur_account = account

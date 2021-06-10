@@ -303,7 +303,6 @@ class Cli():
         elif resource == 'host':
             Cli.handle_host_logic(args, client)
 
-
     @staticmethod
     def _parse_args(parser: ArgparseWrapper):
         args = parser.parse_args()
@@ -326,7 +325,6 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
-
 
 if __name__ == '__main__':
     # Not coverage-tested since the integration tests do this

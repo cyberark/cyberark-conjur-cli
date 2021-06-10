@@ -23,7 +23,6 @@ from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
 
-
 class InitController:
     """
     InitController

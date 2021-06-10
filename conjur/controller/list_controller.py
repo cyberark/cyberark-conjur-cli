@@ -13,7 +13,6 @@ import sys
 from conjur.logic.list_logic import ListLogic
 from conjur.data_object.list_data import ListData
 
-
 class ListController:
     """
     ListController

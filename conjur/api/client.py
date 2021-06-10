@@ -31,7 +31,6 @@ use these parameters defined in this class to initialize our Python
 SDK in their code.
 """
 
-
 # pylint: disable=logging-fstring-interpolation,line-too-long
 class Client():
     """
