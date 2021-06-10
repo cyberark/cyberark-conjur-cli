@@ -9,7 +9,7 @@ the Conjur server
 
 # Builtins
 import logging
-import requests
+from typing import Optional
 
 # Internals
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
@@ -168,13 +168,13 @@ class Client():
         """
         return self._api.resources_list(list_constraints)
 
-    def get(self, variable_id: str, version: str = None) -> requests.Response:
+    def get(self, variable_id: str, version: str = None) -> Optional[bytes]:
         """
         Gets a variable value based on its ID
         """
         return self._api.get_variable(variable_id, version)
 
-    def get_many(self, *variable_ids) -> requests.Response:
+    def get_many(self, *variable_ids) -> Optional[bytes]:
         """
         Gets multiple variable values based on their IDs. Returns a
         dictionary of mapped values.

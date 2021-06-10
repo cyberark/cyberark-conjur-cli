@@ -8,7 +8,7 @@ Provides high-level interface for programmatic API interactions
 # Builtins
 import json
 import logging
-
+from typing import Optional
 # Third party
 from datetime import datetime, timedelta
 import requests
@@ -165,7 +165,7 @@ class Api():
         # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
-    def get_variable(self, variable_id: str, version: str = None) -> requests.Response:
+    def get_variable(self, variable_id: str, version: str = None) -> Optional[bytes]:
         """
         This method is used to fetch a secret's (aka "variable") value from
         Conjur vault.
