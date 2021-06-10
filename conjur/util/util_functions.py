@@ -10,6 +10,7 @@ This module holds the common logic across the codebase
 import logging
 import platform
 import os
+from requests.exceptions import HTTPError
 
 # Internals
 from conjur.util.os_types import OSTypes
@@ -27,19 +28,19 @@ def get_insecure_warning_in_debug():
     logging.debug("Warning: Running the command with '--insecure' "
                   "makes your system vulnerable to security attacks")
 
-def determine_status_code_specific_error_messages(server_error) -> str :
+def determine_status_code_specific_error_messages(server_error:HTTPError) -> str :
     """ Method for returning status code-specific error messages """
     if str(server_error.response.status_code) == '401':
         return "Failed to log in to Conjur. Unable to authenticate with Conjur. " \
                f"Reason: {server_error}. Check your credentials and try again.\n"
     return f"Failed to execute command. Reason: {server_error}\n"
 
-def file_is_missing_or_empty(file):
+def file_is_missing_or_empty(file_path:str):
     """
     Returns true if the file corresponding to the file argument
     exists or the file size is zero; false otherwise
     """
-    return not os.path.exists(file) or os.path.getsize(file) == 0
+    return not os.path.exists(file_path) or os.path.getsize(file_path) == 0
 
 # pylint: disable=logging-fstring-interpolation
 def configure_env_var_with_keyring():

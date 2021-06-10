@@ -14,6 +14,7 @@ import sys
 # Third party
 import argparse
 
+
 class ArgparseWrapper(argparse.ArgumentParser):
     """
     Wrapper to override default behavior of the argparse module.
@@ -21,7 +22,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
 
     ARG_ERROR_FORMAT = 'unrecognized arguments: %s'
 
-    def error(self, message:str):
+    def error(self, message: str):
         """
         This method handles the errors that originate from incorrect
         commands.
@@ -31,7 +32,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
         sys.exit(1)
 
     @staticmethod
-    def _subcommand_error(message:str, help_screen:str):
+    def _subcommand_error(message: str, help_screen: str):
         """
         This method handles the errors that originate from incorrect
         subcommands/flags.
@@ -46,7 +47,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
         return self._subparsers._actions[0].choices.get(resource)
 
     # pylint: disable=arguments-differ
-    def parse_args(self, args=None, namespace=None, resource=None):
+    def parse_args(self, args: list = None, namespace: str = None, resource: str = None) -> list:
         args, arg_flags = self.parse_known_args(args, namespace)
 
         resource = args.resource if args else None

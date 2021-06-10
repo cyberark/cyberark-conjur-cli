@@ -5,6 +5,8 @@ CredentialStoreFactory module
 
 This module is a factory for determining which credential store to use
 """
+# Builtin
+from typing import Tuple
 
 # Internals
 from conjur.constants import SUPPORTED_BACKENDS, DEFAULT_NETRC_FILE
@@ -14,7 +16,6 @@ from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreWrapper
 
-
 # pylint: disable=too-few-public-methods
 class CredentialStoreFactory:
     """
@@ -23,7 +24,7 @@ class CredentialStoreFactory:
     This class follows the Factory pattern to determine which credential store to choose
     """
     @classmethod
-    def create_credential_store(cls) -> CredentialsStoreInterface:
+    def create_credential_store(cls) -> Tuple[CredentialsStoreInterface, str]:
         """
         Factory method for determining which store to use
         """

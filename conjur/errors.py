@@ -8,7 +8,6 @@ This module holds Conjur CLI/SDK-specific errors for this project
 from conjur.errors_messages import MISMATCH_HOSTNAME_MESSAGE, FETCH_CREDENTIALS_FAILURE_MESSAGE, \
     FETCH_CONFIGURATION_FAILURE_MESSAGE, CONFIGURATION_MISSING_FAILURE_MESSAGE
 
-
 class InvalidPasswordComplexityException(Exception):
     """
     Exception for when the user supplies a not complex enough password when
@@ -20,7 +19,7 @@ class OperationNotCompletedException(Exception):
     Exception for when an operation was not completed successfully
     and CLI is left in instable state
     """
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
@@ -32,7 +31,7 @@ class InvalidFormatException(Exception):
     Exception for when user provides input that is not in the proper format
     (policy yml for example)
     """
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
@@ -42,7 +41,7 @@ class CertificateVerificationException(Exception):
     initializing the client using --insecure but running a follow-up command in secure mode
     (without --insecure)
     """
-    def __init__(self, cause="", solution=""):
+    def __init__(self, cause: str = "", solution: str = ""):
         self.message = f"{cause} {solution}"
         super().__init__(self.message)
 
@@ -55,13 +54,13 @@ class CertificateHostnameMismatchException(Exception):
 
 class InvalidConfigurationException(Exception):
     """ Exception for when configuration file (from .conjurrc) is in invalid format """
-    def __init__(self, message=FETCH_CONFIGURATION_FAILURE_MESSAGE):
+    def __init__(self, message: str = FETCH_CONFIGURATION_FAILURE_MESSAGE):
         self.message = message
         super().__init__(self.message)
 
 class ConfigurationMissingException(Exception):
     """ Exception for when configuration is missing """
-    def __init__(self, message=CONFIGURATION_MISSING_FAILURE_MESSAGE):
+    def __init__(self, message: str = CONFIGURATION_MISSING_FAILURE_MESSAGE):
         self.message = message
         super().__init__(self.message)
 
@@ -73,18 +72,18 @@ class CredentialRetrievalException(Exception):
 
 class KeyringWrapperGeneralError(Exception):
     """ General Exception for Keyring Wrapper """
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
 class KeyringWrapperDeletionError(KeyringWrapperGeneralError):
     """ Exception for Keyring Wrapper when underlying deletion operation failed """
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
 class KeyringWrapperSetError(KeyringWrapperGeneralError):
     """ Exception for Keyring Wrapper when underlying set operation failed """
-    def __init__(self, message=""):
+    def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)

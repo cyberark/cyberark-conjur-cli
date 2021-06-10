@@ -23,6 +23,7 @@ from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
 
+
 class InitController:
     """
     InitController
@@ -33,8 +34,8 @@ class InitController:
     conjurrc_data = None
     init_logic = None
 
-    def __init__(self, conjurrc_data:ConjurrcData, init_logic:InitLogic, force:bool,
-                 ssl_verify:bool):
+    def __init__(self, conjurrc_data: ConjurrcData, init_logic: InitLogic, force: bool,
+                 ssl_verify: bool):
         self.ssl_verify = ssl_verify
         if self.ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -90,7 +91,7 @@ class InitController:
 
         return urlparse(self.conjurrc_data.conjur_url)
 
-    def validate_conjur_url(self, conjur_url:ParseResult):
+    def validate_conjur_url(self, conjur_url: ParseResult):
         """
         Validates the specified url
 
@@ -98,10 +99,10 @@ class InitController:
         """
         if conjur_url.scheme != 'https':
             raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
-                   f"'{self.conjurrc_data.conjur_url}' is not supported.")
+                               f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
-    def get_server_certificate(self, conjur_url:ParseResult) -> Optional[str]:
+    def get_server_certificate(self, conjur_url: ParseResult) -> Optional[str]:
         """
         Get the certificate from the specified conjur_url
 
@@ -129,7 +130,7 @@ class InitController:
         return fetched_certificate
 
     # pylint: disable=line-too-long,logging-fstring-interpolation,broad-except,raise-missing-from
-    def get_account_info(self, conjurrc_data:ParseResult):
+    def get_account_info(self, conjurrc_data: ParseResult):
         """
         Method to fetch the account from the user
         """
@@ -143,6 +144,7 @@ class InitController:
                 # a 401 status code will be returned.
                 # If the endpoint does not exist, the user will be prompted to enter in their account.
                 # pylint: disable=no-member
+                # TODO: If respone not exist in error then we will have a ecxption here
                 if hasattr(error.response, 'status_code') and str(error.response.status_code) == '401':
                     conjurrc_data.conjur_account = input("Enter the Conjur account name (required): ").strip()
                     if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
@@ -150,7 +152,7 @@ class InitController:
                 else:
                     raise
 
-    def write_certificate(self, fetched_certificate:str):
+    def write_certificate(self, fetched_certificate: str):
         """
         Method to write the certificate fetched from the Conjur endpoint on the user's machine
         """
@@ -159,8 +161,8 @@ class InitController:
         if self.conjurrc_data.cert_file is None and url.scheme == "https":
             self.conjurrc_data.cert_file = DEFAULT_CERTIFICATE_FILE
             is_file_written = self.init_logic.write_certificate_to_file(fetched_certificate,
-                                                                       self.conjurrc_data.cert_file,
-                                                                       self.force_overwrite)
+                                                                        self.conjurrc_data.cert_file,
+                                                                        self.force_overwrite)
             if not is_file_written:
                 self.ensure_overwrite_file(self.conjurrc_data.cert_file)
                 self.init_logic.write_certificate_to_file(fetched_certificate,
@@ -184,7 +186,7 @@ class InitController:
         sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
 
     @classmethod
-    def ensure_overwrite_file(cls, config_file):
+    def ensure_overwrite_file(cls, config_file: str):
         """
         Method to handle user overwriting logic
         """

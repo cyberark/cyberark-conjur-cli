@@ -9,7 +9,10 @@ This module is the business logic for executing the VARIABLE command
 # Builtins
 import json
 import logging
+
+# Internals
 from conjur.data_object.variable_data import VariableData
+
 
 # pylint: disable=too-few-public-methods
 class VariableLogic:
@@ -24,7 +27,7 @@ class VariableLogic:
         self.client = client
 
     # pylint: disable=logging-fstring-interpolation
-    def get_variable(self, variable_data:VariableData) -> VariableData:
+    def get_variable(self, variable_data: VariableData) -> str:
         """
         Method to handle all get action activity
         """
@@ -39,7 +42,7 @@ class VariableLogic:
             return json.dumps(variable_values, indent=4)
 
     # pylint: disable=logging-fstring-interpolation
-    def set_variable(self, variable_data:VariableData) -> VariableData:
+    def set_variable(self, variable_data: VariableData) -> str:
         """
         Method to handle all set action activity
         """

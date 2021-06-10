@@ -12,6 +12,7 @@ import getpass
 
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
+from conjur.data_object.credentials_data import CredentialsData
 
 class LoginController:
     """
@@ -20,7 +21,8 @@ class LoginController:
     This class represents the Presentation Layer for the LOGIN command
     """
 
-    def __init__(self, ssl_verify:bool, user_password, credential_data, login_logic):
+    def __init__(self, ssl_verify:bool, user_password,
+                 credential_data:CredentialsData, login_logic):
         """
         For init/login commands, the client (client.py) is not initialized
         because we don't yet have enough user-specific information to
@@ -31,7 +33,6 @@ class LoginController:
         if self.ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
-
         self.user_password = user_password
         self.credential_data = credential_data
         self.login_logic = login_logic

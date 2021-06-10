@@ -26,7 +26,7 @@ class ListLogic:
         return self.client.list(list_constraints)
 
     @classmethod
-    def build_constraints(cls, list_data) -> dict :
+    def build_constraints(cls, list_data:list) -> dict :
         """
         Method to accumulate the constraints on list request
         """

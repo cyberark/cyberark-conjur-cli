@@ -10,6 +10,7 @@ library and functionality should we need to do so in the future.
 
 # Builtins
 import logging
+from typing import Optional
 
 # Third party
 import keyring
@@ -71,7 +72,7 @@ class KeystoreWrapper:
             raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to delete '{key}')'") from exception
     @classmethod
-    def get_keyring_name(cls):
+    def get_keyring_name(cls) -> Optional[str]:
         """
         Method to get the system's keyring name
         """

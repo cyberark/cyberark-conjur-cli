@@ -4,7 +4,7 @@ Module For the UserParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
-
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 # pylint: disable=too-few-public-methods
 class UserParser:
@@ -55,7 +55,7 @@ class UserParser:
         return user_subparser
 
     @staticmethod
-    def _add_rotate_api_parser(sub_parser: argparse.ArgumentParser):
+    def _add_rotate_api_parser(sub_parser: ArgparseWrapper):
         user_rotate_api_key_name = 'rotate-api-key - Rotate a user’s API key'
         user_rotate_api_key_usage = 'conjur [global options] user rotate-api-key [options] [args]'
         user_rotate_api_key_parser = sub_parser \
@@ -82,7 +82,7 @@ class UserParser:
                                                  help='Display help screen and exit')
 
     @staticmethod
-    def _add_change_password(sub_parser: argparse.ArgumentParser):
+    def _add_change_password(sub_parser: ArgparseWrapper):
         user_change_password_name = 'change-password - Change the password for the logged-in user'
         user_change_password_usage = 'conjur [global options] user change-password [options] [args]'
         user_change_password = sub_parser \
@@ -108,7 +108,7 @@ class UserParser:
                                                   help='Display help screen and exit')
 
     @staticmethod
-    def _add_user_options(sub_parser: argparse.ArgumentParser):
+    def _add_user_options(sub_parser: ArgparseWrapper):
         user_options = sub_parser.add_argument_group(title=title_formatter("Options"))
         user_options.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')

@@ -90,7 +90,7 @@ class Api():
         logging.debug("Using cached API token...")
         return self._api_token
 
-    def login(self, login_id=None, password=None):
+    def login(self, login_id: str = None, password: str = None) -> requests.Response:
         """
         This method uses the basic auth login id (username) and password
         to retrieve an api key from the server that can be later used to
@@ -129,7 +129,7 @@ class Api():
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
                                self.api_key, ssl_verify=self._ssl_verify).text
 
-    def resources_list(self, list_constraints=None) -> requests.Response:
+    def resources_list(self, list_constraints: dict = None) -> dict:
         """
         This method is used to fetch all available resources for the current
         account. Results are returned as an array of identifiers.
@@ -158,6 +158,7 @@ class Api():
         if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
+            # TODO: Understand why list and not dict
             return list(resource_list)
 
         # To see the full resources response see
@@ -245,7 +246,7 @@ class Api():
                                ssl_verify=self._ssl_verify).text
 
     def _load_policy_file(self, policy_id: str, policy_file: str,
-                          http_verb: HttpVerb) -> requests.Response:
+                          http_verb: HttpVerb) -> dict:
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
@@ -267,7 +268,7 @@ class Api():
         policy_changes = json.loads(json_response)
         return policy_changes
 
-    def load_policy_file(self, policy_id: str, policy_file: str) -> str:
+    def load_policy_file(self, policy_id: str, policy_file: str) -> dict:
         """
         This method is used to load a file-based policy into the desired
         name.
@@ -275,7 +276,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.POST)
 
-    def replace_policy_file(self, policy_id: str, policy_file: str) -> str:
+    def replace_policy_file(self, policy_id: str, policy_file: str) -> dict:
         """
         This method is used to replace a file-based policy into the desired
         policy ID.
@@ -283,7 +284,7 @@ class Api():
 
         return self._load_policy_file(policy_id, policy_file, HttpVerb.PUT)
 
-    def update_policy_file(self, policy_id: str, policy_file: str) -> str:
+    def update_policy_file(self, policy_id: str, policy_file: str) -> dict:
         """
         This method is used to update a file-based policy into the desired
         policy ID.
@@ -339,7 +340,7 @@ class Api():
                                    ).text
         return response
 
-    def whoami(self) -> requests.Response:
+    def whoami(self) -> dict:
         """
         This method provides dictionary of information about the user making an API request.
         """

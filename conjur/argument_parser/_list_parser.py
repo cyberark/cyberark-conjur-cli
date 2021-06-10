@@ -4,7 +4,7 @@ Module For the ListParser
 import argparse
 from conjur.argument_parser.parser_utils import command_description, command_epilog, formatter, \
     title_formatter
-
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 # pylint: disable=too-few-public-methods
 class ListParser:
@@ -51,7 +51,7 @@ class ListParser:
         return list_subparser
 
     @staticmethod
-    def _add_list_options(list_subparser: argparse.ArgumentParser):
+    def _add_list_options(list_subparser: ArgparseWrapper):
         list_options = list_subparser.add_argument_group(title=title_formatter("Options"))
         list_options.add_argument('-i', '--inspect',
                                   action='store_true', dest='inspect',

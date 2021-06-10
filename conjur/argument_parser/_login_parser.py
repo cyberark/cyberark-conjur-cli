@@ -6,7 +6,6 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
     title_formatter
 from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
-
 # pylint: disable=too-few-public-methods
 class LoginParser:
     """Partial class of the ArgParseBuilder.

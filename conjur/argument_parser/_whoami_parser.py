@@ -4,7 +4,7 @@ Module For the WhoamiParser
 
 import argparse
 from conjur.argument_parser.parser_utils import command_description, formatter, title_formatter
-
+from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
 # pylint: disable=too-few-public-methods
 class WhoamiParser:
@@ -38,7 +38,7 @@ class WhoamiParser:
         return whoami_subparser
 
     @staticmethod
-    def _add_whoami_options(whoami_subparser):
+    def _add_whoami_options(whoami_subparser: ArgparseWrapper):
         whoami_options = whoami_subparser.add_argument_group(title=title_formatter("Options"))
 
         whoami_options.add_argument('-h', '--help', action='help',

@@ -16,14 +16,15 @@ import requests
 from conjur.errors import InvalidPasswordComplexityException, \
     OperationNotCompletedException
 from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
-
+from conjur.logic.user_logic import UserLogic
+from conjur.data_object.user_input_data import UserInputData
 class UserController():
     """
     UserController
 
     This class represents the Presentation Layer for the User command.
     """
-    def __init__(self, user_logic, user_input_data):
+    def __init__(self, user_logic: UserLogic, user_input_data:UserInputData):
         self.user_logic=user_logic
         self.user_input_data=user_input_data
 

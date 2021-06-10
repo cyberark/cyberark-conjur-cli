@@ -21,7 +21,7 @@ class PolicyLogic:
     def __init__(self, client):
         self.client = client
 
-    def run_action(self, policy_data:PolicyData) -> PolicyData:
+    def run_action(self, policy_data:PolicyData) -> str:
         """
         Method to determine which subcommand action to run {apply, replace, update}
         """

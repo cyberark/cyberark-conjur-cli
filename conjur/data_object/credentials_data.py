@@ -13,13 +13,13 @@ class CredentialsData:
     Used for setting user input data to login to Conjur
     """
 
-    def __init__(self, machine: str = None, login: str = None, password: str = None) -> str:
+    def __init__(self, machine: str = None, login: str = None, password: str = None):
         self.machine = machine
         self.login = login
         self.password = password
 
     @classmethod
-    def convert_dict_to_obj(cls, dic):
+    def convert_dict_to_obj(cls, dic: dict):
         """
         Method to convert dictionary to object
         """
