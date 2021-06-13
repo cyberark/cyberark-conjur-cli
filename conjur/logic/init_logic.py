@@ -11,6 +11,7 @@ to the user's machine as well as fetching certificates from Conjur
 import logging
 import os.path
 import socket
+
 # Third party
 import yaml
 
@@ -45,13 +46,15 @@ class InitLogic:
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
         except socket.gaierror as error:
-            raise ConnectionToConjurFailedException(f"Unable to resolve server DNS. "
+            raise ConnectionToConjurFailedException(f"Unable to resolve server DNS "
+                            f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
         except socket.timeout as error:
-            raise ConnectionToConjurFailedException(f"Unable to connect to server. "
+            raise ConnectionToConjurFailedException(f"Unable to connect to server "
+                            f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
         except Exception as error:
-            raise RetrieveCertificateException(f"Unable to retrieve certificate"
+            raise RetrieveCertificateException(f"Unable to retrieve certificate "
                             f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
 

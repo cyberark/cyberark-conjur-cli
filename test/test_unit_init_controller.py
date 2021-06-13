@@ -8,7 +8,8 @@ import requests
 from OpenSSL import SSL
 
 from conjur.constants import TEST_HOSTNAME
-from conjur.errors import CertificateHostnameMismatchException
+from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, MissingParametersException, \
+    CertificateNotTrust
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -49,7 +50,7 @@ class InitControllerTest(unittest.TestCase):
         mock_response.status_code = 401
         mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
         mock_conjurrc_data = ConjurrcData()
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(MissingParametersException):
             mock_conjurrc_data.conjur_url = 'https://someurl'
             mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
             mock_init_controller.get_account_info(mock_conjurrc_data)
@@ -77,7 +78,7 @@ class InitControllerTest(unittest.TestCase):
         self.init_logic.connect = MagicMock(return_value = sock)
         self.init_logic.get_certificate = MagicMock(return_value = ["12:AB", "somecertchain"])
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(CertificateNotTrust):
             init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
             init_controller.get_server_certificate(MOCK_FORMATTED_URL)
 
@@ -150,7 +151,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value='')
     def test_user_does_not_input_url_raises_error(self, mock_input):
         mock_conjurrc_data = ConjurrcData(conjur_url=None)
-        with self.assertRaises(RuntimeError) as context:
+        with self.assertRaises(InvalidURLFormatException) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
             init_controller.prompt_for_conjur_url()
         self.assertRegex(str(context.exception), 'Error: URL is required')
@@ -158,7 +159,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value=MockConjurrcData.conjur_url)
     def test_user_does_not_input_https_will_raises_error(self, mock_input):
         mock_conjurrc_data = ConjurrcData(conjur_url='somehost')
-        with self.assertRaises(RuntimeError) as context:
+        with self.assertRaises(InvalidURLFormatException) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
             init_controller.validate_conjur_url(MOCK_FORMATTED_URL)
         self.assertRegex(str(context.exception), 'Error: undefined behavior')

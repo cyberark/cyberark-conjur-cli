@@ -1,10 +1,12 @@
 import io
 import unittest
+from socket import gaierror, timeout
 
 from unittest import mock
 from unittest.mock import patch, mock_open
 
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.errors import ConnectionToConjurFailedException
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.api.ssl_client import SSLClient
@@ -81,13 +83,31 @@ class InitLogicTest(unittest.TestCase):
                     self.assertEquals(lines[0].strip(), "---")
                     self.assertEquals(lines[1].strip(), "conjur_account: someaccount")
                     self.assertEquals(lines[3].strip(), "cert_file: /path/to/conjur-someaccount.pem")
+    '''
+    Validates that Conjur can connect to server
+    '''
+
+    def test_dns_error_will_raise_exception(self):
+        with patch.object(SSLClient, 'get_certificate', side_effect=gaierror) as mock_get_cert:
+            with self.assertRaises(ConnectionToConjurFailedException) as context:
+                init_logic = InitLogic(self.ssl_service)
+                init_logic.get_certificate('https://url', None)
+            self.assertRegex(str(context.exception), 'Unable to resolve server DNS ')
+
+    def test_timeout_error_will_raise_exception(self):
+        with patch.object(SSLClient, 'get_certificate', side_effect=timeout) as mock_get_cert:
+            with self.assertRaises(ConnectionToConjurFailedException) as context:
+                init_logic = InitLogic(self.ssl_service)
+                init_logic.get_certificate('https://url', None)
+            self.assertRegex(str(context.exception), 'Unable to connect to server ')
 
     def test_cert_error_will_raise_exception(self):
         with patch.object(SSLClient, 'get_certificate', side_effect=Exception) as mock_get_cert:
             with self.assertRaises(Exception) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
-            self.assertRegex(str(context.exception), 'Unable to retrieve certificate from')
+            self.assertRegex(str(context.exception), 'Unable to retrieve certificate from ')
+
 
     '''
     Validates that the fingerprint and certificate that were returned 
