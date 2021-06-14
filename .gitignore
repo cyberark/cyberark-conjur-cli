@@ -12,6 +12,8 @@ output/*.xml
 coverage.xml
 .netrc
 .conjurrc
+*.key
+*.crt
 
 # Build artifacts
 build/
