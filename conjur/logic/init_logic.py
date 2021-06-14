@@ -10,7 +10,7 @@ to the user's machine as well as fetching certificates from Conjur
 # Builtins
 import logging
 import os.path
-from socket import gaierror as SocketGetAddressInfoException, timeout as SocketTimeoutException
+from socket import gaierror as SocketGetAddressInfoException
 
 # Third party
 import yaml
@@ -49,7 +49,7 @@ class InitLogic:
             raise ConnectionToConjurFailedException(f"Unable to resolve server DNS "
                             f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
-        except SocketTimeoutException as error:
+        except TimeoutError as error:
             raise ConnectionToConjurFailedException(f"Unable to connect to server "
                             f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error

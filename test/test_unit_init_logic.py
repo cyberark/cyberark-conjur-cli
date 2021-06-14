@@ -95,7 +95,7 @@ class InitLogicTest(unittest.TestCase):
             self.assertRegex(str(context.exception), 'Unable to resolve server DNS ')
 
     def test_timeout_error_will_raise_exception(self):
-        with patch.object(SSLClient, 'get_certificate', side_effect=SocketTimeoutException) as mock_get_cert:
+        with patch.object(SSLClient, 'get_certificate', side_effect=TimeoutError) as mock_get_cert:
             with self.assertRaises(ConnectionToConjurFailedException) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
