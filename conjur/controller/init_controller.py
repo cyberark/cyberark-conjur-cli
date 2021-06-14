@@ -19,7 +19,7 @@ from urllib.parse import ParseResult
 from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
-                            CertificateNotTrust, MissingParametersException, ConfirmationException
+            CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -99,7 +99,7 @@ class InitController:
         """
         if conjur_url.scheme != 'https':
             raise InvalidURLFormatException(f"Error: undefined behavior. "
-                               f" Reason: The Conjur URL format provided "
+                               f" Reason: The Conjur URL format provided. "
                                f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
@@ -126,7 +126,7 @@ class InitController:
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
         trust_certificate = input("Trust this certificate? yes/no (Default: no): ").strip()
         if trust_certificate.lower() not in VALID_CONFIRMATIONS:
-            raise CertificateNotTrust("You decided not to trust the certificate")
+            raise CertificateNotTrustedException("You decided not to trust the certificate")
 
         return fetched_certificate
 
@@ -149,7 +149,7 @@ class InitController:
                 if hasattr(error.response, 'status_code') and str(error.response.status_code) == '401':
                     conjurrc_data.conjur_account = input("Enter the Conjur account name (required): ").strip()
                     if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
-                        raise MissingParametersException("Error: account is required")
+                        raise MissingRequiredParameterException("Error: account is required")
                 else:
                     raise
 

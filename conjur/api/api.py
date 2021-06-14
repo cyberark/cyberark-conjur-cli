@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
-from conjur.errors import MissingParametersException, InvalidResourceException
+from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
 
@@ -50,7 +50,7 @@ class Api():
 
         self._account = account
         if not self._account:
-            raise MissingParametersException("Account cannot be empty!")
+            raise MissingRequiredParameterException("Account cannot be empty!")
 
         self._ssl_verify = ssl_verify
         if ca_bundle:
@@ -72,7 +72,8 @@ class Api():
 
         # Sanity checks
         if not self._url:
-            raise MissingParametersException("Error: API instantiation 'url' cannot be empty!")
+            raise MissingRequiredParameterException("Error: API instantiation 'url' "
+                                                    "cannot be empty!")
 
     @property
     # pylint: disable=missing-docstring
@@ -94,8 +95,7 @@ class Api():
         retrieve short-lived api tokens.
         """
         if not login_id or not password:
-            # TODO: Use custom error
-            raise MissingParametersException("Missing parameters in login invocation!")
+            raise MissingRequiredParameterException("Missing parameters in login invocation!")
 
         logging.debug("Logging in to %s...", self._url)
         self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
@@ -113,7 +113,8 @@ class Api():
         """
         if not self.login_id or not self.api_key:
             # TODO: Use custom error
-            raise MissingParametersException("Missing parameters in authentication invocation!")
+            raise MissingRequiredParameterException("Missing parameters in "
+                                                    "authentication invocation")
 
         params = {
             'login': self.login_id

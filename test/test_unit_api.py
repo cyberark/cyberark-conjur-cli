@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
-from conjur.errors import MissingParametersException
+from conjur.errors import MissingRequiredParameterException
 from conjur.wrapper.http_wrapper import HttpVerb
 from conjur.api.endpoints import ConjurEndpoint
 
@@ -100,11 +100,11 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     def test_login_throws_error_when_username_not_provided(self):
-        with self.assertRaises(MissingParametersException):
+        with self.assertRaises(MissingRequiredParameterException):
             Api(url='http://localhost').login(None, 'mypass')
 
     def test_login_throws_error_when_password_not_provided(self):
-        with self.assertRaises(MissingParametersException):
+        with self.assertRaises(MissingRequiredParameterException):
             Api(url='http://localhost').login('myuser', None)
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
@@ -128,7 +128,7 @@ class ApiTest(unittest.TestCase):
         empty_values = [ None, "" ]
         for empty_value in empty_values:
             with self.subTest(account=empty_value):
-                with self.assertRaises(MissingParametersException):
+                with self.assertRaises(MissingRequiredParameterException):
                     api = Api(url='http://localhost', account=empty_value)
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
@@ -164,11 +164,11 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     def test_authenticate_throws_error_without_login_id_specified(self):
-        with self.assertRaises(MissingParametersException):
+        with self.assertRaises(MissingRequiredParameterException):
             Api(url='http://localhost', api_key='apikey').authenticate()
 
     def test_authenticate_throws_error_without_api_key_specified(self):
-        with self.assertRaises(MissingParametersException):
+        with self.assertRaises(MissingRequiredParameterException):
             Api(url='http://localhost', login_id='mylogin').authenticate()
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())

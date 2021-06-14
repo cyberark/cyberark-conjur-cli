@@ -1,6 +1,6 @@
 import io
 import unittest
-from socket import gaierror, timeout
+from socket import gaierror as SocketGetAddressInfoException, timeout as SocketTimeoutException
 
 from unittest import mock
 from unittest.mock import patch, mock_open
@@ -88,14 +88,14 @@ class InitLogicTest(unittest.TestCase):
     '''
 
     def test_dns_error_will_raise_exception(self):
-        with patch.object(SSLClient, 'get_certificate', side_effect=gaierror) as mock_get_cert:
+        with patch.object(SSLClient, 'get_certificate', side_effect=SocketGetAddressInfoException) as mock_get_cert:
             with self.assertRaises(ConnectionToConjurFailedException) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
             self.assertRegex(str(context.exception), 'Unable to resolve server DNS ')
 
     def test_timeout_error_will_raise_exception(self):
-        with patch.object(SSLClient, 'get_certificate', side_effect=timeout) as mock_get_cert:
+        with patch.object(SSLClient, 'get_certificate', side_effect=SocketTimeoutException) as mock_get_cert:
             with self.assertRaises(ConnectionToConjurFailedException) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)

@@ -10,7 +10,7 @@ to the user's machine as well as fetching certificates from Conjur
 # Builtins
 import logging
 import os.path
-import socket
+from socket import gaierror as SocketGetAddressInfoException, timeout as SocketTimeoutException
 
 # Third party
 import yaml
@@ -45,11 +45,11 @@ class InitLogic:
         try:
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
-        except socket.gaierror as error:
+        except SocketGetAddressInfoException as error:
             raise ConnectionToConjurFailedException(f"Unable to resolve server DNS "
                             f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
-        except socket.timeout as error:
+        except SocketTimeoutException as error:
             raise ConnectionToConjurFailedException(f"Unable to connect to server "
                             f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error

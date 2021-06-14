@@ -25,15 +25,12 @@ class OperationNotCompletedException(Exception):
 
 class MissingRequiredParameterException(Exception):
     """ Exception for when user does not input a required parameter """
-
-class MissingParametersException(Exception):
-    """ Exception for missing parameters """
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
 class InvalidResourceException(Exception):
-    """ Exception when enter invalid resource type"""
+    """ Exception when user inputted an invalid resource type """
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
@@ -53,8 +50,8 @@ class InvalidURLFormatException(Exception):
         self.message = message
         super().__init__(self.message)
 
-class CertificateNotTrust(Exception):
-    """ Exception when choose not trust certificate """
+class CertificateNotTrustedException(Exception):
+    """ Exception when user choose not trust fetched certificate """
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
@@ -77,14 +74,14 @@ class CertificateHostnameMismatchException(Exception):
         super().__init__(self.message)
 
 class RetrieveCertificateException(Exception):
-    """ Exception when override config file not work """
+    """ Exception when Unable retrieve a certificate """
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
 
 class ConnectionToConjurFailedException(Exception):
     """
-    Exception when Conjur cannot connect to server
+    Exception when client cannot connect to Conjur server
     """
     def __init__(self, message: str = ""):
         self.message = message
@@ -97,7 +94,7 @@ class InvalidConfigurationException(Exception):
         super().__init__(self.message)
 
 class ConfirmationException(Exception):
-    """ Exception when override config file not work """
+    """ Exception when user did not confirm a particular flow """
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
