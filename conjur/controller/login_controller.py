@@ -13,6 +13,7 @@ import getpass
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.data_object.credentials_data import CredentialsData
+from conjur.errors import MissingRequiredParameterException
 
 class LoginController:
     """
@@ -58,7 +59,7 @@ class LoginController:
             self.credential_data.login = input("Enter your username: ").strip()
             if self.credential_data.login == '':
                 # pylint: disable=raise-missing-from
-                raise RuntimeError("Error: Login name is required")
+                raise MissingRequiredParameterException("Error: Login name is required")
 
     def get_password(self):
         """

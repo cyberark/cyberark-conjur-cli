@@ -16,7 +16,7 @@ import stat
 # Internals
 from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
 from conjur.data_object import CredentialsData, ConjurrcData
-from conjur.errors import CredentialRetrievalException
+from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
 
@@ -116,7 +116,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             netrc_obj.hosts.pop(credential_data.machine, None)
             self.build_netrc(netrc_obj)
         else:
-            raise Exception("You are already logged out.")
+            raise NotLoggedInException("You are already logged out.")
 
         logging.debug(f"Successfully removed credentials from '{DEFAULT_NETRC_FILE}'")
 
@@ -167,7 +167,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             loaded_credentials[LOGIN] = login
             return CredentialsData.convert_dict_to_obj(loaded_credentials)
         except netrc.NetrcParseError as netrc_error:
-            raise Exception("Error: netrc is in an invalid format. "
+            raise InvalidFormatException("Error: netrc is in an invalid format. "
                             f"Reason: {netrc_error}") from netrc_error
 
     # pylint: disable=unnecessary-pass

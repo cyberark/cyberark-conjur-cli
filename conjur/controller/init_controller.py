@@ -18,7 +18,8 @@ from urllib.parse import ParseResult
 # Internals
 from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import CertificateHostnameMismatchException
+from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
+            CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -76,7 +77,7 @@ class InitController:
             self.conjurrc_data.conjur_url = input("Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
             if self.conjurrc_data.conjur_url == '':
                 # pylint: disable=raise-missing-from
-                raise RuntimeError("Error: URL is required")
+                raise InvalidURLFormatException("Error: URL is required")
 
     # TODO: Factor out the following URL validation to ConjurrcData class
     def format_conjur_url(self) -> Tuple[str, str]:
@@ -97,7 +98,8 @@ class InitController:
         Raises a RuntimeError in case of an invalid url format
         """
         if conjur_url.scheme != 'https':
-            raise RuntimeError(f"Error: undefined behavior. Reason: The Conjur URL format provided "
+            raise InvalidURLFormatException(f"Error: undefined behavior. "
+                               f" Reason: The Conjur URL format provided. "
                                f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
@@ -124,7 +126,7 @@ class InitController:
                          "openssl x509 -fingerprint -noout -in ~conjur/etc/ssl/conjur.pem\n\n")
         trust_certificate = input("Trust this certificate? yes/no (Default: no): ").strip()
         if trust_certificate.lower() not in VALID_CONFIRMATIONS:
-            raise RuntimeError("You decided not to trust the certificate")
+            raise CertificateNotTrustedException("You decided not to trust the certificate")
 
         return fetched_certificate
 
@@ -147,7 +149,7 @@ class InitController:
                 if hasattr(error.response, 'status_code') and str(error.response.status_code) == '401':
                     conjurrc_data.conjur_account = input("Enter the Conjur account name (required): ").strip()
                     if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
-                        raise RuntimeError("Error: account is required")
+                        raise MissingRequiredParameterException("Error: account is required")
                 else:
                     raise
 
@@ -192,4 +194,4 @@ class InitController:
         force_overwrite = input(f"File {config_file} exists. "
                                 f"Overwrite? yes/no (Default: yes): ").strip()
         if force_overwrite != '' and force_overwrite.lower() not in VALID_CONFIRMATIONS:
-            raise Exception(f"Not overwriting {config_file}")
+            raise ConfirmationException(f"Not overwriting {config_file}")

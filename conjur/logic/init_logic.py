@@ -10,6 +10,7 @@ to the user's machine as well as fetching certificates from Conjur
 # Builtins
 import logging
 import os.path
+from socket import gaierror as SocketGetAddressInfoException
 
 # Third party
 import yaml
@@ -19,6 +20,8 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_client import SSLClient
 from conjur.data_object import ConjurrcData
+from conjur.errors import ConnectionToConjurFailedException,RetrieveCertificateException
+
 
 DEFAULT_PORT = 443
 
@@ -42,8 +45,17 @@ class InitLogic:
         try:
             fingerprint, readable_certificate = self.ssl_service.get_certificate(hostname, port)
             logging.debug("Successfully fetched certificate")
+        except SocketGetAddressInfoException as error:
+            raise ConnectionToConjurFailedException(f"Unable to resolve server DNS "
+                            f"from {hostname}:{port}. "
+                            f"Reason: {str(error)}") from error
+        except TimeoutError as error:
+            raise ConnectionToConjurFailedException(f"Unable to connect to server "
+                            f"from {hostname}:{port}. "
+                            f"Reason: {str(error)}") from error
         except Exception as error:
-            raise Exception(f"Unable to retrieve certificate from {hostname}:{port}. "
+            raise RetrieveCertificateException(f"Unable to retrieve certificate "
+                            f"from {hostname}:{port}. "
                             f"Reason: {str(error)}") from error
 
         return fingerprint, readable_certificate

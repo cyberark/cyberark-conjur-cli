@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 import requests
 
-from conjur.errors import CertificateVerificationException
+from conjur.errors import CertificateVerificationException, MissingRequiredParameterException
 from conjur.util import util_functions
 from conjur.data_object.credentials_data import CredentialsData
 from conjur.controller.login_controller import LoginController
@@ -58,7 +58,7 @@ class LoginControllerTest(unittest.TestCase):
     def test_login_raises_error_when_not_provided_username(self, mock_input):
         mock_credential_data = CredentialsData('somemachine', None, 'somepass')
         mock_login_controller = LoginController(True, 'someuserpass', mock_credential_data, LoginLogic)
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(MissingRequiredParameterException):
             mock_login_controller.get_username()
 
     @patch('getpass.getpass', side_effect=['', 'somepass'])
