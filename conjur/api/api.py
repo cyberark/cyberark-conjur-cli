@@ -112,7 +112,6 @@ class Api():
         vault.
         """
         if not self.login_id or not self.api_key:
-            # TODO: Use custom error
             raise MissingRequiredParameterException("Missing parameters in "
                                                     "authentication invocation")
 
