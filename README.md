@@ -25,20 +25,20 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 The Conjur Python SDK is a **Community** level project. It's a community contributed project that **is not reviewed or supported
 by CyberArk**. For more detailed information on our certification levels, see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
-### Using conjur-api-python3 with Conjur OSS 
+### Using conjur-api-python3 with Conjur Open Source 
 
-Are you using this project with [Conjur OSS](https://github.com/cyberark/conjur)? Then we 
+Are you using this project with [Conjur Open Source](https://github.com/cyberark/conjur)? Then we 
 **strongly** recommend choosing the version of this project to use from the latest [Conjur OSS 
 suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html). 
 Conjur maintainers perform additional testing on the suite release versions to ensure 
-compatibility. When possible, upgrade your Conjur OSS version to match the 
+compatibility. When possible, upgrade your Conjur Open Source version to match the 
 [latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm).
-When using integrations, choose the latest suite release that matches your Conjur OSS version. For any 
+When using integrations, choose the latest suite release that matches your Conjur Open Source version. For any 
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
 ### Supported Services
 
-- Conjur OSS v1.2.0 or later
+- Conjur Open Source v1.2.0 or later
 - Conjur Enterprise v11.2.1 (v5.6.3) or later
 
 ### Sypported Platforms
