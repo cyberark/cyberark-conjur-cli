@@ -357,7 +357,7 @@ To copy files over from Windows VM to your local machine, use Remote Desktop red
   connection to see the changes.
 1. Drag the executable/zip to the shared folder. You should now see it on your local machine.
 
-The archives should be called the following:
+The deliverables should be called the following:
 
 ```
 conjur-cli-rhel-7.tar.gz
