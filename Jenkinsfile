@@ -109,5 +109,14 @@ pipeline {
     always {
       cleanupAndNotify(currentBuild.currentResult)
     }
+    unsuccessful {
+      script {
+        if (env.BRANCH_NAME == 'master') {
+          cleanupAndNotify(currentBuild.currentResult, "#development", "@PalmTree")
+        } else {
+          cleanupAndNotify(currentBuild.currentResult, "#development")
+        }
+      }
+    }
   }
 }
