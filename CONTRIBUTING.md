@@ -324,9 +324,11 @@ For all OS types perform the following:
 
 #### RHEL 7/8
 
-1. Run `pyinstaller -F ./pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable in it.
-1. Once an executable has been created, run `tar cvf conjur-cli-rhel-7.tar.gz conjur` 
-   (`tar cvf conjur-cli-rhel-8.tar.gz conjur` for RHEL 8 machines) to archive the file.
+1. Run `pyinstaller -F ./pkg_bin/conjur` on the different RHEL 7 and RHEL 8 machines. Once this is run, a `dist` folder 
+   will be created with the executable in it.
+1. Once an executable has been created, archive the file for RHEL 7 and RHEL 8 platforms, using the following commands:
+  1. `tar cvf conjur-cli-rhel-7.tar.gz conjur`
+  1. `tar cvf conjur-cli-rhel-8.tar.gz conjur`
 1. Sign the archive and add it as an asset in the release page.
 
 #### macOS
