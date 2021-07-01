@@ -329,7 +329,10 @@ For all OS types perform the following:
 1. Once an executable has been created, archive the file for RHEL 7 and RHEL 8 platforms, using the following commands:
   1. `tar cvf conjur-cli-rhel-7.tar.gz conjur`
   1. `tar cvf conjur-cli-rhel-8.tar.gz conjur`
-1. Sign the archive and add it as an asset in the release page.
+1. Sign the archive and add the following files as assets in the release page.
+  1. The archive (i.e `*.tar.gz`)
+  1. The signature file (i.e `*.tar.gz.sig`)
+  1. The public key (`RPM-GPG-KEY-CyberArk`)
 
 #### macOS
 
