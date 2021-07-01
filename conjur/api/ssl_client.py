@@ -46,6 +46,7 @@ class SSLClient:
         return fingerprint, readable_certificate
 
     @classmethod
+    # pylint: disable=unused-private-member
     def __connect(cls, hostname: str, port: int) -> SSL.Connection:
         """
         Method for opening a socket to the Conjur server
