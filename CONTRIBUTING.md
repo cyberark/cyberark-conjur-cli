@@ -248,7 +248,7 @@ The following section provides instructions on what is needed to perform a Conju
 
 Before each release the following tests will need to be performed:
 
-- On *each* platform we support (macOS, RHEL 7/8, Windows), copy over the compressed zip that holds the CLI executable, 
+- On *each* platform we support (macOS, RHEL 7/8, Windows), copy over the compressed archive that holds the CLI executable, 
   decompress it, and [run integration tests](#running-tests-outside-of-a-containerized)
   
 - Run the integration tests against the following different Conjur server environments from any platform you choose:
@@ -309,6 +309,8 @@ See the below section _How to create release artifacts_ for detailed information
 
 - Sign Windows executable
 
+- Sign RHEL 7/8 executable
+
 - Sign and notarize the ConjurCLI app for macOS 
 
 *Important!* The final artifacts that are delivered to the customer should be created from the main branch
@@ -322,10 +324,15 @@ For all OS types perform the following:
 
 #### RHEL 7/8
 
-1. Run `pyinstaller -F ./pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable in it.
-1. Once an executable has been created, run `zip conjur-cli-rhel-7 conjur` (`zip conjur-cli-rhel-8 conjur` for RHEL 8 
-   machines) to zip the file.
-1. Sign the `zip` and add it as an asset in the release page.
+1. Run `pyinstaller -F ./pkg_bin/conjur` on the different RHEL 7 and RHEL 8 machines. Once this is run, a `dist` folder 
+   will be created with the executable in it.
+1. Once an executable has been created, archive the file for RHEL 7 and RHEL 8 platforms, using the following commands:
+  1. `tar cvf conjur-cli-rhel-7.tar.gz conjur`
+  1. `tar cvf conjur-cli-rhel-8.tar.gz conjur`
+1. Sign the archive and add the following files as assets in the release page.
+  1. The archive (i.e `*.tar.gz`)
+  1. The signature file (i.e `*.tar.gz.sig`)
+  1. The public key (`RPM-GPG-KEY-CyberArk`)
 
 #### macOS
 
@@ -350,11 +357,11 @@ To copy files over from Windows VM to your local machine, use Remote Desktop red
   connection to see the changes.
 1. Drag the executable/zip to the shared folder. You should now see it on your local machine.
 
-The zips should be called the following:
+The deliverables should be called the following:
 
 ```
-conjur-cli-rhel-7.zip
-conjur-cli-rhel-8.zip
+conjur-cli-rhel-7.tar.gz
+conjur-cli-rhel-8.tar.gz
 conjur-cli-windows.zip
 conjurcli.dmg
 ```
