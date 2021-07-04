@@ -35,6 +35,7 @@ function _tests_runner_cmd() {
     _cmd="$_cmd --login $LOGIN"
     _cmd="$_cmd --password $ADMIN_PASSWORD"
     _cmd="$_cmd --files-folder /opt/conjur-api-python3/test"
+  echo "$_cmd"
 }
 
 # Appends the 1st argumnet to the script file
