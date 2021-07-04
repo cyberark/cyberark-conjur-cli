@@ -49,7 +49,10 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
     echo "Running testing against $SERVER_MODE. Building the test integration executable..."
     # Add tests runner executable command
     source /build_integrations_tests_runner
+    # The '_tests_runner_cmd' contains the admin password so we don't want to print it to the log
+    append_to_file "set +x"
     append_to_file "$(_tests_runner_cmd)"
+    append_to_file "set -x"
 else
   # Server mode is Conjur OSS
   # Add nose2 command
