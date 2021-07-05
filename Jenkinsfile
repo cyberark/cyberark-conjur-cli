@@ -52,7 +52,7 @@ pipeline {
 
     stage('RHEL8 Integration tests') {
       steps {
-        sh './bin/test_integration_rhel8'
+        sh 'summon -e common ./bin/test_integration_rhel8'
       }
 
       post {
