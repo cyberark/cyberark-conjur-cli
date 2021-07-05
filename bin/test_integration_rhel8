@@ -35,7 +35,9 @@ function _random_password() {
 }
 
 echo "Configuring Conjur..."
+set +x
 export ADMIN_PASSWORD=$(_random_password)
+set -x
 export DEBUG=$DEBUG
 export CONJUR_AUTHN_API_KEY=$ADMIN_PASSWORD
 export SERVER_MODE="appliance"
@@ -56,6 +58,8 @@ ADMIN_PASSWORD=$ADMIN_PASSWORD
 ENV
 
 function _configure_conjur() {
+  # do not print the following command to the log as it contains the admin password
+  set +x
   _cmd="evoke configure master"
   _cmd="$_cmd --accept-eula"
   _cmd="$_cmd --hostname $TEST_HOSTNAME"
@@ -65,6 +69,7 @@ function _configure_conjur() {
 
   docker-compose exec -T conjur-appliance \
     bash -c "$_cmd"
+  set -x
 }
 
 echo "Configure Conjur..."
