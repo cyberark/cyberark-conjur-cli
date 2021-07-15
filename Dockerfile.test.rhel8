@@ -20,13 +20,15 @@ RUN yum --disableplugin=subscription-manager -y \
                                             gnome-keyring \
                                             dbus-x11 \
                                             procps \
+                                            zlib-devel \
          && yum --disableplugin=subscription-manager clean all
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
 COPY ./requirements.txt $INSTALL_DIR/
-RUN pip3 install -r requirements.txt
+RUN pip3 install wheel && \
+    pip3 install -r requirements.txt
 
 COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
 
