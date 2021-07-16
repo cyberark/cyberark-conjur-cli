@@ -57,7 +57,8 @@ class Client():
                  login_id: str = None,
                  password: str = None,
                  ssl_verify: bool = True,
-                 url: str = None):
+                 url: str = None,
+                 service_id: str = None):
 
         if ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -72,6 +73,7 @@ class Client():
             'url': url,
             'account': account,
             'ca_bundle': ca_bundle,
+            'service_id': service_id
         }
         # Parameters from initialized client are missing and
         # will try to search for them in the conjurrc
@@ -125,7 +127,10 @@ class Client():
             self._api = Api(http_debug=http_debug,
                             ssl_verify=ssl_verify,
                             **loaded_config)
-            self._api.login(login_id, password)
+            if service_id is not None:
+                self._api.login_ldap(login_id, password)
+            else:
+                self._api.login(login_id, password)
         else:
             credential_provider, credential_location = CredentialStoreFactory.create_credential_store()
             logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")

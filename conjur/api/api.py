@@ -43,7 +43,8 @@ class Api():
                  http_debug=False,
                  login_id: str = None,
                  ssl_verify: bool = True,
-                 url: str = None):
+                 url: str = None,
+                 service_id: str = None):
 
         self._url = url
         self._ca_bundle = ca_bundle
@@ -63,7 +64,8 @@ class Api():
 
         self._default_params = {
             'url': url,
-            'account': account
+            'account': account,
+            'service_id': service_id
         }
 
         # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINES BELOW UNCOMMENTED
@@ -99,6 +101,23 @@ class Api():
 
         logging.debug("Logging in to %s...", self._url)
         self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
+                                       self._default_params, auth=(login_id, password),
+                                       ssl_verify=self._ssl_verify).text
+        self.login_id = login_id
+
+        return self.api_key
+
+    def login_ldap(self, login_id: str = None, password: str = None) -> str:
+        """
+        This method uses the LDAP auth login id (username) and password
+        to retrieve an api key from the server that can be later used to
+        retrieve short-lived api tokens.
+        """
+        if not login_id or not password:
+            raise MissingRequiredParameterException("Missing parameters in login invocation!")
+
+        logging.debug("Logging in to %s...", self._url)
+        self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN_LDAP,
                                        self._default_params, auth=(login_id, password),
                                        ssl_verify=self._ssl_verify).text
         self.login_id = login_id
