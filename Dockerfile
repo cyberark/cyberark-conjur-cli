@@ -12,7 +12,8 @@ RUN apt-get update && \
                        libssl-dev \
                        python3 \
                        python3-dev \
-                       python3-pip
+                       python3-pip \
+                       zlib1g-dev
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
