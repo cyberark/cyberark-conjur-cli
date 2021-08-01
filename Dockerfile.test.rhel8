@@ -3,7 +3,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.3
 ENV INSTALL_DIR=/opt/conjur-api-python3
 
 # Copy below repo file to enable installation of gnome-keyring and dbus-x11
-COPY ./CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
+COPY ./test/CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
 
 RUN yum --disableplugin=subscription-manager -y \
                                 install -y  bash \
