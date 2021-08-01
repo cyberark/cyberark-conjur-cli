@@ -214,7 +214,7 @@ according to the different operating systems so adjustments will be need to be m
 
 ### UX Guidelines
 
-See [here](guidelines/python-cli-ux-guidelines.md) for full UX guidelines to follow during development. These
+See [here](docs/python-cli-ux-guidelines.md) for full UX guidelines to follow during development. These
   guidelines give structure and uniformity when designing and adding CLI commands to the codebase.
 
 ## Pull Request Workflow
