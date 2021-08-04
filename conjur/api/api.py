@@ -133,17 +133,11 @@ class Api():
             'account': self._account
         }
         params.update(self._default_params)
-        if list_constraints is not None:
-            json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
-                                            params,
-                                            query=list_constraints,
-                                            api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).content
-        else:
-            json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
-                                            params,
-                                            api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).content
+        json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
+                                        params,
+                                        query=list_constraints,
+                                        api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).content
 
         resources = json.loads(json_response.decode('utf-8'))
 
@@ -152,7 +146,6 @@ class Api():
         if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
-            # TODO: Understand why list and not dict
             return list(resource_list)
 
         # To see the full resources response see
