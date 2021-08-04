@@ -14,7 +14,7 @@ to ensure your contribution is compliant with our contributor license agreements
   * [Linting](#linting)
   * [Unit and integration tests](#unit-and-integration-tests)
     + [Running tests in a containerized environment](#running-tests-in-a-containerized-environment)
-    + [Running tests outside of a containerized](#running-tests-outside-of-a-containerized)
+    + [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment)
   * [UX Guidelines](#ux-guidelines)
 - [Pull Request Workflow](#pull-request-workflow)
 - [Releasing](#releasing)
@@ -172,7 +172,7 @@ root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -
 4. You should see that only that specific test is run. Every change made locally can be seen in the container. 
    Therefore, you _do not_ need to rebuild before running these tests again.
 
-#### Running tests outside of a containerized
+#### Running tests outside of a containerized environment
 
 This way of testing allows you to run the integration tests outside a containerized environment and is mainly
   used to test functionality on different platforms before a version release. When run in this way, 
@@ -257,7 +257,7 @@ The following section provides instructions on what is needed to perform a Conju
 
 Before each release the following tests will need to be performed:
 
-- On *each* platform we support (macOS, RHEL 7/8, Windows), follow the instructions provided under [Running tests outside of a containerized](#running-tests-outside-of-a-containerized).
+- On *each* platform we support (macOS, RHEL 7/8, Windows), follow the instructions provided under [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment).
   
 - Run the integration tests against the following different Conjur server environments from any platform you choose:
   
