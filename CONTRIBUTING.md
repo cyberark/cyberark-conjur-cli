@@ -14,7 +14,7 @@ to ensure your contribution is compliant with our contributor license agreements
   * [Linting](#linting)
   * [Unit and integration tests](#unit-and-integration-tests)
     + [Running tests in a containerized environment](#running-tests-in-a-containerized-environment)
-    + [Running tests outside of a containerized](#running-tests-outside-of-a-containerized)
+    + [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment)
   * [UX Guidelines](#ux-guidelines)
 - [Pull Request Workflow](#pull-request-workflow)
 - [Releasing](#releasing)
@@ -172,7 +172,7 @@ root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -
 4. You should see that only that specific test is run. Every change made locally can be seen in the container. 
    Therefore, you _do not_ need to rebuild before running these tests again.
 
-#### Running tests outside of a containerized
+#### Running tests outside of a containerized environment
 
 This way of testing allows you to run the integration tests outside a containerized environment and is mainly
   used to test functionality on different platforms before a version release. When run in this way, 
@@ -181,9 +181,13 @@ This way of testing allows you to run the integration tests outside a containeri
 
 ##### Setup
 
+Before you get started, ensure that you are in the OS you intend to run the tests from. For example, if you want to run tests for Windows, make sure you run the following from a Windows machine.
+
+1. Clone the repository and navigate to the newly created folder.
+
 1. Drop in to the development environment and install required dependencies as described in the above [Development](#development) section.
 
-1. Pack the `integrations_tests_runner.py` using PyInstaller in the platform to run the executable.
+1. Pack the `integrations_tests_runner.py` using PyInstaller.
 
   To pack: `pyinstaller -F test/util/test_runners/integrations_tests_runner.py`. A new executable will be placed 
   in the `dist`  folder. Note that you will need to pack each runner in each platform that you want to run the tests.
@@ -195,7 +199,7 @@ This way of testing allows you to run the integration tests outside a containeri
 `--files-folder` - path to test assets (policy files, etc). This folder is located under `/test` in the
 repo. Copy this executable into every OS you wish to run the CLI integration tests.
 
-Parameters like --url, --account, --login, --password values, are used before each test profile is run to configure
+Parameters like `--url`, `--account`, `--login`, `--password` values, are used before each test profile is run to configure
   the CLI and run the integration tests successfully.
 
 ##### Example
@@ -236,10 +240,15 @@ The following section provides instructions on what is needed to perform a Conju
 ### Checklist
 
 1. Run tests in supported platforms
+
 1. Perform security scan
+
 1. Update the version, CHANGELOG, and NOTICES
+
 1. Create Git tag
+
 1. Create release artifacts
+
 1. Sign artifacts
    
 1. Add release artifacts to release page
@@ -248,8 +257,7 @@ The following section provides instructions on what is needed to perform a Conju
 
 Before each release the following tests will need to be performed:
 
-- On *each* platform we support (macOS, RHEL 7/8, Windows), copy over the compressed archive that holds the CLI executable, 
-  decompress it, and [run integration tests](#running-tests-outside-of-a-containerized)
+- On *each* platform we support (macOS, RHEL 7/8, Windows), follow the instructions provided under [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment).
   
 - Run the integration tests against the following different Conjur server environments from any platform you choose:
   
@@ -288,6 +296,8 @@ Scan the project for vulnerabilities.
 
 ### Add a Git tag
 
+The final artifacts that are delivered to the customer should be created from the main branch.
+
 1. Once your changes have been reviewed and merged into main, tag the version using `git tag -s v0.1.1`
   for example. Note this requires you to be able to sign releases. Consult
   the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification)
@@ -313,7 +323,7 @@ See the below section _How to create release artifacts_ for detailed information
 
 - Sign and notarize the ConjurCLI app for macOS 
 
-*Important!* The final artifacts that are delivered to the customer should be created from the main branch
+After the artifacts are signed, run basic CLI calls (`conjur -v`, `conjur list`) on each platform to make sure no corruption took place during the signing process.
 
 ### How to create release artifacts
 
