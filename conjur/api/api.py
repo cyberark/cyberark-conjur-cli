@@ -152,7 +152,6 @@ class Api():
         if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
-            # TODO: Understand why list and not dict
             return list(resource_list)
 
         # To see the full resources response see
