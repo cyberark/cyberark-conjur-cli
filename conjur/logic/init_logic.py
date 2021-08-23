@@ -25,7 +25,7 @@ from conjur.errors import ConnectionToConjurFailedException,RetrieveCertificateE
 
 DEFAULT_PORT = 443
 
-# pylint: disable=raise-missing-from
+# pylint: disable=raise-missing-from,unspecified-encoding
 class InitLogic:
     """
     InitLogic

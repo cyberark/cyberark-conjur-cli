@@ -39,7 +39,7 @@ class HostParser:
                             'conjur host rotate-api-key -i my_apps/myVM\t\t'
                             'Rotates the API key for host myVM',
                             command='host',
-                            subcommands=['change-password']),
+                            subcommands=['rotate-api-key']),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
