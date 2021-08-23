@@ -38,6 +38,7 @@ class Config():
 
     _config = {}
 
+    # pylint: disable=unspecified-encoding
     def __init__(self, config_file=DEFAULT_CONFIG_FILE):
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Fetching connection details from filesystem '{config_file}'...")

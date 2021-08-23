@@ -26,6 +26,7 @@ class ConjurrcData:
         self.conjur_account = account
         self.cert_file = cert_file
 
+    # pylint: disable=unspecified-encoding
     @classmethod
     def load_from_file(cls, conjurrc_path: str = DEFAULT_CONFIG_FILE):
         """

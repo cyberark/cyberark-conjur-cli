@@ -20,7 +20,7 @@ from conjur.errors import CredentialRetrievalException, NotLoggedInException, In
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
 
-# pylint: disable=logging-fstring-interpolation, line-too-long
+# pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
 class FileCredentialsProvider(CredentialsStoreInterface):
     """
     FileCredentialsProvider

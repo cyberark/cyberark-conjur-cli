@@ -19,6 +19,7 @@ from conjur.errors import InvalidResourceException, MissingRequiredParameterExce
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
 
+# pylint: disable=unspecified-encoding
 class Api():
     """
     This module provides a high-level programmatic access to the HTTP API
