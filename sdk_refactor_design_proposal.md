@@ -1,32 +1,52 @@
 # SDK Refactor Design Proposal
 
-#### Table of contents
+### Table of contents
+
+
+
+### Resources
+
+| Resource                  | Link                                      |
+| ------------------------- | ----------------------------------------- |
+| Zen of Python (the Bible) | https://www.python.org/dev/peps/pep-0020/ |
 
 
 
 ### Motivation
 
-During the push for GAing the CLI, it was realized that the SDK lacks the expandability and 
+While GAing the CLI, it was realized that the SDK has the following limitations:
 
+1. Classes handle multiple responsibilities, making the codebase not easily expandible and impedes on the ability to cover current and future usecases without expensive refactoring
+2. Implicit instead of explicit, forcing the end-user to understand the inner workings of our Client and the context they are running in, instead of allowing them to accomplish their desired flow. See [Zen of Python](https://www.python.org/dev/peps/pep-0020/) for more details.
 
+This document will go into more detail for each of these points as well as supply a proposal for how to address them.
 
 ### Current SDK
 
+#### Folder structure
+
+
+
 #### Flow
+
+The below image details the calls from when a user initalizes the Client to when the user receives a response.
 
 ![CurrentSDKFlow](/Users/Sigal.Sax/Downloads/CurrentSDKFlow.png)
 
 At a high level, the SDK flow is as follows:
 
 1. The user initializes the client, `client=conjur.Client(url="https://someserver", account="cucumber", password="123", ...)`
-2. The *Client* constructor is then called, ensuring all configuration and credential information needed to make a request have been passed in. If not, it fetches the missing information in a discovery-like manner. For example, for `login`, if a Keystore is not available, it will attempt to fetch credentials from the .netrc.
-3. *Client* is now initalized and the user can make a request, `list_values = client.list()`
-4. The *Client* makes a call to *API* which handles the building of the request, merging paramters together, understanding what endpoint to use, etc.
-5. The *API* makes a call to *HTTPWrapper* which escapes the parameters and invokes the endpoint to *ConjurAPI*.
-6. Once the request is made and a response is returned, the *HTTPWrapper* hands back the information to the calling *API* which formats to the desired output.
-7. *API* returns the formatted response to the *Client* and the *Client* returns it to the user. 
+2. The *Client* constructor is called, ensuring all configuration and credential information needed to make a request have been passed in. If not, it fetches the missing information in a discovery-like manner. For example, for `login`, if a Keystore is not available, it will attempt to fetch credentials from the .netrc. At this point the `api` is also initalized as well as an instance variable.
+3. *Client* is now initalized
+4. The user can now make a request, `list_values = client.list()`
+5. Once a request is made, the *Client* makes a call to *API* which handles the building of the request, merging paramters together, understanding what endpoint to use, etc.
+6. The *API* calls the *HTTPWrapper* which escapes the parameters and invokes the endpoint to the *Conjur Server*.
+7. A response is returned to the *HTTPWrapper*, handing it back to the calling *API* which formats the response to the desired output.
+8. *API* returns the formatted response to the *Client* and the *Client* returns it to the user. 
 
 #### Limitations in current SDK Flow
+
+##### The Constructor
 
 The Client constructor resembles the following:
 
@@ -110,6 +130,49 @@ config = client.Configuration(url="https://someserver", account="cucumber", cert
 creds = client.Credental(machine="https://someserver", username="someuser", api_key="123")
 client. conjur.ConjurClient(config, creds, debug, ssl_verify)
 ```
+
+TODO: how best to handle partial states when they give us only the url, or only the account
+
+##### Command separation
+
+Each command has its associated function in `client.py` and `api.py`
+
+```python
+# client.py 
+def __init__(...):
+  self._default_params={...}
+	self._api = Api(...)
+
+	def list(self, list_constraints: dict = None) -> dict:
+	    return self._api.resources_list(list_constraints)
+    
+# api.py
+def resources_list(self, list_constraints: dict = None) -> dict:
+	...
+  params = {
+    'account': self._account
+  }
+  params.update(self._default_params) # builds the parameters to invoke the request
+  json_response = invoke_endpoint(HttpVerb.GET,
+  																...).content
+	...
+  resources = json.loads(json_response.decode('utf-8'))
+  ...
+  return resources
+```
+
+Each time we want to add a new command, we need to open multiple classes, add the desired functionality. This overcrowds the *Client* and *Api*, allowing command-specific logic to spill into the very general classes.
+
+For this reason, I propose we extract command-specific logic into its own class. That way, neither the *Client* nor the *Api* classes will be exposed to the specific details of a command. A high level implementation 
+
+```python
+# client.py 
+def __init__(Configuration, Credential, ...):
+  ...
+  
+```
+
+
 
 
 
