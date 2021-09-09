@@ -6,16 +6,27 @@ This document outlines the limitations of the current SDK implementation and pro
 
 - [SDK Refactor Design Proposal](#sdk-refactor-design-proposal)
     + [Table of contents](#table-of-contents)
+    
     + [Resources](#resources)
+    
     + [Motivation](#motivation)
+    
     + [Current SDK implementation](#current-sdk-implementation)
       - [Flow](#flow)
+      
     + [Limitations in current SDK Flow](#limitations-in-current-sdk-flow)
         * [Client constructor](#client-constructor)
         * [Proposed flow](#proposed-flow)
         * [API and commands](#api-and-commands)
         * [Proposed flow](#proposed-flow-1)
+        
     + [Full proposed SDK flow](#full-proposed-sdk-flow)
+    
+    + [Backwards compatibility](#backwards-compatibility)
+    
+    + [Delivery plan](#delivery-plan)
+    
+        
 
 ### Resources
 
@@ -33,7 +44,9 @@ While GAing the CLI, it was realized that the SDK has the following limitations,
 2. Implicit instead of explicit, forcing the end-user to understand the inner workings of our Client and the context they are running in, instead of allowing them to explicitly accomplish their desired flow. See [Zen of Python](https://www.python.org/dev/peps/pep-0020/) for more details.
 3. Areas of volatility are not encapsulated, becomes problematic when the requirements change or additions need to be made.
 
-In this document, I will go into more detail for each of these points as well as supply a proposal for how to address them.
+In this document, I will go into more detail for each of these points as well as supply a proposal for how to address them. 
+
+It is important to note that this refactor will help us in our effort to decouple the CLI logic from the SDK. That way, when we are ready and decide to make that separation, we can do so more easily.
 
 
 
@@ -57,7 +70,7 @@ At a high level,
 
    `list_values = client.list()`
 
-4. Once a request is made, the *Client* makes a call to *API* which handles the building of the request, merging paramters together, understanding which endpoint to use, etc.
+4. Once a request is made, the *Client* makes a call to *API* which handles the building of the request, merging parameters together, understanding which endpoint to use, etc.
 
 5. The *API* calls the *HTTPWrapper* which escapes the parameters and invokes the endpoint to the *Conjur Server*.
 
@@ -69,7 +82,7 @@ At a high level,
 
 ### Limitations in current SDK Flow
 
-This section will be divided according to the three areas in the code that need to most attention (Client, Api, and Commands). In each section, I will outline their limitations, the consequences of their limitations, and provide a proposal for how to address them.
+This section will be divided according to the three areas in the code that need the most attention (Client, Api, and Commands). In each section, I will outline their limitations, the consequences of their limitations, and provide a proposal for how to address them.
 
 ##### Client constructor
 
@@ -106,7 +119,7 @@ See Client [code](https://github.com/cyberark/conjur-api-python3/blob/main/conju
 
 1. Multiple responsibilities and not easily expandable.
 
-   a. The constructor consumes 92 lines and handles fetching configuration and credential data, validating the input, configuring API calls, error handing, etc. This makes impacts code readability and should be broken up.
+   a. The constructor consumes 92 lines and handles fetching configuration and credential data, validating the input, configuring API calls, error handling, etc. This makes impacts code readability and should be broken up.
 
    b. The constructor expects to have all configuration and credentials loaded by the time it is instantiated. If not, it attempts to fetch the missing information. This is problematic for flows such as `init`,  `login` that have not yet been run and therefore cannot use the Client.
 
@@ -163,7 +176,9 @@ class ConfigurationModel(action = None,
                          ssl_verify = True):
 
 # configuration factory deciding which flow to run based on user input
-class Configuration()
+class Configuration(action=None, 
+                    ssl_verify=None)
+
 	if configuration.action == "file":
 		return ConfigurationFromFile(configuration)
   elif configuration.action == "env":
@@ -349,3 +364,29 @@ At a high level,
 8. *APIClient* makes a request to the *Conjur server* and returns the response to be formatted.
 
 9. The formatted response is returned to the user.
+
+
+
+### Backwards compatibility
+
+This refactor will be breaking backwards compatibility because we will be changing the name of the client ( from `Client` to `ConjurClient`) and how the user provides information.
+
+To recap, the user would use our Client in the following manner:
+
+```python
+config = conjur.Configuration(action=file) # ssl_verify would go here as well
+creds = conjur.Credentials(action=keystore)
+client = conjur.ConjurClient(config, creds, debug=True)
+
+resources = client.list()
+```
+
+
+
+### Delivery plan
+
+- Implementation - 8 days
+- Update and write UTs and Integration tests - 6 days
+- Security review - 2 days
+
+**Total:** 16 days
