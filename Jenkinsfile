@@ -50,9 +50,21 @@ pipeline {
       }
     }
 
+    stage('RHEL7 Integration tests') {
+      steps {
+        sh 'summon -e common ./bin/test_integration_rhel --rhel-version=7'
+      }
+
+      post {
+        always {
+          junit 'output/**/*.xml'
+        }
+      }
+    }
+
     stage('RHEL8 Integration tests') {
       steps {
-        sh 'summon -e common ./bin/test_integration_rhel8'
+        sh 'summon -e common ./bin/test_integration_rhel --rhel-version=8'
       }
 
       post {

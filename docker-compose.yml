@@ -91,11 +91,32 @@ services:
     security_opt:
         - "seccomp:unconfined"
 
-  test-rhel8:
+  rhel8:
     privileged: true
     build:
       context: .
       dockerfile: Dockerfile.test.rhel8
+    command: ['sleep', '999d']
+    environment:
+      CONJUR_AUTHN_API_KEY: Null
+      PYTHON_KEYRING_BACKEND: Null
+      DEBUG: Null
+      TEST_ENV: "True"
+      SERVER_MODE: Null
+      LOGIN: Null
+      ADMIN_PASSWORD: Null
+      TEST_HOSTNAME: Null
+      ACCOUNT: Null
+    depends_on:
+      - conjur-appliance
+    volumes:
+      - ${PWD}:/opt/conjur-api-python3
+
+  rhel7:
+    privileged: true
+    build:
+      context: .
+      dockerfile: Dockerfile.test.rhel7
     command: ['sleep', '999d']
     environment:
       CONJUR_AUTHN_API_KEY: Null
