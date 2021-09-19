@@ -55,7 +55,7 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     headers = {}
     if api_token:
         encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
-        headers['Authorization'] = 'Token token="{}"'.format(encoded_token)
+        headers['Authorization'] = f'Token token="{encoded_token}"'
 
     # By default, on each request the certificate will be verified. If there is
     # a failure in verification, the fallback solution will be passing in the
