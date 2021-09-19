@@ -14,7 +14,7 @@ def formatter(prog: str) -> argparse.RawTextHelpFormatter:
                                          max_help_position=100,
                                          width=100)
 
-
+# pylint: disable=consider-using-f-string
 def header(*args) -> str:
     """
     This method builds the header for the main screen.
