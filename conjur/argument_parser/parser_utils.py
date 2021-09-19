@@ -19,6 +19,7 @@ def header(*args) -> str:
     """
     This method builds the header for the main screen.
     """
+    # pylint: disable = consider-using-f-string
     return '''Usage:
   {}'''.format(*args)
 
