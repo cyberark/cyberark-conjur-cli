@@ -30,7 +30,7 @@ class HttpVerb(Enum):
     PATCH = 5
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals,consider-using-f-string
 # ssl_verify can accept Boolean or String as per requests docs
 # https://requests.readthedocs.io/en/master/api/#main-interface
 def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
