@@ -1,23 +1,59 @@
 #!/bin/bash -ex
 
+function print_help() {
+  cat << EOF
+
+Run integration tests on RHEL container
+
+Usage: test_integration_rhel [options]
+
+    -h, --help            Shows this help message.
+
+    --rhel-version=<version>      Used to Set the RHEL version to test (e.g --rhel-version=7). Default version is 8.
+
+    -d, --debug           Step into the container.
+
+EOF
+}
+
+DEBUG="false"
+
+for option in "$@"; do
+  case "$option" in
+    --rhel-version=* ) RHEL_VERSION="${option#*=}" ; shift ;;
+    -d|--debug ) DEBUG="true" ; shift ;;
+    -h|--help ) print_help ; exit ;;
+     * )
+        echo "Unknown option $option"
+        print_help
+        exit 1;;
+  esac
+done
+
+
 cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
   docker-compose rm --stop --force
 }
 
-DEBUG="false"
-if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
-  DEBUG="true"
-  shift
-fi
-
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
+if [[ "${RHEL_VERSION}" = "8" ]]; then
+  CONTAINER_ID="rhel8"
+elif [[ "${RHEL_VERSION}" = "7" ]]; then
+  CONTAINER_ID="rhel7"
+else
+  echo "RHEL container not set. Using 'rhel8' as default..."
+  CONTAINER_ID="rhel8"
+fi
+
+echo "Run integration tests on RHEL ${RHEL_VERSION}"
+
 echo "Building API container..."
-docker-compose build test-rhel8
+docker-compose build "${CONTAINER_ID}"
 
 echo "Generating certificate..."
 docker-compose up openssl
@@ -53,7 +89,9 @@ function _configure_conjur() {
   _cmd="$_cmd --hostname $TEST_HOSTNAME"
   _cmd="$_cmd --master-altnames $TEST_HOSTNAME"
   _cmd="$_cmd --admin-password $ADMIN_PASSWORD"
-  _cmd="$_cmd dev"
+  _cmd="$_cmd ${ACCOUNT}"
+
+  echo "$_cmd"
 
   docker-compose exec -T conjur-appliance \
     bash -c "$_cmd"
@@ -64,19 +102,19 @@ echo "Configure Conjur..."
 _configure_conjur
 
 echo "Starting test env..."
-docker-compose up -d test-rhel8
+docker-compose up -d "${CONTAINER_ID}"
 
 rm -rf "$CURRENT_DIR"/output/*
 
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test-rhel8 /bin/sh -c " /tests_executor.sh" "$@"
+  docker-compose exec --privileged "${CONTAINER_ID}" /bin/sh -c " /tests_executor.sh" "$@"
   exit
 fi
 
 docker-compose run \
   --rm \
   --no-deps \
-  test-rhel8 \
+  "${CONTAINER_ID}" \
   /bin/sh -c " /tests_executor.sh" "$@"

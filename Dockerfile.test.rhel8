@@ -2,15 +2,21 @@ FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
 
+# Copy public keys for repo GPG check
+RUN curl -L https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official > /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
+# Import gpg key
+RUN gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
 # Copy below repo file to enable installation of gnome-keyring and dbus-x11
-COPY ./test/CentOS-Linux-AppStream.repo /etc/yum.repos.d/CentOS-Linux-AppStream.repo
+COPY ./test/CentOS-Linux-AppStream.repo \
+     /etc/yum.repos.d/
 
 RUN yum --disableplugin=subscription-manager -y \
                                 install -y  bash \
                                             binutils \
                                             yum-utils \
                                             gcc gcc-c++ make \
-                                            curl \
                                             git \
                                             jq \
                                             libffi-devel \
@@ -26,15 +32,14 @@ RUN yum --disableplugin=subscription-manager -y \
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
 
+# Generate unique machne-id file required by dbus-11
+RUN dbus-uuidgen > /var/lib/dbus/machine-id
+
 COPY ./requirements.txt $INSTALL_DIR/
 RUN pip3 install wheel && \
     pip3 install -r requirements.txt
 
-COPY ./bin/build_integrations_tests_runner /build_integrations_tests_runner
-
+COPY ./bin/build_integrations_tests_runner ./test/configure_test_executor.sh /
 COPY . $INSTALL_DIR
 
-COPY ./test/configure_test_executor.sh /configure_test_executor.sh
-
 ENTRYPOINT ["./test/configure_test_executor.sh"]
-
