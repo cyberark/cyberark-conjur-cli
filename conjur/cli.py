@@ -66,6 +66,7 @@ class Cli():
             .add_user_parser() \
             .add_variable_parser() \
             .add_whoami_parser() \
+            .add_hostfactory_parser() \
             .add_main_screen_options() \
             .build()
 

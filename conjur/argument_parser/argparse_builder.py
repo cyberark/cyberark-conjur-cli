@@ -27,6 +27,7 @@ class ArgParseBuilder(InitParser,
                       UserParser,
                       VariableParser,
                       WhoamiParser,
+                      HostFactoryParser,
                       ScreenOptionsParser):
     """
     This class simplifies and encapsulates the way we build the help screens.
