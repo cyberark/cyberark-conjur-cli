@@ -20,8 +20,8 @@ class HostFactoryParser:
         """
         Method adds hostfactory parser functionality to parser
         """
-        hostfacotry_parser = self._create_hostfactory_parser()
-        hostfacotry_subparser = hostfacotry_parser.add_subparsers(title="Subcommand", dest='action')
+        hostfactory_parser = self._create_hostfactory_parser()
+        hostfacotry_subparser = hostfactory_parser.add_subparsers(title="Subcommand", dest='action')
 
         self._add_hostfactory_get(hostfacotry_subparser)
         self._add_hostfactory_set(hostfacotry_subparser)
@@ -29,7 +29,7 @@ class HostFactoryParser:
 
         return self
 
-    def _create_hostfacotry_parser(self):
+    def _create_hostfactory_parser(self):
         hostfactory_name = 'hostfactory - Manage host factories'
         hostfactory_usage = 'conjur [global options] hostfactory <subcommand> [options] [args]'
 
