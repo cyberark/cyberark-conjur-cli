@@ -61,10 +61,11 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_tokens_name, hostfactory_tokens_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory tokens create\t\t\t'
-                            'Create one or more tokens\n'
-                            '    conjur hostfactory tokens revoke\t\t'
-                            'Revoke (delete) a token\n'),
+                            'conjur hostfactory create token --hostfactoryid my_factory --cidr 10.10.1.2/31 '
+                            '--duration-days 2\t\t\t '
+                            'Create token/s for hosts with restrictions\n'
+                            '    conjur hostfactory revoke token --token <TOKEN>,<TOKEN2>\t\t'
+                            'Revoke (delete) one or more tokens\n'),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
@@ -95,28 +96,29 @@ class HostFactoryParser:
 
     @staticmethod
     def _add_hostfacotry_hosts(hostfactory_subparser: ArgparseWrapper):
-        hostfactory_set_name = 'set - Set the value of a hostfactory'
-        hostfactory_set_usage = 'conjur [global options] hostfactory set [options] [args]'
-        hostfactory_set_subcommand_parser = hostfactory_subparser \
-            .add_parser(name="set",
-                        help='Set the value of a hostfactory',
+        hostfactory_hosts_name = 'hosts - Operations on hosts'
+        hostfactory_hosts_usage = 'conjur [global options] hostfactory hosts [options] [args]'
+        hostfactory_hosts_subcommand_parser = hostfactory_subparser \
+            .add_parser(name="create",
+                        help='Use a token to create a host',
                         description=command_description(
-                            hostfactory_set_name, hostfactory_set_usage),
+                            hostfactory_hosts_name, hostfactory_hosts_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory set -i secrets/mysecret -v my_secret_value\t'
-                            'Sets the value of hostfactory secrets/mysecret to my_secret_value\n'),
+                            'conjur hostfactory create host -i my_host -t my_token\t'
+                            'Create a host named \'my_host\' using the token \'my_token\' \n'),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        hostfactory_set_options = hostfactory_set_subcommand_parser.add_argument_group(
+        hostfactory_hosts_options = hostfactory_hosts_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
 
-        hostfactory_set_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
-                                             help='Provide hostfactory identifier', required=True)
-        hostfactory_set_options.add_argument('-v', '--value', metavar='VALUE',
-                                             help='Set the value of the specified hostfactory',
+        hostfactory_hosts_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
+                                             help='(Mandatory) the host ID you wish to create. No need to mention the '
+                                                  'type of entity (host).', required=True)
+        hostfactory_hosts_options.add_argument('-t', '--token', metavar='VALUE',
+                                             help=' (Mandatory) the token itself',
                                              required=True)
-        hostfactory_set_options.add_argument('-h', '--help', action='help',
+        hostfactory_hosts_options.add_argument('-h', '--help', action='help',
                                              help='Display help screen and exit')
 
     @staticmethod
