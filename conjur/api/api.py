@@ -13,7 +13,11 @@ from typing import Optional
 from datetime import datetime, timedelta
 
 # Internals
+from urllib import parse
+import requests
+
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.data_object.create_token_data import CreateTokenData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -220,6 +224,28 @@ class Api():
             remapped_keys_dict[new_variable_name] = variable_value
 
         return remapped_keys_dict
+
+    def create_token(self, create_token_data: CreateTokenData) -> requests.Response:
+        """
+        This method is used to create token/s for hosts with restrictions.
+        """
+        if create_token_data is None:
+            raise MissingRequiredParameterException('create_token_data')
+        params = {}
+        params.update(self._default_params)
+
+        token_params = {}
+        for attr, value in create_token_data.__dict__.items():
+            if value is not None:
+                token_params[attr] = value
+
+        return invoke_endpoint(HttpVerb.POST,
+                               ConjurEndpoint.HOST_FACTORY_TOKENS,
+                               params,
+                               parse.urlencode(token_params),
+                               api_token=self.api_token,
+                               ssl_verify=self._ssl_verify,
+                               headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def set_variable(self, variable_id: str, value: str) -> str:
         """

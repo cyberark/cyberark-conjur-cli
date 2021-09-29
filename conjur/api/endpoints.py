@@ -26,3 +26,4 @@ class ConjurEndpoint(Enum):
     ROTATE_API_KEY = "{url}/authn/{account}/api_key"
     CHANGE_PASSWORD = "{url}/authn/{account}/password"
     WHOAMI = "{url}/whoami"
+    HOST_FACTORY_TOKENS = "{url}/host_factory_tokens"

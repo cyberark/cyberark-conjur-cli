@@ -20,10 +20,13 @@ import requests
 # Internals
 from conjur.api import SSLClient
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
+from conjur.controller.hostfactory_controller import HostFactoryController
+from conjur.data_object.create_token_data import CreateTokenData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
+from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
@@ -170,6 +173,22 @@ class Cli():
         list_controller.load()
 
     @classmethod
+    def handle_hostfactory_logic(cls, args:list=None, client=None):
+        """
+            Method that wraps the hostfdactory call logic
+        """
+        if args.action_type == 'create_token':
+            hostfactory_logic = HostFactoryLogic(client)
+            create_token_data = CreateTokenData(hostfactoryid=args.hostfactoryid,
+                                                cidr=args.cidr,
+                                                duration_days=args.duration_days,
+                                                duration_hours=args.duration_hours,
+                                                duration_minutes=args.duration_minutes,
+                                                count=args.count)
+            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+            hostfactory_controller.create_token(create_token_data)
+
+    @classmethod
     def handle_variable_logic(cls, args:list=None, client=None):
         """
         Method that wraps the variable call logic
@@ -290,6 +309,9 @@ class Cli():
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
+
+        elif resource == 'hostfactory':
+            Cli.handle_hostfactory_logic(args, client)
 
         elif resource == 'variable':
             Cli.handle_variable_logic(args, client)

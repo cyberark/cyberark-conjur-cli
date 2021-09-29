@@ -29,14 +29,13 @@ class HttpVerb(Enum):
     DELETE = 4
     PATCH = 5
 
-
 # pylint: disable=too-many-locals,consider-using-f-string
 # ssl_verify can accept Boolean or String as per requests docs
 # https://requests.readthedocs.io/en/master/api/#main-interface
 def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
                     check_errors: bool = True, ssl_verify: bool = True,
                     auth: tuple = None, api_token: str = None,
-                    query: dict = None) -> requests.Response:
+                    query: dict = None, headers: dict = {}) -> requests.Response:
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -52,7 +51,6 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
 
     url = endpoint.value.format(**params)
 
-    headers = {}
     if api_token:
         encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
         headers['Authorization'] = f'Token token="{encoded_token}"'

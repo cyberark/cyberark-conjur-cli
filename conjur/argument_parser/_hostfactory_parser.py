@@ -21,108 +21,102 @@ class HostFactoryParser:
         Method adds hostfactory parser functionality to parser
         """
         hostfactory_parser = self._create_hostfactory_parser()
-        hostfacotry_subparser = hostfactory_parser.add_subparsers(title="Subcommand", dest='action')
-
-        self._add_hostfactory_get(hostfacotry_subparser)
-        self._add_hostfactory_set(hostfacotry_subparser)
+        hostfactory_subparser = hostfactory_parser.add_subparsers(title="Subcommand", dest='action')
+        hostfactory_create_menu_item = self._add_hostfactory_create(hostfactory_subparser)
+        self._add_hostfactory_create_token(hostfactory_create_menu_item)
         self._add_hostfactory_options(hostfactory_parser)
 
         return self
 
     def _create_hostfactory_parser(self):
-        hostfactory_name = 'hostfactory - Manage host factories'
+        hostfactory_name = 'hostfactory - Manage hosts and tokens'
         hostfactory_usage = 'conjur [global options] hostfactory <subcommand> [options] [args]'
 
         hostfactory_parser = self.resource_subparsers \
             .add_parser('hostfactory',
-                        help='Manage host factories',
+                        help='Create hosts and grant them permissions',
                         description=command_description(hostfactory_name,
                                                         hostfactory_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory hosts \t\t\t'
-                            'Operations on hosts\n'
-                            'conjur hostfactory tokens \t\t'
-                            'Operations on tokens\n',
+                            'conjur hostfactory create token --hostfactoryid my_factory --cidr 10.10.1.2/31 '
+                            '--duration-days 2\t\t\t '
+                            'Creates one or more identical tokens for hosts with restrictions\n',
                             command='hostfactory',
-                            subcommands=['hosts', 'tokens']),
+                            subcommands=['create']),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
         return hostfactory_parser
 
     @staticmethod
-    def _add_hostfacotry_tokens(hostfactory_subparser: ArgparseWrapper):
-        hostfactory_tokens_name = 'tokens - Operations on tokens'
-        hostfactory_tokens_usage = 'conjur [global options] hostfactory tokens [options] [args]'
+    def _add_hostfactory_create(hostfactory_subparser: ArgparseWrapper):
+        hostfactory_create_name = 'create - Create token/s for hosts with restrictions'
+        hostfactory_create_usage = 'conjur [global options] hostfactory create <subcommand> [options] [args]'
 
-        hostfactory_tokens_subcommand_parser = hostfactory_subparser \
-            .add_parser(name="tokens",
-                        help='Operations on tokens',
+        hostfactory_create_subcommand_parser = hostfactory_subparser \
+            .add_parser(name="create",
+                        help='Creates a token or creates a host using a token',
                         description=command_description(
-                            hostfactory_tokens_name, hostfactory_tokens_usage),
+                            hostfactory_create_name, hostfactory_create_usage),
                         epilog=command_epilog(
                             'conjur hostfactory create token --hostfactoryid my_factory --cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
-                            'Create token/s for hosts with restrictions\n'
-                            '    conjur hostfactory revoke token --token <TOKEN>,<TOKEN2>\t\t'
-                            'Revoke (delete) one or more tokens\n'),
+                            'Create creates one or more identical tokens for hosts with restrictions\t\t',
+                            command='create',
+                            subcommands=['token']
+                        ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        hostfactory_tokens_options = hostfactory_tokens_subcommand_parser.add_argument_group(
+        hostfactory_create = hostfactory_create_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
-        hostfactory_tokens_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
-                                                help='Provide hostfactory identifier', nargs='*',
-                                                required=True)
-        hostfactory_tokens_options.add_argument('--hostfactoryid', '-i', metavar='VALUE',
-                                                help='(Mandatory) the ID of the host factory you would like to work '
-                                                     'with. This parameter is mandatory, so we need to prompt a '
-                                                     'message/error if it is missing.')
-        hostfactory_tokens_options.add_argument('--cidr', metavar='VALUE',
-                                                help='(Optional) the CIDR address that contains all IPs that can '
-                                                     'use this token to create hosts. We want to allow multiple cidrs, '
-                                                     'separated by commas (for example --cidr "10.0.10.0/24,'
-                                                     '10.0.11.1/32,10.0.20.0/24")')
-        hostfactory_tokens_options.add_argument('-d', '--duration-days', metavar='VALUE',
-                                                help='(Optional) the number of days the token will be valid.')
-        hostfactory_tokens_options.add_argument('-H', '--duration-hours', metavar='VALUE',
-                                                help='(Optional) the number of hours the token will be valid.')
-        hostfactory_tokens_options.add_argument('-m', '--duration-minutes', metavar='VALUE',
-                                                help='(Optional) the number of minutes the token will be valid.')
-        hostfactory_tokens_options.add_argument('-c', '--count', metavar='VALUE',
-                                                help='(Optional) the number of times the token can be used.')
-        hostfactory_tokens_options.add_argument('-h', '--help', action='help',
-                                                help='Display help screen and exit')
+        hostfactory_create.add_argument('-h', '--help', action='help',
+                                        help='Display help screen and exit')
+        return hostfactory_create_subcommand_parser.add_subparsers(title="Subcommand", dest='action')
 
     @staticmethod
-    def _add_hostfacotry_hosts(hostfactory_subparser: ArgparseWrapper):
-        hostfactory_hosts_name = 'hosts - Operations on hosts'
-        hostfactory_hosts_usage = 'conjur [global options] hostfactory hosts [options] [args]'
-        hostfactory_hosts_subcommand_parser = hostfactory_subparser \
-            .add_parser(name="create",
-                        help='Use a token to create a host',
+    def _add_hostfactory_create_token(menu: ArgparseWrapper):
+        hostfactory_create_token_name = 'token - Create token/s for hosts with restrictions'
+        hostfactory_create_token_usage = 'conjur [global options] hostfactory create token [options] [args]'
+
+        hostfactory_create_subcommand_parser = menu \
+            .add_parser(name="token",
+                        help=' Create token/s for hosts with restrictions',
                         description=command_description(
-                            hostfactory_hosts_name, hostfactory_hosts_usage),
+                            hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create host -i my_host -t my_token\t'
-                            'Create a host named \'my_host\' using the token \'my_token\' \n'),
+                            'conjur hostfactory create token --hostfactoryid my_factory --cidr 10.10.1.2/31 '
+                            '--duration-days 2\t\t '
+                            'Creates one or more identical tokens for hosts with restrictions\t\t',
+                            command='token',
+                        ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        hostfactory_hosts_options = hostfactory_hosts_subcommand_parser.add_argument_group(
+        # Options
+        hostfactory_create_token = hostfactory_create_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
-
-        hostfactory_hosts_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
-                                             help='(Mandatory) the host ID you wish to create. No need to mention the '
-                                                  'type of entity (host).', required=True)
-        hostfactory_hosts_options.add_argument('-t', '--token', metavar='VALUE',
-                                             help=' (Mandatory) the token itself',
-                                             required=True)
-        hostfactory_hosts_options.add_argument('-h', '--help', action='help',
-                                             help='Display help screen and exit')
+        hostfactory_create_token.add_argument('-action_type', default='create_token', help=argparse.SUPPRESS)
+        hostfactory_create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE',
+                                              help='(Mandatory) the ID of the host factory.')
+        hostfactory_create_token.add_argument('--cidr', metavar='VALUE',
+                                              help='(Optional) the CIDR address that contains all IPs that can '
+                                                   'use this token to create hosts. Yoo can specify multiple cidr, '
+                                                   'separated by commas (for example --cidr "10.0.10.0/24,'
+                                                   '10.0.11.1/32,10.0.20.0/24")')
+        hostfactory_create_token.add_argument('-d', '--duration-days', metavar='VALUE', type=int,
+                                              help='(Optional) the number of days the token will be valid.')
+        hostfactory_create_token.add_argument('-H', '--duration-hours', metavar='VALUE', type=int,
+                                              help='(Optional) the number of hours the token will be valid.')
+        hostfactory_create_token.add_argument('-m', '--duration-minutes', metavar='VALUE', type=int,
+                                              help='(Optional) the number of minutes the token will be valid.')
+        hostfactory_create_token.add_argument('-c', '--count', metavar='VALUE', type=int,
+                                              help='(Optional) the number of times the token can be used.')
+        hostfactory_create_token.add_argument('-h', '--help', action='help',
+                                              help='Display help screen and exit')
 
     @staticmethod
-    def _add_hostfacotry_options(hostfactory_parser: ArgparseWrapper):
-        policy_options = hostfactory_parser.add_argument_group(title=title_formatter("Options"))
-        policy_options.add_argument('-h', '--help', action='help',
-                                    help='Display help screen and exit')
+    def _add_hostfactory_options(hostfactory_parser: ArgparseWrapper):
+        hostfactory_options = hostfactory_parser.add_argument_group(title=title_formatter("Options"))
+        hostfactory_options.add_argument('-h', '--help', action='help',
+                                         help='Display help screen and exit')
