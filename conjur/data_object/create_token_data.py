@@ -7,7 +7,6 @@ This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the hostfactory create token request
 """
 
-
 # pylint: disable=too-few-public-methods
 from datetime import datetime, timedelta
 
@@ -17,15 +16,21 @@ class CreateTokenData:
     Used for organizing the params the user passed in to execute the CreateToken command
     """
 
-    def __init__(self, **arg_params):
-        self.host_factory = arg_params['hostfactoryid']
-        self.cidr = arg_params['cidr'] if arg_params['cidr'] else None
-        self.count = arg_params['count'] if arg_params['count'] else 1
+    def __init__(self,
+                 host_factory: str,
+                 cidr: str = None,
+                 duration_days: int = 0,
+                 duration_hours: int = 0,
+                 duration_minutes: int = 0,
+                 count: int = 0):
+        self.host_factory = host_factory
+        self.cidr = cidr.split(',') if cidr else None
+        self.count = count if count else 0
 
         self.expiration = self.get_expiration(
-            arg_params['duration_days'] if arg_params['duration_days'] else 0,
-            arg_params['duration_hours'] if arg_params['duration_hours'] else 0,
-            arg_params['duration_minutes'] if arg_params['duration_minutes'] else 0,
+            duration_days if duration_days else 0,
+            duration_hours if duration_hours else 0,
+            duration_minutes if duration_minutes else 0
         ).isoformat()
 
     @staticmethod
@@ -39,8 +44,28 @@ class CreateTokenData:
             hours=hours,
             minutes=minutes)
 
+    """
+    to_dict
+
+    This method enable aliasing 'cidr' to 'cidr[]' as the server expects and 
+    is later used to urlencode this parameter
+    see: parse.urlencode for more details
+    """
+    def to_dict(self):
+        items = {
+            'host_factory': self.host_factory,
+            'cidr[]': self.cidr,
+            'expiration': self.expiration,
+            'count': self.count
+        }
+
+        if self.cidr is None:
+            items.pop('cidr[]')
+
+        return items
+
     def __repr__(self) -> str:
-        return f"{{'host_factory': '{self.hostfactoryid}', " \
+        return f"{{'host_factory': '{self.host_factory}', " \
                f"'cidr': '{self.cidr}', " \
                f"'expiration': '{self.expiration}'" \
                f"'count': '{self.count}'}} "

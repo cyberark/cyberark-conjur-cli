@@ -11,6 +11,9 @@ the Conjur server
 import logging
 from typing import Optional
 
+# Third Party
+import requests
+
 # Internals
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
@@ -181,7 +184,7 @@ class Client():
         """
         return self._api.get_variables(*variable_ids)
 
-    def create_token(self, create_token_data: CreateTokenData) -> str:
+    def create_token(self, create_token_data: str) -> requests.Response:
         """
         Create token/s for hosts with restrictions
         """

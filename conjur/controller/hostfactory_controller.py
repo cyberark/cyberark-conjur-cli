@@ -30,13 +30,16 @@ class HostFactoryController:
         Method that facilitates create token call to the logic
         """
         if create_token_data is None:
-            raise MissingRequiredParameterException('create_token_data')
+            raise MissingRequiredParameterException('create_token_data cannot be empty!')
 
         if create_token_data.host_factory is None:
-            raise MissingRequiredParameterException('host_factory')
+            raise MissingRequiredParameterException('host_factory cannot be empty!')
 
         if create_token_data.expiration is None:
-            raise MissingRequiredParameterException('expiration')
+            raise MissingRequiredParameterException('expiration cannot be empty!')
+
+        if create_token_data.count == 0:
+            raise MissingRequiredParameterException('count cannot be zero!')
 
         result = self.hostfactory_logic.create_token(create_token_data)
         sys.stdout.write(result + '\n')
