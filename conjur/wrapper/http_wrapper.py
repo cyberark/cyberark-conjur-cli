@@ -35,10 +35,13 @@ class HttpVerb(Enum):
 def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
                     check_errors: bool = True, ssl_verify: bool = True,
                     auth: tuple = None, api_token: str = None,
-                    query: dict = None, headers: dict = {}) -> requests.Response:
+                    query: dict = None, headers=None) -> requests.Response:
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
+    if headers is None:
+        headers = {}
+
     urllib3.disable_warnings()
     orig_params = params or {}
     # Escape all params

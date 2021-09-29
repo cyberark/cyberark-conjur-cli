@@ -1,18 +1,9 @@
 # -*- coding: utf-8 -*-
-
-from conjur.errors import MissingRequiredParameterException
-
-"""
-VariableController module
-
-This module is the controller that facilitates all list actions
-required to successfully execute the HostFactory commands
-"""
 import sys
 
+from conjur.errors import MissingRequiredParameterException
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
-
 
 # pylint: disable=too-few-public-methods
 class HostFactoryController:

@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-
-"""
-VariableLogic module
-
-This module is the business logic for executing the HostFactory commands
-"""
 import json
 from urllib import parse
 
@@ -34,8 +28,9 @@ class HostFactoryLogic:
         # This is set to True to handle CreateTokenData.cidr which is a list
         response = self.client.create_token(parse.urlencode(create_token_data.to_dict(),
                                                             doseq=True))
-
-        if response is not None and response.json() is not None and len(response.json()) > 0:
-            return json.dumps(response.json(), indent=4, sort_keys=True)
+        if response is not None:
+            data = response.json()
+            if data is not None and len(data) > 0:
+                return json.dumps(data, indent=4, sort_keys=True)
 
         raise Exception('create_token API call failed')

@@ -81,7 +81,7 @@ class HostFactoryParser:
 
         hostfactory_create_subcommand_parser = menu \
             .add_parser(name="token",
-                        help=' Create token/s for hosts with restrictions',
+                        help='Create token/s for hosts with restrictions',
                         description=command_description(
                             hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(

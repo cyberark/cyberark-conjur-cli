@@ -175,7 +175,7 @@ class Cli():
     @classmethod
     def handle_hostfactory_logic(cls, args:list=None, client=None):
         """
-            Method that wraps the hostfdactory call logic
+            Method that wraps the hostfactory call logic
         """
         if args.action_type == 'create_token':
             hostfactory_logic = HostFactoryLogic(client)

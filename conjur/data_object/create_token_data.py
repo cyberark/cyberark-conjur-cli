@@ -25,7 +25,7 @@ class CreateTokenData:
                  count: int = 0):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr else None
-        self.count = count if count else 0
+        self.count = 1 if count is None else count
 
         self.expiration = self.get_expiration(
             duration_days if duration_days else 0,
@@ -35,11 +35,12 @@ class CreateTokenData:
 
     @staticmethod
     def get_expiration(days, hours, minutes) -> datetime:
-        default_expiration = datetime.now() + timedelta(hours=1)
+        default_expiration = datetime.utcnow() + timedelta(hours=1)
+
         if days == 0 and hours == 0 and minutes == 0:
             return default_expiration
 
-        return datetime.now() + timedelta(
+        return datetime.utcnow() + timedelta(
             days=days,
             hours=hours,
             minutes=minutes)
