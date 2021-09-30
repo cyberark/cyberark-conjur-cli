@@ -188,13 +188,10 @@ class Cli():
             hours = args.duration_hours if args.duration_hours else 0
             minutes = args.duration_minutes if args.duration_minutes else 0
             duration = timedelta(days=days, hours=hours, minutes=minutes)
-            default_duration = timedelta(hours=1)
 
             create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
                                                 cidr=args.cidr,
-                                                duration=duration
-                                                if duration.total_seconds() > 0
-                                                else default_duration,
+                                                duration=duration,
                                                 count=args.count)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)

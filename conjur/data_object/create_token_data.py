@@ -8,7 +8,7 @@ We use this DTO to build the hostfactory create token request
 """
 
 # pylint: disable=too-few-public-methods
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 class CreateTokenData:
@@ -24,8 +24,7 @@ class CreateTokenData:
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr else []
         self.count = 1 if count is None else count
-
-        self.expiration = (datetime.utcnow() + duration).isoformat()
+        self.duration = duration
 
     def to_dict(self):
         """
@@ -38,12 +37,12 @@ class CreateTokenData:
         return {
             'host_factory': self.host_factory,
             'cidr[]': self.cidr,
-            'expiration': self.expiration,
+            'expiration': self.duration,
             'count': self.count
         }
 
     def __repr__(self) -> str:
         return f"{{'host_factory': '{self.host_factory}', " \
                f"'cidr': '{self.cidr}', " \
-               f"'expiration': '{self.expiration}'" \
+               f"'expiration': '{self.duration.isoformat()}'" \
                f"'count': '{self.count}'}} "
