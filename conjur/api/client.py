@@ -15,7 +15,6 @@ from typing import Optional
 import requests
 
 # Internals
-from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
     InvalidConfigurationException

@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+"""
+HostFactoryController
+
+This Module represents the Presentation Layer for the HostFactory command
+"""
+
 import sys
 
 from conjur.errors import MissingRequiredParameterException
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
+
 
 # pylint: disable=too-few-public-methods
 class HostFactoryController:

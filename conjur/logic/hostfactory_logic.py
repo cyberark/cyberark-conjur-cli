@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+HostFactoryLogic
+
+This module holds the business logic for executing and manipulating
+returned data
+"""
 import json
 from urllib import parse
 
@@ -20,6 +26,10 @@ class HostFactoryLogic:
         self.client = client
 
     def create_token(self, create_token_data: CreateTokenData) -> str:
+        """
+        Creates a host factory token using the parameters in the 'create_token_data' argument.
+        Returns the generated token.
+        """
         if create_token_data is None:
             raise MissingRequiredParameterException('create_token_data cannot be empty!')
 

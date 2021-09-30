@@ -19,51 +19,40 @@ class CreateTokenData:
     def __init__(self,
                  host_factory: str,
                  cidr: str = None,
-                 duration_days: int = 0,
-                 duration_hours: int = 0,
-                 duration_minutes: int = 0,
+                 duration: timedelta = timedelta(days=0, hours=1, minutes=0),
                  count: int = 0):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr else None
         self.count = 1 if count is None else count
 
-        self.expiration = self.get_expiration(
-            duration_days if duration_days else 0,
-            duration_hours if duration_hours else 0,
-            duration_minutes if duration_minutes else 0
-        ).isoformat()
+        self.expiration = self.get_expiration(duration).isoformat()
 
     @staticmethod
-    def get_expiration(days, hours, minutes) -> datetime:
+    def get_expiration(duration: timedelta) -> datetime:
+        """
+        Returns the token expiration in UTC; One hour of not specified.
+        """
         default_expiration = datetime.utcnow() + timedelta(hours=1)
 
-        if days == 0 and hours == 0 and minutes == 0:
+        if duration.total_seconds() == 0:
             return default_expiration
 
-        return datetime.utcnow() + timedelta(
-            days=days,
-            hours=hours,
-            minutes=minutes)
+        return datetime.utcnow() + duration
 
-    """
-    to_dict
-
-    This method enable aliasing 'cidr' to 'cidr[]' as the server expects and 
-    is later used to urlencode this parameter
-    see: parse.urlencode for more details
-    """
     def to_dict(self):
-        items = {
+        """
+        to_dict
+
+        This method enable aliasing 'cidr' to 'cidr[]' as the server expects and
+        is later used to urlencode this parameter
+        see: parse.urlencode for more details
+        """
+        return {
             'host_factory': self.host_factory,
             'cidr[]': self.cidr,
             'expiration': self.expiration,
             'count': self.count
         }
-
-        if self.cidr is None:
-            items.pop('cidr[]')
-
-        return items
 
     def __repr__(self) -> str:
         return f"{{'host_factory': '{self.host_factory}', " \

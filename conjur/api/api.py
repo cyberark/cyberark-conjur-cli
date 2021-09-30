@@ -16,7 +16,6 @@ import requests
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.data_object.create_token_data import CreateTokenData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes

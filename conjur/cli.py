@@ -15,6 +15,8 @@ import sys
 import traceback
 
 # Third party
+from datetime import timedelta
+
 import requests
 
 # Internals
@@ -179,11 +181,14 @@ class Cli():
         """
         if args.action_type == 'create_token':
             hostfactory_logic = HostFactoryLogic(client)
+            days = args.duration_days if args.duration_days else 0
+            hours = args.duration_hours if args.duration_hours else 0
+            minutes = args.duration_minutes if args.duration_minutes else 0
+
             create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
                                                 cidr=args.cidr,
-                                                duration_days=args.duration_days,
-                                                duration_hours=args.duration_hours,
-                                                duration_minutes=args.duration_minutes,
+                                                duration=timedelta(
+                                                    days=days, hours=hours, minutes=minutes),
                                                 count=args.count)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)
