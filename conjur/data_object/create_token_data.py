@@ -22,22 +22,10 @@ class CreateTokenData:
                  duration: timedelta = timedelta(days=0, hours=1, minutes=0),
                  count: int = 0):
         self.host_factory = host_factory
-        self.cidr = cidr.split(',') if cidr else None
+        self.cidr = cidr.split(',') if cidr else []
         self.count = 1 if count is None else count
 
-        self.expiration = self.get_expiration(duration).isoformat()
-
-    @staticmethod
-    def get_expiration(duration: timedelta) -> datetime:
-        """
-        Returns the token expiration in UTC; One hour if not specified.
-        """
-        default_expiration = datetime.utcnow() + timedelta(hours=1)
-
-        if duration.total_seconds() == 0:
-            return default_expiration
-
-        return datetime.utcnow() + duration
+        self.expiration = (datetime.utcnow() + duration).isoformat()
 
     def to_dict(self):
         """
@@ -49,7 +37,7 @@ class CreateTokenData:
         """
         return {
             'host_factory': self.host_factory,
-            'cidr[]': self.cidr if self.cidr else [],
+            'cidr[]': self.cidr,
             'expiration': self.expiration,
             'count': self.count
         }

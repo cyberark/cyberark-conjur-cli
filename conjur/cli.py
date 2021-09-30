@@ -42,6 +42,7 @@ from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, 
 from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
 
+
 # pylint: disable=too-many-statements
 class Cli():
     """
@@ -51,8 +52,7 @@ class Cli():
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-
-        # pylint: disable=no-self-use, too-many-locals
+    # pylint: disable=no-self-use, too-many-locals
     def run(self, *args):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
@@ -118,8 +118,9 @@ class Cli():
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url:str=None, account:str=None, cert:str=None, force:bool=None,
-            ssl_verify:bool=True):
+    def handle_init_logic(cls, url: str = None, account: str = None,
+                          cert: str = None, force: bool = None,
+                          ssl_verify: bool = True):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file
@@ -138,7 +139,8 @@ class Cli():
 
     @classmethod
     # pylint: disable=line-too-long
-    def handle_login_logic(cls, credential_provider:CredentialsStoreInterface, identifier:str=None, password:str=None, ssl_verify:bool=True):
+    def handle_login_logic(cls, credential_provider: CredentialsStoreInterface, identifier: str = None,
+                           password: str = None, ssl_verify: bool = True):
         """
         Method that wraps the login call logic
         """
@@ -153,8 +155,8 @@ class Cli():
         sys.stdout.write("Successfully logged in to Conjur\n")
 
     @classmethod
-    def handle_logout_logic(cls, credential_provider:CredentialsStoreInterface,
-                            ssl_verify:bool=True):
+    def handle_logout_logic(cls, credential_provider: CredentialsStoreInterface,
+                            ssl_verify: bool = True):
         """
         Method that wraps the logout call logic
         """
@@ -165,7 +167,7 @@ class Cli():
         logout_controller.remove_credentials()
 
     @classmethod
-    def handle_list_logic(cls, list_data:ListData=None, client=None):
+    def handle_list_logic(cls, list_data: ListData = None, client=None):
         """
         Method that wraps the list call logic
         """
@@ -175,26 +177,30 @@ class Cli():
         list_controller.load()
 
     @classmethod
-    def handle_hostfactory_logic(cls, args:list=None, client=None):
+    def handle_hostfactory_logic(cls, args: list = None, client=None):
         """
             Method that wraps the hostfactory call logic
         """
         if args.action_type == 'create_token':
             hostfactory_logic = HostFactoryLogic(client)
+
             days = args.duration_days if args.duration_days else 0
             hours = args.duration_hours if args.duration_hours else 0
             minutes = args.duration_minutes if args.duration_minutes else 0
+            duration = timedelta(days=days, hours=hours, minutes=minutes)
+            default_duration = timedelta(hours=1)
 
             create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
                                                 cidr=args.cidr,
-                                                duration=timedelta(
-                                                    days=days, hours=hours, minutes=minutes),
+                                                duration=duration
+                                                if duration.total_seconds() > 0
+                                                else default_duration,
                                                 count=args.count)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)
 
     @classmethod
-    def handle_variable_logic(cls, args:list=None, client=None):
+    def handle_variable_logic(cls, args: list = None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -213,7 +219,7 @@ class Cli():
             variable_controller.set_variable()
 
     @classmethod
-    def handle_policy_logic(cls, policy_data:PolicyData=None, client=None):
+    def handle_policy_logic(cls, policy_data: PolicyData = None, client=None):
         """
         Method that wraps the variable call logic
         """
@@ -223,7 +229,7 @@ class Cli():
         policy_controller.load()
 
     @classmethod
-    def handle_user_logic(cls, credential_provider:CredentialsStoreInterface,
+    def handle_user_logic(cls, credential_provider: CredentialsStoreInterface,
                           args=None, client=None):
         """
         Method that wraps the user call logic
@@ -256,7 +262,7 @@ class Cli():
 
     @staticmethod
     # pylint: disable=too-many-branches,logging-fstring-interpolation
-    def run_action(resource:str, args):
+    def run_action(resource: str, args):
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
@@ -353,6 +359,7 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
+
 
 if __name__ == '__main__':
     # Not coverage-tested since the integration tests do this
