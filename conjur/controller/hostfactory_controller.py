@@ -41,11 +41,11 @@ class HostFactoryController:
             raise MissingRequiredParameterException('count cannot be zero!')
 
         # set the request token duration parameter, default is one hour
-        default_duration = timedelta(hours=1)
+        now = datetime.utcnow()
+        default_duration = now + timedelta(hours=1)
         duration = create_token_data.duration
         duration_sec = duration.total_seconds()
-        now = datetime.utcnow()
-        duration = (now + duration if duration_sec > 0 else now + default_duration)
+        duration = (now + duration if duration_sec > 0 else default_duration)
         create_token_data.duration = duration.isoformat()
 
         result = self.hostfactory_logic.create_token(create_token_data)
