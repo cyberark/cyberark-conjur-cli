@@ -11,7 +11,7 @@ import logging
 from typing import Optional
 from datetime import datetime, timedelta
 
-# Third party
+# Third Parties
 import requests
 
 # Internals

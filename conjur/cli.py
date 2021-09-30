@@ -315,9 +315,6 @@ class Cli():
             result = client.whoami()
             print(json.dumps(result, indent=4))
 
-        elif resource == 'hostfactory':
-            Cli.handle_hostfactory_logic(args, client)
-
         elif resource == 'variable':
             Cli.handle_variable_logic(args, client)
 
@@ -330,6 +327,9 @@ class Cli():
 
         elif resource == 'host':
             Cli.handle_host_logic(args, client)
+
+        elif resource == 'hostfactory':
+            Cli.handle_hostfactory_logic(args, client)
 
     @staticmethod
     def _parse_args(parser: ArgparseWrapper):
