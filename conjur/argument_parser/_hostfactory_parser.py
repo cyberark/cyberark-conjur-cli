@@ -34,7 +34,7 @@ class HostFactoryParser:
 
         hostfactory_parser = self.resource_subparsers \
             .add_parser('hostfactory',
-                        help='Create hosts and grant them permissions',
+                        help='Allows creating hosts dynamically and manage hostfactory tokens',
                         description=command_description(hostfactory_name,
                                                         hostfactory_usage),
                         epilog=command_epilog(
@@ -101,7 +101,7 @@ class HostFactoryParser:
                                               help='(Mandatory) the ID of the host factory.')
         hostfactory_create_token.add_argument('--cidr', metavar='VALUE',
                                               help='(Optional) the CIDR address that contains all IPs that can '
-                                                   'use this token to create hosts. Yoo can specify multiple cidr, '
+                                                   'use this token to create hosts. You can specify multiple cidr, '
                                                    'separated by commas (for example --cidr "10.0.10.0/24,'
                                                    '10.0.11.1/32,10.0.20.0/24")')
         hostfactory_create_token.add_argument('-d', '--duration-days', metavar='VALUE', type=int,
