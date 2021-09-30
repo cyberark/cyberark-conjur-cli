@@ -20,6 +20,7 @@ to ensure your contribution is compliant with our contributor license agreements
 - [Releasing](#releasing)
   * [Checklist](#checklist)
   
+
 Majority of the instructions on how to build, develop, and run the code in
 this repo is located in the main [README.md](README.md) but this file adds
 any additional information for contributing code to this project.
@@ -31,7 +32,7 @@ any additional information for contributing code to this project.
 ```
 ./bin/build_binary
 ```
- 
+
 NOTE that the executable will be saved to the `dist` directory of the project and can only be run in Ubuntu
  environments.
 
@@ -227,11 +228,11 @@ See [here](docs/python-cli-ux-guidelines.md) for full UX guidelines to follow du
 2. Select an existing issue or open an issue to propose changes or fixes
 3. Add any relevant labels as you work on it
 4. Run tests as described in the
-  [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#testing),
-  ensuring they pass
+    [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#testing),
+    ensuring they pass
 5. Submit a pull request, linking the issue in the description
 6. Adjust labels as-needed on the issue. Ask another contributor to review and merge your code if there are delays in
-  merging.
+    merging.
 
 ## Releasing
 
@@ -255,11 +256,14 @@ The following section provides instructions on what is needed to perform a Conju
 
 ### Run tests in supported platforms
 
-Before each release the following tests will need to be performed:
+Before each release the following steps need to be performed:
 
-- On *each* platform we support (macOS, RHEL 7/8, Windows), follow the instructions provided under [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment).
+- Run tests against macOS and Windows environments. Follow the instructions provided under [Running tests outside of a containerized environment](#running-tests-outside-of-a-containerized-environment) for a detailed explanation on how to do this. The project's automation provides full test automation for RHEL 7/8 so tests do not need to be run again.
   
-- Run the integration tests against the following different Conjur server environments from any platform you choose:
+- Backwards compatibility - deploy Conjur Enterprise v5.6.3 and OSS v1.2.0 servers and
+  [run the integration test](#running-tests-outside-of-a-containerized) from *each* supported platform.
+  
+- Run the integration tests against the following different Conjur server environments from *any* platform you choose:
   
   1. An environment configured with a CA-signed certificate (can be configured at the Load Balancer level)
      
@@ -267,11 +271,9 @@ Before each release the following tests will need to be performed:
      
   1. An environment configured with an unknown CA certificate
 
-  Note environments used to pack the binary should not be the same environment to run the tests!
+  Note that environments used to pack the binary should not be the same environment to run the tests!
 
-- Backwards compatibility - deploy Conjur Enterprise v5.6.3 and OSS v1.2.0 servers and
-  [run the integration test](#running-tests-outside-of-a-containerized) from each supported platform.
-  
+- For *each* platform we support (Windows, macOS, RHEL 7/8), run basic sanity tests *manually* (`init`, `login`, `list`)
 ### Perform security scan
 
 Scan the project for vulnerabilities.
@@ -283,25 +285,25 @@ Scan the project for vulnerabilities.
 1. Based on the unreleased content, determine the new version number and update the version in `version.py`.
 
 1. Review the git log and ensure the [CHANGELOG](CHANGELOG.md) contains all relevant recent changes with
-  references to GitHub issues or PRs, if possible.
+    references to GitHub issues or PRs, if possible.
 
 1. Review the changes since the last tag, and if the dependencies have changed revise the [NOTICES](NOTICES.txt)
-  file to correctly capture the added dependencies and their licenses / copyrights.
+    file to correctly capture the added dependencies and their licenses / copyrights.
 
 1. Before creating a release, ensure that all documentation that needs to be written has been written by
-  TW, approved by PO/Engineer, and pushed to the forward-facing documentation.
+    TW, approved by PO/Engineer, and pushed to the forward-facing documentation.
 
 1. Commit these changes to the branch. "Bump version to x.y.z" is an acceptable commit message and open a
-  PR for review.
+    PR for review.
 
 ### Add a Git tag
 
 The final artifacts that are delivered to the customer should be created from the main branch.
 
 1. Once your changes have been reviewed and merged into main, tag the version using `git tag -s v0.1.1`
-  for example. Note this requires you to be able to sign releases. Consult
-  the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification)
-  on how to set this up. 
+    for example. Note this requires you to be able to sign releases. Consult
+    the [github documentation on signing commits](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/managing-commit-signature-verification)
+    on how to set this up. 
 
   "vx.y.z" is an acceptable tag message
 
@@ -355,7 +357,7 @@ NOTE that the macOS executable is packed as a directory instead of a file for pe
 #### Windows
 
 1. Run `pyinstaller -F ./pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable
-  in it.
+    in it.
 1. Once an executable has been created, zip the executable (`zip conjur-cli-windows.zip conjur`).
 1. Sign the `zip` and add it as an asset in the release page.
 
@@ -364,7 +366,7 @@ To copy files over from Windows VM to your local machine, use Remote Desktop red
 
 1. Edit the machine and navigate to *Folders*.
 1. Click on *Redirect folders* and enter the path of the shared folder. Note that you will need to establish a new
-  connection to see the changes.
+    connection to see the changes.
 1. Drag the executable/zip to the shared folder. You should now see it on your local machine.
 
 The deliverables should be called the following:
