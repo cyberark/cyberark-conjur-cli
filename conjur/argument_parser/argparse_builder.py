@@ -2,6 +2,7 @@
 Module For the argparseBuilder
 """
 import argparse
+
 from conjur.wrapper import ArgparseWrapper
 
 from conjur.argument_parser.parser_utils import formatter, header, main_epilog, title_formatter
@@ -15,6 +16,7 @@ from conjur.argument_parser._screen_options_parser import ScreenOptionsParser
 from conjur.argument_parser._user_parser import UserParser
 from conjur.argument_parser._variable_parser import VariableParser
 from conjur.argument_parser._whoami_parser import WhoamiParser
+from conjur.argument_parser._hostfactory_parser import HostFactoryParser
 
 
 # pylint: disable=line-too-long
@@ -27,6 +29,7 @@ class ArgParseBuilder(InitParser,
                       UserParser,
                       VariableParser,
                       WhoamiParser,
+                      HostFactoryParser,
                       ScreenOptionsParser):
     """
     This class simplifies and encapsulates the way we build the help screens.
@@ -49,7 +52,6 @@ class ArgParseBuilder(InitParser,
             add_help=False,
             formatter_class=formatter)
         self.resource_subparsers = self.parser.add_subparsers(dest='resource', title=title_formatter("Commands"))
-
 
     def build(self) -> ArgparseWrapper:
         """
