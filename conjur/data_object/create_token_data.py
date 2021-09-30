@@ -49,7 +49,7 @@ class CreateTokenData:
         """
         return {
             'host_factory': self.host_factory,
-            'cidr[]': self.cidr,
+            'cidr[]': self.cidr if self.cidr else [],
             'expiration': self.expiration,
             'count': self.count
         }
