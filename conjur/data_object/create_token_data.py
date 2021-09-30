@@ -19,7 +19,7 @@ class CreateTokenData:
     def __init__(self,
                  host_factory: str,
                  cidr: str = None,
-                 duration: timedelta = timedelta(days=0, hours=1, minutes=0),
+                 duration: timedelta = timedelta(days=0, hours=0, minutes=0),
                  count: int = 0):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr else []
