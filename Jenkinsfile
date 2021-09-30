@@ -39,6 +39,8 @@ pipeline {
     }
 
     stage('Integration tests') {
+    parallel {
+    stage('Python Integration tests') {
       steps {
         sh './bin/test_integration'
       }
@@ -72,6 +74,8 @@ pipeline {
           junit 'output/**/*.xml'
         }
       }
+    }
+    }
     }
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
