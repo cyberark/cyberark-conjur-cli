@@ -30,7 +30,7 @@ class CreateTokenData:
     @staticmethod
     def get_expiration(duration: timedelta) -> datetime:
         """
-        Returns the token expiration in UTC; One hour of not specified.
+        Returns the token expiration in UTC; One hour if not specified.
         """
         default_expiration = datetime.utcnow() + timedelta(hours=1)
 
