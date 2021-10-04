@@ -8,7 +8,6 @@ returned data
 
 # Builtins
 import json
-from urllib import parse
 
 # Internals
 from conjur.data_object.create_token_data import CreateTokenData
@@ -35,11 +34,8 @@ class HostFactoryLogic:
         if create_token_data is None:
             raise MissingRequiredParameterException('create_token_data cannot be empty!')
 
-        # parse.urlencode, If any values in the query arg are sequences and doseq is true, each
-        # sequence element is converted to a separate parameter.
-        # This is set to True to handle CreateTokenData.cidr which is a list
-        response = self.client.create_token(parse.urlencode(create_token_data.to_dict(),
-                                                            doseq=True))
+        response = self.client.create_token(create_token_data)
+
         if response is not None:
             data = response.json()
             if data is not None and len(data) > 0:

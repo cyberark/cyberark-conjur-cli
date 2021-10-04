@@ -10,12 +10,14 @@ import json
 import logging
 from typing import Optional
 from datetime import datetime, timedelta
+from urllib import parse
 
 # Third Parties
 import requests
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.data_object.create_token_data import CreateTokenData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -32,8 +34,9 @@ class Api():
     API_TOKEN_DURATION = 5
 
     KIND_VARIABLE = 'variable'
-    SECRET_ID_FORMAT = '{account}:{kind}:{id}'
-    SECRET_ID_RETURN_PREFIX = '{account}:{kind}:'
+    KIND_HOSTFACTORY = 'host_factory'
+    ID_FORMAT = '{account}:{kind}:{id}'
+    ID_RETURN_PREFIX = '{account}:{kind}:'
 
     _api_token = None
 
@@ -198,7 +201,7 @@ class Api():
 
         full_variable_ids = []
         for variable_id in variable_ids:
-            full_variable_ids.append(self.SECRET_ID_FORMAT.format(account=self._account,
+            full_variable_ids.append(self.ID_FORMAT.format(account=self._account,
                                                                   kind=self.KIND_VARIABLE,
                                                                   id=variable_id))
         query_params = {
@@ -216,7 +219,7 @@ class Api():
 
         # Remove the 'account:variable:' prefix from result's variable names
         remapped_keys_dict = {}
-        prefix_length = len(self.SECRET_ID_RETURN_PREFIX.format(account=self._account,
+        prefix_length = len(self.ID_RETURN_PREFIX.format(account=self._account,
                                                                 kind=self.KIND_VARIABLE))
         for variable_name, variable_value in variable_map.items():
             new_variable_name = variable_name[prefix_length:]
@@ -224,10 +227,20 @@ class Api():
 
         return remapped_keys_dict
 
-    def create_token(self, create_token_data: str) -> requests.Response:
+    def create_token(self, create_token_data: CreateTokenData) -> requests.Response:
         """
         This method is used to create token/s for hosts with restrictions.
         """
+        create_token_data.host_factory = self.ID_FORMAT.format(account=self._account,
+                                                               kind=self.KIND_HOSTFACTORY,
+                                                               id=create_token_data.host_factory)
+
+        # parse.urlencode, If any values in the query arg are sequences and doseq is true, each
+        # sequence element is converted to a separate parameter.
+        # This is set to True to handle CreateTokenData.cidr which is a list
+        create_token_data = parse.urlencode(create_token_data.to_dict(),
+                                            doseq=True)
+
         if create_token_data is None:
             raise MissingRequiredParameterException('create_token_data cannot be empty!')
 
