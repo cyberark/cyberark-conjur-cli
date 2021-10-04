@@ -1,0 +1,11 @@
+- !policy
+  id: hostfactory_policy
+
+  body:
+    - !layer some_vms
+
+    - !host-factory
+      id: some_host_factory
+      annotations:
+        description: Factory to create new vms
+      layers: [ !layer some_vms ]
