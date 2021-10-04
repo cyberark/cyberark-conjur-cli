@@ -8,7 +8,6 @@ returned data
 
 # Builtins
 import json
-from urllib import parse
 
 # Internals
 from conjur.data_object.create_token_data import CreateTokenData
