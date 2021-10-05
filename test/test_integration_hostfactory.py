@@ -49,3 +49,20 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory'],
                                  exit_code=1)
         self.assertIn("Failed to execute command. Reason: 404 Client Error", output)
+
+    def test_hostfactory_with_single_cidr_returns_cidr_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--cidr', '1.2.3.4'])
+
+        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32"\n        ],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      '        "token":', output)
+
+    def test_hostfactory_with_multiple_ciders_returns_cidrs_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--cidr', '1.2.3.4,2.2.2.2'])
+
+        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32",\n'
+                      '            "2.2.2.2/32"\n        ],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      '        "token":', output)
