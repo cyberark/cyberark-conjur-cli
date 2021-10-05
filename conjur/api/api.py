@@ -231,9 +231,12 @@ class Api():
         """
         This method is used to create token/s for hosts with restrictions.
         """
+        if create_token_data is None:
+            raise MissingRequiredParameterException('create_token_data is empty')
+
         create_token_data.host_factory = self.ID_FORMAT.format(account=self._account,
-                                                               kind=self.KIND_HOSTFACTORY,
-                                                               id=create_token_data.host_factory)
+                                                                 kind=self.KIND_HOSTFACTORY,
+                                                                 id=create_token_data.host_factory)
 
         # parse.urlencode, If any values in the query arg are sequences and doseq is true, each
         # sequence element is converted to a separate parameter.
@@ -241,12 +244,8 @@ class Api():
         create_token_data = parse.urlencode(create_token_data.to_dict(),
                                             doseq=True)
 
-        if create_token_data is None:
-            raise MissingRequiredParameterException('create_token_data cannot be empty!')
-
         params = {}
         params.update(self._default_params)
-
         return invoke_endpoint(HttpVerb.POST,
                                ConjurEndpoint.HOST_FACTORY_TOKENS,
                                params,

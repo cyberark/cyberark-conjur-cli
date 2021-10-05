@@ -38,7 +38,7 @@ class HostFactoryParser:
                         description=command_description(hostfactory_name,
                                                         hostfactory_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Creates one or more identical tokens for hosts with restrictions\n',
@@ -62,7 +62,7 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_create_name, hostfactory_create_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Create creates one or more identical tokens '
@@ -92,7 +92,7 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t '
                             'Creates one or more identical tokens for hosts with restrictions\t\t',
@@ -105,7 +105,7 @@ class HostFactoryParser:
         create_token = hostfactory_create_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
         create_token.add_argument('-action_type', default='create_token', help=argparse.SUPPRESS)
-        create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE',
+        create_token.add_argument('-i', '--hostfactory-id', metavar='VALUE', required=True,
                                   help='(Mandatory) the ID of the host factory.')
         create_token.add_argument('--cidr', metavar='VALUE',
                                   help='(Optional) the CIDR address that contains '
