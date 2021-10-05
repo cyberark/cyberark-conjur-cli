@@ -5,6 +5,7 @@ import time
 from conjur import Client
 from conjur.controller import InitController
 from conjur.controller.host_controller import HostController
+from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
 from conjur.controller.user_controller import UserController
@@ -364,3 +365,17 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
 
             Cli().run_action('host', mock_obj)
             mock_handle_host.assert_called_once()
+
+    @patch.object(HostFactoryController, 'create_token')
+    def test_cli_hostfactory_token_create_functions_are_properly_called(self, mock_hostfactory_create_token):
+        mock_obj = MockArgs()
+        mock_obj.action_type = 'create_token'
+        mock_obj.hostfactoryid = "some-id"
+        mock_obj.duration_days = 1
+        mock_obj.duration_hours = 1
+        mock_obj.duration_minutes = 1
+        mock_obj.cidr = []
+        mock_obj.count = 1
+
+        Cli().handle_hostfactory_logic(args=mock_obj, client='someclient')
+        mock_hostfactory_create_token.assert_called_once()

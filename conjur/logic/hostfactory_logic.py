@@ -32,7 +32,7 @@ class HostFactoryLogic:
         Returns the generated token.
         """
         if create_token_data is None:
-            raise MissingRequiredParameterException('create_token_data cannot be empty!')
+            raise MissingRequiredParameterException('Missing required parameters')
 
         response = self.client.create_token(create_token_data)
 
@@ -41,4 +41,4 @@ class HostFactoryLogic:
             if data is not None and len(data) > 0:
                 return json.dumps(data, indent=4, sort_keys=True)
 
-        raise Exception('create_token API call failed')
+        raise Exception('Failed to create a hostfactory token')

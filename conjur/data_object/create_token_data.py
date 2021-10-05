@@ -17,10 +17,10 @@ class CreateTokenData:
     """
 
     def __init__(self,
-                 host_factory: str,
+                 host_factory: str = "",
                  cidr: str = None,
-                 duration: timedelta = timedelta(days=0, hours=0, minutes=0),
-                 count: int = 0):
+                 duration: timedelta = timedelta(days=0, hours=1, minutes=0),
+                 count: int = 1):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr else []
         self.count = 1 if count is None else count
@@ -44,5 +44,5 @@ class CreateTokenData:
     def __repr__(self) -> str:
         return f"{{'host_factory': '{self.host_factory}', " \
                f"'cidr': '{self.cidr}', " \
-               f"'expiration': '{self.duration.isoformat()}'" \
-               f"'count': '{self.count}'}} "
+               f"'expiration': '{self.duration}', " \
+               f"'count': '{self.count}'}}"

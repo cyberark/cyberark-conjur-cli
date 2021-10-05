@@ -29,16 +29,16 @@ class HostFactoryController:
         Method that facilitates create token call to the logic
         """
         if create_token_data is None:
-            raise MissingRequiredParameterException('create_token_data cannot be empty!')
+            raise MissingRequiredParameterException('Missing required parameters')
 
         if create_token_data.host_factory is None:
-            raise MissingRequiredParameterException('host_factory cannot be empty!')
+            raise MissingRequiredParameterException("Missing required parameter, 'host_factory'")
 
         if create_token_data.duration is None:
-            raise MissingRequiredParameterException('expiration cannot be empty!')
+            raise MissingRequiredParameterException("Missing required parameter, 'duration'")
 
         if create_token_data.count == 0:
-            raise MissingRequiredParameterException('count cannot be zero!')
+            raise MissingRequiredParameterException("Missing required parameter, 'count'")
 
         # set the request token duration parameter, default is one hour
         now = datetime.utcnow()

@@ -7,6 +7,7 @@ from unittest.mock import patch
 from conjur.api.client import ConfigurationMissingException, Client
 
 from conjur.data_object import CredentialsData
+from conjur.data_object.create_token_data import CreateTokenData
 from conjur.errors import CertificateVerificationException
 
 MockCredentials = CredentialsData(login='apiconfigloginid', password='apiconfigapikey')
@@ -471,3 +472,15 @@ class ClientTest(unittest.TestCase):
         mock_api_instance.return_value.change_personal_password.assert_called_once_with("someloggedinuser",
                                                                                         "somecurrentpassword",
                                                                                         "somenewpassword")
+
+    @patch('conjur.wrapper.keystore_wrapper.KeystoreWrapper.is_keyring_accessible', return_value=False)
+    @patch('conjur.api.client.ApiConfig', return_value=MockApiConfig())
+    @patch('conjur.logic.credential_provider.FileCredentialsProvider.load', return_value=MockCredentials)
+    @patch('conjur.api.client.Api')
+    def test_client_passes_through_api_host_factory_token_create_params(self, mock_api_instance, mock_creds,
+                                                                        mock_api_config, mock_accessible):
+        mock_create_token_data = CreateTokenData(host_factory="some_hostfactory_id")
+        Client().create_token(mock_create_token_data)
+
+        mock_api_instance.return_value.create_token.assert_called_once_with(mock_create_token_data)
+

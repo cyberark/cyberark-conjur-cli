@@ -185,7 +185,7 @@ class Cli():
             hostfactory_logic = HostFactoryLogic(client)
 
             days = args.duration_days if args.duration_days else 0
-            hours = args.duration_hours if args.duration_hours else 0
+            hours = args.duration_hours if args.duration_hours else 1
             minutes = args.duration_minutes if args.duration_minutes else 0
             duration = timedelta(days=days, hours=hours, minutes=minutes)
 

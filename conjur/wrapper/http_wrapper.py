@@ -62,6 +62,7 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     # a failure in verification, the fallback solution will be passing in the
     # server pem received during initialization of the client
     # pylint: disable=not-callable
+
     try:
         response = invoke_request(http_verb,
                                   url, *args,
