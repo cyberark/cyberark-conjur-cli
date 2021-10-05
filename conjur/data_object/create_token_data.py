@@ -31,9 +31,9 @@ class CreateTokenData:
         self.hours = hours if hours else 0
         self.minutes = minutes if minutes else 0
 
-        self.duration = self.set_duration(self.days, self.hours, self.minutes)
+        self.duration = self._set_duration(self.days, self.hours, self.minutes)
 
-    def set_duration(self, days, hours, minutes):
+    def _set_duration(self, days, hours, minutes):
         """
         Compiles the hours, days, minutes into a single duration
         """
