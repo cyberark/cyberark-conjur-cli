@@ -105,7 +105,7 @@ class HostFactoryParser:
         create_token = hostfactory_create_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
         create_token.add_argument('-action_type', default='create_token', help=argparse.SUPPRESS)
-        create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE',
+        create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE', required=True,
                                   help='(Mandatory) the ID of the host factory.')
         create_token.add_argument('--cidr', metavar='VALUE',
                                   help='(Optional) the CIDR address that contains '

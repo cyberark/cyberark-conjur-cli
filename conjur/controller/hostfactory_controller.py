@@ -4,16 +4,16 @@ HostFactoryController
 
 This Module represents the Presentation Layer for the HostFactory command
 """
-
+import logging
 import sys
-from datetime import datetime, timedelta
 
+# Internals
 from conjur.errors import MissingRequiredParameterException
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods,logging-fstring-interpolation
 class HostFactoryController:
     """
     HostFactoryController
@@ -34,19 +34,12 @@ class HostFactoryController:
         if create_token_data.host_factory is None:
             raise MissingRequiredParameterException("Missing required parameter, 'host_factory'")
 
-        if create_token_data.duration is None:
-            raise MissingRequiredParameterException("Missing required parameter, 'duration'")
-
         if create_token_data.count == 0:
             raise MissingRequiredParameterException("Missing required parameter, 'count'")
 
-        # set the request token duration parameter, default is one hour
-        now = datetime.utcnow()
-        default_duration = now + timedelta(hours=1)
-        duration = create_token_data.duration
-        duration_sec = duration.total_seconds()
-        duration = (now + duration if duration_sec > 0 else default_duration)
-        create_token_data.duration = duration.isoformat()
+        logging.debug(f"Creating token for hostfactory '{create_token_data.host_factory}'...")
 
         result = self.hostfactory_logic.create_token(create_token_data)
         sys.stdout.write(result + '\n')
+        logging.debug("Successfully created token for hostfactory "
+                      f"'{create_token_data.host_factory}'")

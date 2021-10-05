@@ -26,6 +26,7 @@ class HostFactoryLogic:
     def __init__(self, client):
         self.client = client
 
+    # pylint: disable=inconsistent-return-statements
     def create_token(self, create_token_data: CreateTokenData) -> str:
         """
         Creates a host factory token using the parameters in the 'create_token_data' argument.
@@ -40,5 +41,3 @@ class HostFactoryLogic:
             data = response.json()
             if data is not None and len(data) > 0:
                 return json.dumps(data, indent=4, sort_keys=True)
-
-        raise Exception('Failed to create a hostfactory token')

@@ -100,8 +100,6 @@ class ApiTest(unittest.TestCase):
                               headers={'Content-Type': 'application/x-www-form-urlencoded'},
                               ssl_verify=True)
 
-    test_host_factory_create_token_invokes_http_client_correctly.test=True
-
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_new_client_delegates_ssl_verify_flag(self, mock_http_client):
         Api(url='http://localhost', ssl_verify=True).login('myuser', 'mypass')
@@ -214,7 +212,6 @@ class ApiTest(unittest.TestCase):
                               api_token=False,
                               ssl_verify=True)
 
-    test_account_info_is_passed_down_to_http_call.test=True
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_authenticate_passes_down_ssl_verify_param(self, mock_http_client):
         Api(url='http://localhost', login_id='mylogin', api_key='apikey',
