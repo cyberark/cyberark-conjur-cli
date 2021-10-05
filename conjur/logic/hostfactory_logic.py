@@ -26,13 +26,14 @@ class HostFactoryLogic:
     def __init__(self, client):
         self.client = client
 
+    # pylint: disable=inconsistent-return-statements
     def create_token(self, create_token_data: CreateTokenData) -> str:
         """
         Creates a host factory token using the parameters in the 'create_token_data' argument.
         Returns the generated token.
         """
         if create_token_data is None:
-            raise MissingRequiredParameterException('create_token_data cannot be empty!')
+            raise MissingRequiredParameterException('Missing required parameters')
 
         response = self.client.create_token(create_token_data)
 
@@ -40,5 +41,3 @@ class HostFactoryLogic:
             data = response.json()
             if data is not None and len(data) > 0:
                 return json.dumps(data, indent=4, sort_keys=True)
-
-        raise Exception('create_token API call failed')
