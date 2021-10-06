@@ -43,8 +43,8 @@ MOCK_POLICY_CHANGE_OBJECT = {
 }
 
 
-MOCK_HOSTFACTORY_OBJECT = CreateTokenData(host_factory="some_host_factory", cidr="1.2.3.4,0.0.0.0")
-MOCK_HOSTFACTORY_WITHOUT_CIDR_OBJECT = CreateTokenData(host_factory="some_host_factory")
+MOCK_HOSTFACTORY_OBJECT = CreateTokenData(host_factory="some_host_factory", cidr="1.2.3.4,0.0.0.0", days=1)
+MOCK_HOSTFACTORY_WITHOUT_CIDR_OBJECT = CreateTokenData(host_factory="some_host_factory", days=1)
 
 class ApiTest(unittest.TestCase):
     class MockClientResponse():

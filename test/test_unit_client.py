@@ -479,7 +479,7 @@ class ClientTest(unittest.TestCase):
     @patch('conjur.api.client.Api')
     def test_client_passes_through_api_host_factory_token_create_params(self, mock_api_instance, mock_creds,
                                                                         mock_api_config, mock_accessible):
-        mock_create_token_data = CreateTokenData(host_factory="some_hostfactory_id")
+        mock_create_token_data = CreateTokenData(host_factory="some_hostfactory_id", days=1)
         Client().create_token(mock_create_token_data)
 
         mock_api_instance.return_value.create_token.assert_called_once_with(mock_create_token_data)

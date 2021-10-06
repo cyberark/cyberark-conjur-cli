@@ -27,7 +27,7 @@ class CreateTokenData:
                  count: int = 0):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr is not None else []
-        self.count = 1 if count is None else count
+        self.count = 1 if count is None or count == 0 else count
 
         self.days = days if days else 0
         self.hours = hours if hours else 0
