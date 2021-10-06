@@ -34,8 +34,9 @@ class HostFactoryController:
         if create_token_data.host_factory is None:
             raise MissingRequiredParameterException("Missing required parameter, 'host_factory'")
 
-        if create_token_data.count == 0:
-            raise MissingRequiredParameterException("Missing required parameter, 'count'")
+        if create_token_data.count == 0 or create_token_data.count < 0:
+            raise MissingRequiredParameterException("Missing required parameter 'count' "
+                                                    "or it is not in the correct format")
 
         logging.debug(f"Creating token for hostfactory '{create_token_data.host_factory}'...")
 

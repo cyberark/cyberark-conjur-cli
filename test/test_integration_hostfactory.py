@@ -8,6 +8,7 @@ This test file handles the main test flows for the hostfactory command
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
+import json
 from datetime import datetime, timedelta
 
 from test.util.test_infrastructure import integration_test
@@ -29,6 +30,13 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                         ['policy', 'replace', '-b', 'root', '-f',
                          self.environment.path_provider.get_policy_path("hostfactory")])
 
+    def extract_from_json(self, output, property):
+        values = []
+        output_to_dict = json.loads(output)
+        for entry in output_to_dict:
+            values.append(entry[property])
+        return values
+
     # *************** TESTS ***************
 
     @integration_test()
@@ -46,7 +54,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  exit_code=1)
         self.assertIn("Failed to execute command", output)
 
-    def test_hostfactory_with_unknown_hostfactory_id_returns_error(self):
+    def test_hostfactory_with_unknown_hostfactory_id_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory'],
                                  exit_code=1)
@@ -150,3 +158,32 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn('[\n    {\n        "cidr": [],\n'
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n'
                       '        "token":', output)
+
+    def test_hostfactory_with_count_returns_correct_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--count', '3'])
+        token_values = self.extract_from_json(output, "token")
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      f'        "token": "{token_values[0]}"\n    }},'
+                      '\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      f'        "token": "{token_values[1]}"\n    }},'
+                      '\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      f'        "token": "{token_values[2]}"\n    }}\n]\n'
+                      , output)
+
+    def test_hostfactory_with_negative_count_raises_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--count', '-1'], exit_code=1)
+        self.assertIn("Reason: Missing required", output)
+
+    def test_hostfactory_with_zero_count_raises_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--count', '0'], exit_code=1)
+        self.assertIn("Reason: Missing required", output)
