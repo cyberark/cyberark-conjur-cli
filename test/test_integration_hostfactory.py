@@ -105,3 +105,48 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
+
+    def test_hostfactory_with_all_duration_flags_returns_correct_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-days', '1', '--duration-hours', '1', '--duration-minutes', '1'])
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1, hours=1, minutes=1)).isoformat()}Z",\n'
+                      '        "token":', output)
+
+    def test_hostfactory_with_zero_value_duration_will_return_correct_default_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-days', '0', '--duration-hours', '0', '--duration-minutes', '0'])
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+                      '        "token":', output)
+
+    def test_hostfactory_with_only_days_duration_flags_returns_correct_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-days', '365'])
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=365)).isoformat()}Z",\n'
+                      '        "token":', output)
+
+    def test_hostfactory_with_only_hours_duration_flags_returns_correct_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '24'])
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=24)).isoformat()}Z",\n'
+                      '        "token":', output)
+
+    def test_hostfactory_with_only_minutes_duration_flags_returns_correct_in_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-minutes', '60'])
+
+        self.assertIn('[\n    {\n        "cidr": [],\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n'
+                      '        "token":', output)
