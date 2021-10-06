@@ -17,7 +17,7 @@ class HostfactoryLogicTest(unittest.TestCase):
         mock_client = MagicMock(return_value=None)
         mock_hostfactory_logic = HostFactoryLogic(mock_client)
 
-        mock_create_token_data = CreateTokenData(host_factory="some_host_factory_id")
+        mock_create_token_data = CreateTokenData(host_factory="some_host_factory_id", days=1)
         mock_hostfactory_logic.create_token(create_token_data=mock_create_token_data)
 
         mock_hostfactory_logic.client.create_token.assert_called_once_with(mock_create_token_data)

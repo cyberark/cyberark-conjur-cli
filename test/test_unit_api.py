@@ -43,7 +43,8 @@ MOCK_POLICY_CHANGE_OBJECT = {
 }
 
 
-MOCK_HOSTFACTORY_OBJECT = CreateTokenData(host_factory="some_host_factory")
+MOCK_HOSTFACTORY_OBJECT = CreateTokenData(host_factory="some_host_factory", cidr="1.2.3.4,0.0.0.0", days=1)
+MOCK_HOSTFACTORY_WITHOUT_CIDR_OBJECT = CreateTokenData(host_factory="some_host_factory", days=1)
 
 class ApiTest(unittest.TestCase):
     class MockClientResponse():
@@ -91,6 +92,25 @@ class ApiTest(unittest.TestCase):
 
         api.create_token(MOCK_HOSTFACTORY_OBJECT)
         MOCK_EXPECTED_HOSTFACTORY_PARAM = parse.urlencode(MOCK_HOSTFACTORY_OBJECT.to_dict(),
+                                                          doseq=True)
+
+        self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.HOST_FACTORY_TOKENS,
+                              MOCK_EXPECTED_HOSTFACTORY_PARAM,
+                              query={},
+                              api_token='apitoken',
+                              headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                              ssl_verify=True)
+
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
+    def test_host_factory_create_token_with_no_cidr_invokes_http_client_correctly(self, mock_http_client):
+        api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
+
+        def mock_auth():
+            return 'apitoken'
+        api.authenticate = mock_auth
+
+        api.create_token(MOCK_HOSTFACTORY_WITHOUT_CIDR_OBJECT)
+        MOCK_EXPECTED_HOSTFACTORY_PARAM = parse.urlencode(MOCK_HOSTFACTORY_WITHOUT_CIDR_OBJECT.to_dict(),
                                                           doseq=True)
 
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.HOST_FACTORY_TOKENS,

@@ -374,7 +374,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.duration_days = 1
         mock_obj.duration_hours = 1
         mock_obj.duration_minutes = 1
-        mock_obj.cidr = []
+        mock_obj.cidr = '[]'
         mock_obj.count = 1
 
         Cli().handle_hostfactory_logic(args=mock_obj, client='someclient')
