@@ -106,7 +106,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                   '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
-    def test_hostfactory_with_all_duration_flags_returns_correct_in_response(self):
+    def test_hostfactory_with_all_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '1', '--duration-hours', '1', '--duration-minutes', '1'])
@@ -124,7 +124,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
-    def test_hostfactory_with_only_days_duration_flags_returns_correct_in_response(self):
+    def test_hostfactory_with_only_days_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '365'])
@@ -133,7 +133,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=365)).isoformat()}Z",\n'
                       '        "token":', output)
 
-    def test_hostfactory_with_only_hours_duration_flags_returns_correct_in_response(self):
+    def test_hostfactory_with_only_hours_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '24'])
@@ -142,7 +142,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=24)).isoformat()}Z",\n'
                       '        "token":', output)
 
-    def test_hostfactory_with_only_minutes_duration_flags_returns_correct_in_response(self):
+    def test_hostfactory_with_only_minutes_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-minutes', '60'])
