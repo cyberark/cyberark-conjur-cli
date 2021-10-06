@@ -166,10 +166,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_without_duration_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-minutes', '1'], exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Parameter", output)
-
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'], exit_code=1)
+        self.assertIn("Failed to execute command. Reason: Either", output)
 
     def test_hostfactory_with_count_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
@@ -190,12 +188,12 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_with_negative_count_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1'
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1',
                                   '--count', '-1'], exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Missing required", output)
+        self.assertIn("Failed to execute command. Reason: Parameter", output)
 
     def test_hostfactory_with_zero_count_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1'
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1',
                                   '--count', '0'], exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Missing required", output)
+        self.assertIn("Failed to execute command. Reason: Parameter", output)
