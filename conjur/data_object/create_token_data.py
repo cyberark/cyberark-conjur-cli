@@ -37,14 +37,14 @@ class CreateTokenData:
             raise MissingRequiredParameterException("Missing required parameter, 'hostfactory-id'")
 
         if self.count <= 0:
-            raise InvalidFormatException("Parameter 'count' is not in the correct format")
+            raise InvalidFormatException("Parameter 'count' is not in the correct format. "
+                                         "Solution: Parameter must be a positive integer")
 
         if self.days <= 0 and self.hours <= 0 and self.minutes <= 0:
-            raise InvalidFormatException("Either 'duration-days' / 'duration-hours' "
-                                         "/ 'duration-minutes' are missing or not in "
-                                         "the correct format. "
-                                         "Solution: provide one of the required parameters or "
-                                         "make sure they are positive numbers")
+            raise InvalidFormatException("The command must contain one of the following parameters:"
+                                         "'duration-days', 'duration-hours, 'duration-minutes'. "
+                                         "Solution: Provide one of the required parameters; "
+                                         "make sure it is a positive integer")
 
         self.duration = self._set_duration(self.days, self.hours, self.minutes)
 
