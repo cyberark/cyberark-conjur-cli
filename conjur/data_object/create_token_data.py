@@ -73,7 +73,7 @@ class CreateTokenData:
         }
 
     # pylint: disable=multiple-statements
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         result = []
         if self.host_factory: result.append(f"'host_factory': '{self.host_factory}'")
         if self.cidr: result.append(f"'cidr': '{self.cidr}'")
