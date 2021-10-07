@@ -182,7 +182,7 @@ class Cli():
         if args.action_type == 'create_token':
             hostfactory_logic = HostFactoryLogic(client)
 
-            create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
+            create_token_data = CreateTokenData(host_factory=args.hostfactory_id,
                                                 cidr=args.cidr,
                                                 days=args.duration_days,
                                                 hours=args.duration_hours,

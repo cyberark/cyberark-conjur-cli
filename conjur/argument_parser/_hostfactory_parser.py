@@ -38,7 +38,7 @@ class HostFactoryParser:
                         description=command_description(hostfactory_name,
                                                         hostfactory_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Creates one or more identical tokens for hosts with restrictions\n',
@@ -62,7 +62,7 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_create_name, hostfactory_create_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Create creates one or more identical tokens '
@@ -92,7 +92,7 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory create token --hostfactoryid my_factory '
+                            'conjur hostfactory create token --hostfactory-id my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t '
                             'Creates one or more identical tokens for hosts with restrictions\t\t',
@@ -105,23 +105,23 @@ class HostFactoryParser:
         create_token = hostfactory_create_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
         create_token.add_argument('-action_type', default='create_token', help=argparse.SUPPRESS)
-        create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE', required=True,
-                                  help='(Mandatory) the ID of the host factory.')
+        create_token.add_argument('-i', '--hostfactory-id', metavar='VALUE', required=True,
+                                  help='(Mandatory) The ID of the host factory.')
         create_token.add_argument('--cidr', metavar='VALUE',
-                                  help='(Optional) the CIDR address that contains '
+                                  help='(Optional) The CIDR address that contains '
                                        'all IPs that can use this token to create hosts. '
                                        'You can specify multiple cidr, '
                                        'separated by commas (for example '
                                        '--cidr "10.0.10.0/24,'
                                        '10.0.11.1/32,10.0.20.0/24")')
         create_token.add_argument('-d', '--duration-days', metavar='VALUE', type=int,
-                                  help='(Optional) the number of days the token will be valid.')
-        create_token.add_argument('-H', '--duration-hours', metavar='VALUE', type=int,
-                                  help='(Optional) the number of hours the token will be valid.')
+                                  help='(Optional) The number of days the token will be valid.')
+        create_token.add_argument('-dh', '--duration-hours', metavar='VALUE', type=int,
+                                  help='(Optional) The number of hours the token will be valid.')
         create_token.add_argument('-m', '--duration-minutes', metavar='VALUE', type=int,
-                                  help='(Optional) the number of minutes the token will be valid.')
+                                  help='(Optional) The number of minutes the token will be valid.')
         create_token.add_argument('-c', '--count', metavar='VALUE', type=int,
-                                  help='(Optional) the number of times the token can be used.')
+                                  help='(Optional) The number of times the token can be used.')
         create_token.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')
 

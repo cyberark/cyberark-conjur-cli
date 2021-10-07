@@ -34,7 +34,7 @@ class CreateTokenData:
         self.minutes = minutes if minutes else 0
 
         if self.host_factory == "":
-            raise MissingRequiredParameterException("Missing required parameter, 'host_factory'")
+            raise MissingRequiredParameterException("Missing required parameter, 'hostfactory-id'")
 
         if self.count <= 0:
             raise InvalidFormatException("Parameter 'count' is not in the correct format")
@@ -72,8 +72,11 @@ class CreateTokenData:
             'count': self.count
         }
 
+    # pylint: disable=multiple-statements
     def __repr__(self) -> str:
-        return f"{{'host_factory': '{self.host_factory}', " \
-               f"'cidr': '{self.cidr}', " \
-               f"'expiration': '{self.duration}', " \
-               f"'count': '{self.count}'}}"
+        result = []
+        if self.host_factory: result.append(f"'host_factory': '{self.host_factory}'")
+        if self.cidr: result.append(f"'cidr': '{self.cidr}'")
+        if self.duration: result.append(f"'expiration': '{self.duration}'")
+        if self.count: result.append(f"'count': '{self.count}'")
+        return '{' + ', '.join(result) + '}'

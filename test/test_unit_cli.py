@@ -370,7 +370,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_hostfactory_token_create_functions_are_properly_called(self, mock_hostfactory_create_token):
         mock_obj = MockArgs()
         mock_obj.action_type = 'create_token'
-        mock_obj.hostfactoryid = "some-id"
+        mock_obj.hostfactory_id = "some-id"
         mock_obj.duration_days = 1
         mock_obj.duration_hours = 1
         mock_obj.duration_minutes = 1

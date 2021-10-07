@@ -31,7 +31,8 @@ class HostFactoryController:
         if create_token_data is None:
             raise MissingRequiredParameterException('Missing required parameters')
 
-        logging.debug(f"Creating token for hostfactory '{create_token_data.host_factory}'...")
+        logging.debug("Creating token for hostfactory with the following details: "
+                      f"{create_token_data}...")
 
         result = self.hostfactory_logic.create_token(create_token_data)
         sys.stdout.write(result + '\n')
