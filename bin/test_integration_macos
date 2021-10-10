@@ -18,9 +18,6 @@ trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cl
 trap 'cleanup' EXIT
 cleanup
 
-# echo "Building API container..."
-# docker-compose build test
-
 echo "Generating certificate..."
 docker-compose up openssl
 
@@ -44,10 +41,7 @@ CONJUR_AUTHN_API_KEY=$admin_api_key
 DEBUG=$DEBUG
 ENV
 
-echo "Starting test env..."
-./test/configure_test_executor.sh
-
-echo "Setting python environment..."
+echo "Configuring python environment..."
 export TEST_HOSTNAME="https://localhost"
 export IS_LOCALHOST="true"
 python3 -m pip install pipenv
