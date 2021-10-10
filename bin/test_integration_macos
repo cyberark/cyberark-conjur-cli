@@ -47,6 +47,10 @@ export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
 
+python3 -c 'import keyring; keyring.set_password("system", "username", "password")'
+
+security authorize
+
 rm -rf $CURRENT_DIR/output/*
 
 # Hint: '--privileged' is added here otherwise we will get operation
