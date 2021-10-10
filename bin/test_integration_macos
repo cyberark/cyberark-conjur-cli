@@ -1,0 +1,65 @@
+#!/bin/bash -ex
+
+cleanup() {
+  echo "Cleaning up..."
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
+}
+
+DEBUG="false"
+if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
+  DEBUG="true"
+  shift
+fi
+
+export ADMIN_PASSWORD=$(openssl rand -hex 12)
+
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'cleanup' EXIT
+cleanup
+
+# echo "Building API container..."
+# docker-compose build test
+
+echo "Generating certificate..."
+docker-compose up openssl
+
+echo "Starting Conjur..."
+docker-compose up -d conjur
+docker-compose up -d conjur-https
+docker-compose exec -T conjur conjurctl wait
+
+echo "Configuring Conjur..."
+admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
+export CONJUR_AUTHN_API_KEY=$admin_api_key
+export DEBUG=$DEBUG
+conjur_host_port=$(docker-compose port conjur 80)
+conjur_port="${conjur_host_port##*:}"
+export TEST_HOSTNAME=conjur-https
+
+# Docker-compose will pick this file up when starting containers
+# so we will have these variables in the container
+cat <<ENV > .env
+CONJUR_AUTHN_API_KEY=$admin_api_key
+DEBUG=$DEBUG
+ENV
+
+echo "Starting test env..."
+./test/configure_test_executor.sh
+
+echo "Setting python environment..."
+export TEST_HOSTNAME="https://localhost"
+export IS_LOCALHOST="true"
+python3 -m pip install pipenv
+python3 -m pipenv install -r requirements.txt
+
+rm -rf $CURRENT_DIR/output/*
+
+# Hint: '--privileged' is added here otherwise we will get operation
+# not permitted when attempting to do anything related to dbus
+if [[ "$DEBUG" == "true" ]]; then
+  python3 -m nose2 -v -X --config integration_test.cfg -A 'integration'
+  exit
+fi
+
+python3 -m nose2 -v -X --config integration_test.cfg -A 'integration'
