@@ -17,7 +17,6 @@ export ADMIN_PASSWORD=$(openssl rand -hex 12)
 
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
-cleanup
 
 echo "Generating certificate..."
 docker-compose up openssl
