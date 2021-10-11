@@ -4,8 +4,6 @@ cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
   docker-compose rm --stop --force
-  security default-keychain -s
-  security delete-keychain https://localhost
 }
 
 DEBUG="false"
@@ -48,9 +46,9 @@ export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
 
-security create-keychain -p foo https://localhost
-security default-keychain -s https://localhost
-python3 -c 'import keyring; keyring.set_password("https://localhost", "username", "password")'
+# To run this script on the pipeline we need to configure the keychain so we'll have permissions to add and get passwords.
+# As for now, our current MacOS executor cannot allow this, we cannot run it in the pipeline.
+# echo "Configuring keychain..."
 
 rm -rf $CURRENT_DIR/output/*
 

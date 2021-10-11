@@ -74,12 +74,6 @@ pipeline {
       }
     }
 
-    stage('MacOS Integration tests') {
-      agent { label 'executor-v2-mac' }
-      steps {
-        sh './bin/test_integration_macos'
-      }
-    }
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {
