@@ -48,7 +48,7 @@ python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
 
 security create-keychain -p foo https://localhost
-python3 -m keyring set https://localhost username hi
+python3 -c 'import keyring; keyring.set_password("https://localhost", "username", "password")'
 
 rm -rf $CURRENT_DIR/output/*
 
