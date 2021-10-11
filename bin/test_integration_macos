@@ -46,11 +46,9 @@ export TEST_HOSTNAME="https://localhost"
 export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
+
 security create-keychain -p foo https://localhost
-
-python3 -c 'import keyring; keyring.set_password("https://localhost", "username", "password")'
-
-
+python3 -m keyring set https://localhost username hi
 
 rm -rf $CURRENT_DIR/output/*
 
