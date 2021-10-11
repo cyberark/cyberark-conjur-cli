@@ -4,6 +4,7 @@ cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
   docker-compose rm --stop --force
+  security delete-keychain https://localhost
 }
 
 DEBUG="false"
@@ -50,7 +51,6 @@ security create-keychain -p foo https://localhost
 
 python3 -c 'import keyring; keyring.set_password("https://localhost", "username", "password")'
 
-security delete-keychain https://localhost
 
 
 rm -rf $CURRENT_DIR/output/*
