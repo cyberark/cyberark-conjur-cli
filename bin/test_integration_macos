@@ -46,8 +46,11 @@ export TEST_HOSTNAME="https://localhost"
 export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
-security create-keychain -p foo jenkins-build1234
-security delete-keychain jenkins-build1234
+security create-keychain -p foo https://localhost
+
+python3 -c 'import keyring; keyring.set_password("https://localhost", "username", "password")'
+
+security delete-keychain https://localhost
 
 
 rm -rf $CURRENT_DIR/output/*
