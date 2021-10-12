@@ -1,5 +1,8 @@
 #!/bin/bash -ex
 
+# To run this script on the pipeline we need to configure the keychain so we'll have permissions to add and get passwords.
+# As for now, our current MacOS executor cannot allow this, we cannot run it in the pipeline.
+
 cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
@@ -12,10 +15,9 @@ if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
   shift
 fi
 
-export ADMIN_PASSWORD=$(openssl rand -hex 12)
-
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
+cleanup
 
 echo "Generating certificate..."
 docker-compose up openssl
@@ -43,21 +45,11 @@ ENV
 
 echo "Configuring python environment..."
 export TEST_HOSTNAME="https://localhost"
+# We want to run this on our local machine to check integration with MacOS
 export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
 
-# To run this script on the pipeline we need to configure the keychain so we'll have permissions to add and get passwords.
-# As for now, our current MacOS executor cannot allow this, we cannot run it in the pipeline.
-# echo "Configuring keychain..."
-
 rm -rf $CURRENT_DIR/output/*
-
-# Hint: '--privileged' is added here otherwise we will get operation
-# not permitted when attempting to do anything related to dbus
-if [[ "$DEBUG" == "true" ]]; then
-  python3 -m nose2 -v -X --config integration_test.cfg -A 'integration'
-  exit
-fi
 
 python3 -m nose2 -v -X --config integration_test.cfg -A 'integration'
