@@ -46,7 +46,6 @@ ENV
 echo "Configuring python environment..."
 export TEST_HOSTNAME="https://localhost"
 # We want to run this on our local machine to check integration with MacOS
-export IS_LOCALHOST="true"
 python3 -m pip install pipenv
 python3 -m pipenv install -r requirements.txt
 
