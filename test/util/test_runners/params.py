@@ -9,7 +9,7 @@ class ClientParams:
     Default params are used for test_integration script
     """
 
-    def __init__(self, url='https://conjur-https', account='dev', login='admin', api_key=None):
+    def __init__(self, url=os.environ.get('TEST_HOSTNAME') or 'https://conjur-https', account='dev', login='admin', api_key=None):
         self.hostname = url
         self.account = account
         self.login = login

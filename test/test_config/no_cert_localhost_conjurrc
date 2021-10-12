@@ -1,0 +1,4 @@
+---
+conjur_account: dev
+conjur_url: https://localhost
+cert_file: ''

@@ -1,0 +1,54 @@
+#!/bin/bash -ex
+
+# To run this script on the pipeline we need to configure the keychain so we'll have permissions to add and get passwords.
+# As for now, our current MacOS executor cannot allow this, we cannot run it in the pipeline.
+
+cleanup() {
+  echo "Cleaning up..."
+  echo "Cleaning up... logs in cleanup.log"
+  docker-compose rm --stop --force
+}
+
+DEBUG="false"
+if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
+  DEBUG="true"
+  shift
+fi
+
+trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'cleanup' EXIT
+cleanup
+
+echo "Generating certificate..."
+docker-compose up openssl
+
+echo "Starting Conjur..."
+docker-compose up -d conjur
+docker-compose up -d conjur-https
+docker-compose exec -T conjur conjurctl wait
+
+echo "Configuring Conjur..."
+admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
+export CONJUR_AUTHN_API_KEY=$admin_api_key
+export DEBUG=$DEBUG
+conjur_host_port=$(docker-compose port conjur 80)
+conjur_port="${conjur_host_port##*:}"
+export TEST_HOSTNAME=conjur-https
+export CONJURRC=no_cert_localhost_conjurrc
+
+# Docker-compose will pick this file up when starting containers
+# so we will have these variables in the container
+cat <<ENV > .env
+CONJUR_AUTHN_API_KEY=$admin_api_key
+DEBUG=$DEBUG
+ENV
+
+echo "Configuring python environment..."
+export TEST_HOSTNAME="https://localhost"
+# We want to run this on our local machine to check integration with MacOS
+python3 -m pip install pipenv
+python3 -m pipenv install -r requirements.txt
+
+rm -rf $CURRENT_DIR/output/*
+
+python3 -m nose2 -v -X --config integration_test.cfg -A 'integration'

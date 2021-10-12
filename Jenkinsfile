@@ -73,6 +73,7 @@ pipeline {
         }
       }
     }
+
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {

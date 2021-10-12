@@ -273,7 +273,9 @@ Before each release the following steps need to be performed:
 
   Note that environments used to pack the binary should not be the same environment to run the tests!
 
-- For *each* platform we support (Windows, macOS, RHEL 7/8), run basic sanity tests *manually* (`init`, `login`, `list`)
+- For macOS run `./bin/test_integration_macos` to run the intagration tests locally.
+
+- For *each* platform we support (Windows, RHEL 7/8), run basic sanity tests *manually* (`init`, `login`, `list`)
 ### Perform security scan
 
 Scan the project for vulnerabilities.

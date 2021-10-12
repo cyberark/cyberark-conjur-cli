@@ -56,8 +56,8 @@ class TestRunnerPathProvider():  # pragma: no cover
 
     @property
     def test_insecure_conjurrc_file_path(self):
-        return os.path.join(self.HELPERS_FILES_DIR, "test_config", "no_cert_conjurrc")
-
+        return os.path.join(self.HELPERS_FILES_DIR, "test_config", os.environ.get('CONJURRC') or "no_cert_conjurrc")
+    
     @property
     def netrc_path(self):
         return os.path.join(self.ROOT_DIR, self.netrc_file_name)

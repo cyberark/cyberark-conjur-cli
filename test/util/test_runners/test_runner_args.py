@@ -1,3 +1,5 @@
+import os
+
 from argparse import ArgumentParser
 
 
@@ -47,7 +49,7 @@ class TestRunnerArgs:
                             help='Added to run OSS-specific tests')
         parser.add_argument('-i', '--identifier', dest='test_name_identifier', action='store', default='integration',
                             help='the test method with this identifier will be run (integration by default).')
-        parser.add_argument('-u', '--url', dest='url', action='store', default='https://conjur-https',
+        parser.add_argument('-u', '--url', dest='url', action='store', default=os.environ.get('TEST_HOSTNAME') or 'https://conjur-https',
                             help='server host name')
         parser.add_argument('-a', '--account', dest='account', action='store', default='dev', help='account name')
         parser.add_argument('-l', '--login', dest='login', action='store', default='admin', help='user name')
