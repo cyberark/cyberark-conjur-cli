@@ -34,7 +34,7 @@ export DEBUG=$DEBUG
 conjur_host_port=$(docker-compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
 export TEST_HOSTNAME=conjur-https
-export CONJURRC=no_cert_conjurrc_localhost
+export CONJURRC=no_cert_localhost_conjurrc
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
