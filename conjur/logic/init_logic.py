@@ -12,18 +12,15 @@ import logging
 import os.path
 from socket import gaierror as SocketGetAddressInfoException
 
-# Third party
-import yaml
-
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_client import SSLClient
 from conjur.data_object import ConjurrcData
-from conjur.errors import ConnectionToConjurFailedException,RetrieveCertificateException
-
+from conjur.errors import ConnectionToConjurFailedException, RetrieveCertificateException
 
 DEFAULT_PORT = 443
+
 
 # pylint: disable=raise-missing-from,unspecified-encoding
 class InitLogic:
@@ -33,10 +30,11 @@ class InitLogic:
     This class holds the business logic for populating the
     conjurrc configuration details needed to connect to Conjur
     """
-    def __init__(self, ssl_service:SSLClient):
+
+    def __init__(self, ssl_service: SSLClient):
         self.ssl_service = ssl_service
 
-    def get_certificate(self, hostname:str, port):
+    def get_certificate(self, hostname: str, port):
         """
         Method for connecting to Conjur to fetch the certificate chain
         """
@@ -47,21 +45,21 @@ class InitLogic:
             logging.debug("Successfully fetched certificate")
         except SocketGetAddressInfoException as error:
             raise ConnectionToConjurFailedException(f"Unable to resolve server DNS "
-                            f"from {hostname}:{port}. "
-                            f"Reason: {str(error)}") from error
+                                                    f"from {hostname}:{port}. "
+                                                    f"Reason: {str(error)}") from error
         except TimeoutError as error:
             raise ConnectionToConjurFailedException(f"Unable to connect to server "
-                            f"from {hostname}:{port}. "
-                            f"Reason: {str(error)}") from error
+                                                    f"from {hostname}:{port}. "
+                                                    f"Reason: {str(error)}") from error
         except Exception as error:
             raise RetrieveCertificateException(f"Unable to retrieve certificate "
-                            f"from {hostname}:{port}. "
-                            f"Reason: {str(error)}") from error
+                                               f"from {hostname}:{port}. "
+                                               f"Reason: {str(error)}") from error
 
         return fingerprint, readable_certificate
 
     @classmethod
-    def fetch_account_from_server(cls, conjurrc_data:ConjurrcData):
+    def fetch_account_from_server(cls, conjurrc_data: ConjurrcData):
         """
         Fetches the account from the Conjur Enterprise server by making a
         request to the /info endpoint. This endpoint only exists in the
@@ -74,7 +72,7 @@ class InitLogic:
         # to make a request to /info
         if conjurrc_data.cert_file is None and conjurrc_data.conjur_url.startswith("https"):
             certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
-                                          "conjur-server.pem")
+                                            "conjur-server.pem")
         else:
             certificate_path = conjurrc_data.cert_file
 
@@ -90,8 +88,8 @@ class InitLogic:
                       "successfully fetched from the Conjur server")
 
     @classmethod
-    def write_certificate_to_file(cls, fetched_certificate:str, cert_file_path:str,
-            force_overwrite_flag:bool) -> bool :
+    def write_certificate_to_file(cls, fetched_certificate: str, cert_file_path: str,
+                                  force_overwrite_flag: bool) -> bool:
         """
         Method for writing certificate to a file on the user's machine
         """
@@ -106,23 +104,14 @@ class InitLogic:
         return is_written
 
     @classmethod
-    def write_conjurrc(cls, conjurrc_file_path:str, conjurrc_data:ConjurrcData,
-                       force_overwrite_flag:bool) -> bool :
+    def write_conjurrc(cls, conjurrc_file_path: str, conjurrc_data: ConjurrcData,
+                       force_overwrite_flag: bool) -> bool:
         """
         Method for writing the conjurrc configuration
         details needed to create a connection to Conjur
         """
-        is_written = True
         if not force_overwrite_flag and os.path.exists(conjurrc_file_path):
-            return not is_written
+            return False
 
-        with open(conjurrc_file_path, 'w') as config_fp:
-            _pretty_print_object = {}
-
-            # Ensures that there are no None fields written to conjurrc
-            for attr,value in conjurrc_data.__dict__.items():
-                _pretty_print_object[str(attr)] = value
-
-            config_fp.write("---\n")
-            yaml.dump(_pretty_print_object, config_fp)
-        return is_written
+        conjurrc_data.write_to_file(conjurrc_file_path)
+        return True

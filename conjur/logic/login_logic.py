@@ -44,7 +44,7 @@ class LoginLogic:
         elif ssl_verify and credential_data.machine.startswith("https"):
             # Catches the case where a user does not run in insecure mode but the
             # .conjurrc cert_file entry is empty
-            if conjurrc.cert_file == '' and ssl_verify:
+            if conjurrc.cert_file == '':
                 raise CertificateVerificationException
 
             certificate_path = conjurrc.cert_file

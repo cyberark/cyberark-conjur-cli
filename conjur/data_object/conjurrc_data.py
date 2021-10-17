@@ -7,6 +7,7 @@ This module represents an object that holds conjurrc data
 """
 # pylint: disable=too-few-public-methods
 from yaml import load as yaml_load
+from yaml import dump as yaml_dump
 
 try:
     from yaml import CLoader as YamlLoader
@@ -17,10 +18,12 @@ except ImportError:  # pragma: no cover
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException
 
+
 class ConjurrcData:
     """
     Used for setting user input data
     """
+
     def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
         self.conjur_url = conjur_url
         self.conjur_account = account
@@ -43,5 +46,14 @@ class ConjurrcData:
 
     # pylint: disable=line-too-long
     def __repr__(self) -> str:
-        return f"{{'conjur_url': '{self.conjur_url}', 'conjur_account': '{self.conjur_account}', " \
-               f"'cert_file': '{self.cert_file}'}}"
+        return f"{self.__dict__}"
+
+    def write_to_file(self, dest: str):
+        """
+        Method for writing the conjurrc configuration
+        details needed to create a connection to Conjur
+        """
+        with open(dest, 'w') as config_fp:
+            data = {key: val for key, val in self.__dict__.items() if val is not None}
+            out = f"---\n{yaml_dump(data)}"
+            config_fp.write(out)
