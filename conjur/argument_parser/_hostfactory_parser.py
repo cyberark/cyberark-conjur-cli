@@ -41,7 +41,7 @@ class HostFactoryParser:
                             'conjur hostfactory create token --hostfactoryid my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
-                            'Creates a token for host with restrictions\n',
+                            'Creates a token for creating hosts with restrictions\n',
                             command='hostfactory',
                             subcommands=['create']),
                         usage=argparse.SUPPRESS,
@@ -51,14 +51,14 @@ class HostFactoryParser:
 
     @staticmethod
     def _add_hostfactory_create(hostfactory_subparser: ArgparseWrapper):
-        hostfactory_create_name = 'create - Create token/s for hosts ' \
+        hostfactory_create_name = 'create - Create token for creating hosts ' \
                                   'with restrictions'
         hostfactory_create_usage = 'conjur [global options] hostfactory ' \
                                    'create <subcommand> [options] [args]'
 
         create_cmd = hostfactory_subparser \
             .add_parser(name="create",
-                        help='Creates a token or creates a host using a token',
+                        help='Creates a token for creating hosts or creates a host using a token',
                         description=command_description(
                             hostfactory_create_name, hostfactory_create_usage),
                         epilog=command_epilog(
@@ -66,7 +66,7 @@ class HostFactoryParser:
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Create creates a token '
-                            'for hosts with restrictions\t\t',
+                            'for creating hosts with restrictions\t\t',
                             command='create',
                             subcommands=['token']
                         ),
@@ -81,14 +81,14 @@ class HostFactoryParser:
 
     @staticmethod
     def _add_hostfactory_create_token(menu: ArgparseWrapper):
-        hostfactory_create_token_name = 'token - Creates a token for host ' \
+        hostfactory_create_token_name = 'token - Creates a token for creating hosts ' \
                                         'with restrictions'
         hostfactory_create_token_usage = 'conjur [global options] hostfactory ' \
                                          'create token [options] [args]'
 
         hostfactory_create_subcommand_parser = menu \
             .add_parser(name="token",
-                        help='Creates a token for host with restrictions',
+                        help='Creates a token for creating hosts with restrictions',
                         description=command_description(
                             hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(
