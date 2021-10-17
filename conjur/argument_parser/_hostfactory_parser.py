@@ -95,7 +95,7 @@ class HostFactoryParser:
                             'conjur hostfactory create token --hostfactoryid my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t '
-                            'Creates a token for host with restrictions\t\t',
+                            'Creates a token for creating hosts with restrictions\t\t',
                             command='token',
                         ),
                         usage=argparse.SUPPRESS,
