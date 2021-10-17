@@ -18,6 +18,7 @@ import requests
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.create_host_data import CreateHostData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -251,6 +252,25 @@ class Api():
                                params,
                                create_token_data,
                                api_token=self.api_token,
+                               ssl_verify=self._ssl_verify,
+                               headers={'Content-Type': 'application/x-www-form-urlencoded'})
+
+    def create_host(self, create_host_data: CreateHostData) -> requests.Response:
+        """
+        This method is used to create host using the hostfactory.
+        """
+        if create_host_data is None:
+            raise MissingRequiredParameterException('create_host_data is empty')
+
+        request_body_parameters = parse.urlencode(create_host_data.to_dict())
+        params = {}
+        params.update(self._default_params)
+
+        return invoke_endpoint(HttpVerb.POST,
+                               ConjurEndpoint.HOST_FACTORY_HOSTS,
+                               params,
+                               request_body_parameters,
+                               api_token=create_host_data.token,
                                ssl_verify=self._ssl_verify,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 

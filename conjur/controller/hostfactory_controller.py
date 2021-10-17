@@ -10,6 +10,7 @@ import sys
 # Internals
 from conjur.errors import MissingRequiredParameterException
 from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.create_host_data import CreateHostData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 
 
@@ -37,3 +38,17 @@ class HostFactoryController:
         sys.stdout.write(result + '\n')
         logging.debug("Successfully created token for hostfactory "
                       f"'{create_token_data.host_factory}'")
+
+    def create_host(self, create_host_data: CreateHostData):
+        """
+        Method that facilitates create token call to the logic
+        """
+        if create_host_data is None:
+            raise MissingRequiredParameterException('Missing required parameters')
+
+        logging.debug(f"Creating host: '{create_host_data.id}'...")
+
+        result = self.hostfactory_logic.create_host(create_host_data)
+        sys.stdout.write(result + '\n')
+        logging.debug("Successfully created host using hostfactory: host_id:"
+                      f"'{create_host_data.host_id}'")
