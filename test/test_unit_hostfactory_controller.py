@@ -24,4 +24,4 @@ class HostfactoryControllerTest(unittest.TestCase):
         mock_hostfactory_logic = HostFactoryLogic
         mock_hostfactory_controller = HostFactoryController(mock_hostfactory_logic)
         with self.assertRaises(MissingRequiredParameterException):
-            mock_hostfactory_controller.create_token(create_token_data=CreateTokenData(count=0))
+            mock_hostfactory_controller.create_token(create_token_data=CreateTokenData())

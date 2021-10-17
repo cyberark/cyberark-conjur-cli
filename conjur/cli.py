@@ -186,8 +186,7 @@ class Cli():
                                                 cidr=args.cidr,
                                                 days=args.duration_days,
                                                 hours=args.duration_hours,
-                                                minutes=args.duration_minutes,
-                                                count=args.count)
+                                                minutes=args.duration_minutes)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)
 
