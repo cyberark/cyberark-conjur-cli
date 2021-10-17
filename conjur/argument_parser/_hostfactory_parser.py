@@ -41,7 +41,7 @@ class HostFactoryParser:
                             'conjur hostfactory create token --hostfactoryid my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
-                            'Creates one or more identical tokens for hosts with restrictions\n',
+                            'Creates a token for host with restrictions\n',
                             command='hostfactory',
                             subcommands=['create']),
                         usage=argparse.SUPPRESS,
@@ -65,7 +65,7 @@ class HostFactoryParser:
                             'conjur hostfactory create token --hostfactoryid my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
-                            'Create creates one or more identical tokens '
+                            'Create creates a token '
                             'for hosts with restrictions\t\t',
                             command='create',
                             subcommands=['token']
@@ -81,21 +81,21 @@ class HostFactoryParser:
 
     @staticmethod
     def _add_hostfactory_create_token(menu: ArgparseWrapper):
-        hostfactory_create_token_name = 'token - Create token/s for hosts ' \
+        hostfactory_create_token_name = 'token - Creates a token for host ' \
                                         'with restrictions'
         hostfactory_create_token_usage = 'conjur [global options] hostfactory ' \
                                          'create token [options] [args]'
 
         hostfactory_create_subcommand_parser = menu \
             .add_parser(name="token",
-                        help='Create token/s for hosts with restrictions',
+                        help='Creates a token for host with restrictions',
                         description=command_description(
                             hostfactory_create_token_name, hostfactory_create_token_usage),
                         epilog=command_epilog(
                             'conjur hostfactory create token --hostfactoryid my_factory '
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t '
-                            'Creates one or more identical tokens for hosts with restrictions\t\t',
+                            'Creates a token for host with restrictions\t\t',
                             command='token',
                         ),
                         usage=argparse.SUPPRESS,
@@ -120,8 +120,6 @@ class HostFactoryParser:
                                   help='(Optional) the number of hours the token will be valid.')
         create_token.add_argument('-m', '--duration-minutes', metavar='VALUE', type=int,
                                   help='(Optional) the number of minutes the token will be valid.')
-        create_token.add_argument('-c', '--count', metavar='VALUE', type=int,
-                                  help='(Optional) the number of times the token can be used.')
         create_token.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')
 

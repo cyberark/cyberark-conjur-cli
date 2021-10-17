@@ -168,32 +168,3 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'], exit_code=1)
         self.assertIn("Failed to execute command. Reason: Either", output)
-
-    def test_hostfactory_with_count_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1',
-                                  '--count', '3'])
-        token_values = self.extract_from_json(output, "token")
-
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      f'        "token": "{token_values[0]}"\n    }},'
-                      '\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      f'        "token": "{token_values[1]}"\n    }},'
-                      '\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      f'        "token": "{token_values[2]}"\n    }}\n]\n'
-                      , output)
-
-    def test_hostfactory_with_negative_count_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1',
-                                  '--count', '-1'], exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Parameter", output)
-
-    def test_hostfactory_with_zero_count_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-minutes', '1',
-                                  '--count', '0'], exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Parameter", output)
