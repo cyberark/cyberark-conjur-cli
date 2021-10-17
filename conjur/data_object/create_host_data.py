@@ -25,7 +25,7 @@ class CreateHostData:
         self.token = token
         self.annotations = annotations
 
-        if self.id == "":
+        if self.host_id == "":
             raise MissingRequiredParameterException("Missing required parameter, 'id'")
 
         if self.token == "":

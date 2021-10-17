@@ -180,7 +180,6 @@ class Cli():
         """
             Method that wraps the hostfactory call logic
         """
-        print('handle_hostfactory_logic')
         if args.action_type == 'create_token':
             hostfactory_logic = HostFactoryLogic(client)
 
@@ -192,14 +191,13 @@ class Cli():
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)
         elif args.action_type == 'create_host':
-            print('chill')
             hostfactory_logic = HostFactoryLogic(client)
 
-            create_token_data = CreateHostData(host_id=args.id,
-                                               token=args.token,
-                                               annotations=args.annotations)
+            create_host_data = CreateHostData(host_id=args.id,
+                                              token=args.token,
+                                              annotations=args.annotations)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
-            hostfactory_controller.create_token(create_token_data)
+            hostfactory_controller.create_host(create_host_data)
 
     @classmethod
     def handle_variable_logic(cls, args: list = None, client=None):

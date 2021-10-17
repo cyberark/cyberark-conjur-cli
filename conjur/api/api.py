@@ -265,7 +265,7 @@ class Api():
         request_body_parameters = parse.urlencode(create_host_data.to_dict())
         params = {}
         params.update(self._default_params)
-
+        print(create_host_data.token)
         return invoke_endpoint(HttpVerb.POST,
                                ConjurEndpoint.HOST_FACTORY_HOSTS,
                                params,
