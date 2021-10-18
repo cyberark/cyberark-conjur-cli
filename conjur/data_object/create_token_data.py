@@ -23,11 +23,9 @@ class CreateTokenData:
                  cidr: str = "",
                  days: int = 0,
                  hours: int = 0,
-                 minutes: int = 0,
-                 count: int = None):
+                 minutes: int = 0):
         self.host_factory = host_factory
         self.cidr = cidr.split(',') if cidr is not None else []
-        self.count = 1 if count is None else count
 
         self.days = days if days else 0
         self.hours = hours if hours else 0
@@ -35,9 +33,6 @@ class CreateTokenData:
 
         if self.host_factory == "":
             raise MissingRequiredParameterException("Missing required parameter, 'host_factory'")
-
-        if self.count <= 0:
-            raise InvalidFormatException("Parameter 'count' is not in the correct format")
 
         if self.days <= 0 and self.hours <= 0 and self.minutes <= 0:
             raise InvalidFormatException("Either 'duration-days' / 'duration-hours' "
@@ -68,12 +63,10 @@ class CreateTokenData:
         return {
             'host_factory': self.host_factory,
             'cidr[]': self.cidr,
-            'expiration': self.duration,
-            'count': self.count
+            'expiration': self.duration
         }
 
     def __repr__(self) -> str:
         return f"{{'host_factory': '{self.host_factory}', " \
                f"'cidr': '{self.cidr}', " \
-               f"'expiration': '{self.duration}', " \
-               f"'count': '{self.count}'}}"
+               f"'expiration': '{self.duration}'}}"
