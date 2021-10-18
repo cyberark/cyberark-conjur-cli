@@ -184,10 +184,11 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '1'])
-        token = self.extract_from_json(output, 'token')
+        response = json.loads(output)
+        token = response[0]['token']
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', 'some_host',
-                                  '-t', f"{token[0]}"])
+                                  '-t', f"{token}"])
         response = json.loads(output)
 
         self.assertEqual(response['id'],  'dev:host:some_host')
