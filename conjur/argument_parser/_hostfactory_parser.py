@@ -140,9 +140,7 @@ class HostFactoryParser:
                             name, usage),
                         epilog=command_epilog(
                             'conjur hostfactory create host --id brand-new-host '
-                            '--token 2c0vfj61pmah3efbgpcz2x9vzcy1ycskfkyqy0kgk1fv014880f4 '
-                            '--annotations {"puppet": "true", '
-                            '"description": "new db host"}\t\t '
+                            '--token 2c0vfj61pmah3efbgpcz2x9vzcy1ycskfkyqy0kgk1fv014880f4\t\t '
                             'Creates a Host using the HostFactory\t\t',
                             command='host',
                         ),
@@ -159,8 +157,6 @@ class HostFactoryParser:
                                       'the account of the Host Factory.')
         create_host.add_argument('-t', '--token', metavar='VALUE', required=True,
                                  help='(Mandatory) A Host Factory Token must be provided.')
-        create_host.add_argument('-a', '--annotations', metavar='VALUE',
-                                 help='(Optional) Annotations to apply to the new Host.')
         create_host.add_argument('-h', '--help', action='help',
                                  help='Display help screen and exit')
 

@@ -30,11 +30,11 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                         ['policy', 'replace', '-b', 'root', '-f',
                          self.environment.path_provider.get_policy_path("hostfactory")])
 
-    def extract_from_json(self, output, property):
+    def extract_from_json(self, output, name):
         values = []
         output_to_dict = json.loads(output)
         for entry in output_to_dict:
-            values.append(entry[property])
+            values.append(entry[name])
         return values
 
     # *************** TESTS ***************
@@ -42,7 +42,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test()
     def test_hostfactory_vanilla_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-days', '1'])
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-days', '1'])
 
         self.assertIn('[\n    {\n        "cidr": [],\n'
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1)).isoformat()}Z",\n'
@@ -56,13 +57,15 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_with_unknown_hostfactory_id_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory', '--duration-days', '1'],
+                                 ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory', '--duration-days',
+                                  '1'],
                                  exit_code=1)
         self.assertIn("Failed to execute command. Reason: 404 Client Error", output)
 
     def test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'])
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'])
 
         self.assertIn('[\n    {\n        "cidr": [],\n'
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
@@ -70,7 +73,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_with_single_cidr_returns_cidr_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1',
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1',
                                   '--cidr', '1.2.3.4'])
 
         self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32"\n        ],\n'
@@ -79,8 +83,9 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_with_multiple_ciders_returns_cidrs_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'
-                                  '--cidr', '1.2.3.4,2.2.2.2'])
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'
+                                                      '--cidr', '1.2.3.4,2.2.2.2'])
 
         self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32",\n'
                       '            "2.2.2.2/32"\n        ],\n'
@@ -89,8 +94,9 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_with_low_cidr_range_returns_cidrs_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'
-                                  '--cidr', '1.2.0.0/16'])
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'
+                                                      '--cidr', '1.2.0.0/16'])
 
         self.assertIn('[\n    {\n        "cidr": [\n            "1.2.0.0/16"\n        ],\n'
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
@@ -98,20 +104,23 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_wrong_cidr_format_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'
-                                  '--cidr', '1.2.3'], exit_code=1)
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'
+                                                      '--cidr', '1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
     def test_hostfactory_wrong_cidr_format_range_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'
-                                  '--cidr', '1.2.3/16'], exit_code=1)
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'
+                                                      '--cidr', '1.2.3/16'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
     def test_hostfactory_with_valid_and_invalid_cidr_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory', '--duration-hours', '1'
-                                  '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-hours', '1'
+                                                      '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
     def test_hostfactory_with_all_duration_flags_returns_correct_response(self):
@@ -154,7 +163,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                   '--duration-minutes', '60'])
 
         self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n'
+                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n '
                       '        "token":', output)
 
     def test_hostfactory_with_negative_duration_days_flags_raises_error(self):
@@ -166,5 +175,17 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     def test_hostfactory_without_duration_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'], exit_code=1)
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'],
+                                 exit_code=1)
         self.assertIn("Failed to execute command. Reason: Either", output)
+
+    @integration_test()
+    def test_hostfactory_vanilla_returns_correct_response(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
+                                  '--duration-days', '1'])
+        token = self.extract_from_json(output, 'token')
+
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
+                                  '-t', f"{token}"])

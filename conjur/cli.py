@@ -194,8 +194,7 @@ class Cli():
             hostfactory_logic = HostFactoryLogic(client)
 
             create_host_data = CreateHostData(host_id=args.id,
-                                              token=args.token,
-                                              annotations=args.annotations)
+                                              token=args.token)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_host(create_host_data)
 
