@@ -47,7 +47,6 @@ class HostFactoryController:
             raise MissingRequiredParameterException('Missing required parameters')
 
         logging.debug(f"Creating host: '{create_host_data.host_id}'...")
-
         result = self.hostfactory_logic.create_host(create_host_data)
         sys.stdout.write(result + '\n')
         logging.debug("Successfully created host using hostfactory: host_id:"

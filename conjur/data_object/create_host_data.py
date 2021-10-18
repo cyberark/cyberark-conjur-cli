@@ -19,14 +19,12 @@ class CreateHostData:
     def __init__(self,
                  # using id shadows the internal id
                  host_id: str = "",
-                 token: str = "",
-                 annotations: str = None):
+                 token: str = ""):
         self.host_id = host_id
         self.token = token
-        self.annotations = annotations
 
         if self.host_id == "":
-            raise MissingRequiredParameterException("Missing required parameter, 'id'")
+            raise MissingRequiredParameterException("Missing required parameter, 'host_id'")
 
         if self.token == "":
             raise MissingRequiredParameterException("Missing required parameter, 'token'")
@@ -41,11 +39,7 @@ class CreateHostData:
             'id': self.host_id
         }
 
-        if self.annotations is not None:
-            params['annotations': self.annotations]
-
         return params
 
     def __repr__(self) -> str:
-        return f"{{'id': '{self.host_factory}', " \
-               f"'annotations': '{self.annotations}'"
+        return f"{{'id': '{self.host_factory}'"

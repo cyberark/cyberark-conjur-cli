@@ -36,7 +36,7 @@ class HttpVerb(Enum):
 def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
                     check_errors: bool = True, ssl_verify: bool = True,
                     auth: tuple = None, api_token: str = None,
-                    query: dict = None, headers=None, decode_token=False) -> requests.Response:
+                    query: dict = None, headers=None, decode_token=True) -> requests.Response:
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -56,7 +56,7 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     url = endpoint.value.format(**params)
 
     if api_token:
-        if decode_token:
+        if decode_token:  # host factory token does not require encoding
             api_token = base64.b64encode(api_token.encode()).decode('utf-8')
 
         headers['Authorization'] = f'Token token="{api_token}"'

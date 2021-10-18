@@ -261,17 +261,16 @@ class Api():
         """
         if create_host_data is None:
             raise MissingRequiredParameterException('create_host_data is empty')
-
         request_body_parameters = parse.urlencode(create_host_data.to_dict())
         params = {}
         params.update(self._default_params)
-        print(create_host_data.token)
         return invoke_endpoint(HttpVerb.POST,
                                ConjurEndpoint.HOST_FACTORY_HOSTS,
                                params,
                                request_body_parameters,
                                api_token=create_host_data.token,
                                ssl_verify=self._ssl_verify,
+                               decode_token=False,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def set_variable(self, variable_id: str, value: str) -> str:
