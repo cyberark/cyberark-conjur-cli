@@ -14,6 +14,7 @@ import sys
 # Third party
 from urllib.parse import urlparse
 from urllib.parse import ParseResult
+from requests.exceptions import HTTPError # TODO this should be wrapped. we should throw our own error if possible
 
 # Internals
 from typing import Optional, Tuple
@@ -62,7 +63,7 @@ class InitController:
             # or CA-signed, we will write the certificate on the machine
             self.write_certificate(fetched_certificate)
         else:
-            self.conjurrc_data.cert_file = ""
+            self.conjurrc_data.cert_file = None
 
         self.get_account_info(self.conjurrc_data)
         self.write_conjurrc()
@@ -138,10 +139,10 @@ class InitController:
         """
         if conjurrc_data.conjur_account is None:
             try:
-                self.init_logic.fetch_account_from_server(self.conjurrc_data)
+                self.init_logic.fetch_account_from_server(self.conjurrc_data,self.ssl_verify)
             except CertificateHostnameMismatchException:
                 raise
-            except Exception as error:
+            except HTTPError as error:
                 # Check for catching if the endpoint is exists. If the endpoint does not exist,
                 # a 401 status code will be returned.
                 # If the endpoint does not exist, the user will be prompted to enter in their account.

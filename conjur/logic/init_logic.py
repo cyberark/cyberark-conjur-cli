@@ -12,7 +12,7 @@ import logging
 import os.path
 from socket import gaierror as SocketGetAddressInfoException
 
-from conjur.constants import DEFAULT_CONFIG_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_client import SSLClient
@@ -59,7 +59,7 @@ class InitLogic:
         return fingerprint, readable_certificate
 
     @classmethod
-    def fetch_account_from_server(cls, conjurrc_data: ConjurrcData):
+    def fetch_account_from_server(cls, conjurrc_data: ConjurrcData, ssl_verify):
         """
         Fetches the account from the Conjur Enterprise server by making a
         request to the /info endpoint. This endpoint only exists in the
@@ -70,17 +70,14 @@ class InitLogic:
         }
         # If the user provides us with the certificate path, we will use it
         # to make a request to /info
-        if conjurrc_data.cert_file is None and conjurrc_data.conjur_url.startswith("https"):
-            certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
-                                            "conjur-server.pem")
-        else:
-            certificate_path = conjurrc_data.cert_file
+        if conjurrc_data.cert_file:
+            ssl_verify = conjurrc_data.cert_file
 
         logging.debug("Attempting to fetch the account from the Conjur server...")
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,
                                    params,
-                                   ssl_verify=certificate_path).json()
+                                   ssl_verify=ssl_verify).json()
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation

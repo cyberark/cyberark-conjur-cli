@@ -88,21 +88,13 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     return response
 
 
-# Input validation. ssl_verify = true would lead to the sdk validating the cert against certifi ca_bundle
-def verify_ssl_verify_is_not_true(ssl_verify):
-    if type(ssl_verify) == bool and ssl_verify is True:
-        raise InvalidParameterException("ssl_verify value cannot be true.")
-    if type(ssl_verify) == str and ssl_verify.strip() == "":
-        raise InvalidParameterException("ssl_verify value cannot be empty string.")
-
-
 def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify, auth: tuple,
                    headers: dict) -> requests.Response:
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages
     """
-    verify_ssl_verify_is_not_true(ssl_verify)
+    __verify_ssl_verify_is_not_true(ssl_verify)
     request_method = getattr(requests, http_verb.name.lower())
 
     try:
@@ -149,3 +141,11 @@ def enable_http_logging():  # pragma: no cover
     requests_log = logging.getLogger("urllib3")
     requests_log.setLevel(logging.DEBUG)
     requests_log.propagate = True
+
+# Input validation. ssl_verify = true would lead to the sdk validating the cert against certifi ca_bundle
+def __verify_ssl_verify_is_not_true(ssl_verify):
+
+    if type(ssl_verify) == bool and ssl_verify is True:
+        raise InvalidParameterException("ssl_verify value cannot be true.")
+    if type(ssl_verify) == str and ssl_verify.strip() == "":
+        raise InvalidParameterException("ssl_verify value cannot be empty string.")

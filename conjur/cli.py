@@ -121,7 +121,7 @@ class Cli():
     # pylint: disable=too-many-arguments
     def handle_init_logic(cls, url: str = None, account: str = None,
                           cert: str = None, force: bool = None,
-                          ssl_verify: bool = True):
+                          ssl_verify: bool = False):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file
@@ -360,6 +360,8 @@ class Cli():
 
 def get_conjur_client(args):
     ssl_verify = False if args.ssl_verify is False else ConjurrcData.load_from_file().cert_file
+    with open("/opt/conjur-api-python3/file.txt",'a') as f:
+        f.write(f"{ssl_verify}")
     return Client(ssl_verify=ssl_verify, debug=args.debug)
 
 
