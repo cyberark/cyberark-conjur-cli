@@ -42,4 +42,4 @@ class CreateHostData:
         return params
 
     def __repr__(self) -> str:
-        return f"{{'id': '{self.host_factory}'"
+        return f"{{'id': '{self.host_id}'"
