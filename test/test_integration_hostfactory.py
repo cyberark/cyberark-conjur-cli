@@ -30,13 +30,6 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                         ['policy', 'replace', '-b', 'root', '-f',
                          self.environment.path_provider.get_policy_path("hostfactory")])
 
-    def extract_from_json(self, output, name):
-        values = []
-        output_to_dict = json.loads(output)
-        for entry in output_to_dict:
-            values.append(entry[name])
-        return values
-
     # *************** TESTS ***************
 
     @integration_test()
@@ -182,20 +175,44 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test()
     def test_hostfactory_vanilla_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
+                                  '-t', f"{self.create_token()}"])
+        response = json.loads(output)
+
+        self.assertEqual(response['id'], 'dev:host:some_host')
+        self.assertEqual(response['owner'], 'dev:host_factory:hostfactory_policy/some_host_factory')
+        self.assertEqual(response['restricted_to'], [])
+        self.assertEqual(response['permissions'], [])
+        self.assertEqual(response['annotations'], [])
+        self.assertTrue(response['api_key'] is not None)
+
+    @integration_test()
+    def test_hostfactory_vanilla_host_id_accepts_any_key(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.',
+                                  '-t', f"{self.create_token()}"])
+        self.assertEqual(json.loads(output)['id'], 'dev:host:DifferentTestingChars @#$%^&*()"{}[];\'<>?/.')
+
+    @integration_test()
+    def test_hostfactory_invalid_token_raise_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
+                                  '-t', 'invalid_token'], exit_code=1)
+
+        self.assertIn("Failed to log in to Conjur. Unable to authenticate with Conjur. Reason: 401 Client Error: "
+                      "Unauthorized for url:", output)
+
+    @integration_test()
+    def test_hostfactory_empty_host_id_raise_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', ' ',
+                                  '-t', f"{self.create_token()}"], exit_code=1)
+
+        self.assertIn("Failed to execute command. Reason: 422 Client Error: Unprocessable Entity for url: ", output)
+
+    def create_token(self):
+        output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '1'])
         response = json.loads(output)
-        token = response[0]['token']
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
-                                  '-t', f"{token}"])
-        response = json.loads(output)
-
-        self.assertEqual(response['id'],  'dev:host:some_host')
-        self.assertEqual(response['owner'],  'dev:host_factory:hostfactory_policy/some_host_factory')
-        self.assertEqual(response['restricted_to'],  [])
-        self.assertEqual(response['permissions'],  [])
-        self.assertEqual(response['annotations'],  [])
-        self.assertTrue(response['api_key'] is not None)
-
-    test_hostfactory_vanilla_returns_correct_response.create_host = True
+        return response[0]['token']
