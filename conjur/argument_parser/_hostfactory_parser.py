@@ -153,7 +153,8 @@ class HostFactoryParser:
         # hidden argument to be used to distinguish this action
         create_host.add_argument('-action_type', default='create_host', help=argparse.SUPPRESS)
         create_host.add_argument('-i', '--id', metavar='VALUE', required=True,
-                                 help='(Mandatory) Identifier of the Host to be created. It will be created within '
+                                 help='(Mandatory) Identifier of the Host to be created. '
+                                      'It will be created within '
                                       'the account of the Host Factory.')
         create_host.add_argument('-t', '--token', metavar='VALUE', required=True,
                                  help='(Mandatory) A Host Factory Token must be provided.')
