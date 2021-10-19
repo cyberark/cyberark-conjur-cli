@@ -54,6 +54,9 @@ class ConjurrcData:
         details needed to create a connection to Conjur
         """
         with open(dest, 'w') as config_fp:
-            data = {key: val for key, val in self.__dict__.items() if val is not None}
+            data = {}
+            for key, val in self.__dict__.items():
+                val = "" if val is None else val
+                data[key] = val
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
