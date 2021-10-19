@@ -32,7 +32,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     # *************** TESTS ***************
 
-    @integration_test()
+    @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -42,12 +42,14 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_without_id_returns_menu(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token'],
                                  exit_code=1)
-        self.assertIn("Failed to execute command", output)
+        self.assertIn("' Name:\n  token - Creates a token for creating hosts with restrictions\n\nUsage:\n", output)
 
+    @integration_test(True)
     def test_hostfactory_with_unknown_hostfactory_id_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory', '--duration-days',
@@ -55,6 +57,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  exit_code=1)
         self.assertIn("Failed to execute command. Reason: 404 Client Error", output)
 
+    @integration_test(True)
     def test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -64,6 +67,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_single_cidr_returns_cidr_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -73,6 +77,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_multiple_ciders_returns_cidrs_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -83,6 +88,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_low_cidr_range_returns_cidrs_in_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -92,24 +98,28 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_wrong_cidr_format_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '1', '--cidr', '1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
+    @integration_test(True)
     def test_hostfactory_wrong_cidr_format_range_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '1', '--cidr', '1.2.3/16'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
+    @integration_test(True)
     def test_hostfactory_with_valid_and_invalid_cidr_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '1', '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
         self.assertIn("Reason: 422", output)
 
+    @integration_test(True)
     def test_hostfactory_with_all_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -119,6 +129,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1, hours=1, minutes=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_zero_value_duration_will_raise_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -126,6 +137,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertIn("Failed to execute command. Reason: Parameter", output)
 
+    @integration_test(True)
     def test_hostfactory_with_only_days_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -135,6 +147,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=365)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_only_hours_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -144,6 +157,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=24)).isoformat()}Z",\n'
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_only_minutes_duration_flags_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -153,6 +167,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n '
                       '        "token":', output)
 
+    @integration_test(True)
     def test_hostfactory_with_negative_duration_days_flags_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
@@ -160,13 +175,14 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertIn("Failed to execute command. Reason: Parameter", output)
 
+    @integration_test(True)
     def test_hostfactory_without_duration_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'],
                                  exit_code=1)
         self.assertIn("Failed to execute command. Reason: Either", output)
 
-    @integration_test()
+    @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', 'some_host',
@@ -180,14 +196,14 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertEqual(response['annotations'], [])
         self.assertTrue(response['api_key'] is not None)
 
-    @integration_test()
+    @integration_test(True)
     def test_hostfactory_vanilla_host_id_accepts_any_char(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.',
                                   '-t', f"{self.create_token()}"])
         self.assertEqual(json.loads(output)['id'], 'dev:host:DifferentTestingChars @#$%^&*()"{}[];\'<>?/.')
 
-    @integration_test()
+    @integration_test(True)
     def test_hostfactory_invalid_token_raise_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', 'some_host',
@@ -196,7 +212,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Failed to log in to Conjur. Unable to authenticate with Conjur. Reason: 401 Client Error: "
                       "Unauthorized for url:", output)
 
-    @integration_test()
+    @integration_test(True)
     def test_hostfactory_empty_host_id_raise_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', ' ',
