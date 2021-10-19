@@ -69,7 +69,7 @@ class HostFactoryParser:
                             'Create creates a token '
                             'for creating hosts with restrictions\t\t'
                             '\nconjur hostfactory create host --id brand-new-token '
-                            '--token 2c0vfj61pmah3efbgpcz2x9vzcy1ycskfkyqy0kgk1fv014880f4\t\t\t '
+                            '--token 82cv6kk040axyffzvmscpf129k81yq1bzkey3gcgfvjc00pfy41h\t\t\t '
                             'Create creates a Host using the HostFactory\t\t',
                             command='create',
                             subcommands=['token', 'host']
@@ -140,7 +140,7 @@ class HostFactoryParser:
                             name, usage),
                         epilog=command_epilog(
                             'conjur hostfactory create host --id brand-new-host '
-                            '--token 2c0vfj61pmah3efbgpcz2x9vzcy1ycskfkyqy0kgk1fv014880f4\t\t '
+                            '--token 82cv6kk040axyffzvmscpf129k81yq1bzkey3gcgfvjc00pfy41h\t\t '
                             'Creates a Host using the HostFactory\t\t',
                             command='host',
                         ),
