@@ -5,7 +5,7 @@ Error module
 
 This module holds Conjur CLI/SDK-specific errors for this project
 """
-from conjur.errors_messages import MISMATCH_HOSTNAME_MESSAGE, FETCH_CREDENTIALS_FAILURE_MESSAGE, \
+from conjur.errors_messages import FETCH_CREDENTIALS_FAILURE_MESSAGE, \
     FETCH_CONFIGURATION_FAILURE_MESSAGE, CONFIGURATION_MISSING_FAILURE_MESSAGE
 
 class InvalidPasswordComplexityException(Exception):
@@ -66,12 +66,6 @@ class CertificateVerificationException(Exception):
         self.message = f"{cause} {solution}"
         super().__init__(self.message)
 
-# pylint: disable=line-too-long
-class CertificateHostnameMismatchException(Exception):
-    """ Exception for when machine's hostname does not match the hostname on the certificate """
-    def __init__(self):
-        self.message = MISMATCH_HOSTNAME_MESSAGE
-        super().__init__(self.message)
 
 class RetrieveCertificateException(Exception):
     """ Exception when Unable retrieve a certificate """

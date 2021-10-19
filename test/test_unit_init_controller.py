@@ -8,8 +8,9 @@ import requests
 from OpenSSL import SSL
 
 from conjur.constants import TEST_HOSTNAME
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
+from conjur.errors import InvalidURLFormatException,\
     CertificateNotTrustedException, MissingRequiredParameterException
+from conjur.api.errors import CertificateHostnameMismatchException
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData

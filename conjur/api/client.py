@@ -19,7 +19,6 @@ from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
     InvalidConfigurationException
-from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.resource import Resource
@@ -62,9 +61,6 @@ class Client():
                  password: str = None,
                  ssl_verify: bool = True,
                  url: str = None):
-
-        if ssl_verify is False:
-            util_functions.get_insecure_warning_in_debug()
 
         self.setup_logging(debug)
 

@@ -18,8 +18,9 @@ from urllib.parse import ParseResult
 # Internals
 from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
+from conjur.errors import InvalidURLFormatException,\
             CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException
+from conjur.api.errors import CertificateHostnameMismatchException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic

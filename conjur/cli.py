@@ -39,9 +39,12 @@ from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLo
 from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData
 from conjur.data_object import PolicyData, UserInputData, VariableData
 from conjur.version import __version__
+from conjur.util import util_functions
 
 
 # pylint: disable=too-many-statements
+
+
 class Cli():
     """
     Main wrapper around CLI-like usages of this module. Provides various
@@ -300,7 +303,10 @@ class Cli():
                 sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
                 Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
 
-        client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
+        client = get_conjur_client(args)
+        if args.ssl_verify is False:
+            #TODO why debug?
+            util_functions.get_insecure_warning_in_debug()
 
         if resource == 'list':
             list_data = ListData(kind=args.kind, inspect=args.inspect,
@@ -350,6 +356,11 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
+
+
+def get_conjur_client(args):
+    ssl_verify = False if args.ssl_verify is False else ConjurrcData.load_from_file().cert_file
+    return Client(ssl_verify=ssl_verify, debug=args.debug)
 
 
 if __name__ == '__main__':

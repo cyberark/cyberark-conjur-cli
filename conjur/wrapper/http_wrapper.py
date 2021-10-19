@@ -14,7 +14,7 @@ from urllib.parse import quote
 import requests
 import urllib3
 
-from conjur.errors import CertificateHostnameMismatchException
+from conjur.api.errors import CertificateHostnameMismatchException, InvalidParameterException
 from conjur.api.endpoints import ConjurEndpoint
 
 
@@ -28,6 +28,7 @@ class HttpVerb(Enum):
     PUT = 3
     DELETE = 4
     PATCH = 5
+
 
 # pylint: disable=too-many-locals,consider-using-f-string
 # ssl_verify can accept Boolean or String as per requests docs
@@ -63,20 +64,12 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     # server pem received during initialization of the client
     # pylint: disable=not-callable
 
-    try:
-        response = invoke_request(http_verb,
-                                  url, *args,
-                                  query=query,
-                                  ssl_verify=True,
-                                  auth=auth,
-                                  headers=headers)
-    except requests.exceptions.SSLError:
-        response = invoke_request(http_verb,
-                                  url, *args,
-                                  query=query,
-                                  ssl_verify=ssl_verify,
-                                  auth=auth,
-                                  headers=headers)
+    response = invoke_request(http_verb,
+                              url, *args,
+                              query=query,
+                              ssl_verify=ssl_verify,
+                              auth=auth,
+                              headers=headers)
 
     if check_errors:
         # takes the "requests" response object and expands the
@@ -95,12 +88,21 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     return response
 
 
-def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify: bool, auth: tuple,
+# Input validation. ssl_verify = true would lead to the sdk validating the cert against certifi ca_bundle
+def verify_ssl_verify_is_not_true(ssl_verify):
+    if type(ssl_verify) == bool and ssl_verify is True:
+        raise InvalidParameterException("ssl_verify value cannot be true.")
+    if type(ssl_verify) == str and ssl_verify.strip() == "":
+        raise InvalidParameterException("ssl_verify value cannot be empty string.")
+
+
+def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify, auth: tuple,
                    headers: dict) -> requests.Response:
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages
     """
+    verify_ssl_verify_is_not_true(ssl_verify)
     request_method = getattr(requests, http_verb.name.lower())
 
     try:
@@ -115,6 +117,7 @@ def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify
         if host_mismatch_message:
             raise CertificateHostnameMismatchException from ssl_error
         raise ssl_error
+
 
 # Not coverage tested since this code should never be hit
 # from checked-in code
