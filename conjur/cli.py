@@ -22,6 +22,7 @@ from conjur.api import SSLClient
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.create_host_data import CreateHostData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
@@ -189,6 +190,13 @@ class Cli():
                                                 minutes=args.duration_minutes)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_token(create_token_data)
+        elif args.action_type == 'create_host':
+            hostfactory_logic = HostFactoryLogic(client)
+
+            create_host_data = CreateHostData(host_id=args.id,
+                                              token=args.token)
+            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+            hostfactory_controller.create_host(create_host_data)
 
     @classmethod
     def handle_variable_logic(cls, args: list = None, client=None):

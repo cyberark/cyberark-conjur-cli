@@ -15,6 +15,7 @@ from typing import Optional
 import requests
 
 # Internals
+from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
@@ -189,6 +190,12 @@ class Client():
         Create token/s for hosts with restrictions
         """
         return self._api.create_token(create_token_data)
+
+    def create_host(self, create_host_data: CreateHostData) -> requests.Response:
+        """
+        Create host using the hostfactory
+        """
+        return self._api.create_host(create_host_data)
 
     def set(self, variable_id: str, value: str) -> str:
         """

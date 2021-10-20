@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-VariableData module
+CreateTokenData module
 
 This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the hostfactory create token request

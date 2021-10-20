@@ -24,6 +24,7 @@ class HostFactoryParser:
         hostfactory_subparser = hostfactory_parser.add_subparsers(title="Subcommand", dest='action')
         hostfactory_create_menu_item = self._add_hostfactory_create(hostfactory_subparser)
         self._add_hostfactory_create_token(hostfactory_create_menu_item)
+        self._add_hostfactory_create_host(hostfactory_create_menu_item)
         self._add_hostfactory_options(hostfactory_parser)
 
         return self
@@ -52,7 +53,7 @@ class HostFactoryParser:
     @staticmethod
     def _add_hostfactory_create(hostfactory_subparser: ArgparseWrapper):
         hostfactory_create_name = 'create - Create token for creating hosts ' \
-                                  'with restrictions'
+                                  'with restrictions or creates a Host using the Host Factory'
         hostfactory_create_usage = 'conjur [global options] hostfactory ' \
                                    'create <subcommand> [options] [args]'
 
@@ -66,9 +67,12 @@ class HostFactoryParser:
                             '--cidr 10.10.1.2/31 '
                             '--duration-days 2\t\t\t '
                             'Create creates a token '
-                            'for creating hosts with restrictions\t\t',
+                            'for creating hosts with restrictions\t\t'
+                            '\nconjur hostfactory create host --id brand-new-token '
+                            '--token 82cv6kk040axyffzvmscpf129k81yq1bzkey3gcgfvjc00pfy41h\t\t\t '
+                            'Create creates a Host using the HostFactory\t\t',
                             command='create',
-                            subcommands=['token']
+                            subcommands=['token', 'host']
                         ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
@@ -122,6 +126,40 @@ class HostFactoryParser:
                                   help='(Optional) the number of minutes the token will be valid.')
         create_token.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')
+
+    @staticmethod
+    def _add_hostfactory_create_host(menu: ArgparseWrapper):
+        name = 'host - Creates a Host using the Host Factory'
+        usage = 'conjur [global options] hostfactory ' \
+                'create host [options] [args]'
+
+        hostfactory_create_subcommand_parser = menu \
+            .add_parser(name="host",
+                        help='Creates a Host using the Host Factory',
+                        description=command_description(
+                            name, usage),
+                        epilog=command_epilog(
+                            'conjur hostfactory create host --id brand-new-host '
+                            '--token 82cv6kk040axyffzvmscpf129k81yq1bzkey3gcgfvjc00pfy41h\t\t '
+                            'Creates a Host using the HostFactory\t\t',
+                            command='host',
+                        ),
+                        usage=argparse.SUPPRESS,
+                        add_help=False,
+                        formatter_class=formatter)
+        # Options
+        create_host = hostfactory_create_subcommand_parser.add_argument_group(
+            title=title_formatter("Options"))
+        # hidden argument to be used to distinguish this action
+        create_host.add_argument('-action_type', default='create_host', help=argparse.SUPPRESS)
+        create_host.add_argument('-i', '--id', metavar='VALUE', required=True,
+                                 help='(Mandatory) Identifier of the Host to be created. '
+                                      'It will be created within '
+                                      'the account of the Host Factory.')
+        create_host.add_argument('-t', '--token', metavar='VALUE', required=True,
+                                 help='(Mandatory) A Host Factory Token must be provided.')
+        create_host.add_argument('-h', '--help', action='help',
+                                 help='Display help screen and exit')
 
     @staticmethod
     def _add_hostfactory_options(parser: ArgparseWrapper):

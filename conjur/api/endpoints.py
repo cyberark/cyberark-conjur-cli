@@ -27,3 +27,4 @@ class ConjurEndpoint(Enum):
     CHANGE_PASSWORD = "{url}/authn/{account}/password"
     WHOAMI = "{url}/whoami"
     HOST_FACTORY_TOKENS = "{url}/host_factory_tokens"
+    HOST_FACTORY_HOSTS = "{url}/host_factories/hosts"

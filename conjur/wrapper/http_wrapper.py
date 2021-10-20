@@ -29,13 +29,14 @@ class HttpVerb(Enum):
     DELETE = 4
     PATCH = 5
 
+
 # pylint: disable=too-many-locals,consider-using-f-string
 # ssl_verify can accept Boolean or String as per requests docs
 # https://requests.readthedocs.io/en/master/api/#main-interface
 def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
                     check_errors: bool = True, ssl_verify: bool = True,
                     auth: tuple = None, api_token: str = None,
-                    query: dict = None, headers=None) -> requests.Response:
+                    query: dict = None, headers=None, decode_token=True) -> requests.Response:
     """
     This method flexibly invokes HTTP calls from 'requests' module
     """
@@ -55,8 +56,10 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     url = endpoint.value.format(**params)
 
     if api_token:
-        encoded_token = base64.b64encode(api_token.encode()).decode('utf-8')
-        headers['Authorization'] = f'Token token="{encoded_token}"'
+        if decode_token:  # host factory token does not require encoding
+            api_token = base64.b64encode(api_token.encode()).decode('utf-8')
+
+        headers['Authorization'] = f'Token token="{api_token}"'
 
     # By default, on each request the certificate will be verified. If there is
     # a failure in verification, the fallback solution will be passing in the
@@ -115,6 +118,7 @@ def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify
         if host_mismatch_message:
             raise CertificateHostnameMismatchException from ssl_error
         raise ssl_error
+
 
 # Not coverage tested since this code should never be hit
 # from checked-in code

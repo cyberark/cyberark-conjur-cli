@@ -11,6 +11,7 @@ import json
 
 # Internals
 from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.create_host_data import CreateHostData
 from conjur.errors import MissingRequiredParameterException
 
 
@@ -36,6 +37,22 @@ class HostFactoryLogic:
             raise MissingRequiredParameterException('Missing required parameters')
 
         response = self.client.create_token(create_token_data)
+
+        if response is not None:
+            data = response.json()
+            if data is not None and len(data) > 0:
+                return json.dumps(data, indent=4, sort_keys=True)
+
+    # pylint: disable=inconsistent-return-statements
+    def create_host(self, create_host_data: CreateHostData) -> str:
+        """
+        Creates a host factory token using the parameters in the 'create_token_data' argument.
+        Returns the generated token.
+        """
+        if create_host_data is None:
+            raise MissingRequiredParameterException('Missing required parameters')
+
+        response = self.client.create_host(create_host_data)
 
         if response is not None:
             data = response.json()
