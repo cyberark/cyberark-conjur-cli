@@ -186,25 +186,34 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
-        host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
+        # roles are not removed from conjur
+        # generate random host id
+        random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', host_id,
+                                 ['hostfactory', 'create', 'host', '-i', random_host_id,
                                   '-t', f"{self.create_token()}"])
-        response = json.loads(output)
+        json_output = json.loads(output)
+        api_key = json_output['api_key']
+        created_at = json_output['created_at']
 
-        self.assertEqual(response['id'], f"dev:host:{host_id}")
-        self.assertEqual(response['owner'], 'dev:host_factory:hostfactory_policy/some_host_factory')
-        self.assertEqual(response['restricted_to'], [])
-        self.assertEqual(response['permissions'], [])
-        self.assertEqual(response['annotations'], [])
-        self.assertTrue(response['api_key'] is not None)
+        self.assertIn(output,
+                      '{\n    "annotations": [],\n    '
+                      f'"api_key": "{api_key}",\n    "created_at": "{created_at}",\n    '
+                      f'"id": "dev:host:{random_host_id}",\n    '
+                      '"owner": "dev:host_factory:hostfactory_policy/some_host_factory",\n    '
+                      '"permissions": [],\n    "restricted_to": []\n}\n')
 
     @integration_test(True)
     def test_hostfactory_vanilla_host_id_accepts_any_char(self):
+        # roles are not removed from conjur
+        # generate random host id
+        random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.',
+                                 ['hostfactory', 'create', 'host', '-i',
+                                  'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.' + random_host_id,
                                   '-t', f"{self.create_token()}"])
-        self.assertEqual(json.loads(output)['id'], 'dev:host:DifferentTestingChars @#$%^&*()"{}[];\'<>?/.')
+        self.assertEqual(json.loads(output)['id'],
+                         'dev:host:DifferentTestingChars @#$%^&*()"{}[];\'<>?/.' + random_host_id)
 
     @integration_test(True)
     def test_hostfactory_invalid_token_raise_error(self):
