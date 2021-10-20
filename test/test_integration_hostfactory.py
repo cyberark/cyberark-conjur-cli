@@ -47,7 +47,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token'],
                                  exit_code=1)
-        self.assertIn("' Name:\n  token - Creates a token for creating hosts with restrictions\n\nUsage:\n", output)
+        self.assertIn(" Name:\n  token - Creates a token for creating hosts with restrictions\n\nUsage:\n", output)
 
     @integration_test(True)
     def test_hostfactory_with_unknown_hostfactory_id_raises_error(self):
@@ -133,9 +133,10 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     def test_hostfactory_with_zero_value_duration_will_raise_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '0', '--duration-hours', '0', '--duration-minutes', '0'])
+                                  '--duration-days', '0', '--duration-hours', '0', '--duration-minutes', '0'],
+                                 exit_code=1)
 
-        self.assertIn("Failed to execute command. Reason: Parameter", output)
+        self.assertIn("Failed to execute command.", output)
 
     @integration_test(True)
     def test_hostfactory_with_only_days_duration_flags_returns_correct_response(self):
@@ -163,9 +164,9 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-minutes', '60'])
 
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n '
-                      '        "token":', output)
+        self.assertIn('[\n    {\n        "cidr": [],\n        "expiration": '
+                      f'"{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n'
+                      '        "token": ', output)
 
     @integration_test(True)
     def test_hostfactory_with_negative_duration_days_flags_raises_error(self):
@@ -173,7 +174,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '-1'], exit_code=1)
 
-        self.assertIn("Failed to execute command. Reason: Parameter", output)
+        self.assertIn("Failed to execute command.", output)
 
     @integration_test(True)
     def test_hostfactory_without_duration_raises_error(self):
