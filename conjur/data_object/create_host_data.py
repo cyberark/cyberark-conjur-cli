@@ -29,7 +29,7 @@ class CreateHostData:
         if self.token == "":
             raise MissingRequiredParameterException("Missing required parameter, 'token'")
 
-    def host_id(self):
+    def get_host_id(self):
         """
         to_dict
 

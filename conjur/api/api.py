@@ -261,7 +261,7 @@ class Api():
         """
         if create_host_data is None:
             raise MissingRequiredParameterException('create_host_data is empty')
-        request_body_parameters = parse.urlencode(create_host_data.host_id())
+        request_body_parameters = parse.urlencode(create_host_data.get_host_id())
         params = {}
         params.update(self._default_params)
         return invoke_endpoint(HttpVerb.POST,
