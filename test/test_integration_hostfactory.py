@@ -9,6 +9,8 @@ This test file handles the main test flows for the hostfactory command
 # Not coverage tested since integration tests doesn't run in
 # the same build step
 import json
+import random
+import string
 from datetime import datetime, timedelta
 
 from test.util.test_infrastructure import integration_test
@@ -83,8 +85,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '1', '--cidr', '1.2.3.4,2.2.2.2'])
 
-        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32",\n'
-                      '            "2.2.2.2/32"\n        ],\n'
+        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32",\n            "2.2.2.2/32"\n        ],\n'
                       f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
@@ -94,8 +95,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-hours', '1', '--cidr', '1.2.0.0/16'])
 
-        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.0.0/16"\n        ],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
+        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.0.0/16"\n        ],\n        "expiration": '
+                      f'"{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
                       '        "token":', output)
 
     @integration_test(True)
@@ -185,12 +186,13 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
+        host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
+                                 ['hostfactory', 'create', 'host', '-i', host_id,
                                   '-t', f"{self.create_token()}"])
         response = json.loads(output)
 
-        self.assertEqual(response['id'], 'dev:host:some_host')
+        self.assertEqual(response['id'], f"dev:host:{host_id}")
         self.assertEqual(response['owner'], 'dev:host_factory:hostfactory_policy/some_host_factory')
         self.assertEqual(response['restricted_to'], [])
         self.assertEqual(response['permissions'], [])
