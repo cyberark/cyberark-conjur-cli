@@ -232,9 +232,26 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
         self.assertIn("Failed to execute command. Reason: 422 Client Error: Unprocessable Entity for url: ", output)
 
+    @integration_test(True)
+    def test_hostfactory_revoke_token_returns_correct_response(self):
+        token = self.create_token()
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'revoke', 'token', '-t', token])
+
+        self.assertIn(f'Token: \'{token}\' has been revoked.\n', output)
+
+    @integration_test(True)
+    def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'revoke', 'token', '-t', 'non_exist'], exit_code=1)
+
+        self.assertIn("Failed to execute command. Reason: 404 Client Error: Not Found for url: ", output)
+
     def create_token(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
                                   '--duration-days', '1'])
         response = json.loads(output)
         return response[0]['token']
+
+    test_hostfactory_revoke_token_returns_correct_response.id1 = True

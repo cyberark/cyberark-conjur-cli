@@ -58,3 +58,13 @@ class HostFactoryLogic:
             data = response.json()
             if data is not None and len(data) > 0:
                 return json.dumps(data, indent=4, sort_keys=True)
+
+    # pylint: disable=inconsistent-return-statements
+    def revoke_token(self, token: str):
+        """
+        Revokes the given token.
+        """
+        if token is None:
+            raise MissingRequiredParameterException('Missing required parameters')
+
+        return self.client.revoke_token(token)

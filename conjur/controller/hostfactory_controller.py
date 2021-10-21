@@ -51,3 +51,19 @@ class HostFactoryController:
         sys.stdout.write(result + '\n')
         logging.debug("Successfully created host using hostfactory: host_id:"
                       f"'{create_host_data.host_id}'")
+
+    def revoke_token(self, token: str):
+        """
+        Method that facilitates token revocation call to the logic
+        """
+        if token is None:
+            raise MissingRequiredParameterException('Missing required parameters')
+
+        logging.debug(f"Attempting to revoke a token")
+        response = self.hostfactory_logic.revoke_token(token)
+
+        if response.ok:
+            sys.stdout.write(f'Token: \'{token}\' has been revoked.\n')
+
+        logging.debug("Successfully revoked token, response ok: {}, return code: {}"
+                      .format(response.ok, response.status_code))

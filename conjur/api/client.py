@@ -197,6 +197,12 @@ class Client():
         """
         return self._api.create_host(create_host_data)
 
+    def revoke_token(self, token: str) -> requests.Response:
+        """
+        Revokes the given token
+        """
+        return self._api.revoke_token(token)
+
     def set(self, variable_id: str, value: str) -> str:
         """
         Sets a variable to a specific value based on its ID
