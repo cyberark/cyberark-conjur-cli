@@ -59,11 +59,11 @@ class HostFactoryController:
         if token is None:
             raise MissingRequiredParameterException('Missing required parameters')
 
-        logging.debug(f"Attempting to revoke a token")
+        logging.debug("Attempting to revoke a token")
         response = self.hostfactory_logic.revoke_token(token)
 
         if response.ok:
             sys.stdout.write(f'Token: \'{token}\' has been revoked.\n')
 
-        logging.debug("Successfully revoked token, response ok: {}, return code: {}"
-                      .format(response.ok, response.status_code))
+        logging.debug(f'Successfully revoked token, response ok: '
+                      f'{response.ok}, return code: {response.status_code}')

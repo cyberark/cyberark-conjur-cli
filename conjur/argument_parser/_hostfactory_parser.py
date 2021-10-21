@@ -97,7 +97,8 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_revoke_name, hostfactory_revoke_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory revoke token --token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
+                            'conjur hostfactory revoke token '
+                            '--token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
                             '\t\t\t '
                             'Revokes a token, immediately disabling it.',
                             command='revoke',
@@ -124,7 +125,8 @@ class HostFactoryParser:
                         description=command_description(
                             hostfactory_revoke_token_name, hostfactory_revoke_token_usage),
                         epilog=command_epilog(
-                            'conjur hostfactory revoke token --token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
+                            'conjur hostfactory revoke token '
+                            '--token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
                             '\t\t'
                             'Revokes a token, immediately disabling it\t\t',
                             command='token'
@@ -133,12 +135,12 @@ class HostFactoryParser:
                         add_help=False,
                         formatter_class=formatter)
         # Options
-        revoke_token_options = subcommand.add_argument_group(
+        options = subcommand.add_argument_group(
             title=title_formatter("Options"))
-        revoke_token_options.add_argument('-action_type', default='revoke_token', help=argparse.SUPPRESS)
-        revoke_token_options.add_argument('-t', '--token', metavar='VALUE', required=True,
+        options.add_argument('-action_type', default='revoke_token', help=argparse.SUPPRESS)
+        options.add_argument('-t', '--token', metavar='VALUE', required=True,
                                           help='(Mandatory) the Host Factory Token to revoke')
-        revoke_token_options.add_argument('-h', '--help', action='help',
+        options.add_argument('-h', '--help', action='help',
                                           help='Display help screen and exit')
 
     @staticmethod
