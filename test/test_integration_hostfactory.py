@@ -185,9 +185,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertIn("Failed to execute command. Reason: Either", output)
 
     @integration_test(True)
-    def test_hostfactory_vanilla_returns_correct_response(self):
-        # roles are not removed from conjur
-        # generate random host id
+    def test_hostfactory_create_host_returns_correct_response(self):
         random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i', random_host_id,
@@ -204,9 +202,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       '"permissions": [],\n    "restricted_to": []\n}\n')
 
     @integration_test(True)
-    def test_hostfactory_vanilla_host_id_accepts_any_char(self):
-        # roles are not removed from conjur
-        # generate random host id
+    def test_hostfactory_create_host_id_accepts_any_char(self):
         random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'host', '-i',
@@ -254,4 +250,15 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         response = json.loads(output)
         return response[0]['token']
 
-    test_hostfactory_revoke_token_returns_correct_response.id1 = True
+    @integration_test(True)
+    def test_hostfactory_create_host_with_revoked_token_should_raise_401_error(self):
+        token = self.create_token()
+        self.invoke_cli(self.cli_auth_params,
+                        ['hostfactory', 'create', 'host', '-i', 'some_host',
+                         '-t', token])
+        self.invoke_cli(self.cli_auth_params, ['hostfactory', 'revoke', 'token', '-t', token])
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
+                                  '-t', token], exit_code=1)
+        self.assertIn('Failed to log in to Conjur. Unable to authenticate with Conjur. Reason: '
+                      '401 Client Error: Unauthorized for url: ', output)
