@@ -51,7 +51,7 @@ def token_response_regex(cidr: str):
 
 
 def token_response_empty_cidr_regex(duration=one_hour_from_now()):
-    return '\[\n    {\n        "cidr": \[\],\n' \
+    return '\[\n    {\n        "cidr": \\[\\],\n' \
            '        "expiration": "' \
            f'{duration}\d\dZ",\n        "token": ".*"\n' \
            '    }\n\]\n'
