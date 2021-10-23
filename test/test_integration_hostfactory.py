@@ -17,6 +17,45 @@ from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
+ACCOUNT = 'dev'
+HOST_FACTORY_ID = 'hostfactory_policy/some_host_factory'
+FULLY_QUALIFIED_HOST_FACTORY_ID = 'dev:host_factory:hostfactory_policy/some_host_factory'
+INVALID_DURATION_ERROR_MSG = 'Failed to execute command. Reason: ' \
+                             'Either \'duration-days\' / \'duration-hours\' / \'duration-minutes\' ' \
+                             'are missing or not in the correct format. Solution: provide one of the required ' \
+                             'parameters or make sure they are positive numbers'
+BASIC_CREATE_HOST_RESPONSE_REGEX = '{\n    "annotations": \[\],\n    "api_key": ".*",\n    ' \
+                                   f'"created_at": ".*",\n    "id": "{ACCOUNT}:host:.*",\n    ' \
+                                   f'"owner": "{FULLY_QUALIFIED_HOST_FACTORY_ID}",\n    ' \
+                                   '"permissions": \[\],\n    "restricted_to": \[\]\n}\n'
+ERROR_PATTERN_422 = "Failed to execute command. Reason: 422 Client Error: Unprocessable Entity for url:.*"
+ERROR_PATTERN_404 = 'Failed to execute command. Reason: 404 Client Error: Not Found for url:.*'
+ERROR_PATTERN_401 = 'Failed to log in to Conjur. Unable to authenticate with Conjur. ' \
+                    'Reason: 401 Client Error: Unauthorized for url:.*'
+
+
+def one_hour_from_now():
+    return time_iso_format_exclude_seconds(timedelta(hours=1))
+
+
+def time_iso_format_exclude_seconds(duration: timedelta):
+    return ''.join((datetime.utcnow().replace(microsecond=0) + duration).isoformat()[:-2])
+
+
+def token_response_regex(cidr: str):
+    return '\[\n    {\n        "cidr": \[\n' \
+           f'            "{cidr}"\n' \
+           '        \],\n        "expiration": "' \
+           f'{one_hour_from_now()}\d\dZ",\n        "token": ".*"\n' \
+           '    }\n\]\n'
+
+
+def token_response_empty_cidr_regex(duration=one_hour_from_now()):
+    return '\[\n    {\n        "cidr": \[\],\n' \
+           '        "expiration": "' \
+           f'{duration}\d\dZ",\n        "token": ".*"\n' \
+           '    }\n\]\n'
+
 
 class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     def __init__(self, testname, client_params=None, environment_params=None):
@@ -36,227 +75,155 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '1'])
-
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1)).isoformat()}Z",\n'
-                      '        "token":', output)
+        self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
 
     @integration_test(True)
     def test_hostfactory_without_id_returns_menu(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token'],
                                  exit_code=1)
-        self.assertIn(" Name:\n  token - Creates a token for creating hosts with restrictions\n\nUsage:\n", output)
+        self.assertRegex(output, ".*token - Creates a token for creating hosts with restrictions\n\nUsage:\n.*")
 
     @integration_test(True)
-    def test_hostfactory_with_unknown_hostfactory_id_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'some-unknown-hostfactory', '--duration-days',
-                                  '1'],
-                                 exit_code=1)
-        self.assertIn("Failed to execute command. Reason: 404 Client Error", output)
+    def test_hostfactory_with_unknown_hostfactory_id_raises_404_error(self):
+        self.assertRegex(self._create_token(host_factory='some-unknown-hostfactory', exit_code=1), ERROR_PATTERN_404)
 
     @integration_test(True)
     def test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1'])
-
-        self.assertIn('"cidr": []', output)
+        self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
 
     @integration_test(True)
     def test_hostfactory_with_single_cidr_returns_cidr_in_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.3.4'])
-
-        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32"\n        ],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      '        "token":', output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4'),
+                         token_response_regex('1.2.3.4/32'))
 
     @integration_test(True)
     def test_hostfactory_with_multiple_ciders_returns_cidrs_in_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.3.4,2.2.2.2'])
-
-        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.3.4/32",\n            "2.2.2.2/32"\n        ],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      '        "token":', output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4,2.2.2.2'),
+                         token_response_regex('1.2.3.4/32",\n            "2.2.2.2/32'))
 
     @integration_test(True)
     def test_hostfactory_with_low_cidr_range_returns_cidrs_in_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.0.0/16'])
-
-        self.assertIn('[\n    {\n        "cidr": [\n            "1.2.0.0/16"\n        ],\n        "expiration": '
-                      f'"{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=1)).isoformat()}Z",\n'
-                      '        "token":', output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.0.0/16'), token_response_regex('1.2.0.0/16'))
 
     @integration_test(True)
     def test_hostfactory_wrong_cidr_format_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.3'], exit_code=1)
-        self.assertIn("Reason: 422", output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.3', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
     def test_hostfactory_wrong_cidr_format_range_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.3/16'], exit_code=1)
-        self.assertIn("Reason: 422", output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.3/16', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
     def test_hostfactory_with_valid_and_invalid_cidr_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '1', '--cidr', '1.2.3.4,1.2.3'], exit_code=1)
-        self.assertIn("Reason: 422", output)
+        self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4,1.2.3', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
     def test_hostfactory_with_all_duration_flags_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '1', '--duration-hours', '1', '--duration-minutes', '1'])
-
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=1, hours=1, minutes=1)).isoformat()}Z",\n'
-                      '        "token":', output)
+        duration = timedelta(days=1, hours=1, minutes=1)
+        self.assertRegex(self._create_token(duration=duration),
+                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
 
     @integration_test(True)
     def test_hostfactory_with_zero_value_duration_will_raise_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '0', '--duration-hours', '0', '--duration-minutes', '0'],
-                                 exit_code=1)
-
-        self.assertIn("Failed to execute command.", output)
+        self.assertRegex(self._create_token(duration=timedelta(days=0, hours=0, minutes=0), exit_code=1),
+                         INVALID_DURATION_ERROR_MSG)
 
     @integration_test(True)
     def test_hostfactory_with_only_days_duration_flags_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '365'])
-
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(days=365)).isoformat()}Z",\n'
-                      '        "token":', output)
+        duration = timedelta(days=365, hours=0, minutes=0)
+        self.assertRegex(self._create_token(duration=duration),
+                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
 
     @integration_test(True)
     def test_hostfactory_with_only_hours_duration_flags_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-hours', '24'])
-
-        self.assertIn('[\n    {\n        "cidr": [],\n'
-                      f'        "expiration": "{(datetime.utcnow().replace(microsecond=0) + timedelta(hours=24)).isoformat()}Z",\n'
-                      '        "token":', output)
+        duration = timedelta(days=0, hours=24, minutes=0)
+        self.assertRegex(self._create_token(duration=duration),
+                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
 
     @integration_test(True)
     def test_hostfactory_with_only_minutes_duration_flags_returns_correct_response(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-minutes', '60'])
-
-        self.assertIn('[\n    {\n        "cidr": [],\n        "expiration": '
-                      f'"{(datetime.utcnow().replace(microsecond=0) + timedelta(minutes=60)).isoformat()}Z",\n'
-                      '        "token": ', output)
+        duration = timedelta(days=0, hours=0, minutes=60)
+        self.assertRegex(self._create_token(duration=duration),
+                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
 
     @integration_test(True)
     def test_hostfactory_with_negative_duration_days_flags_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '-1'], exit_code=1)
-
-        self.assertIn("Failed to execute command.", output)
+        self.assertRegex(self._create_token(duration=timedelta(days=-1, hours=0, minutes=0), exit_code=1),
+                         INVALID_DURATION_ERROR_MSG)
 
     @integration_test(True)
     def test_hostfactory_without_duration_raises_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory'],
-                                 exit_code=1)
-        self.assertIn("Failed to execute command. Reason: Either", output)
+        self.assertRegex(self._create_token(duration=timedelta(), exit_code=1),
+                         INVALID_DURATION_ERROR_MSG)
 
     @integration_test(True)
     def test_hostfactory_create_host_returns_correct_response(self):
-        random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', random_host_id,
-                                  '-t', f"{self.create_token()}"])
-        json_output = json.loads(output)
-        api_key = json_output['api_key']
-        created_at = json_output['created_at']
-
-        self.assertIn(output,
-                      '{\n    "annotations": [],\n    '
-                      f'"api_key": "{api_key}",\n    "created_at": "{created_at}",\n    '
-                      f'"id": "dev:host:{random_host_id}",\n    '
-                      '"owner": "dev:host_factory:hostfactory_policy/some_host_factory",\n    '
-                      '"permissions": [],\n    "restricted_to": []\n}\n')
+        output = self.create_host(self.create_token(), 'some_host' + str(random.randint(0, 1024)))
+        self.assertRegex(output, BASIC_CREATE_HOST_RESPONSE_REGEX)
 
     @integration_test(True)
     def test_hostfactory_create_host_id_accepts_any_char(self):
-        random_host_id = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=12))
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i',
-                                  'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.' + random_host_id,
-                                  '-t', f"{self.create_token()}"])
-        self.assertEqual(json.loads(output)['id'],
-                         'dev:host:DifferentTestingChars @#$%^&*()"{}[];\'<>?/.' + random_host_id)
+        output = self.create_host(self.create_token(), 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.'
+                                  + str(random.randint(0, 1024)))
+        self.assertRegex(output, BASIC_CREATE_HOST_RESPONSE_REGEX)
 
     @integration_test(True)
     def test_hostfactory_invalid_token_raise_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
-                                  '-t', 'invalid_token'], exit_code=1)
-
-        self.assertIn("Failed to log in to Conjur. Unable to authenticate with Conjur. Reason: 401 Client Error: "
-                      "Unauthorized for url:", output)
+        output = self.create_host('invalid_token', 'some_host', exit_code=1)
+        self.assertRegex(output, ERROR_PATTERN_401)
 
     @integration_test(True)
     def test_hostfactory_empty_host_id_raise_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', ' ',
-                                  '-t', f"{self.create_token()}"], exit_code=1)
-
-        self.assertIn("Failed to execute command. Reason: 422 Client Error: Unprocessable Entity for url: ", output)
+        self.assertRegex(self.create_host(self.create_token(), ' ', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
     def test_hostfactory_revoke_token_returns_correct_response(self):
-        token = self.create_token()
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'revoke', 'token', '-t', token])
-
-        self.assertIn(f'Token: \'{token}\' has been revoked.\n', output)
+        self.assertRegex(self.revoke_token(self.create_token()), 'Token: \'.*\' has been revoked.\\n')
 
     @integration_test(True)
     def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'revoke', 'token', '-t', 'non_exist'], exit_code=1)
-
-        self.assertIn("Failed to execute command. Reason: 404 Client Error: Not Found for url: ", output)
-
-    def create_token(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'token', '-i', 'hostfactory_policy/some_host_factory',
-                                  '--duration-days', '1'])
-        response = json.loads(output)
-        return response[0]['token']
+        self.assertRegex(self.revoke_token('non_exist', exit_code=1), ERROR_PATTERN_404)
 
     @integration_test(True)
     def test_hostfactory_create_host_with_revoked_token_should_raise_401_error(self):
+        host_id = f'some_host_{str(random.randint(0, 1024))}'
         token = self.create_token()
-        self.invoke_cli(self.cli_auth_params,
-                        ['hostfactory', 'create', 'host', '-i', 'some_host',
-                         '-t', token])
-        self.invoke_cli(self.cli_auth_params, ['hostfactory', 'revoke', 'token', '-t', token])
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['hostfactory', 'create', 'host', '-i', 'some_host',
-                                  '-t', token], exit_code=1)
-        self.assertIn('Failed to log in to Conjur. Unable to authenticate with Conjur. Reason: '
-                      '401 Client Error: Unauthorized for url: ', output)
+        self.create_host(token, host_id)
+        self.revoke_token(token)
+        self.assertRegex(self.create_host(token, host_id, exit_code=1), ERROR_PATTERN_401)
+
+    def revoke_token(self, token: str, exit_code=0):
+        return self.invoke_cli(self.cli_auth_params, ['hostfactory', 'revoke', 'token', '-t', token],
+                               exit_code=exit_code)
+
+    def create_host(self, token: str, host: str, exit_code=0):
+        return self.invoke_cli(self.cli_auth_params,
+                               ['hostfactory', 'create', 'host', '-i', host,
+                                '-t', token], exit_code=exit_code)
+
+    def create_token(self):
+        """
+        Returns the token extracted from the response
+        """
+        return json.loads(self._create_token())[0]['token']
+
+    @staticmethod
+    def token_response_regex(duration: timedelta):
+        return '\[\n    {\n        "cidr": \[\],\n' \
+               '        "expiration": "' \
+               f'{time_iso_format_exclude_seconds(duration=duration)}\d\dZ",\n        "token":.*'
+
+    def _create_token(self, duration=timedelta(hours=1), host_factory=HOST_FACTORY_ID, exit_code=0):
+        return self.invoke_cli(self.cli_auth_params,
+                               ['hostfactory', 'create', 'token', '-i', host_factory,
+                                '--duration-days', str(duration.days),
+                                '--duration-hours', str(duration.seconds // 3600),
+                                '--duration-minutes', str((duration.seconds // 60) % 60)], exit_code=exit_code)
+
+    def create_one_hour_token(self, cidr: str, exit_code=0):
+        return self.invoke_cli(self.cli_auth_params,
+                               ['hostfactory', 'create', 'token', '-i', HOST_FACTORY_ID,
+                                '--duration-hours', '1', '--cidr', cidr], exit_code=exit_code)
+
+
