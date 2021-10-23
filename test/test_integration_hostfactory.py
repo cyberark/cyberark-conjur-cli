@@ -77,8 +77,6 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     def test_hostfactory_vanilla_returns_correct_response(self):
         self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
 
-    test_hostfactory_vanilla_returns_correct_response.id1 = True
-
     @integration_test(True)
     def test_hostfactory_without_id_returns_menu(self):
         output = self.invoke_cli(self.cli_auth_params,
