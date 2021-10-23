@@ -50,7 +50,7 @@ def token_response_regex(cidr: str):
            '    }\n\]\n'
 
 
-def token_response_empty_cidr_regex(duration=one_hour_from_now()):
+def token_response_empty_cidr_regex(duration: str):
     return '\[\n    {\n' \
            '        "cidr": \[],\n' \
            f'        "expiration": "' \
@@ -77,9 +77,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
-        self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
-
-    test_hostfactory_vanilla_returns_correct_response.id1 = True
+        self.assertRegex(self._create_token(), token_response_empty_cidr_regex(one_hour_from_now()))
 
     @integration_test(True)
     def test_hostfactory_without_id_returns_menu(self):
@@ -94,7 +92,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response(self):
-        self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
+        self.assertRegex(self._create_token(), token_response_empty_cidr_regex(one_hour_from_now()))
 
     @integration_test(True)
     def test_hostfactory_with_single_cidr_returns_cidr_in_response(self):
@@ -123,15 +121,15 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4,1.2.3', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
+    def test_hostfactory_with_zero_value_duration_will_raise_error(self):
+        self.assertRegex(self._create_token(duration=timedelta(days=0, hours=0, minutes=0), exit_code=1),
+                         INVALID_DURATION_ERROR_MSG)
+
+    @integration_test(True)
     def test_hostfactory_with_all_duration_flags_returns_correct_response(self):
         duration = timedelta(days=1, hours=1, minutes=1)
         self.assertRegex(self._create_token(duration=duration),
                          token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
-
-    @integration_test(True)
-    def test_hostfactory_with_zero_value_duration_will_raise_error(self):
-        self.assertRegex(self._create_token(duration=timedelta(days=0, hours=0, minutes=0), exit_code=1),
-                         INVALID_DURATION_ERROR_MSG)
 
     @integration_test(True)
     def test_hostfactory_with_only_days_duration_flags_returns_correct_response(self):
