@@ -51,7 +51,7 @@ def token_response_regex(cidr: str):
 
 
 def token_response_empty_cidr_regex(duration=one_hour_from_now()):
-    return '\[\n    {\n        "cidr": \\[\\],\n' \
+    return '\[\n    {\n        "cidr": \[],\n' \
            '        "expiration": "' \
            f'{duration}\d\dZ",\n        "token": ".*"\n' \
            '    }\n\]\n'
@@ -76,6 +76,8 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_hostfactory_vanilla_returns_correct_response(self):
         self.assertRegex(self._create_token(), token_response_empty_cidr_regex())
+
+    test_hostfactory_vanilla_returns_correct_response.id1 = True
 
     @integration_test(True)
     def test_hostfactory_without_id_returns_menu(self):
