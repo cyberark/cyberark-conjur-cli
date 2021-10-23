@@ -16,7 +16,7 @@ pipeline {
     stage('Linting') {
       parallel {
         stage('Code') {
-          steps { echo './bin/test_linting' }
+          steps { sh './bin/test_linting' }
         }
 
         stage('Changelog') {
