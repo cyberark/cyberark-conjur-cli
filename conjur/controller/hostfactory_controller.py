@@ -63,7 +63,7 @@ class HostFactoryController:
         response = self.hostfactory_logic.revoke_token(token)
 
         if response.ok:
-            sys.stdout.write(f'Token: \'{token}\' has been revoked.\n')
+            sys.stdout.write(f'Token \'{token}\' has been revoked.\n')
 
         logging.debug(f'Successfully revoked token, response ok: '
                       f'{response.ok}, return code: {response.status_code}')

@@ -180,7 +180,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_hostfactory_revoke_token_returns_correct_response(self):
-        self.assertRegex(self.revoke_token(self.create_token()), 'Token: \'.*\' has been revoked.\\n')
+        self.assertRegex(self.revoke_token(self.create_token()), 'Token \'.*\' has been revoked.\\n')
 
     @integration_test(True)
     def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
