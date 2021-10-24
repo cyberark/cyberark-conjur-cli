@@ -12,9 +12,6 @@ import json
 import logging
 from typing import Optional
 
-# Third Party
-import requests
-
 # Internals
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData

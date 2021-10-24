@@ -225,31 +225,6 @@ class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cove
     def test_basic_create_host_response_regex(self):
         print(self.get_basic_create_host_response_regex())
 
-    test_hostfactory_create_host_id_accepts_any_char.id1 = True
-    test_hostfactory_create_host_returns_correct_response.id1 = True
-    test_hostfactory_create_host_with_revoked_token_should_raise_401_error.id1 = True
-    test_hostfactory_empty_host_id_raise_error.id1 = True
-    test_hostfactory_invalid_token_raise_error.id1 = True
-    test_hostfactory_revoke_token_invalid_token_raise_404_error.id1 = True
-    test_hostfactory_revoke_token_returns_correct_response.id1 = True
-    test_hostfactory_vanilla_returns_correct_response.id1 = True
-    test_hostfactory_with_all_duration_flags_returns_correct_response.id1 = True
-    test_hostfactory_with_low_cidr_range_returns_cidrs_in_response.id1 = True
-    test_hostfactory_with_multiple_ciders_returns_cidrs_in_response.id1 = True
-    test_hostfactory_with_negative_duration_days_flags_raises_error.id1 = True
-    test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response.id1 = True
-    test_hostfactory_with_only_days_duration_flags_returns_correct_response.id1 = True
-    test_hostfactory_with_only_hours_duration_flags_returns_correct_response.id1 = True
-    test_hostfactory_with_only_minutes_duration_flags_returns_correct_response.id1 = True
-    test_hostfactory_with_single_cidr_returns_cidr_in_response.id1 = True
-    test_hostfactory_with_unknown_hostfactory_id_raises_404_error.id1 = True
-    test_hostfactory_with_valid_and_invalid_cidr_raises_error.id1 = True
-    test_hostfactory_with_zero_value_duration_will_raise_error.id1 = True
-    test_hostfactory_without_duration_raises_error.id1 = True
-    test_hostfactory_without_id_returns_menu.id1 = True
-    test_hostfactory_wrong_cidr_format_raises_error.id1 = True
-    test_hostfactory_wrong_cidr_format_range_raises_error.id1 = True
-
     def get_basic_create_host_response_regex(self, host: str):
         return '{\n    "annotations": \[\],\n    "api_key": ".*",\n    ' \
                f'"created_at": ".*",\n    ' \
