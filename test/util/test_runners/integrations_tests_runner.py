@@ -21,9 +21,6 @@ for all integration tests
 
 # Builtins
 import sys
-import os
-
-from test.test_integration_hostfactory import CliIntegrationTestHostFactory
 
 sys.path.append('.')
 sys.path.append('..')
@@ -38,8 +35,7 @@ import logging
 # NOTE do not delete this import even though it seems to not be used. This used to
 # run the integration tests as a process. Otherwise this dependency will not be available
 # once the test module is packed
-import uuid
-import ssl
+
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
@@ -49,10 +45,12 @@ from test.test_integration_list import CliIntegrationTestList
 from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
 from test.test_integration_resource import CliIntegrationResourceTest
+from test.test_integration_hostfactory import CliIntegrationTestHostFactory
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
+
 from conjur.constants import *
 
 
