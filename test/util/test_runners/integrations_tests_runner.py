@@ -23,6 +23,8 @@ for all integration tests
 import sys
 import os
 
+from test.test_integration_hostfactory import CliIntegrationTestHostFactory
+
 sys.path.append('.')
 sys.path.append('..')
 
@@ -64,6 +66,7 @@ def main():
         CliIntegrationTestVariable,
         CliIntegrationResourceTest,
         CliIntegrationTestList,
+        CliIntegrationTestHostFactory,
         CliIntegrationPolicy
     ]
     if args.run_oss_tests:

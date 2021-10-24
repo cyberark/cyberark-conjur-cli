@@ -58,9 +58,9 @@ def token_response_empty_cidr_regex(duration: str):
            '    }\n]\n'
 
 
-class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
+class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cover
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationTestList, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationTestHostFactory, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
 
