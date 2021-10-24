@@ -1,9 +1,12 @@
+import json
 import unittest
 from unittest.mock import MagicMock
 
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.errors import MissingRequiredParameterException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
+from unittest.mock import patch
+from conjur.api.client import Client
 
 class HostfactoryLogicTest(unittest.TestCase):
 
@@ -13,9 +16,10 @@ class HostfactoryLogicTest(unittest.TestCase):
         with self.assertRaises(MissingRequiredParameterException):
             mock_hostfactory_logic.create_token(create_token_data=None)
 
-    def test_hostfactory_logic_call_passes_object(self):
-        mock_client = MagicMock(return_value=None)
-        mock_hostfactory_logic = HostFactoryLogic(mock_client)
+    @patch('conjur.api.client.Client')
+    def test_hostfactory_logic_call_passes_object(self, client):
+        client.create_token.return_value = '{"name": "value"}'
+        mock_hostfactory_logic = HostFactoryLogic(client)
 
         mock_create_token_data = CreateTokenData(host_factory="some_host_factory_id", days=1)
         mock_hostfactory_logic.create_token(create_token_data=mock_create_token_data)
