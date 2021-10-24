@@ -6,7 +6,7 @@ from conjur.data_object.create_token_data import CreateTokenData
 from conjur.errors import MissingRequiredParameterException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from unittest.mock import patch
-from conjur.api.client import Client
+
 
 class HostfactoryLogicTest(unittest.TestCase):
 
