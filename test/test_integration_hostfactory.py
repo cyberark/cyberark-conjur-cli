@@ -8,7 +8,6 @@ This test file handles the main test flows for the hostfactory command
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
-import inspect
 import json
 import random
 from datetime import datetime, timedelta
