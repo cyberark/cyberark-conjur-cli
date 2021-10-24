@@ -37,11 +37,7 @@ class HostFactoryLogic:
             raise MissingRequiredParameterException('Missing required parameters')
 
         response = self.client.create_token(create_token_data)
-
-        if response is not None:
-            data = response.json()
-            if data is not None and len(data) > 0:
-                return json.dumps(data, indent=4, sort_keys=True)
+        return json.dumps(response, indent=4, sort_keys=True)
 
     # pylint: disable=inconsistent-return-statements
     def create_host(self, create_host_data: CreateHostData) -> str:
@@ -53,11 +49,7 @@ class HostFactoryLogic:
             raise MissingRequiredParameterException('Missing required parameters')
 
         response = self.client.create_host(create_host_data)
-
-        if response is not None:
-            data = response.json()
-            if data is not None and len(data) > 0:
-                return json.dumps(data, indent=4, sort_keys=True)
+        return json.dumps(response, indent=4, sort_keys=True)
 
     # pylint: disable=inconsistent-return-statements
     def revoke_token(self, token: str):

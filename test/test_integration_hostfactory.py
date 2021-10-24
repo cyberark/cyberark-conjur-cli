@@ -16,17 +16,12 @@ from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
-ACCOUNT = 'dev'
 HOST_FACTORY_ID = 'hostfactory_policy/some_host_factory'
-FULLY_QUALIFIED_HOST_FACTORY_ID = 'dev:host_factory:hostfactory_policy/some_host_factory'
+FULLY_QUALIFIED_HOST_FACTORY_ID = '{}:host_factory:hostfactory_policy/some_host_factory'
 INVALID_DURATION_ERROR_MSG = 'Failed to execute command. Reason: ' \
                              'Either \'duration-days\' / \'duration-hours\' / \'duration-minutes\' ' \
                              'are missing or not in the correct format. Solution: provide one of the required ' \
                              'parameters or make sure they are positive numbers'
-BASIC_CREATE_HOST_RESPONSE_REGEX = '{\n    "annotations": \[\],\n    "api_key": ".*",\n    ' \
-                                   f'"created_at": ".*",\n    "id": "{ACCOUNT}:host:.*",\n    ' \
-                                   f'"owner": "{FULLY_QUALIFIED_HOST_FACTORY_ID}",\n    ' \
-                                   '"permissions": \[\],\n    "restricted_to": \[\]\n}\n'
 ERROR_PATTERN_422 = "Failed to execute command. Reason: 422 Client Error: Unprocessable Entity for url:.*"
 ERROR_PATTERN_404 = 'Failed to execute command. Reason: 404 Client Error: Not Found for url:.*'
 ERROR_PATTERN_401 = 'Failed to log in to Conjur. Unable to authenticate with Conjur. ' \
@@ -59,6 +54,7 @@ def token_response_empty_cidr_regex(duration: str):
 
 
 class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cover
+
     def __init__(self, testname, client_params=None, environment_params=None):
         super(CliIntegrationTestHostFactory, self).__init__(testname, client_params, environment_params)
 
@@ -160,14 +156,16 @@ class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cove
 
     @integration_test(True)
     def test_hostfactory_create_host_returns_correct_response(self):
-        output = self.create_host(self.create_token(), 'some_host' + str(random.randint(0, 1024)))
-        self.assertRegex(output, BASIC_CREATE_HOST_RESPONSE_REGEX)
+        host_id = 'some_host' + str(random.randint(0, 1024))
+        output = self.create_host(self.create_token(), host_id)
+        self.assertRegex(output, self.get_basic_create_host_response_regex(host_id))
 
     @integration_test(True)
     def test_hostfactory_create_host_id_accepts_any_char(self):
-        output = self.create_host(self.create_token(), 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.'
-                                  + str(random.randint(0, 1024)))
-        self.assertRegex(output, BASIC_CREATE_HOST_RESPONSE_REGEX)
+        host_id = 'DifferentTestingChars @#$%^&*()"{}[];\'<>?/.' \
+                                  + str(random.randint(0, 1024))
+        output = self.create_host(self.create_token(), host_id)
+        self.assertRegex(output, self.get_basic_create_host_response_regex('.*'))
 
     @integration_test(True)
     def test_hostfactory_invalid_token_raise_error(self):
@@ -223,3 +221,39 @@ class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cove
     def create_token_with_args(self, *args, host_factory=HOST_FACTORY_ID, exit_code=0):
         return self.invoke_cli(self.cli_auth_params, ['hostfactory', 'create', 'token', '-i', host_factory, *args],
                                exit_code=exit_code)
+
+    def test_basic_create_host_response_regex(self):
+        print(self.get_basic_create_host_response_regex())
+
+    test_hostfactory_create_host_id_accepts_any_char.id1 = True
+    test_hostfactory_create_host_returns_correct_response.id1 = True
+    test_hostfactory_create_host_with_revoked_token_should_raise_401_error.id1 = True
+    test_hostfactory_empty_host_id_raise_error.id1 = True
+    test_hostfactory_invalid_token_raise_error.id1 = True
+    test_hostfactory_revoke_token_invalid_token_raise_404_error.id1 = True
+    test_hostfactory_revoke_token_returns_correct_response.id1 = True
+    test_hostfactory_vanilla_returns_correct_response.id1 = True
+    test_hostfactory_with_all_duration_flags_returns_correct_response.id1 = True
+    test_hostfactory_with_low_cidr_range_returns_cidrs_in_response.id1 = True
+    test_hostfactory_with_multiple_ciders_returns_cidrs_in_response.id1 = True
+    test_hostfactory_with_negative_duration_days_flags_raises_error.id1 = True
+    test_hostfactory_with_no_cidr_returns_empty_cidr_list_in_response.id1 = True
+    test_hostfactory_with_only_days_duration_flags_returns_correct_response.id1 = True
+    test_hostfactory_with_only_hours_duration_flags_returns_correct_response.id1 = True
+    test_hostfactory_with_only_minutes_duration_flags_returns_correct_response.id1 = True
+    test_hostfactory_with_single_cidr_returns_cidr_in_response.id1 = True
+    test_hostfactory_with_unknown_hostfactory_id_raises_404_error.id1 = True
+    test_hostfactory_with_valid_and_invalid_cidr_raises_error.id1 = True
+    test_hostfactory_with_zero_value_duration_will_raise_error.id1 = True
+    test_hostfactory_without_duration_raises_error.id1 = True
+    test_hostfactory_without_id_returns_menu.id1 = True
+    test_hostfactory_wrong_cidr_format_raises_error.id1 = True
+    test_hostfactory_wrong_cidr_format_range_raises_error.id1 = True
+
+    def get_basic_create_host_response_regex(self, host: str):
+        return '{\n    "annotations": \[\],\n    "api_key": ".*",\n    ' \
+               f'"created_at": ".*",\n    ' \
+               f'"id": "{self.client_params.account}:host:{host}",\n    ' \
+               f'"owner": "{FULLY_QUALIFIED_HOST_FACTORY_ID.format(self.client_params.account)}",\n    ' \
+               '"permissions": \[\],\n    "restricted_to": \[\]\n}\n'
+
