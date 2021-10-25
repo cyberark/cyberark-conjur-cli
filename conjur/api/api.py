@@ -445,7 +445,7 @@ class Api:
         request_parameters = uri_parameters.list_dictify()
         del request_parameters['identifier']
         json_response = invoke_endpoint(HttpVerb.GET,
-                                        ConjurEndpoint.RESOURCES_MEMBERS_OF,
+                                        ConjurEndpoint.RESOURCES_PERMITTED_MEMBERS_OF,
                                         params,
                                         query=request_parameters,
                                         api_token=self.api_token,
