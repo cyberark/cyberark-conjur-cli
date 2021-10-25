@@ -48,7 +48,10 @@ class ListParser:
                             '    conjur list --members-of group:conjur-root-admins\t\t'
                             'List members within a role.\n'
                             '    conjur list --kind group --members-of conjur-root-admins\t\t'
-                            'List members within a role passing the role type in the --kind option.\n'
+                            'List members within a role passing the role type in the --kind option\n'
+                            '    conjur list --kind group --permitted-members-of '
+                            'conjur-root-admins --privilege read\t\t'
+                            'Lists the roles which have the named permission on a resource.\n'
                         ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
@@ -96,7 +99,7 @@ class ListParser:
                                        'or passed in the --kind option')
         list_options.add_argument('-p', '--privilege',
                                   action='store', metavar='VALUE', dest='permitted_members_of',
-                                  help='Optional - When combined with --permitted-members-of'
+                                  help='Mandatory - when combined with --permitted-members-of'
                                        'Specifies the roles permitted to exercise this privilege are shown '
                                        '(read | execute | update).')
         list_options.add_argument('-s', '--search',
