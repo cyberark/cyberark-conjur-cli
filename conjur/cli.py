@@ -197,6 +197,10 @@ class Cli():
                                               token=args.token)
             hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
             hostfactory_controller.create_host(create_host_data)
+        elif args.action_type == 'revoke_token':
+            hostfactory_logic = HostFactoryLogic(client)
+            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+            hostfactory_controller.revoke_token(args.token)
 
     @classmethod
     def handle_variable_logic(cls, args: list = None, client=None):

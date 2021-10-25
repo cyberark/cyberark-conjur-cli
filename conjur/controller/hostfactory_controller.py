@@ -4,6 +4,7 @@ HostFactoryController
 
 This Module represents the Presentation Layer for the HostFactory command
 """
+import http
 import logging
 import sys
 
@@ -51,3 +52,19 @@ class HostFactoryController:
         sys.stdout.write(result + '\n')
         logging.debug("Successfully created host using hostfactory: host_id:"
                       f"'{create_host_data.host_id}'")
+
+    def revoke_token(self, token: str):
+        """
+        Method that facilitates token revocation call to the logic
+        """
+        if token is None:
+            raise MissingRequiredParameterException('Missing required parameters')
+
+        logging.debug("Attempting to revoke a token")
+        response = self.hostfactory_logic.revoke_token(token)
+
+        if response == http.HTTPStatus.NO_CONTENT:
+            sys.stdout.write(f'Token \'{token}\' has been revoked.\n')
+
+        logging.debug(f'Successfully revoked token'
+                      f', return code: {response}')

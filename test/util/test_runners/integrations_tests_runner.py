@@ -21,7 +21,6 @@ for all integration tests
 
 # Builtins
 import sys
-import os
 
 sys.path.append('.')
 sys.path.append('..')
@@ -38,6 +37,7 @@ import logging
 # once the test module is packed
 import uuid
 import ssl
+
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
@@ -47,10 +47,12 @@ from test.test_integration_list import CliIntegrationTestList
 from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
 from test.test_integration_resource import CliIntegrationResourceTest
+from test.test_integration_hostfactory import CliIntegrationTestHostFactory
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
+
 from conjur.constants import *
 
 
@@ -64,6 +66,7 @@ def main():
         CliIntegrationTestVariable,
         CliIntegrationResourceTest,
         CliIntegrationTestList,
+        CliIntegrationTestHostFactory,
         CliIntegrationPolicy
     ]
     if args.run_oss_tests:

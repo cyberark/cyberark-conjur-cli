@@ -23,8 +23,10 @@ class HostFactoryParser:
         hostfactory_parser = self._create_hostfactory_parser()
         hostfactory_subparser = hostfactory_parser.add_subparsers(title="Subcommand", dest='action')
         hostfactory_create_menu_item = self._add_hostfactory_create(hostfactory_subparser)
+        hostfactory_revoke_menu_item = self._add_hostfactory_revoke(hostfactory_subparser)
         self._add_hostfactory_create_token(hostfactory_create_menu_item)
         self._add_hostfactory_create_host(hostfactory_create_menu_item)
+        self._add_hostfactory_revoke_token(hostfactory_revoke_menu_item)
         self._add_hostfactory_options(hostfactory_parser)
 
         return self
@@ -82,6 +84,64 @@ class HostFactoryParser:
         hostfactory_create.add_argument('-h', '--help', action='help',
                                         help='Display help screen and exit')
         return create_cmd.add_subparsers(title="Subcommand", dest='action')
+
+    @staticmethod
+    def _add_hostfactory_revoke(hostfactory_subparser: ArgparseWrapper):
+        hostfactory_revoke_name = 'revoke - Revokes a token, immediately disabling it'
+        hostfactory_revoke_usage = 'conjur [global options] hostfactory ' \
+                                   'revoke <subcommand> [options] [args]'
+
+        create_cmd = hostfactory_subparser \
+            .add_parser(name="revoke",
+                        help='Revokes a token, immediately disabling it',
+                        description=command_description(
+                            hostfactory_revoke_name, hostfactory_revoke_usage),
+                        epilog=command_epilog(
+                            'conjur hostfactory revoke token '
+                            '--token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
+                            '\t\t\t '
+                            'Revokes a token, immediately disabling it.',
+                            command='revoke',
+                            subcommands=['token']
+                        ),
+                        usage=argparse.SUPPRESS,
+                        add_help=False,
+                        formatter_class=formatter)
+        hostfactory_create = create_cmd.add_argument_group(
+            title=title_formatter("Options"))
+        hostfactory_create.add_argument('-h', '--help', action='help',
+                                        help='Display help screen and exit')
+        return create_cmd.add_subparsers(title="Subcommand", dest='action')
+
+    @staticmethod
+    def _add_hostfactory_revoke_token(menu: ArgparseWrapper):
+        hostfactory_revoke_token_name = 'token - Revokes a token, immediately disabling it'
+        hostfactory_revoke_token_usage = 'conjur [global options] hostfactory ' \
+                                         'revoke token [options] [args]'
+
+        subcommand = menu \
+            .add_parser(name="token",
+                        help='Revokes a token, immediately disabling it',
+                        description=command_description(
+                            hostfactory_revoke_token_name, hostfactory_revoke_token_usage),
+                        epilog=command_epilog(
+                            'conjur hostfactory revoke token '
+                            '--token "1bcarsc2bqvsxt6cnd74xem8yf15gtma71vp23y315n0z201"'
+                            '\t\t'
+                            'Revokes a token, immediately disabling it\t\t',
+                            command='token'
+                        ),
+                        usage=argparse.SUPPRESS,
+                        add_help=False,
+                        formatter_class=formatter)
+        # Options
+        options = subcommand.add_argument_group(
+            title=title_formatter("Options"))
+        options.add_argument('-action_type', default='revoke_token', help=argparse.SUPPRESS)
+        options.add_argument('-t', '--token', metavar='VALUE', required=True,
+                                          help='(Mandatory) the Host Factory Token to revoke')
+        options.add_argument('-h', '--help', action='help',
+                                          help='Display help screen and exit')
 
     @staticmethod
     def _add_hostfactory_create_token(menu: ArgparseWrapper):

@@ -8,11 +8,9 @@ the Conjur server
 """
 
 # Builtins
+import json
 import logging
 from typing import Optional
-
-# Third Party
-import requests
 
 # Internals
 from conjur.data_object.create_host_data import CreateHostData
@@ -185,17 +183,23 @@ class Client():
         """
         return self._api.get_variables(*variable_ids)
 
-    def create_token(self, create_token_data: CreateTokenData) -> requests.Response:
+    def create_token(self, create_token_data: CreateTokenData) -> json:
         """
         Create token/s for hosts with restrictions
         """
-        return self._api.create_token(create_token_data)
+        return self._api.create_token(create_token_data).json()
 
-    def create_host(self, create_host_data: CreateHostData) -> requests.Response:
+    def create_host(self, create_host_data: CreateHostData) -> json:
         """
         Create host using the hostfactory
         """
-        return self._api.create_host(create_host_data)
+        return self._api.create_host(create_host_data).json()
+
+    def revoke_token(self, token: str) -> int:
+        """
+        Revokes the given token
+        """
+        return self._api.revoke_token(token).status_code
 
     def set(self, variable_id: str, value: str) -> str:
         """

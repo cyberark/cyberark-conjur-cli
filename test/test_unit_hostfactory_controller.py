@@ -38,3 +38,9 @@ class HostfactoryControllerTest(unittest.TestCase):
         mock_hostfactory_controller = HostFactoryController(mock_hostfactory_logic)
         with self.assertRaises(MissingRequiredParameterException):
             mock_hostfactory_controller.create_host(create_host_data=CreateHostData(host_id="foo"))
+
+    def test_empty_revoke_token_raises_correct_error(self):
+        mock_hostfactory_logic = HostFactoryLogic
+        mock_hostfactory_controller = HostFactoryController(mock_hostfactory_logic)
+        with self.assertRaises(MissingRequiredParameterException):
+            mock_hostfactory_controller.revoke_token(None)

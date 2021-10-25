@@ -273,6 +273,26 @@ class Api():
                                decode_token=False,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
+    def revoke_token(self, token: str) -> requests.Response:
+        """
+        This method is used to revoke a hostfactory token.
+        """
+        if token is None:
+            raise MissingRequiredParameterException('token is empty')
+
+        params = {}
+        params.update(self._default_params)
+
+        # add the token to the params so it will
+        # get formatted in the url in invoke_endpoint
+        params['token'] = token
+
+        return invoke_endpoint(HttpVerb.DELETE,
+                               ConjurEndpoint.HOST_FACTORY_REVOKE_TOKEN,
+                               params,
+                               api_token=self.api_token,
+                               ssl_verify=self._ssl_verify)
+
     def set_variable(self, variable_id: str, value: str) -> str:
         """
         This method is used to set a secret (aka "variable") to a value of
@@ -299,7 +319,6 @@ class Api():
         }
         params.update(self._default_params)
 
-        policy_data = None
         with open(policy_file, 'r') as content_file:
             policy_data = content_file.read()
 
