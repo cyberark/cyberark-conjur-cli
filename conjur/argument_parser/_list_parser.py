@@ -6,6 +6,7 @@ from conjur.argument_parser.parser_utils import command_description, command_epi
     title_formatter
 from conjur.wrapper.argparse_wrapper import ArgparseWrapper
 
+
 # pylint: disable=too-few-public-methods
 class ListParser:
     """Partial class of the ArgParseBuilder.
@@ -43,7 +44,12 @@ class ListParser:
                             '    conjur list --role=myorg:user:superuser\t'
                             'Shows resources that superuser is entitled to see\n'
                             '    conjur list --search=superuser\t\t'
-                            'Searches for resources with superuser\n'),
+                            'Searches for resources with superuser\n'
+                            '    conjur list --members-of group:conjur-root-admins\t\t'
+                            'List members within a role.\n'
+                            '    conjur list --kind group --members-of conjur-root-admins\t\t'
+                            'List members within a role passing the role type in the --kind option.\n'
+                        ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
@@ -70,7 +76,29 @@ class ListParser:
         list_options.add_argument('-r', '--role',
                                   action='store', metavar='VALUE', dest='role',
                                   help='Optional- retrieve list of resources that specified role '
-                                       'is entitled to see (must specify role’s full ID)')
+                                       'is entitled to see (must specify role\'s full ID)')
+        list_options.add_argument('-m', '--members-of',
+                                  action='store', metavar='VALUE', dest='members_of',
+                                  help='Optional - List members within a role. Types of Roles: '
+                                       '(user | host | layer | group | policy). '
+                                       'Value must specify role\'s full ID). The role type must be specified as '
+                                       'a prefix on the Identifier of the role (e.g.  [group:]conjur-root-admins),'
+                                       'or passed in the --kind option')
+        list_options.add_argument('-pm', '--permitted-members-of',
+                                  action='store', metavar='VALUE', dest='permitted_members_of',
+                                  help='Optional - Lists the roles which have the named permission on a resource. '
+                                       'Types of Roles: '
+                                       '(user | host | layer | group '
+                                       '| policy | variable | webservice).'
+                                       'Value must specify the resource\'s full ID ). '
+                                       'The role type must be specified as '
+                                       'a prefix on the Identifier of the role (e.g.  [group:]conjur-root-admins),'
+                                       'or passed in the --kind option')
+        list_options.add_argument('-p', '--privilege',
+                                  action='store', metavar='VALUE', dest='permitted_members_of',
+                                  help='Optional - When combined with --permitted-members-of'
+                                       'Specifies the roles permitted to exercise this privilege are shown '
+                                       '(read | execute | update).')
         list_options.add_argument('-s', '--search',
                                   action='store', metavar='VALUE', dest='search',
                                   help='Optional- search for resources based on specified query')

@@ -7,18 +7,20 @@ This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the list request
 """
 
+
 # pylint: disable=too-few-public-methods
 class ListData:
     """
     Used for organizing the the params the user passed in to execute the list command
     """
-    def __init__(self, **argParams):
-        self.kind = argParams['kind']
-        self.inspect = argParams['inspect']
-        self.search = argParams['search']
-        self.limit = argParams['limit']
-        self.offset = argParams['offset']
-        self.role = argParams['role']
+
+    def __init__(self, **arg_params):
+        self.kind = arg_params['kind'] if 'kind' in arg_params.keys() else None
+        self.inspect = arg_params['inspect'] if 'inspect' in arg_params.keys() else None
+        self.search = arg_params['search'] if 'search' in arg_params.keys() else None
+        self.limit = arg_params['limit'] if 'limit' in arg_params.keys() else None
+        self.offset = arg_params['offset'] if 'offset' in arg_params.keys() else None
+        self.role = arg_params['role'] if 'offset' in arg_params.keys() else None
 
     def list_dictify(self):
         """
