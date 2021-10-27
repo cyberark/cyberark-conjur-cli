@@ -35,8 +35,6 @@ import logging
 # NOTE do not delete this import even though it seems to not be used. This used to
 # run the integration tests as a process. Otherwise this dependency will not be available
 # once the test module is packed
-import uuid
-import ssl
 
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
@@ -51,8 +49,8 @@ from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
-from test.test_integration_hostfactory_host import CliIntegrationTestHostFactoryHost
-from test.test_integration_hostfactory_token import CliIntegrationTestHostFactoryToken
+from test.host_factory.test_integration_hostfactory_host import CliIntegrationTestHostFactoryHost
+from test.host_factory.test_integration_hostfactory_token import CliIntegrationTestHostFactoryToken
 from conjur.constants import *
 
 

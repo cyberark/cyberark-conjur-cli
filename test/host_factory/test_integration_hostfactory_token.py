@@ -10,7 +10,7 @@ This test file handles the main test flows for the hostfactory command
 # the same build step
 from datetime import timedelta
 from test.util.test_infrastructure import integration_test
-from test.test_integration_hostfactory import CliIntegrationTestHostFactory, \
+from test.host_factory.test_integration_hostfactory import CliIntegrationTestHostFactory, \
     ERROR_PATTERN_404, ERROR_PATTERN_422, INVALID_DURATION_ERROR_MSG
 
 # Helper methods

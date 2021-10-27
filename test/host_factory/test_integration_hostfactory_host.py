@@ -12,9 +12,8 @@ import json
 import random
 from datetime import timedelta
 
-from test.test_integration_hostfactory import CliIntegrationTestHostFactory, \
-    HOST_FACTORY_ID, FULLY_QUALIFIED_HOST_FACTORY_ID, ERROR_PATTERN_401, ERROR_PATTERN_404, \
-    ERROR_PATTERN_422
+from test.host_factory.test_integration_hostfactory import CliIntegrationTestHostFactory, \
+    HOST_FACTORY_ID, FULLY_QUALIFIED_HOST_FACTORY_ID, ERROR_PATTERN_401, ERROR_PATTERN_422
 from test.util.test_infrastructure import integration_test
 
 
