@@ -8,7 +8,6 @@ Provides high-level interface for programmatic API interactions
 # Builtins
 import json
 import logging
-import os
 from typing import Optional
 from datetime import datetime, timedelta
 from urllib import parse
