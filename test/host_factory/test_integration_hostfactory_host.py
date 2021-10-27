@@ -54,6 +54,8 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
         self.revoke_token(token)
         self.assertRegex(self.create_host(token, host_id, exit_code=1), ERROR_PATTERN_401)
 
+    test_hostfactory_create_host_with_revoked_token_should_raise_401_error.id1 = True
+
     def create_host(self, token: str, host: str, exit_code=0):
         return self.invoke_cli(self.cli_auth_params,
                                ['hostfactory', 'create', 'host', '-i', host,
