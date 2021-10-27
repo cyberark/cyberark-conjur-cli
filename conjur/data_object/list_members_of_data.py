@@ -21,7 +21,7 @@ class ListMembersOfData(ListData):
     def __init__(self, **arg_params):
         super().__init__(**arg_params)
         self.identifier = get_param('identifier', **arg_params)
-        self.privilege = get_param('privilege')
+        self.privilege = get_param('privilege', **arg_params)
 
     def list_dictify(self):
         """

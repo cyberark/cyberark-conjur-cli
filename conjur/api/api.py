@@ -412,11 +412,11 @@ class Api:
         List members within a role.
         """
         params = {
-            'account': self._account
+            'account': self._account,
+            'identifier': uri_parameters.identifier,
+            'kind': uri_parameters.kind,
         }
         params.update(self._default_params)
-        params['identifier'] = uri_parameters.identifier
-        params['kind'] = uri_parameters.kind
 
         request_parameters = uri_parameters.list_dictify()
         del request_parameters['identifier']

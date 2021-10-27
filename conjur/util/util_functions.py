@@ -13,6 +13,7 @@ import os
 from requests.exceptions import HTTPError
 
 # Internals
+from conjur.errors import MissingRequiredParameterException
 from conjur.util.os_types import OSTypes
 from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME, \
     MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, WINDOWS_KEYRING_NAME
@@ -30,9 +31,15 @@ def list_dictify(obj):
     return list_dict
 
 
-def get_param(name: str, **arg_params):
-    """ Return value of name if name in kwargs; None otherwise"""
-    return arg_params[name] if name in arg_params else None
+def get_param(name: str, **kwargs):
+    """
+    Return value of name if name in kwargs; None otherwise.
+    Throws MissingRequiredParameterException in case kwargs is empty or not
+    provided
+    """
+    if len(kwargs) == 0:
+        raise MissingRequiredParameterException('arg_params is empty')
+    return kwargs[name] if name in kwargs else None
 
 
 def get_insecure_warning_in_warning():
