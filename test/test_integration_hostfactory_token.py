@@ -68,8 +68,6 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
     def test_hostfactory_create_token_wrong_cidr_format_range_raises_error(self):
         self.assertRegex(self.create_one_hour_token(cidr='1.2.3/16', exit_code=1), ERROR_PATTERN_422)
 
-    test_hostfactory_create_token_wrong_cidr_format_range_raises_error.id1 = True
-
     @integration_test(True)
     def test_hostfactory_create_token_with_valid_and_invalid_cidr_raises_error(self):
         self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4,1.2.3', exit_code=1), ERROR_PATTERN_422)
@@ -116,6 +114,10 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
     @integration_test(True)
     def test_hostfactory_revoke_token_returns_correct_response(self):
         self.assertRegex(self.revoke_token(self.create_token()), 'Token \'.*\' has been revoked.\\n')
+
+    @integration_test(True)
+    def test_hostfactory_revoke_token_empty_token_raise_404_error(self):
+        self.assertRegex(self.revoke_token('', exit_code=1), ERROR_PATTERN_404)
 
     @integration_test(True)
     def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
