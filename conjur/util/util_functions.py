@@ -13,9 +13,34 @@ import os
 from requests.exceptions import HTTPError
 
 # Internals
+from conjur.errors import MissingRequiredParameterException
 from conjur.util.os_types import OSTypes
 from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME, \
     MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, WINDOWS_KEYRING_NAME
+
+
+def list_dictify(obj):
+    """
+    Function for building a dictionary from all attributes that have values
+    """
+    list_dict = {}
+    for attr, value in obj.__dict__.items():
+        if value:
+            list_dict[str(attr)] = value
+
+    return list_dict
+
+
+def get_param(name: str, **kwargs):
+    """
+    Return value of name if name in kwargs; None otherwise.
+    Throws MissingRequiredParameterException in case kwargs is empty or not
+    provided
+    """
+    if len(kwargs) == 0:
+        raise MissingRequiredParameterException('arg_params is empty')
+    return kwargs[name] if name in kwargs else None
+
 
 def get_insecure_warning_in_warning():
     """ Log warning message"""
@@ -23,24 +48,28 @@ def get_insecure_warning_in_warning():
                     "If you prefer to communicate with the server securely, "
                     "you must reinitialize the client in secure mode.")
 
+
 def get_insecure_warning_in_debug():
     """ Log debug message"""
     logging.debug("Warning: Running the command with '--insecure' "
                   "makes your system vulnerable to security attacks")
 
-def determine_status_code_specific_error_messages(server_error:HTTPError) -> str :
+
+def determine_status_code_specific_error_messages(server_error: HTTPError) -> str:
     """ Method for returning status code-specific error messages """
     if str(server_error.response.status_code) == '401':
         return "Failed to log in to Conjur. Unable to authenticate with Conjur. " \
                f"Reason: {server_error}. Check your credentials and try again.\n"
     return f"Failed to execute command. Reason: {server_error}\n"
 
-def file_is_missing_or_empty(file_path:str):
+
+def file_is_missing_or_empty(file_path: str):
     """
     Returns true if the file corresponding to the file argument
     exists or the file size is zero; false otherwise
     """
     return not os.path.exists(file_path) or os.path.getsize(file_path) == 0
+
 
 # pylint: disable=logging-fstring-interpolation
 def configure_env_var_with_keyring():
@@ -60,7 +89,8 @@ def configure_env_var_with_keyring():
     else:
         logging.debug(f"Platform {platform.system()} not supported")
 
-def get_current_os() -> OSTypes: # pragma: no cover
+
+def get_current_os() -> OSTypes:  # pragma: no cover
     """
     Determine which os we currently use
     """

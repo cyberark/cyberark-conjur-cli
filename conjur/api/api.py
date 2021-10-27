@@ -19,6 +19,7 @@ import requests
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
+from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -26,7 +27,7 @@ from conjur.resource import Resource
 
 
 # pylint: disable=unspecified-encoding
-class Api():
+class Api:
     """
     This module provides a high-level programmatic access to the HTTP API
     when all the needed arguments and parameters are well-known
@@ -44,14 +45,16 @@ class Api():
     # We explicitly want to enumerate all params needed to instantiate this
     # class but this might not be needed in the future
     # pylint: disable=unused-argument,too-many-arguments
-    def __init__(self,
-                 account: str = 'default',
-                 api_key: str = None,
-                 ca_bundle: str = None,
-                 http_debug=False,
-                 login_id: str = None,
-                 ssl_verify: bool = True,
-                 url: str = None):
+    def __init__(
+            self,
+            account: str = 'default',
+            api_key: str = None,
+            ca_bundle: str = None,
+            http_debug: bool = False,
+            login_id: str = None,
+            ssl_verify: bool = True,
+            url: str = None
+    ):
 
         self._url = url
         self._ca_bundle = ca_bundle
@@ -154,12 +157,12 @@ class Api():
                                             ssl_verify=self._ssl_verify).content
 
         resources = json.loads(json_response.decode('utf-8'))
-
         # Returns the result as a list of resource ids instead of the raw JSON only
         # when the user does not provide `inspect` as one of their filters
         if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
+            # TODO method signature returns dict, need to check who is expecting list
             return list(resource_list)
 
         # To see the full resources response see
@@ -203,8 +206,8 @@ class Api():
         full_variable_ids = []
         for variable_id in variable_ids:
             full_variable_ids.append(self.ID_FORMAT.format(account=self._account,
-                                                                  kind=self.KIND_VARIABLE,
-                                                                  id=variable_id))
+                                                           kind=self.KIND_VARIABLE,
+                                                           id=variable_id))
         query_params = {
             'variable_ids': ','.join(full_variable_ids),
         }
@@ -221,7 +224,7 @@ class Api():
         # Remove the 'account:variable:' prefix from result's variable names
         remapped_keys_dict = {}
         prefix_length = len(self.ID_RETURN_PREFIX.format(account=self._account,
-                                                                kind=self.KIND_VARIABLE))
+                                                         kind=self.KIND_VARIABLE))
         for variable_name, variable_value in variable_map.items():
             new_variable_name = variable_name[prefix_length:]
             remapped_keys_dict[new_variable_name] = variable_value
@@ -236,8 +239,8 @@ class Api():
             raise MissingRequiredParameterException('create_token_data is empty')
 
         create_token_data.host_factory = self.ID_FORMAT.format(account=self._account,
-                                                                 kind=self.KIND_HOSTFACTORY,
-                                                                 id=create_token_data.host_factory)
+                                                               kind=self.KIND_HOSTFACTORY,
+                                                               id=create_token_data.host_factory)
 
         # parse.urlencode, If any values in the query arg are sequences and doseq is true, each
         # sequence element is converted to a separate parameter.
@@ -401,6 +404,54 @@ class Api():
         """
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.WHOAMI,
                                         self._default_params,
+                                        api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).content
+
+        return json.loads(json_response.decode('utf-8'))
+
+    def list_members_of(self, uri_parameters: ListMembersOfData = None) -> dict:
+        """
+        List members within a role.
+        """
+        params = {
+            'account': self._account,
+            'identifier': uri_parameters.identifier,
+            'kind': uri_parameters.kind,
+        }
+        params.update(self._default_params)
+
+        request_parameters = uri_parameters.list_dictify()
+        del request_parameters['identifier']
+        json_response = invoke_endpoint(HttpVerb.GET,
+                                        ConjurEndpoint.ROLES_MEMBERS_OF,
+                                        params,
+                                        query=request_parameters,
+                                        api_token=self.api_token,
+                                        ssl_verify=self._ssl_verify).content
+
+        return json.loads(json_response.decode('utf-8'))
+
+    def list_permitted_members_of(self, uri_parameters: ListMembersOfData = None) -> dict:
+        """
+        Lists the roles which have the named permission on a resource.
+        """
+        params = {
+            'account': self._account,
+            'identifier': uri_parameters.identifier,
+            'kind': uri_parameters.kind,
+            'privilege': uri_parameters.privilege
+        }
+        params.update(self._default_params)
+
+        request_parameters = uri_parameters.list_dictify()
+        # 'identifier' is part of the request path.
+        # Remove 'identifier' so it won't be part of the query string
+        del request_parameters['identifier']
+
+        json_response = invoke_endpoint(HttpVerb.GET,
+                                        ConjurEndpoint.RESOURCES_PERMITTED_MEMBERS_OF,
+                                        params,
+                                        query=request_parameters,
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
 

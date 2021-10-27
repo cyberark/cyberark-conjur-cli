@@ -7,29 +7,30 @@ This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the list request
 """
 
+
 # pylint: disable=too-few-public-methods
+from conjur.util import util_functions
+from conjur.util.util_functions import get_param
+
+
 class ListData:
     """
     Used for organizing the the params the user passed in to execute the list command
     """
-    def __init__(self, **argParams):
-        self.kind = argParams['kind']
-        self.inspect = argParams['inspect']
-        self.search = argParams['search']
-        self.limit = argParams['limit']
-        self.offset = argParams['offset']
-        self.role = argParams['role']
+
+    def __init__(self, **arg_params):
+        self.kind = get_param('kind', **arg_params)
+        self.inspect = get_param('inspect', **arg_params)
+        self.search = get_param('search', **arg_params)
+        self.limit = get_param('limit', **arg_params)
+        self.offset = get_param('offset', **arg_params)
+        self.role = get_param('role', **arg_params)
 
     def list_dictify(self):
         """
-        Method for building a dictionary from all attributes that have values
+        Returns a dictionary of all non-None attributes values
         """
-        list_dict = {}
-        for attr, value in self.__dict__.items():
-            if value:
-                list_dict[str(attr)] = value
-
-        return list_dict
+        return util_functions.list_dictify(self)
 
     def __repr__(self) -> str:
         result = []
