@@ -35,6 +35,8 @@ import logging
 # NOTE do not delete this import even though it seems to not be used. This used to
 # run the integration tests as a process. Otherwise this dependency will not be available
 # once the test module is packed
+import uuid
+import ssl
 
 # Internals
 from test.test_integration_policy import CliIntegrationPolicy
