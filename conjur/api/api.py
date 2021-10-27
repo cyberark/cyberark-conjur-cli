@@ -45,15 +45,16 @@ class Api:
     # We explicitly want to enumerate all params needed to instantiate this
     # class but this might not be needed in the future
     # pylint: disable=unused-argument,too-many-arguments
-    def __init__(self,
-                 account: str = 'default',
-                 api_key: str = None,
-                 ca_bundle: str = None,
-                 http_debug: bool = False,
-                 login_id: str = None,
-                 ssl_verify: bool = True,
-                 url: str = None,
-                 ):
+    def __init__(
+            self,
+            account: str = 'default',
+            api_key: str = None,
+            ca_bundle: str = None,
+            http_debug: bool = False,
+            login_id: str = None,
+            ssl_verify: bool = True,
+            url: str = None
+    ):
 
         self._url = url
         self._ca_bundle = ca_bundle
@@ -161,6 +162,7 @@ class Api:
         if list_constraints is not None and 'inspect' not in list_constraints:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
+            # TODO method signature returns dict, need to check who is expecting list
             return list(resource_list)
 
         # To see the full resources response see
@@ -442,7 +444,10 @@ class Api:
         params.update(self._default_params)
 
         request_parameters = uri_parameters.list_dictify()
+        # 'identifier' is part of the request path.
+        # Remove 'identifier' so it won't be part of the query string
         del request_parameters['identifier']
+
         json_response = invoke_endpoint(HttpVerb.GET,
                                         ConjurEndpoint.RESOURCES_PERMITTED_MEMBERS_OF,
                                         params,
