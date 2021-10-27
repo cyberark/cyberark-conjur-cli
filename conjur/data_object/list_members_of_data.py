@@ -9,6 +9,8 @@ We use this DTO to build the list members-of request
 
 # pylint: disable=too-few-public-methods
 from conjur.data_object import ListData
+from conjur.util import util_functions
+from conjur.util.util_functions import get_param
 
 
 class ListMembersOfData(ListData):
@@ -18,19 +20,14 @@ class ListMembersOfData(ListData):
 
     def __init__(self, **arg_params):
         super().__init__(**arg_params)
-        self.identifier = arg_params['identifier'] if 'identifier' in arg_params.keys() else None
-        self.privilege = arg_params['privilege'] if 'privilege' in arg_params.keys() else None
+        self.identifier = get_param('identifier', **arg_params)
+        self.privilege = get_param('privilege')
 
     def list_dictify(self):
         """
-        Method for building a dictionary from all attributes that have values
+        Returns a dictionary of all non-None attributes values
         """
-        list_dict = super().list_dictify()
-        for attr, value in self.__dict__.items():
-            if value:
-                list_dict[str(attr)] = value
-
-        return list_dict
+        return util_functions.list_dictify(self)
 
     def __repr__(self) -> str:
         result = []

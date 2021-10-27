@@ -9,29 +9,28 @@ We use this DTO to build the list request
 
 
 # pylint: disable=too-few-public-methods
+from conjur.util import util_functions
+from conjur.util.util_functions import get_param
+
+
 class ListData:
     """
     Used for organizing the the params the user passed in to execute the list command
     """
 
     def __init__(self, **arg_params):
-        self.kind = arg_params['kind'] if 'kind' in arg_params.keys() else None
-        self.inspect = arg_params['inspect'] if 'inspect' in arg_params.keys() else None
-        self.search = arg_params['search'] if 'search' in arg_params.keys() else None
-        self.limit = arg_params['limit'] if 'limit' in arg_params.keys() else None
-        self.offset = arg_params['offset'] if 'offset' in arg_params.keys() else None
-        self.role = arg_params['role'] if 'offset' in arg_params.keys() else None
+        self.kind = get_param('kind', **arg_params)
+        self.inspect = get_param('inspect', **arg_params)
+        self.search = get_param('search', **arg_params)
+        self.limit = get_param('limit', **arg_params)
+        self.offset = get_param('offset', **arg_params)
+        self.role = get_param('role', **arg_params)
 
     def list_dictify(self):
         """
-        Method for building a dictionary from all attributes that have values
+        Returns a dictionary of all non-None attributes values
         """
-        list_dict = {}
-        for attr, value in self.__dict__.items():
-            if value:
-                list_dict[str(attr)] = value
-
-        return list_dict
+        return util_functions.list_dictify(self)
 
     def __repr__(self) -> str:
         result = []

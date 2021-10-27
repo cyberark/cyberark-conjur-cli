@@ -48,7 +48,8 @@ class ListParser:
                             '    conjur list --members-of group:conjur-root-admins\t\t'
                             'List members within a role.\n'
                             '    conjur list --kind group --members-of conjur-root-admins\t\t'
-                            'List members within a role passing the role type in the --kind option\n'
+                            'List members within a role passing the role '
+                            'type in the --kind option\n'
                             '    conjur list --kind group --permitted-members-of '
                             'conjur-root-admins --privilege read\t\t'
                             'Lists the roles which have the named permission on a resource.\n'
@@ -84,23 +85,28 @@ class ListParser:
                                   action='store', metavar='VALUE', dest='members_of',
                                   help='Optional - List members within a role. Types of Roles: '
                                        '(user | host | layer | group | policy). '
-                                       'Value must specify role\'s full ID). The role type must be specified as '
-                                       'a prefix on the Identifier of the role (e.g.  [group:]conjur-root-admins),'
+                                       'Value must specify role\'s full ID). '
+                                       'The role type must be specified as '
+                                       'a prefix on the Identifier of the role '
+                                       '(e.g.  [group:]conjur-root-admins),'
                                        'or passed in the --kind option')
         list_options.add_argument('-pm', '--permitted-members-of',
                                   action='store', metavar='VALUE', dest='permitted_members_of',
-                                  help='Optional - Lists the roles which have the named permission on a resource. '
+                                  help='Optional - Lists the roles which have '
+                                       'the named permission on a resource. '
                                        'Types of Roles: '
                                        '(user | host | layer | group '
                                        '| policy | variable | webservice).'
                                        'Value must specify the resource\'s full ID ). '
                                        'The role type must be specified as '
-                                       'a prefix on the Identifier of the role (e.g.  [group:]conjur-root-admins),'
+                                       'a prefix on the Identifier of the role '
+                                       '(e.g.  [group:]conjur-root-admins),'
                                        'or passed in the --kind option')
         list_options.add_argument('-p', '--privilege',
                                   action='store', metavar='VALUE', dest='permitted_members_of',
                                   help='Mandatory - when combined with --permitted-members-of'
-                                       'Specifies the roles permitted to exercise this privilege are shown '
+                                       'Specifies the roles permitted '
+                                       'to exercise this privilege are shown '
                                        '(read | execute | update).')
         list_options.add_argument('-s', '--search',
                                   action='store', metavar='VALUE', dest='search',
