@@ -46,10 +46,10 @@ class Api:
     # class but this might not be needed in the future
     # pylint: disable=unused-argument,too-many-arguments
     def __init__(self,
-                 http_debug: False,
                  account: str = 'default',
                  api_key: str = None,
                  ca_bundle: str = None,
+                 http_debug: bool = False,
                  login_id: str = None,
                  ssl_verify: bool = True,
                  url: str = None,

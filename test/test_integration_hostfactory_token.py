@@ -112,3 +112,11 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
     def test_hostfactory_create_token_without_duration_raises_error(self):
         self.assertRegex(self.cli_create_token(exit_code=1),
                          INVALID_DURATION_ERROR_MSG)
+
+    @integration_test(True)
+    def test_hostfactory_revoke_token_returns_correct_response(self):
+        self.assertRegex(self.revoke_token(self.create_token()), 'Token \'.*\' has been revoked.\\n')
+
+    @integration_test(True)
+    def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
+        self.assertRegex(self.revoke_token('non_exist', exit_code=1), ERROR_PATTERN_404)

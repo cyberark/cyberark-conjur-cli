@@ -48,24 +48,12 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
         self.assertRegex(self.create_host(self.create_token(), ' ', exit_code=1), ERROR_PATTERN_422)
 
     @integration_test(True)
-    def test_hostfactory_revoke_token_returns_correct_response(self):
-        self.assertRegex(self.revoke_token(self.create_token()), 'Token \'.*\' has been revoked.\\n')
-
-    @integration_test(True)
-    def test_hostfactory_revoke_token_invalid_token_raise_404_error(self):
-        self.assertRegex(self.revoke_token('non_exist', exit_code=1), ERROR_PATTERN_404)
-
-    @integration_test(True)
     def test_hostfactory_create_host_with_revoked_token_should_raise_401_error(self):
         host_id = f'some_host_{str(random.randint(0, 1024))}'
         token = self.create_token()
         self.create_host(token, host_id)
         self.revoke_token(token)
         self.assertRegex(self.create_host(token, host_id, exit_code=1), ERROR_PATTERN_401)
-
-    def revoke_token(self, token: str, exit_code=0):
-        return self.invoke_cli(self.cli_auth_params, ['hostfactory', 'revoke', 'token', '-t', token],
-                               exit_code=exit_code)
 
     def create_host(self, token: str, host: str, exit_code=0):
         return self.invoke_cli(self.cli_auth_params,
