@@ -47,12 +47,12 @@ from test.test_integration_list import CliIntegrationTestList
 from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
 from test.test_integration_resource import CliIntegrationResourceTest
-from test.test_integration_hostfactory import CliIntegrationTestHostFactory
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
 from test.util.test_path_provider import TestRunnerPathProvider
-
+from test.host_factory.test_integration_hostfactory_host import CliIntegrationTestHostFactoryHost
+from test.host_factory.test_integration_hostfactory_token import CliIntegrationTestHostFactoryToken
 from conjur.constants import *
 
 
@@ -66,7 +66,8 @@ def main():
         CliIntegrationTestVariable,
         CliIntegrationResourceTest,
         CliIntegrationTestList,
-        CliIntegrationTestHostFactory,
+        CliIntegrationTestHostFactoryToken,
+        CliIntegrationTestHostFactoryHost,
         CliIntegrationPolicy
     ]
     if args.run_oss_tests:
