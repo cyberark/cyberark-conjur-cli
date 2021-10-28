@@ -4,9 +4,14 @@ HostFactoryController
 
 This Module represents the Presentation Layer for the HostFactory command
 """
+# Builtins
 import http
 import logging
 import sys
+import traceback
+
+# Third party
+import requests
 
 # Internals
 from conjur.errors import MissingRequiredParameterException
@@ -48,10 +53,22 @@ class HostFactoryController:
             raise MissingRequiredParameterException('Missing required parameters')
 
         logging.debug(f"Creating host: '{create_host_data.host_id}'...")
-        result = self.hostfactory_logic.create_host(create_host_data)
-        sys.stdout.write(result + '\n')
-        logging.debug("Successfully created host using hostfactory: host_id:"
-                      f"'{create_host_data.host_id}'")
+        try:
+            result = self.hostfactory_logic.create_host(create_host_data)
+            sys.stdout.write(result + '\n')
+            logging.debug("Successfully created host using hostfactory: host_id:"
+                          f"'{create_host_data.host_id}'")
+        except requests.exceptions.HTTPError as server_error:
+            logging.debug(traceback.format_exc())
+            # pylint: disable=no-member
+            if hasattr(server_error.response, 'status_code') \
+                    and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
+                sys.stdout.write("Unable to authenticate with Conjur using the given Host "
+                                 "Factory token.\n"
+                                 f"Reason: {server_error}.\nCheck that the token is valid"
+                                 " and has not been revoked and try again.\n")
+        except Exception as error:
+            print(error)
 
     def revoke_token(self, token: str):
         """
