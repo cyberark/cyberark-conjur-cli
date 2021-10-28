@@ -63,9 +63,9 @@ class HostFactoryController:
             # pylint: disable=no-member
             if hasattr(server_error.response, 'status_code') \
                     and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
-                sys.stdout.write("Unable to create host using the given Host Factory token.\n"
-                                 f"Reason: {server_error}.\nCheck that the token is valid"
-                                 " and has not been revoked and try again.\n")
+                raise Exception("Cannot create a host using the Host Factory token provided."
+                                f" Reason: {server_error}. Check that the token is valid"
+                                "/has not been revoked and try again.")
 
     def revoke_token(self, token: str):
         """

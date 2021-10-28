@@ -52,7 +52,11 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
         token = self.create_token()
         self.create_host(token, host_id)
         self.revoke_token(token)
-        self.assertRegex(self.create_host(token, host_id, exit_code=1), ERROR_PATTERN_401)
+        self.assertRegex(self.create_host(token, host_id, exit_code=1),
+                         'Failed to execute command. Reason: Cannot create a host '
+                         'using the Host Factory token provided. Reason: 401 Client '
+                         'Error: Unauthorized for url: .*\/host_factories\/hosts. '
+                         'Check that the token is valid\/has not been revoked and try again.\\n')
 
     def create_host(self, token: str, host: str, exit_code=0):
         return self.invoke_cli(self.cli_auth_params,
