@@ -2,7 +2,7 @@ import logging
 import netrc
 import unittest
 from unittest.mock import patch
-
+from test.util import test_helpers as utils
 from conjur.api.client import ConfigurationMissingException, Client
 from conjur.util.util_functions import random_uuid
 from conjur.data_object import CredentialsData
@@ -337,7 +337,7 @@ class ClientTest(unittest.TestCase):
     def test_client_returns_get_variables_result(
             self, mock_api_instance, mock_creds,
             mock_api_config, mock_accessible):
-        variable_values = self.rand
+        variable_values = utils.random_uuid()
         mock_api_instance.return_value.get_variables.return_value = variable_values
 
         return_value = Client().get_many('variable_id', 'variable_id2')
