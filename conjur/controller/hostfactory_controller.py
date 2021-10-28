@@ -21,6 +21,13 @@ from conjur.logic.hostfactory_logic import HostFactoryLogic
 
 
 # pylint: disable=too-few-public-methods,logging-fstring-interpolation
+INVALID_TOKEN_ERROR = "Cannot create a host using the Host " \
+                         "Factory token provided." \
+                         " Reason: {}. " \
+                         "Check that the token is valid" \
+                         "/has not been revoked and try again."
+
+
 class HostFactoryController:
     """
     HostFactoryController
@@ -63,9 +70,7 @@ class HostFactoryController:
             # pylint: disable=no-member
             if hasattr(server_error.response, 'status_code') \
                     and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
-                raise InvalidHostFactoryException("Cannot create a host using the Host Factory token provided."
-                                                  f" Reason: {server_error}. Check that the token is valid"
-                                                  "/has not been revoked and try again.")
+                raise InvalidHostFactoryException(INVALID_TOKEN_ERROR.format(server_error))
 
     def revoke_token(self, token: str):
         """
