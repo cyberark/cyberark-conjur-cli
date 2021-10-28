@@ -67,8 +67,6 @@ class HostFactoryController:
                                  "Factory token.\n"
                                  f"Reason: {server_error}.\nCheck that the token is valid"
                                  " and has not been revoked and try again.\n")
-        except Exception as error:
-            print(error)
 
     def revoke_token(self, token: str):
         """
