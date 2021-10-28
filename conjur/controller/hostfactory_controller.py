@@ -63,8 +63,7 @@ class HostFactoryController:
             # pylint: disable=no-member
             if hasattr(server_error.response, 'status_code') \
                     and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
-                sys.stdout.write("Unable to authenticate with Conjur using the given Host "
-                                 "Factory token.\n"
+                sys.stdout.write("Unable to create host using the given Host Factory token.\n"
                                  f"Reason: {server_error}.\nCheck that the token is valid"
                                  " and has not been revoked and try again.\n")
 
