@@ -110,4 +110,3 @@ def random_uuid():
     Generate a random UUID.
     """
     return uuid.uuid4().hex
-
