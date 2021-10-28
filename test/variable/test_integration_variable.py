@@ -272,3 +272,4 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_cli_can_set_and_get_a_defined_variable_if_verification_disabled(self):
         self.setup_cli_params({}, '--insecure')
         utils.assert_set_and_get(self, self.DEFINED_VARIABLE_ID)
+

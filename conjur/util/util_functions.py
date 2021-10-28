@@ -106,4 +106,8 @@ def get_current_os() -> OSTypes:  # pragma: no cover
 
 
 def random_uuid():
+    """
+    Generate a random UUID.
+    """
     return uuid.uuid4().hex
+
