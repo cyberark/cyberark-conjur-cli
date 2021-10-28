@@ -93,6 +93,17 @@ class InvalidConfigurationException(Exception):
         self.message = message
         super().__init__(self.message)
 
+
+class InvalidHostFactoryTokenException(Exception):
+    """
+    Thrown to indicate that the host factory token
+    provided is invalid/revoked
+    """
+    def __init__(self, message: str = ""):
+        self.message = message
+        super().__init__(self.message)
+
+
 class ConfirmationException(Exception):
     """ Exception when user did not confirm a particular flow """
     def __init__(self, message: str = ""):

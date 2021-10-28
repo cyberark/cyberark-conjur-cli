@@ -23,7 +23,7 @@ class CreateHostData:
         self.host_id = host_id
         self.token = token
 
-        if self.host_id == "":
+        if self.host_id.strip() == "":
             raise MissingRequiredParameterException("Missing required parameter, 'host_id'")
 
         if self.token == "":
