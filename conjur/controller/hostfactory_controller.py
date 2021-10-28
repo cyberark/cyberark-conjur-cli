@@ -70,7 +70,8 @@ class HostFactoryController:
             # pylint: disable=no-member
             if hasattr(server_error.response, 'status_code') \
                     and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
-                raise InvalidHostFactoryException(INVALID_TOKEN_ERROR.format(server_error))
+                raise InvalidHostFactoryException(
+                    INVALID_TOKEN_ERROR.format(server_error)) from server_error
 
     def revoke_token(self, token: str):
         """
