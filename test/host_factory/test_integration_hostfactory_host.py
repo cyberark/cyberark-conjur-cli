@@ -16,6 +16,11 @@ from test.host_factory.test_integration_hostfactory import CliIntegrationTestHos
     HOST_FACTORY_ID, FULLY_QUALIFIED_HOST_FACTORY_ID, ERROR_PATTERN_401, ERROR_PATTERN_422
 from test.util.test_infrastructure import integration_test
 
+INVALID_TOKEN_ERROR = 'Failed to execute command. Reason: Cannot create a host ' \
+    'using the Host Factory token provided. Reason: 401 Client ' \
+    'Error: Unauthorized for url: .*\/host_factories\/hosts. ' \
+    'Check that the token is valid\/has not been revoked and try again.\\n'
+
 
 class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragma: no cover
 
@@ -39,12 +44,8 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
 
     @integration_test(True)
     def test_hostfactory_invalid_token_raise_error(self):
-        output = self.create_host('invalid_token', 'some_host', exit_code=1)
-        self.assertRegex(output, ERROR_PATTERN_401)
-
-    @integration_test(True)
-    def test_hostfactory_empty_host_id_raise_error(self):
-        self.assertRegex(self.create_host(self.create_token(), ' ', exit_code=1), ERROR_PATTERN_422)
+        self.assertRegex(self.create_host('invalid_token', 'some_host', exit_code=1),
+                         INVALID_TOKEN_ERROR)
 
     @integration_test(True)
     def test_hostfactory_create_host_with_revoked_token_should_raise_401_error(self):
@@ -52,7 +53,8 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
         token = self.create_token()
         self.create_host(token, host_id)
         self.revoke_token(token)
-        self.assertRegex(self.create_host(token, host_id, exit_code=1), ERROR_PATTERN_401)
+        self.assertRegex(self.create_host(token, host_id, exit_code=1),
+                         INVALID_TOKEN_ERROR)
 
     def create_host(self, token: str, host: str, exit_code=0):
         return self.invoke_cli(self.cli_auth_params,
