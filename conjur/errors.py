@@ -94,7 +94,7 @@ class InvalidConfigurationException(Exception):
         super().__init__(self.message)
 
 
-class InvalidHostFactoryException(Exception):
+class InvalidHostFactoryTokenException(Exception):
     """
     Thrown to indicate that the host factory token
     provided is invalid/revoked

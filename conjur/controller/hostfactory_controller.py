@@ -14,7 +14,7 @@ import traceback
 import requests
 
 # Internals
-from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryException
+from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
@@ -70,7 +70,7 @@ class HostFactoryController:
             # pylint: disable=no-member
             if hasattr(server_error.response, 'status_code') \
                     and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
-                raise InvalidHostFactoryException(
+                raise InvalidHostFactoryTokenException(
                     INVALID_TOKEN_ERROR.format(server_error)) from server_error
 
     def revoke_token(self, token: str):
