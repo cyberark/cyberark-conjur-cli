@@ -12,6 +12,7 @@ from unittest.mock import patch
 import string
 import uuid
 
+from conjur.util.util_functions import random_uuid
 from conjur.data_object import CredentialsData
 from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import integration_test
@@ -391,7 +392,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         will still be accessible
         """
         utils.setup_cli(self)
-        variable_name = "someversionedvar" + uuid.uuid4().hex
+        variable_name = "someversionedvar" + random_uuid()
         policy = f"- !variable {variable_name}"
         utils.load_policy_from_string(self, policy)
 

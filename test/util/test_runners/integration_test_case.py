@@ -12,6 +12,7 @@ from unittest import TestCase
 from contextlib import redirect_stdout
 import subprocess as sp
 from unittest.mock import patch, MagicMock
+from conjur.util.util_functions import random_uuid
 
 # Internals
 from conjur.cli import Cli
@@ -24,8 +25,9 @@ MAX_INTERACTIONS_ALLOWED = 5
 
 class IntegrationTestCaseBase(TestCase):
 
-    def __init__(self, testname, client_params: ClientParams = None,
-                 environment_params: TestEnvironmentParams = None):
+    def __init__(
+            self, testname, client_params: ClientParams = None,
+            environment_params: TestEnvironmentParams = None):
         """
         Base class that extends unittest TestCase
         used to setup tests environment
@@ -56,6 +58,10 @@ class IntegrationTestCaseBase(TestCase):
         if self.environment.invoke_process:
             return invoke_cli_as_process(self, *args, exit_code=exit_code)
         return invoke_cli_as_code(self, *args, exit_code=exit_code)
+
+    @staticmethod
+    def random_uuid():
+        return random_uuid()
 
 
 def invoke_cli_as_code(test_runner, *args, exit_code=0):

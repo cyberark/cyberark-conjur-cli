@@ -1,7 +1,7 @@
 import os
 import signal
 import tempfile
-import uuid
+from conjur.util.util_functions import random_uuid
 from unittest.mock import patch
 
 # *************************************************
@@ -62,7 +62,7 @@ def get_variable(self, *variable_ids, exit_code=0):
                            ['variable', 'get', '-i', *variable_ids], exit_code=exit_code)
 
 def assert_set_and_get(self, variable_id):
-    expected_value = uuid.uuid4().hex
+    expected_value = random_uuid()
 
     set_variable(self, variable_id, expected_value)
     output = get_variable(self, variable_id)
@@ -71,20 +71,20 @@ def assert_set_and_get(self, variable_id):
 
 def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
     with self.assertRaises(error_class):
-        self.set_variable(variable_id, uuid.uuid4().hex, exit_code)
+        self.set_variable(variable_id, random_uuid(), exit_code)
 
 def print_instead_of_raise_error(self, variable_id, error_message_regex):
     output = self.invoke_cli(self.cli_auth_params,
-                             ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
+                             ['variable', 'set', '-i', variable_id, '-v', random_uuid()], exit_code=1)
 
     self.assertRegex(output, error_message_regex)
 
 # *************** POLICY ***************
 
 def generate_policy_string():
-    variable_1 = 'simple/basic/{}'.format(uuid.uuid4().hex)
-    variable_2 = 'simple/space filled/{}'.format(uuid.uuid4().hex)
-    variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=uuid.uuid4().hex)
+    variable_1 = 'simple/basic/{}'.format(random_uuid())
+    variable_2 = 'simple/space filled/{}'.format(random_uuid())
+    variable_3 = 'simple/special @#$%^&*(){{}}[]._+/{id}'.format(id=random_uuid())
 
     # We purposefully build this policy like this
     # this is due to the fact inteliJ auto - ident

@@ -8,7 +8,6 @@ import io
 import json
 import os
 import tempfile
-import uuid
 from contextlib import redirect_stderr
 from unittest.mock import patch
 
@@ -40,7 +39,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test()
     def test_variable_get_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
-            expected_value = uuid.uuid4().hex
+            expected_value = self.random_uuid()
             utils.set_variable(self, 'one/password', expected_value)
             self.invoke_cli(self.cli_auth_params,
                                      ['--insecure', 'variable', 'get', '-i', 'one/password'])
@@ -56,7 +55,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
         Therefore, the variable name needs to be a random string so that the version
         will still be accessible
         """
-        variable_name = "someversionedvar" + uuid.uuid4().hex
+        variable_name = "someversionedvar" + self.random_uuid()
         policy = f"- !variable {variable_name}"
         utils.load_policy_from_string(self, policy)
 
@@ -68,7 +67,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test()
     def test_variable_different_version_calls_returns_different_versions(self):
-        variable_name = "someversionedsecret" + uuid.uuid4().hex
+        variable_name = "someversionedsecret" + self.random_uuid()
         policy = f"- !variable {variable_name}"
         utils.load_policy_from_string(self, policy)
 
@@ -88,7 +87,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test()
     def test_variable_set_insecure_prints_warning_in_log(self):
         with self.assertLogs('', level='DEBUG') as mock_log:
-            expected_value = uuid.uuid4().hex
+            expected_value = self.random_uuid()
             self.invoke_cli(self.cli_auth_params,
                        ['--insecure', 'variable', 'set', '-i',  'one/password', '-v', expected_value])
 
@@ -125,7 +124,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_variable_get_long_variable_returns_variable_value(self):
-        expected_value = uuid.uuid4().hex
+        expected_value = self.random_uuid()
         utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '--id=one/password'])
@@ -133,7 +132,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test(True)
     def test_variable_get_short_variable_returns_variable_value(self):
-        expected_value = uuid.uuid4().hex
+        expected_value = self.random_uuid()
         utils.set_variable(self, 'one/password', expected_value)
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password'])
@@ -170,7 +169,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
             utils.load_policy(self, temp_policy_file.name)
         value_map = {}
         for variable in variables:
-            value = uuid.uuid4().hex
+            value = self.random_uuid()
             utils.set_variable(self, variable, value)
             value_map[variable] = value
 

@@ -10,6 +10,8 @@ This module holds the common logic across the codebase
 import logging
 import platform
 import os
+import uuid
+
 from requests.exceptions import HTTPError
 
 # Internals
@@ -101,3 +103,7 @@ def get_current_os() -> OSTypes:  # pragma: no cover
     if platform.system() == "Windows":
         return OSTypes.WINDOWS
     return OSTypes.UNKNOWN
+
+
+def random_uuid():
+    return uuid.uuid4().hex
