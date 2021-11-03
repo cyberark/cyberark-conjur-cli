@@ -35,5 +35,8 @@ class PolicyController:
         except requests.exceptions.HTTPError as http_error:
             if http_error.response.status_code == 422:
                 raise InvalidFormatException(f"{http_error}. The policy was empty or its contents "
-                                             "were not in valid YAML.") from http_error
-            raise
+                                             f"were not in valid YAML."
+                                             f"Error: {http_error.response.text}") from http_error
+            raise requests.exceptions.HTTPError(f"{http_error}."
+                                         f"Error: {http_error.response.text}",
+                                         response=http_error.response) from http_error
