@@ -81,7 +81,7 @@ class UserLogic:
         """
         logging.debug(f"Rotating API key for '{resource_to_update}'...")
 
-        resource = Resource(type_='user', name=resource_to_update)
+        resource = Resource(kind='user', identifier=resource_to_update)
         new_api_key = self.client.rotate_other_api_key(resource)
         logging.debug(f"Successfully rotated API key for '{resource_to_update}'")
         return new_api_key

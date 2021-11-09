@@ -29,7 +29,7 @@ class HostControllerTest(unittest.TestCase):
         mock_host_controller.rotate_api_key()
         mock_host_controller.prompt_for_host_id_if_needed.assert_called_once()
 
-        mock_host_controller.client.rotate_other_api_key.assert_called_once_with(Resource(type_='host', name=mock_host_resource_data.host_to_update))
+        mock_host_controller.client.rotate_other_api_key.assert_called_once_with(Resource(kind='host', identifier=mock_host_resource_data.host_to_update))
 
     def test_user_does_not_provide_host_id_raises_exception(self):
         mock_client=Client

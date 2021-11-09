@@ -1,0 +1,17 @@
+- !user someuser
+
+- !variable one/password
+- !permit
+  resource: !variable one/password
+  privileges: [read,execute]
+  role: !user someuser
+
+- !policy
+  id: service
+  body:
+    - !webservice
+
+- !permit
+  resource: !webservice service
+  privileges: [read,execute]
+  role: !user someuser

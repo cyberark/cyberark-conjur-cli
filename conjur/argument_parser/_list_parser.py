@@ -50,7 +50,7 @@ class ListParser:
                             '    conjur list --kind group --members-of conjur-root-admins\t\t'
                             'List members within a role passing the role '
                             'type in the --kind option\n'
-                            '    conjur list --kind group --permitted-members-of '
+                            '    conjur list --kind group --permitted-roles '
                             'conjur-root-admins --privilege read\t\t'
                             'Lists the roles which have the named permission on a resource.\n'
                         ),
@@ -90,8 +90,8 @@ class ListParser:
                                        'a prefix on the Identifier of the role '
                                        '(e.g.  [group:]conjur-root-admins),'
                                        'or passed in the --kind option')
-        list_options.add_argument('-pm', '--permitted-members-of',
-                                  action='store', metavar='VALUE', dest='permitted_members_of',
+        list_options.add_argument('-pr', '--permitted-roles',
+                                  action='store', metavar='VALUE', dest='permitted_roles_identifier',
                                   help='Optional - Lists the roles which have '
                                        'the named permission on a resource. '
                                        'Types of Roles: '
@@ -103,8 +103,8 @@ class ListParser:
                                        '(e.g.  [group:]conjur-root-admins),'
                                        'or passed in the --kind option')
         list_options.add_argument('-p', '--privilege',
-                                  action='store', metavar='VALUE', dest='permitted_members_of',
-                                  help='Mandatory - when combined with --permitted-members-of'
+                                  action='store', metavar='VALUE', dest='privilege',
+                                  help='Mandatory - when combined with --permitted-roles'
                                        'Specifies the roles permitted '
                                        'to exercise this privilege are shown '
                                        '(read | execute | update).')
