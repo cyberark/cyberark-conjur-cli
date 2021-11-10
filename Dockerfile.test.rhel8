@@ -2,16 +2,6 @@ FROM registry.access.redhat.com/ubi8/ubi:8.3
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
 
-# Copy public keys for repo GPG check
-RUN curl -L https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official > /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
-
-# Import gpg key
-RUN gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
-
-# Copy below repo file to enable installation of gnome-keyring and dbus-x11
-COPY ./test/CentOS-Linux-AppStream.repo \
-     /etc/yum.repos.d/
-
 RUN yum --disableplugin=subscription-manager -y \
                                 install -y  bash \
                                             binutils \
@@ -23,10 +13,23 @@ RUN yum --disableplugin=subscription-manager -y \
                                             python3 \
                                             python3-devel \
                                             python3-pip \
-                                            gnome-keyring \
-                                            dbus-x11 \
                                             procps \
                                             zlib-devel \
+         && yum --disableplugin=subscription-manager clean all
+
+# Copy public keys for repo GPG check
+RUN curl -L https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official > /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
+# Import gpg key
+RUN gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
+# Copy below repo file to enable installation of gnome-keyring and dbus-x11
+COPY ./test/CentOS-Linux-AppStream.repo \
+     /etc/yum.repos.d/
+                   
+RUN yum --disableplugin=subscription-manager -y \
+                                install -y  dbus-x11 \  
+                                            gnome-keyring \                                        
          && yum --disableplugin=subscription-manager clean all
 
 RUN mkdir -p $INSTALL_DIR
