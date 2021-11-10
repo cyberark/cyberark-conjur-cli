@@ -23,6 +23,7 @@ from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
+from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
@@ -118,9 +119,10 @@ class Cli():
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def handle_init_logic(cls, url: str = None, account: str = None,
-                          cert: str = None, force: bool = None,
-                          ssl_verify: bool = True):
+    def handle_init_logic(
+            cls, url: str = None, account: str = None,
+            cert: str = None, force: bool = None,
+            ssl_verify: bool = True):
         """
         Method that wraps the init call logic
         Initializes the client, creating the .conjurrc file
@@ -139,8 +141,9 @@ class Cli():
 
     @classmethod
     # pylint: disable=line-too-long
-    def handle_login_logic(cls, credential_provider: CredentialsStoreInterface, identifier: str = None,
-                           password: str = None, ssl_verify: bool = True):
+    def handle_login_logic(
+            cls, credential_provider: CredentialsStoreInterface, identifier: str = None,
+            password: str = None, ssl_verify: bool = True):
         """
         Method that wraps the login call logic
         """
@@ -155,8 +158,9 @@ class Cli():
         sys.stdout.write("Successfully logged in to Conjur\n")
 
     @classmethod
-    def handle_logout_logic(cls, credential_provider: CredentialsStoreInterface,
-                            ssl_verify: bool = True):
+    def handle_logout_logic(
+            cls, credential_provider: CredentialsStoreInterface,
+            ssl_verify: bool = True):
         """
         Method that wraps the logout call logic
         """
@@ -179,6 +183,14 @@ class Cli():
                                             identifier=args.permitted_roles_identifier,
                                             privilege=args.privilege)
             list_controller.get_permitted_roles(list_permitted_roles_data)
+        elif args.members_of:
+            list_role_members_data = ListMembersOfData(kind=args.kind,
+                                                       identifier=args.members_of,
+                                                       inspect=args.inspect,
+                                                       search=args.search,
+                                                       limit=args.limit,
+                                                       offset=args.offset)
+            list_controller.get_role_members(list_role_members_data)
         else:
             list_data = ListData(kind=args.kind, inspect=args.inspect,
                                  search=args.search, limit=args.limit,
@@ -242,8 +254,9 @@ class Cli():
         policy_controller.load()
 
     @classmethod
-    def handle_user_logic(cls, credential_provider: CredentialsStoreInterface,
-                          args=None, client=None):
+    def handle_user_logic(
+            cls, credential_provider: CredentialsStoreInterface,
+            args=None, client=None):
         """
         Method that wraps the user call logic
         """

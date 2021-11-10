@@ -410,19 +410,26 @@ class Api:
 
         return json.loads(json_response.decode('utf-8'))
 
-    def list_members_of(self, uri_parameters: ListMembersOfData = None) -> dict:
+    def list_members_of_role(self, parameters: ListMembersOfData = None) -> list:
         """
-        List members within a role.
+        List all members of a role, both direct and indirect
         """
+        if not parameters.resource or not parameters.resource.identifier:
+            raise MissingRequiredParameterException("Missing required parameter, 'identifier'")
+
+        if not parameters.resource or not parameters.resource.kind:
+            raise MissingRequiredParameterException("Missing required parameter, 'kind'")
+
         params = {
             'account': self._account,
-            'identifier': uri_parameters.identifier,
-            'kind': uri_parameters.kind,
+            'identifier': parameters.resource.identifier,
+            'kind': parameters.resource.kind,
         }
         params.update(self._default_params)
 
-        request_parameters = uri_parameters.list_dictify()
+        request_parameters = parameters.list_dictify()
         del request_parameters['identifier']
+        del request_parameters['resource']
         json_response = invoke_endpoint(HttpVerb.GET,
                                         ConjurEndpoint.ROLES_MEMBERS_OF,
                                         params,
@@ -430,7 +437,14 @@ class Api:
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
 
-        return json.loads(json_response.decode('utf-8'))
+        resources = json.loads(json_response.decode('utf-8'))
+
+        if not parameters.inspect:
+            # For each element (resource) in the resources sequence, we extract the resource id
+            resource_list = map(lambda resource: resource['member'], resources)
+            return list(resource_list)
+
+        return resources
 
     def list_permitted_roles(self, data: ListPermittedRolesData) -> dict:
         """

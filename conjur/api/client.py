@@ -15,6 +15,7 @@ from typing import Optional
 # Internals
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
     InvalidConfigurationException, ResourceNotFoundException, MissingRequiredParameterException
@@ -177,6 +178,12 @@ class Client:
         Lists the roles which have the named permission on a resource.
         """
         return self._api.list_permitted_roles(list_permitted_roles_data)
+
+    def list_members_of_role(self, data: ListMembersOfData) -> dict:
+        """
+        Lists the roles which have the named permission on a resource.
+        """
+        return self._api.list_members_of_role(data)
 
     def get(self, variable_id: str, version: str = None) -> Optional[bytes]:
         """

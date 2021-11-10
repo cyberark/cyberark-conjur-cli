@@ -20,8 +20,8 @@ class ListMembersOfData(ListData):
 
     def __init__(self, **arg_params):
         super().__init__(**arg_params)
+        self.resource = None
         self.identifier = get_param('identifier', **arg_params)
-        self.privilege = get_param('privilege', **arg_params)
 
     def list_dictify(self):
         """
@@ -45,3 +45,9 @@ class ListMembersOfData(ListData):
         if self.role:
             result.append(f"'identifier': '{self.identifier}'")
         return '{' + ', '.join(result) + '}'
+
+    def set_resource(self, resource):
+        """
+        Sets the resource of this class
+        """
+        self.resource = resource
