@@ -55,7 +55,7 @@ class HostFactoryParser:
     @staticmethod
     def _add_hostfactory_create(hostfactory_subparser: ArgparseWrapper):
         hostfactory_create_name = 'create - Create token for creating hosts ' \
-                                  'with restrictions or creates a Host using the Host Factory'
+                                  'with restrictions or creates a host using the Host Factory'
         hostfactory_create_usage = 'conjur [global options] hostfactory ' \
                                    'create <subcommand> [options] [args]'
 
@@ -79,11 +79,12 @@ class HostFactoryParser:
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        hostfactory_create = create_cmd.add_argument_group(
+        hostfactory_create_subcommand = create_cmd.add_subparsers(title="Subcommand", dest='action')
+        hostfactory_create_options = create_cmd.add_argument_group(
             title=title_formatter("Options"))
-        hostfactory_create.add_argument('-h', '--help', action='help',
+        hostfactory_create_options.add_argument('-h', '--help', action='help',
                                         help='Display help screen and exit')
-        return create_cmd.add_subparsers(title="Subcommand", dest='action')
+        return hostfactory_create_subcommand
 
     @staticmethod
     def _add_hostfactory_revoke(hostfactory_subparser: ArgparseWrapper):
@@ -107,11 +108,12 @@ class HostFactoryParser:
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        hostfactory_create = create_cmd.add_argument_group(
+        hostfactory_revoke_subcommand = create_cmd.add_subparsers(title="Subcommand", dest='action')
+        hostfactory_revoke_options = create_cmd.add_argument_group(
             title=title_formatter("Options"))
-        hostfactory_create.add_argument('-h', '--help', action='help',
+        hostfactory_revoke_options.add_argument('-h', '--help', action='help',
                                         help='Display help screen and exit')
-        return create_cmd.add_subparsers(title="Subcommand", dest='action')
+        return hostfactory_revoke_subcommand
 
     @staticmethod
     def _add_hostfactory_revoke_token(menu: ArgparseWrapper):
@@ -170,7 +172,8 @@ class HostFactoryParser:
             title=title_formatter("Options"))
         create_token.add_argument('-action_type', default='create_token', help=argparse.SUPPRESS)
         create_token.add_argument('-i', '--hostfactoryid', metavar='VALUE', required=True,
-                                  help='(Mandatory) the ID of the host factory.')
+                                  help='(Mandatory) The ID of the Host Factory'
+                                        'you are working work with.')
         create_token.add_argument('--cidr', metavar='VALUE',
                                   help='(Optional) the CIDR address that contains '
                                        'all IPs that can use this token to create hosts. '
@@ -179,11 +182,14 @@ class HostFactoryParser:
                                        '--cidr "10.0.10.0/24,'
                                        '10.0.11.1/32,10.0.20.0/24")')
         create_token.add_argument('-d', '--duration-days', metavar='VALUE', type=int,
-                                  help='(Optional) the number of days the token will be valid.')
-        create_token.add_argument('-H', '--duration-hours', metavar='VALUE', type=int,
-                                  help='(Optional) the number of hours the token will be valid.')
+                                  help='(Optional) The validity (in days) '
+                                       'of the Host Factory token.')
+        create_token.add_argument('-dh', '--duration-hours', metavar='VALUE', type=int,
+                                  help='(Optional) The validity (in hours) '
+                                        'of the Host Factory token.')
         create_token.add_argument('-m', '--duration-minutes', metavar='VALUE', type=int,
-                                  help='(Optional) the number of minutes the token will be valid.')
+                                  help='(Optional) The validity (in minutes) '
+                                       'of the Host Factory token')
         create_token.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')
 
@@ -195,13 +201,13 @@ class HostFactoryParser:
 
         hostfactory_create_subcommand_parser = menu \
             .add_parser(name="host",
-                        help='Creates a Host using the Host Factory',
+                        help='Creates a host using the Host Factory',
                         description=command_description(
                             name, usage),
                         epilog=command_epilog(
                             'conjur hostfactory create host --id brand-new-host '
                             '--token 82cv6kk040axyffzvmscpf129k81yq1bzkey3gcgfvjc00pfy41h\t\t '
-                            'Creates a Host using the HostFactory\t\t',
+                            'Creates a host using the HostFactory\t\t',
                             command='host',
                         ),
                         usage=argparse.SUPPRESS,
@@ -213,11 +219,11 @@ class HostFactoryParser:
         # hidden argument to be used to distinguish this action
         create_host.add_argument('-action_type', default='create_host', help=argparse.SUPPRESS)
         create_host.add_argument('-i', '--id', metavar='VALUE', required=True,
-                                 help='(Mandatory) Identifier of the Host to be created. '
+                                 help='(Mandatory) Identifier of the host to be created. '
                                       'It will be created within '
                                       'the account of the Host Factory.')
         create_host.add_argument('-t', '--token', metavar='VALUE', required=True,
-                                 help='(Mandatory) A Host Factory Token must be provided.')
+                                 help='(Mandatory) A Host Factory token must be provided.')
         create_host.add_argument('-h', '--help', action='help',
                                  help='Display help screen and exit')
 

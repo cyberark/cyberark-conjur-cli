@@ -117,6 +117,31 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
                   str(mock_log.output))
 
     @integration_test()
+    def test_policy_bad_syntax_error_user_recieve_detailed_error(self):
+        policy_with_bad_syntax = "- ! user bad syntax"
+        with redirect_stderr(self.capture_stream):
+            output = utils.load_policy_from_string(self, policy_with_bad_syntax, exit_code=1)
+        self.assertIn("{\"error\":{\"code\":\"validation_failed\",\"message\":", output, 
+                        "Could not find detailed error in the output."
+                        "Expected to find:"
+                        "{\"error\":{\"code\":\"validation_failed\",\"message\":"
+                        "Result:"
+                        f"{output}")
+
+    @integration_test()
+    def test_policy_load_bad_branch_recieve_detailed_error(self):
+        with redirect_stderr(self.capture_stream):
+            output = self.invoke_cli(self.cli_auth_params,
+                           ['policy', 'load', '-b', 'wrong-branch', '-f', 
+                           self.environment.path_provider.get_policy_path("resource")], exit_code=1)
+        self.assertIn("{\"error\":{\"code\":\"not_found\",\"message\":", output, 
+                        "Could not find detailed error in the output."
+                        "Expected to find:"
+                        "{\"error\":{\"code\":\"not_found\",\"message\":"
+                        "Result:"
+                        f"{output}")
+
+    @integration_test()
     def test_policy_replace_load_combo_returns_help_screen(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,

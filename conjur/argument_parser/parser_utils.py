@@ -48,7 +48,7 @@ def command_epilog(example: str, command: str = None, subcommands: list = None) 
     refer_to_help = "See more details in each subcommand's help:"
     if subcommands:
         res = ""
-        res += " -h\n".join(f"conjur {command} {subcommand}" for subcommand in subcommands)
+        res += "\n".join(f"conjur {command} {subcommand} -h" for subcommand in subcommands)
         return f"{refer_to_help}\n{res}"
     return f"Examples:\n    {example}"
 
