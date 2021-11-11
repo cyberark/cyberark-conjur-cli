@@ -15,9 +15,10 @@ from typing import Optional
 # Internals
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
-from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
+from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
-    InvalidConfigurationException
+    InvalidConfigurationException, ResourceNotFoundException, MissingRequiredParameterException
+from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
@@ -34,8 +35,9 @@ use these parameters defined in this class to initialize our Python
 SDK in their code.
 """
 
+
 # pylint: disable=logging-fstring-interpolation,line-too-long
-class Client():
+class Client:
     """
     Client
 
@@ -170,6 +172,12 @@ class Client():
         """
         return self._api.resources_list(list_constraints)
 
+    def list_permitted_roles(self, list_permitted_roles_data: ListPermittedRolesData) -> dict:
+        """
+        Lists the roles which have the named permission on a resource.
+        """
+        return self._api.list_permitted_roles(list_permitted_roles_data)
+
     def get(self, variable_id: str, version: str = None) -> Optional[bytes]:
         """
         Gets a variable value based on its ID
@@ -244,3 +252,33 @@ class Client():
         """
         # pylint: disable=line-too-long
         return self._api.change_personal_password(logged_in_user, current_password, new_password)
+
+    def find_resources_by_identifier(self, resource_identifier: str) -> list:
+        """
+        Get all the resources with the given identifier.
+        """
+        list_constraints = {"search": resource_identifier}
+        returned_resources_ids = self.list(list_constraints)
+
+        def get_resource_kind_if_matches(returned_resource_id):
+            resource = Resource.from_full_id(returned_resource_id)
+            return resource if resource.identifier == resource_identifier else None
+
+        resources = map(get_resource_kind_if_matches, returned_resources_ids)
+        resources = [res for res in resources if res]  # Remove None elements
+        return resources
+
+    def find_resource_by_identifier(self, resource_identifier: str) -> list:
+        """
+        Look for a resource with the given identifier, and return its kind.
+        Fail if there isn't exactly one such resource.
+        """
+        resources = self.find_resources_by_identifier(resource_identifier)
+        if not resources:
+            raise ResourceNotFoundException(resource_identifier)
+        if len(resources) > 1:
+            raise MissingRequiredParameterException(
+                f"Ambiguous resource identifier, multiple resources exist with this identifier: "
+                f"({', '.join([res.full_id() for res in resources])})")
+
+        return resources[0]

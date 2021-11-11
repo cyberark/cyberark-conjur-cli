@@ -23,6 +23,7 @@ from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
+from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
@@ -166,14 +167,23 @@ class Cli():
         logout_controller.remove_credentials()
 
     @classmethod
-    def handle_list_logic(cls, list_data: ListData = None, client=None):
+    def handle_list_logic(cls, args: list = None, client=None):
         """
         Method that wraps the list call logic
         """
         list_logic = ListLogic(client)
-        list_controller = ListController(list_logic=list_logic,
-                                         list_data=list_data)
-        list_controller.load()
+        list_controller = ListController(list_logic=list_logic)
+
+        if args.permitted_roles_identifier:
+            list_permitted_roles_data = ListPermittedRolesData(
+                                            identifier=args.permitted_roles_identifier,
+                                            privilege=args.privilege)
+            list_controller.get_permitted_roles(list_permitted_roles_data)
+        else:
+            list_data = ListData(kind=args.kind, inspect=args.inspect,
+                                 search=args.search, limit=args.limit,
+                                 offset=args.offset, role=args.role)
+            list_controller.load(list_data)
 
     @classmethod
     def handle_hostfactory_logic(cls, args: list = None, client=None):
@@ -315,10 +325,7 @@ class Cli():
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
-            list_data = ListData(kind=args.kind, inspect=args.inspect,
-                                 search=args.search, limit=args.limit,
-                                 offset=args.offset, role=args.role)
-            Cli.handle_list_logic(list_data, client)
+            Cli.handle_list_logic(args, client)
 
         elif resource == 'whoami':
             result = client.whoami()

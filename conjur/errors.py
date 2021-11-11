@@ -29,6 +29,12 @@ class MissingRequiredParameterException(Exception):
         self.message = message
         super().__init__(self.message)
 
+class ResourceNotFoundException(Exception):
+    """ Exception when user inputted an invalid resource type """
+    def __init__(self, resource: str):
+        self.message = f"Resource not found: {resource}"
+        super().__init__(self.message)
+
 class InvalidResourceException(Exception):
     """ Exception when user inputted an invalid resource type """
     def __init__(self, message: str = ""):

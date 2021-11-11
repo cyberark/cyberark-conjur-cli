@@ -626,7 +626,7 @@ class ApiTest(unittest.TestCase):
 
         api.authenticate = mock_auth
 
-        api.rotate_other_api_key(Resource(type_='user', name="somename"))
+        api.rotate_other_api_key(Resource(kind='user', identifier="somename"))
 
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                               query={'role': 'user:somename'},
@@ -642,7 +642,7 @@ class ApiTest(unittest.TestCase):
 
         api.authenticate = mock_auth
         with self.assertRaises(Exception):
-            api.rotate_other_api_key(Resource(type_='someinvalidresource', name="somename"))
+            api.rotate_other_api_key(Resource(kind='someinvalidresource', identifier="somename"))
 
     @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps({})))
