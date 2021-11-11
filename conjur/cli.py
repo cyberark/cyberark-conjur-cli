@@ -175,9 +175,9 @@ class Cli():
         list_controller = ListController(list_logic=list_logic)
 
         if args.permitted_roles_identifier:
-            list_permitted_roles_data = ListPermittedRolesData(kind=args.kind,
-                                                               identifier=args.permitted_roles_identifier,
-                                                               privilege=args.privilege)
+            list_permitted_roles_data = ListPermittedRolesData(
+                                            identifier=args.permitted_roles_identifier,
+                                            privilege=args.privilege)
             list_controller.get_permitted_roles(list_permitted_roles_data)
         else:
             list_data = ListData(kind=args.kind, inspect=args.inspect,

@@ -359,7 +359,7 @@ class Api:
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
         """
-        if resource.type not in ('user', 'host'):
+        if resource.kind not in ('user', 'host'):
             raise InvalidResourceException("Error: Invalid resource type")
 
         # Attach the resource type (user or host)

@@ -8,18 +8,17 @@ We use this DTO to build the permitted-roles request.
 """
 
 # pylint: disable=too-few-public-methods
-from conjur.errors import MissingRequiredParameterException
 
 
 class ListPermittedRolesData:
     """
-    Used for organizing the the params the user passed in to execute the list permitted-roles command
+    Used for organizing the params the user passed in to execute the list permitted-roles command
     """
 
-    def __init__(self, kind: str, identifier: str, privilege: str):
-        self.kind = kind
+    def __init__(self, identifier: str, privilege: str, kind: str = None):
         self.identifier = identifier
         self.privilege = privilege
+        self.kind = kind
 
     def __repr__(self) -> str:
         result = []

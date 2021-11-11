@@ -10,6 +10,10 @@ from conjur.errors import MissingRequiredParameterException
 
 
 class Resource:
+    """
+    DTO class that represents a resource in Conjur.
+    """
+
     @classmethod
     def from_full_id(cls, full_id: str):
         """
@@ -20,7 +24,8 @@ class Resource:
             # If identifier contains also the account part, remove it.
             id_parts.pop(0)
         elif len(id_parts) != 2:
-            raise MissingRequiredParameterException(f"Resource id is missing 'kind:' prefix: {full_id}")
+            raise MissingRequiredParameterException(
+                f"Resource id is missing 'kind:' prefix: {full_id}")
 
         return Resource(kind=id_parts[0], identifier=id_parts[1])
 

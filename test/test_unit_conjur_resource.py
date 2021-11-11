@@ -11,6 +11,6 @@ class ConjurResourceDataTest(unittest.TestCase):
         self.assertEquals(resource_pair, "sometype:somename")
 
     def test_host_input_data_rotate_api_key_is_printed_as_dict_properly(self):
-        EXPECTED_REP_OBJECT = "'type': 'sometype', 'name': 'somename'"
+        EXPECTED_REP_OBJECT = "'kind': 'sometype', 'identifier': 'somename'"
         mock_resource = Resource(kind="sometype", identifier="somename")
         self.assertEquals(str(EXPECTED_REP_OBJECT), mock_resource.__repr__())

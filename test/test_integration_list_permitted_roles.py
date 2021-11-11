@@ -30,34 +30,34 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     # *************** TESTS ***************
 
     @integration_test()
-    def test_list_permitted_roles_without_identifier(self):
+    def test_list_permitted_roles_without_identifier_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params, ['list', '--permitted-roles'])
 
     @integration_test()
-    def test_list_permitted_roles_without_privilege_flag(self):
+    def test_list_permitted_roles_without_privilege_flag_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params, ['list', '--permitted-roles', 'one/password'])
 
     @integration_test()
-    def test_list_permitted_roles_without_privilege_value(self):
+    def test_list_permitted_roles_without_privilege_value_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params, ['list', '--permitted-roles', 'one/password', '--privilege'])
 
     @integration_test()
-    def test_list_permitted_roles_without_kind_value(self):
+    def test_list_permitted_roles_without_kind_value_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params,
                             ['list', '--permitted-roles', 'one/password', '--privilege', 'read', '--kind'])
 
     @integration_test()
-    def test_list_permitted_roles_for_resource_without_kind_where_no_resource_with_this_identifier_exists(self):
+    def test_list_permitted_roles_for_unknown_resource_without_kind_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params,
                             ['list', '--permitted-roles', 'unknown_resource', '--privilege', 'read'])
 
     @integration_test()
-    def test_list_permitted_roles_for_resource_without_kind_where_single_resource_with_this_identifier_exists(self):
+    def test_list_permitted_roles_for_distinct_resource_without_kind_return_success(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['list', '--permitted-roles', 'one/password', '--privilege', 'read'])
         json_result = json.loads(output)
@@ -65,12 +65,12 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertCountEqual(expected_result, json_result)
 
     @integration_test()
-    def test_list_permitted_roles_for_resource_without_kind_where_multiple_resources_with_this_identifier_exists(self):
+    def test_list_permitted_roles_for_ambiguous_resource_without_kind_return_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params, ['list', '--permitted-roles', 'service', '--privilege', 'read'])
 
     @integration_test()
-    def test_list_permitted_roles_with_kind_in_identifier(self):
+    def test_list_permitted_roles_with_kind_in_identifier_return_success(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['list', '--permitted-roles', 'variable:one/password', '--privilege', 'read'])
         json_result = json.loads(output)
@@ -78,17 +78,15 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         self.assertCountEqual(expected_result, json_result)
 
     @integration_test()
-    def test_list_permitted_roles_with_all_flags(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['list', '--permitted-roles', 'one/password', '--privilege', 'read', '--kind', 'variable'])
-        json_result = json.loads(output)
-        expected_result = [f"{self.client_params.account}:user:someuser", f"{self.client_params.account}:user:admin"]
-        self.assertCountEqual(expected_result, json_result)
+    def test_list_permitted_roles_for_ambiguous_resource_with_kind_param_return_error(self):
+        with self.assertRaises(AssertionError):
+            self.invoke_cli(self.cli_auth_params,
+                            ['list', '--permitted-roles', 'service', '--privilege', 'read', '--kind', 'webservice'])
 
     @integration_test()
-    def test_list_permitted_roles_with_all_flags_in_short_version(self):
+    def test_list_permitted_roles_with_all_flags_in_short_version_return_success(self):
         output = self.invoke_cli(self.cli_auth_params,
-                                 ['list', '-pr', 'one/password', '-p', 'read', '-k', 'variable'])
+                                 ['list', '-pr', 'variable:one/password', '-p', 'read'])
         json_result = json.loads(output)
         expected_result = [f"{self.client_params.account}:user:someuser", f"{self.client_params.account}:user:admin"]
         self.assertCountEqual(expected_result, json_result)

@@ -16,8 +16,9 @@ from typing import Optional
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
+    InvalidConfigurationException, ResourceNotFoundException, MissingRequiredParameterException
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
-from conjur.errors import *
 from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
@@ -252,32 +253,32 @@ class Client:
         # pylint: disable=line-too-long
         return self._api.change_personal_password(logged_in_user, current_password, new_password)
 
-    def get_resource_kinds(self, resource_identifier: str) -> list:
+    def find_resources_by_identifier(self, resource_identifier: str) -> list:
         """
-        Look for all the resources with the given identifier, and return a list of their kinds.
+        Get all the resources with the given identifier.
         """
         list_constraints = {"search": resource_identifier}
         returned_resources_ids = self.list(list_constraints)
 
         def get_resource_kind_if_matches(returned_resource_id):
             resource = Resource.from_full_id(returned_resource_id)
-            return resource.kind if resource.identifier == resource_identifier else None
+            return resource if resource.identifier == resource_identifier else None
 
-        kinds = map(get_resource_kind_if_matches, returned_resources_ids)
-        kinds = [k for k in kinds if k]  # Remove None elements
-        return kinds
+        resources = map(get_resource_kind_if_matches, returned_resources_ids)
+        resources = [res for res in resources if res]  # Remove None elements
+        return resources
 
-    def get_resource_kind(self, resource_identifier: str) -> list:
+    def find_resource_by_identifier(self, resource_identifier: str) -> list:
         """
         Look for a resource with the given identifier, and return its kind.
         Fail if there isn't exactly one such resource.
         """
-        resource_kinds = self.get_resource_kinds(resource_identifier)
-        if not resource_kinds:
+        resources = self.find_resources_by_identifier(resource_identifier)
+        if not resources:
             raise ResourceNotFoundException(resource_identifier)
-        elif len(resource_kinds) > 1:
+        if len(resources) > 1:
             raise MissingRequiredParameterException(
-                f"More than one resource was found with this identifier. "
-                f"Supply required parameter 'kind' with one of the kinds: ({', '.join(resource_kinds)})")
+                f"Ambiguous resource identifier, multiple resources exist with this identifier: "
+                f"({', '.join([res.full_id() for res in resources])})")
 
-        return resource_kinds[0]
+        return resources[0]

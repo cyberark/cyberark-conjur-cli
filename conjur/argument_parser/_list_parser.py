@@ -91,7 +91,8 @@ class ListParser:
                                        '(e.g.  [group:]conjur-root-admins),'
                                        'or passed in the --kind option')
         list_options.add_argument('-pr', '--permitted-roles',
-                                  action='store', metavar='VALUE', dest='permitted_roles_identifier',
+                                  action='store', metavar='VALUE',
+                                  dest='permitted_roles_identifier',
                                   help='Optional - Lists the roles which have '
                                        'the named permission on a resource. '
                                        'Types of Roles: '

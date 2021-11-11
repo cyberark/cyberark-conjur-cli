@@ -34,26 +34,22 @@ class ListLogic:
         """
         Lists the roles which have the named permission on a resource.
         """
-        # Split 'kind' out of the given identifier if it was prefixed with it.
-        if ':' in data.identifier:
-            data = self.extract_kind_from_identifier(data)
-        elif not data.kind:
-            data = self.retrieve_kind_by_resource_id(data)
-
-        return self.client.list_permitted_roles(data)
-
-    @staticmethod
-    def extract_kind_from_identifier(data):
-        resource = Resource.from_full_id(data.identifier)
-        return ListPermittedRolesData(kind=resource.kind,
+        resource = self.__get_resource_from_identifier(data.identifier)
+        data = ListPermittedRolesData(kind=resource.kind,
                                       identifier=resource.identifier,
                                       privilege=data.privilege)
 
-    def retrieve_kind_by_resource_id(self, data):
-        kind = self.client.get_resource_kind(data.identifier)
-        return ListPermittedRolesData(kind=kind,
-                                      identifier=data.identifier,
-                                      privilege=data.privilege)
+        return self.client.list_permitted_roles(data)
+
+    def __get_resource_from_identifier(self, identifier):
+        """
+        Lists the roles which have the named permission on a resource.
+        """
+        # Split 'kind' out of the given identifier if it was prefixed with it.
+        if ':' in identifier:
+            return Resource.from_full_id(identifier)
+
+        return self.client.find_resource_by_identifier(identifier)
 
     @classmethod
     def build_constraints(cls, list_data: list) -> dict:
