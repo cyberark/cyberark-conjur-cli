@@ -35,7 +35,7 @@ class UserController():
         try:
             # pylint: disable=line-too-long
             resource_to_update, new_api_key = self.user_logic.rotate_api_key(self.user_input_data.user_id)
-            sys.stdout.write(f"Successfully rotated API key for '{resource_to_update}'. "
+            sys.stdout.write(f"Successfully rotated API key for '{resource_to_update}'."'\n'
                              f"New API key is: {new_api_key}\n")
         except OperationNotCompletedException:
             sys.stdout.write("An error occurred. Log in again or try again in debug mode.\n")
