@@ -8,7 +8,6 @@ This test file handles the main test flows after initialization and configuratio
 import io
 import json
 import tempfile
-import uuid
 from contextlib import redirect_stderr
 
 from conjur.constants import *
@@ -47,8 +46,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_load_policy_of_new_resources_returns_new_entry_json_data(self):
         self.setup_cli_params({})
 
-        user_id1 = uuid.uuid4().hex
-        user_id2 = uuid.uuid4().hex
+        user_id1 = utils.generate_uuid()
+        user_id2 = utils.generate_uuid()
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
 
@@ -168,8 +167,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_load_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
-        user_id1 = uuid.uuid4().hex
-        user_id2 = uuid.uuid4().hex
+        user_id1 = utils.generate_uuid()
+        user_id2 = utils.generate_uuid()
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
         # Ensure that the accounts exist
@@ -212,8 +211,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_replace_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
-        user_id1 = uuid.uuid4().hex
-        user_id2 = uuid.uuid4().hex
+        user_id1 = utils.generate_uuid()
+        user_id2 = utils.generate_uuid()
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
         json_result = json.loads(utils.replace_policy_from_string(self, policy))
@@ -263,8 +262,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_update_policy_can_output_returned_data(self):
         self.setup_cli_params({})
 
-        user_id1 = uuid.uuid4().hex
-        user_id2 = uuid.uuid4().hex
+        user_id1 = utils.generate_uuid()
+        user_id2 = utils.generate_uuid()
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
 
@@ -292,8 +291,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_https_update_policy_doesnt_break_if_no_created_roles(self):
         self.setup_cli_params({})
 
-        user_id1 = uuid.uuid4().hex
-        user_id2 = uuid.uuid4().hex
+        user_id1 = utils.generate_uuid()
+        user_id2 = utils.generate_uuid()
         policy = "- !user {user_id1}\n- !user {user_id2}\n".format(user_id1=user_id1,
                                                                    user_id2=user_id2)
         # Ensure that the accounts exist
@@ -314,7 +313,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     '''
     @integration_test()
     def test_policy_update_policy_removes_user(self):
-        user_id = uuid.uuid4().hex
+        user_id = utils.generate_uuid()
 
         load_policy = f"- !user {user_id}"
         json.loads(utils.load_policy_from_string(self, load_policy))

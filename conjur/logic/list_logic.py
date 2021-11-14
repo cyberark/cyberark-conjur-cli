@@ -8,6 +8,7 @@ This module is the business logic for executing the list command
 # pylint: disable=too-few-public-methods
 import logging
 
+from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.resource import Resource
 
@@ -40,6 +41,13 @@ class ListLogic:
                                       privilege=data.privilege)
 
         return self.client.list_permitted_roles(data)
+
+    def get_members_of(self, data: ListMembersOfData) -> dict:
+        """
+        Lists the roles which have the named permission on a resource.
+        """
+        data.set_resource(self.__get_resource_from_identifier(data.identifier))
+        return self.client.list_members_of_role(data)
 
     def __get_resource_from_identifier(self, identifier):
         """
