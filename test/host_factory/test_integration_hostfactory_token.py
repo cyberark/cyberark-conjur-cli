@@ -36,7 +36,8 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
         output = self.invoke_cli(self.cli_auth_params,
                                  ['hostfactory', 'create', 'token'],
                                  exit_code=1)
-        self.assertRegex(output, ".*token - Creates a token for creating hosts with restrictions\n\nUsage:\n.*")
+        self.assertRegex(output, ".*token - Generate a Host Factory token for " \
+                                    "creating hosts with restrictions\n\nUsage:\n.*")
 
     @integration_test(True)
     def test_hostfactory_create_token_with_unknown_hostfactory_id_raises_404_error(self):
