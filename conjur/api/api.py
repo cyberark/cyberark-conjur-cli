@@ -20,6 +20,7 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.list_members_of_data import ListMembersOfData
+from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -358,7 +359,7 @@ class Api:
         This method is used to rotate a user/host's API key that is not the current user.
         To rotate API key of the current user use rotate_personal_api_key
         """
-        if resource.type not in ('user', 'host'):
+        if resource.kind not in ('user', 'host'):
             raise InvalidResourceException("Error: Invalid resource type")
 
         # Attach the resource type (user or host)
@@ -409,19 +410,26 @@ class Api:
 
         return json.loads(json_response.decode('utf-8'))
 
-    def list_members_of(self, uri_parameters: ListMembersOfData = None) -> dict:
+    def list_members_of_role(self, parameters: ListMembersOfData = None) -> list:
         """
-        List members within a role.
+        List all members of a role, both direct and indirect
         """
+        if not parameters.resource or not parameters.resource.identifier:
+            raise MissingRequiredParameterException("Missing required parameter, 'identifier'")
+
+        if not parameters.resource or not parameters.resource.kind:
+            raise MissingRequiredParameterException("Missing required parameter, 'kind'")
+
         params = {
             'account': self._account,
-            'identifier': uri_parameters.identifier,
-            'kind': uri_parameters.kind,
+            'identifier': parameters.resource.identifier,
+            'kind': parameters.resource.kind,
         }
         params.update(self._default_params)
 
-        request_parameters = uri_parameters.list_dictify()
+        request_parameters = parameters.list_dictify()
         del request_parameters['identifier']
+        del request_parameters['resource']
         json_response = invoke_endpoint(HttpVerb.GET,
                                         ConjurEndpoint.ROLES_MEMBERS_OF,
                                         params,
@@ -429,29 +437,38 @@ class Api:
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
 
-        return json.loads(json_response.decode('utf-8'))
+        resources = json.loads(json_response.decode('utf-8'))
 
-    def list_permitted_members_of(self, uri_parameters: ListMembersOfData = None) -> dict:
+        if not parameters.inspect:
+            # For each element (resource) in the resources sequence, we extract the resource id
+            resource_list = map(lambda resource: resource['member'], resources)
+            return list(resource_list)
+
+        return resources
+
+    def list_permitted_roles(self, data: ListPermittedRolesData) -> dict:
         """
         Lists the roles which have the named permission on a resource.
         """
+        if not data.kind:
+            raise MissingRequiredParameterException("Missing required parameter, 'kind'")
+
+        if not data.identifier:
+            raise MissingRequiredParameterException("Missing required parameter, 'identifier'")
+
+        if not data.privilege:
+            raise MissingRequiredParameterException("Missing required parameter, 'privilege'")
+
         params = {
-            'account': self._account,
-            'identifier': uri_parameters.identifier,
-            'kind': uri_parameters.kind,
-            'privilege': uri_parameters.privilege
+            'identifier': data.identifier,
+            'kind': data.kind,
+            'privilege': data.privilege
         }
         params.update(self._default_params)
 
-        request_parameters = uri_parameters.list_dictify()
-        # 'identifier' is part of the request path.
-        # Remove 'identifier' so it won't be part of the query string
-        del request_parameters['identifier']
-
         json_response = invoke_endpoint(HttpVerb.GET,
-                                        ConjurEndpoint.RESOURCES_PERMITTED_MEMBERS_OF,
+                                        ConjurEndpoint.RESOURCES_PERMITTED_ROLES,
                                         params,
-                                        query=request_parameters,
                                         api_token=self.api_token,
                                         ssl_verify=self._ssl_verify).content
 

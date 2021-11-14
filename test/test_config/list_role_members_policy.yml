@@ -1,0 +1,12 @@
+- !group devs
+- !group devs2
+- !host devs2
+- !user bob
+- !host my_vm
+
+
+- !grant
+  role: !group devs
+  member:
+  - !user bob
+  - !host my_vm
