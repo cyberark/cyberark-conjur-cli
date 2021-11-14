@@ -21,7 +21,7 @@ from conjur.logic.hostfactory_logic import HostFactoryLogic
 
 
 # pylint: disable=too-few-public-methods,logging-fstring-interpolation
-INVALID_TOKEN_ERROR = "Cannot create a host using the Host " \
+INVALID_TOKEN_ERROR = "Cannot create host using Host " \
                          "Factory token provided." \
                          " Reason: {}. " \
                          "Check that the token is valid" \
@@ -45,11 +45,11 @@ class HostFactoryController:
         if create_token_data is None:
             raise MissingRequiredParameterException('Missing required parameters')
 
-        logging.debug(f"Creating token for hostfactory '{create_token_data.host_factory}'...")
+        logging.debug(f"Creating Host Factory token '{create_token_data.host_factory}'...")
 
         result = self.hostfactory_logic.create_token(create_token_data)
         sys.stdout.write(result + '\n')
-        logging.debug("Successfully created token for hostfactory "
+        logging.debug("Successfully created Host Factory token "
                       f"'{create_token_data.host_factory}'")
 
     def create_host(self, create_host_data: CreateHostData):
@@ -63,7 +63,7 @@ class HostFactoryController:
         try:
             result = self.hostfactory_logic.create_host(create_host_data)
             sys.stdout.write(result + '\n')
-            logging.debug("Successfully created host using hostfactory: host_id:"
+            logging.debug("Successfully created host using Host Factory: host_id:"
                           f"'{create_host_data.host_id}'")
         except requests.exceptions.HTTPError as server_error:
             logging.debug(traceback.format_exc())
@@ -86,5 +86,5 @@ class HostFactoryController:
         if response == http.HTTPStatus.NO_CONTENT:
             sys.stdout.write(f'Token \'{token}\' has been revoked.\n')
 
-        logging.debug(f'Successfully revoked token'
+        logging.debug(f'Successfully revoked Host Factory token'
                       f', return code: {response}')
