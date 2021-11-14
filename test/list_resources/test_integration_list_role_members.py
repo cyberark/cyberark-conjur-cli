@@ -87,6 +87,11 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
             self.invoke_cli(self.cli_auth_params, ['list', '-m'])
 
     @integration_test()
+    def test_list_members_of_role_resource_does_not_exist_should_raise_error(self):
+        with self.assertRaises(AssertionError):
+            self.invoke_cli(self.cli_auth_params, ['list', '-m', 'resource_does_not_exist'])
+
+    @integration_test()
     def test_list_members_of_non_exist_role_should_raise_error(self):
         with self.assertRaises(AssertionError):
             self.invoke_cli(self.cli_auth_params,
