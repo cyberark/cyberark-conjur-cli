@@ -25,7 +25,7 @@ class Resource:
             id_parts.pop(0)
         elif len(id_parts) != 2:
             raise MissingRequiredParameterException(
-                f"Resource id is missing 'kind:' prefix: {full_id}")
+                f"Resource ID missing 'kind:' prefix: {full_id}")
 
         return Resource(kind=id_parts[0], identifier=id_parts[1])
 

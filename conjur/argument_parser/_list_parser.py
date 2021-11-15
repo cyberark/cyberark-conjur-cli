@@ -26,7 +26,8 @@ class ListParser:
         return self
 
     def _create_list_parser(self):
-        list_name = 'list - List resources within an organization\'s account'
+        list_name = 'list - List resources or information about resources within an' \
+                    ' organization\'s account'
         list_usage = 'conjur [global options] list [options] [args]'
 
         list_subparser = self.resource_subparsers \
@@ -35,24 +36,23 @@ class ListParser:
                         description=command_description(list_name,
                                                         list_usage),
                         epilog=command_epilog(
-                            'conjur list --kind=variable\t\t\t'
+                            'conjur list --kind=variable\t\t\t\t\t\t'
                             'Filters list by variable\n'
-                            '    conjur list --limit=20\t\t\t'
+                            '    conjur list --limit=20\t\t\t\t\t\t'
                             'Lists first 20 resources\n'
-                            '    conjur list --offset=4\t\t\t'
+                            '    conjur list --offset=4\t\t\t\t\t\t'
                             'Skips the first 4 resources in the list and displays all the rest\n'
-                            '    conjur list --role=myorg:user:superuser\t'
+                            '    conjur list --role=myorg:user:superuser\t\t\t\t'
                             'Shows resources that superuser is entitled to see\n'
-                            '    conjur list --search=superuser\t\t'
+                            '    conjur list --search=superuser\t\t\t\t\t'
                             'Searches for resources with superuser\n'
-                            '    conjur list --members-of group:conjur-root-admins\t\t'
-                            'List members within a role.\n'
-                            '    conjur list --kind group --members-of conjur-root-admins\t\t'
-                            'List members within a role passing the role '
-                            'type in the --kind option\n'
-                            '    conjur list --kind group --permitted-roles '
-                            'conjur-root-admins --privilege read\t\t'
-                            'Lists the roles which have the named permission on a resource.\n'
+                            '    conjur list --members-of group:\'aws-apps\'\t\t\t\t'
+                            'Returns all direct members of the \'aws-apps\' group\n'
+                            '    conjur list'
+                            ' --permitted-roles \'azure-secret\' --privileges execute\t'
+                            'Returns the roles that have the \'execute\' privilege on the '
+                            '\'azure-secret\' resource. Note: If more than one resource in Conjur '
+                            'uses the same ID, you must specify full resource identifier\n'
                         ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
@@ -80,37 +80,26 @@ class ListParser:
         list_options.add_argument('-r', '--role',
                                   action='store', metavar='VALUE', dest='role',
                                   help='Optional- retrieve list of resources that specified role '
-                                       'is entitled to see (must specify role\'s full ID)')
-        list_options.add_argument('-m', '--members-of',
-                                  action='store', metavar='VALUE', dest='members_of',
-                                  help='Optional - List members within a role. Types of Roles: '
-                                       '(user | host | layer | group | policy). '
-                                       'Value must specify role\'s full ID). '
-                                       'The role type must be specified as '
-                                       'a prefix on the Identifier of the role '
-                                       '(e.g.  [group:]conjur-root-admins),'
-                                       'or passed in the --kind option')
-        list_options.add_argument('-pr', '--permitted-roles',
-                                  action='store', metavar='VALUE',
-                                  dest='permitted_roles_identifier',
-                                  help='Optional - Lists the roles which have '
-                                       'the named permission on a resource. '
-                                       'Types of Roles: '
-                                       '(user | host | layer | group '
-                                       '| policy | variable | webservice).'
-                                       'Value must specify the resource\'s full ID ). '
-                                       'The role type must be specified as '
-                                       'a prefix on the Identifier of the role '
-                                       '(e.g.  [group:]conjur-root-admins),'
-                                       'or passed in the --kind option')
-        list_options.add_argument('-p', '--privilege',
-                                  action='store', metavar='VALUE', dest='privilege',
-                                  help='Mandatory - when combined with --permitted-roles'
-                                       'Specifies the roles permitted '
-                                       'to exercise this privilege are shown '
-                                       '(read | execute | update).')
+                                       'is entitled to see (VALUE must include resource\'s full '
+                                       'identifier. See example below)')
         list_options.add_argument('-s', '--search',
                                   action='store', metavar='VALUE', dest='search',
                                   help='Optional- search for resources based on specified query')
+        list_options.add_argument('-m', '--members-of',
+                                  action='store', metavar='VALUE', dest='members_of',
+                                  help='Optional - retrieve list of direct members of a specified '
+                                       'group/layer. Note: If more than one resource in Conjur uses'
+                                       ' the same ID, VALUE must specify full resource identifier')
+        list_options.add_argument('-pr', '--permitted-roles',
+                                  action='store', metavar='VALUE',
+                                  dest='permitted_roles_identifier',
+                                  help='Optional - retrieve roles that have the specified '
+                                       'privilege on the resource. Use \'--privilege\' option to '
+                                       'specify privilege. Note: If more than one resource in '
+                                       'Conjur uses the same ID, specify full resource identifier')
+        list_options.add_argument('-p', '--privilege',
+                                  action='store', metavar='VALUE', dest='privilege',
+                                  help='Use together with \'--permitted-roles\' option - specify '
+                                       'the privilege you are querying')
         list_options.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')

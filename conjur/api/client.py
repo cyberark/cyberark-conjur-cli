@@ -285,7 +285,8 @@ class Client:
             raise ResourceNotFoundException(resource_identifier)
         if len(resources) > 1:
             raise MissingRequiredParameterException(
-                f"Ambiguous resource identifier, multiple resources exist with this identifier: "
+                f"Ambiguous resource identifier: {resource_identifier}. "
+                f"There are multiple resources with this identifier: "
                 f"({', '.join([res.full_id() for res in resources])})")
 
         return resources[0]
