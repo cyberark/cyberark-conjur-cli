@@ -15,7 +15,7 @@ from socket import gaierror as SocketGetAddressInfoException
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
-from conjur.api.ssl_client import SSLClient
+from conjur.api.ssl_utils.ssl_client import SSLClient
 from conjur.data_object import ConjurrcData
 from conjur.errors import ConnectionToConjurFailedException, RetrieveCertificateException
 

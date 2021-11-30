@@ -65,7 +65,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
                         ['--insecure', 'init', '--url', self.client_params.hostname, '--account', 'someaccount',
-                         '--certificate', self.environment.path_provider.certificate_path])
+                         '--ca-cert', self.environment.path_provider.certificate_path])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, '')
 

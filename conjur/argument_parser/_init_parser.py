@@ -51,11 +51,12 @@ class InitParser:
                                   help='Provide Conjur account name. '
                                        'Optional for Conjur Enterprise - overrides '
                                        'the value on the Conjur Enterprise server')
-        init_options.add_argument('-c', '--certificate', metavar='VALUE',
+        init_options.add_argument('-c', '--ca-cert', metavar='VALUE',
                                   action='store', dest='certificate',
-                                  help='Optional- provide path to Conjur SSL certificate '
-                                       '(obtained from Conjur server '
-                                       'unless provided by this option)')
+                                  help='Optional- provide path to Conjur SSL certificate RootCA')
+        init_options.add_argument('-s', '--self-signed', action='store_true', dest='is_self_signed',
+                                  help='Optional- state if you want to work with self signed '
+                                       'certificate')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Optional- force overwrite of existing files')

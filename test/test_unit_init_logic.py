@@ -1,6 +1,6 @@
 import io
 import unittest
-from socket import gaierror as SocketGetAddressInfoException, timeout as SocketTimeoutException
+from socket import gaierror as SocketGetAddressInfoException
 
 from unittest import mock
 from unittest.mock import patch, mock_open
@@ -9,7 +9,7 @@ from conjur.api.endpoints import ConjurEndpoint
 from conjur.errors import ConnectionToConjurFailedException
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.api.ssl_client import SSLClient
+from conjur.api.ssl_utils.ssl_client import SSLClient
 from conjur.wrapper.http_wrapper import HttpVerb
 
 MOCK_CERT='''

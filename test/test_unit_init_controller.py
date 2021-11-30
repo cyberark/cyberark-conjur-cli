@@ -13,7 +13,7 @@ from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormat
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.api.ssl_client import SSLClient
+from conjur.api.ssl_utils.ssl_client import SSLClient
 
 MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 

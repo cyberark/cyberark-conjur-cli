@@ -5,4 +5,4 @@ Package containing classes that are responsible for communicating with the Conju
 """
 
 from conjur.api.api import Api
-from conjur.api.ssl_client import SSLClient
+from conjur.api.ssl_utils.ssl_client import SSLClient
