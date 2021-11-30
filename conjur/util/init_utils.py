@@ -37,4 +37,5 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
             with open(ca_path, 'r'):
                 pass
         except Exception:
+            # pylint: disable=raise-missing-from
             raise InvalidFilePermissionsException(f"No read access for: {ca_path}")
