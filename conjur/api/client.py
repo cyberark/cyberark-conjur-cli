@@ -146,7 +146,8 @@ class Client:
 
         logging.debug("Client initialized")
 
-    def setup_logging(self, debug: bool):
+    @classmethod
+    def setup_logging(cls, debug: bool):
         """
         Configures the logging for the client
         """
@@ -154,9 +155,9 @@ class Client:
         KeystoreWrapper.configure_keyring_log_to_info()
 
         if debug:
-            logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
+            logging.basicConfig(level=logging.DEBUG, format=cls.LOGGING_FORMAT)
         else:
-            logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT_WARNING)
+            logging.basicConfig(level=logging.WARN, format=cls.LOGGING_FORMAT_WARNING)
 
     ### API passthrough
 

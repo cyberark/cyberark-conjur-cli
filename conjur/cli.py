@@ -35,7 +35,7 @@ from conjur.version import __version__
 
 
 # pylint: disable=too-many-statements
-class Cli():
+class Cli:
     """
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
@@ -43,8 +43,13 @@ class Cli():
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    # pylint: disable=no-self-use, too-many-locals
-    def run(self, *args):
+    def __init__(self):
+        # TODO stop using testing_env
+        self.is_testing_env = str(os.getenv('TEST_ENV')).lower() == 'true'
+
+        self.credential_provider, _ = CredentialStoreFactory.create_credential_store()
+
+    def run(self):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
@@ -66,67 +71,51 @@ class Cli():
             .add_main_screen_options() \
             .build()
 
-        resource, args = Cli._parse_args(parser)
+        resource, args = self._parse_args(parser)
         # pylint: disable=broad-except
         try:
-            Cli.run_action(resource, args)
+            self.run_action(resource, args)
         except KeyboardInterrupt:
-            # A new line required so when the CLI is packaged as an exec,
-            # it won't erase the previous line
-            sys.stdout.write("\n")
-            sys.exit(0)
-        except FileNotFoundError as not_found_error:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
-            sys.exit(1)
+            self._handle_keyboard_interrupt_exception()
+        except FileNotFoundError as file_not_found_error:
+            self._handle_file_not_found_exception(file_not_found_error)
         except requests.exceptions.HTTPError as server_error:
-            logging.debug(traceback.format_exc())
-            # pylint: disable=no-member
-            if hasattr(server_error.response, 'status_code'):
-                sys.stdout.write(determine_status_code_specific_error_messages(server_error))
-            else:
-                sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
-
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_http_exception(server_error, args)
         except CertificateVerificationException:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: "
-                             f"{INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_certificate_verification_exception(args)
         except Exception as error:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_general_exception(args, error)
+
         else:
             # Explicit exit (required for tests)
             sys.exit(0)
 
-
-
-    @staticmethod
     # pylint: disable=too-many-branches,logging-fstring-interpolation
-    def run_action(resource: str, args):
+    def run_action(self, resource: str, args):
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
         """
-        Client.setup_logging(Client, args.debug)
+        Client.setup_logging(args.debug)
 
-        credential_provider, _ = CredentialStoreFactory.create_credential_store()
+        # Needed for unit tests so that they do not require configuring
+
+        if resource in ['logout', 'init', 'login']:
+            self._run_auth_flow(args, resource)
+            return
+        self._perofrm_auth_if_not_login(args)
+        self._run_command_flow(args, resource)
+
+    def _run_auth_flow(self, args, resource):
         # pylint: disable=no-else-return,line-too-long
         if resource == 'logout':
-            cli_actions.handle_logout_logic(credential_provider, args.ssl_verify)
+            cli_actions.handle_logout_logic(self.credential_provider)
             sys.stdout.write("Successfully logged out from Conjur\n")
             return
 
         if resource == 'init':
-            cli_actions.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
+            cli_actions.handle_init_logic(args.url, args.name, args.certificate, args.force,
+                                          args.ssl_verify, args.is_self_signed)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init
@@ -134,29 +123,17 @@ class Cli():
                              "running `conjur login`\n")
             return
 
-        # Needed for unit tests so that they do not require configuring
-        is_testing_env = os.getenv('TEST_ENV') in ('true', 'True')
-
-        # If the user runs a command without configuring the CLI,
-        # we request they do so before executing their request
-        # pylint: disable=line-too-long
-        if not is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
-            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
-            cli_actions.handle_init_logic()
-
         if resource == 'login':
-            cli_actions.handle_login_logic(credential_provider, args.identifier, args.password, args.ssl_verify)
+            # If the user runs a command without configuring the CLI,
+            # we request they do so before executing their request
+            # pylint: disable=line-too-long
+            self._run_init_if_not_occur()
+
+            cli_actions.handle_login_logic(self.credential_provider,
+                                           args.identifier, args.password, args.ssl_verify)
             return
 
-        # If the user runs a command without logging into the CLI,
-        # we request they do so before executing their request
-        if not is_testing_env:
-            loaded_conjurrc = ConjurrcData.load_from_file()
-            if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-                # The below message when a user implicitly requested to init
-                # pylint: disable=logging-fstring-interpolation
-                sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
-                cli_actions.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
+    def _run_command_flow(self, args, resource):
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
@@ -175,13 +152,30 @@ class Cli():
             cli_actions.handle_policy_logic(policy_data, client)
 
         elif resource == 'user':
-            cli_actions.handle_user_logic(credential_provider, args, client)
+            cli_actions.handle_user_logic(self.credential_provider, args, client)
 
         elif resource == 'host':
             cli_actions.handle_host_logic(args, client)
 
         elif resource == 'hostfactory':
             cli_actions.handle_hostfactory_logic(args, client)
+
+    def _run_init_if_not_occur(self):
+        if not self.is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
+            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
+            cli_actions.handle_init_logic()
+
+    def _perofrm_auth_if_not_login(self, args):
+        self._run_init_if_not_occur()
+        # If the user runs a command without logging into the CLI,
+        # we request they do so before executing their request
+        if not self.is_testing_env:
+            loaded_conjurrc = ConjurrcData.load_from_file()
+            if not self.credential_provider.is_exists(loaded_conjurrc.conjur_url):
+                # The below message when a user implicitly requested to init
+                # pylint: disable=logging-fstring-interpolation
+                sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
+                cli_actions.handle_login_logic(self.credential_provider, ssl_verify=args.ssl_verify)
 
     @staticmethod
     def _parse_args(parser: ArgparseWrapper):
@@ -205,6 +199,48 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
+
+    @staticmethod
+    def _handle_keyboard_interrupt_exception():
+        # A new line required so when the CLI is packaged as an exec,
+        # it won't erase the previous line
+        sys.stdout.write("\n")
+        sys.exit(0)
+
+    @staticmethod
+    def _handle_file_not_found_exception(file_not_found_error: FileNotFoundError):
+        sys.stdout.write(f"Error: No such file or directory: '{file_not_found_error.filename}'\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_http_exception(server_error, args):
+        logging.debug(traceback.format_exc())
+        # pylint: disable=no-member
+        if hasattr(server_error.response, 'status_code'):
+            sys.stdout.write(determine_status_code_specific_error_messages(server_error))
+        else:
+            sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
+
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_certificate_verification_exception(args):
+        logging.debug(traceback.format_exc())
+        sys.stdout.write(f"Failed to execute command. Reason: "
+                         f"{INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_general_exception(args, error):
+        logging.debug(traceback.format_exc())
+        sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
 
 
 if __name__ == '__main__':

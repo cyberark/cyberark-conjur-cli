@@ -27,9 +27,9 @@ from conjur.api import SSLClient
 
 
 def handle_init_logic(
-         url: str = None, account: str = None,
+        url: str = None, account: str = None,
         cert: str = None, force: bool = None,
-        ssl_verify: bool = True):
+        ssl_verify: bool = True, is_self_signed: bool = True):
     """
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
@@ -49,7 +49,7 @@ def handle_init_logic(
 
 # pylint: disable=line-too-long
 def handle_login_logic(
-         credential_provider: CredentialsStoreInterface, identifier: str = None,
+        credential_provider: CredentialsStoreInterface, identifier: str = None,
         password: str = None, ssl_verify: bool = True):
     """
     Method that wraps the login call logic
@@ -66,7 +66,7 @@ def handle_login_logic(
 
 
 def handle_logout_logic(
-         credential_provider: CredentialsStoreInterface,
+        credential_provider: CredentialsStoreInterface,
         ssl_verify: bool = True):
     """
     Method that wraps the logout call logic
@@ -78,7 +78,7 @@ def handle_logout_logic(
     logout_controller.remove_credentials()
 
 
-def handle_list_logic( args: list = None, client=None):
+def handle_list_logic(args: list = None, client=None):
     """
     Method that wraps the list call logic
     """
@@ -87,8 +87,8 @@ def handle_list_logic( args: list = None, client=None):
 
     if args.permitted_roles_identifier:
         list_permitted_roles_data = ListPermittedRolesData(
-                                        identifier=args.permitted_roles_identifier,
-                                        privilege=args.privilege)
+            identifier=args.permitted_roles_identifier,
+            privilege=args.privilege)
         list_controller.get_permitted_roles(list_permitted_roles_data)
     elif args.members_of:
         list_role_members_data = ListMembersOfData(kind=args.kind,
@@ -105,7 +105,7 @@ def handle_list_logic( args: list = None, client=None):
         list_controller.load(list_data)
 
 
-def handle_hostfactory_logic( args: list = None, client=None):
+def handle_hostfactory_logic(args: list = None, client=None):
     """
         Method that wraps the hostfactory call logic
     """
@@ -132,7 +132,7 @@ def handle_hostfactory_logic( args: list = None, client=None):
         hostfactory_controller.revoke_token(args.token)
 
 
-def handle_variable_logic( args: list = None, client=None):
+def handle_variable_logic(args: list = None, client=None):
     """
     Method that wraps the variable call logic
     """
@@ -151,7 +151,7 @@ def handle_variable_logic( args: list = None, client=None):
         variable_controller.set_variable()
 
 
-def handle_policy_logic( policy_data: PolicyData = None, client=None):
+def handle_policy_logic(policy_data: PolicyData = None, client=None):
     """
     Method that wraps the variable call logic
     """
@@ -162,7 +162,7 @@ def handle_policy_logic( policy_data: PolicyData = None, client=None):
 
 
 def handle_user_logic(
-         credential_provider: CredentialsStoreInterface,
+        credential_provider: CredentialsStoreInterface,
         args=None, client=None):
     """
     Method that wraps the user call logic
@@ -185,7 +185,7 @@ def handle_user_logic(
         user_controller.change_personal_password()
 
 
-def handle_host_logic( args, client):
+def handle_host_logic(args, client):
     """
     Method that wraps the host call logic
     """
