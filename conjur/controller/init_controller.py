@@ -54,7 +54,7 @@ class InitController:
             self._prompt_for_conjur_url()
 
         formatted_conjur_url = self._format_conjur_url()
-        self._validate_conjur_url(formatted_conjur_url)
+        self._validate_conjur_url(formatted_conjur_url, self.ssl_verify)
 
         if self.ssl_verify is True:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
@@ -93,13 +93,15 @@ class InitController:
 
         return urlparse(self.conjurrc_data.conjur_url)
 
-    def _validate_conjur_url(self, conjur_url: ParseResult):
+    def _validate_conjur_url(self, conjur_url: ParseResult, allow_https_only: bool = True):
         """
         Validates the specified url
 
         Raises a RuntimeError in case of an invalid url format
         """
-        if conjur_url.scheme != 'https':
+        valid_scheme = conjur_url.scheme == 'https' or (
+                    not allow_https_only and conjur_url.scheme == 'http')
+        if not valid_scheme:
             raise InvalidURLFormatException(f"Error: undefined behavior. "
                                             f" Reason: The Conjur URL format provided. "
                                             f"'{self.conjurrc_data.conjur_url}' is not supported.")

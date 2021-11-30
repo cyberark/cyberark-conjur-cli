@@ -60,7 +60,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, '')
 
     '''
-    Validates that certificate flag is overwritten when running in --insecure mode
+    Validates that cli can't run with insecure + --ca-cert
     '''
 
     @integration_test(True)
@@ -72,6 +72,10 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
                          'someaccount',
                          '--ca-cert', self.environment.path_provider.certificate_path], exit_code=1)
 
+    '''
+    Validates that cli can't run with insecure + --self-signed
+    '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_no_insecure_mode_possible_with_self_signed(self, mock_input):
@@ -80,14 +84,39 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
                         ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
                          'someaccount', '--self-signed'], exit_code=1)
 
+    '''
+    Validates that cli can't run with --ca-cert + --self-signed
+    '''
+
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_no_self_signed_possible_with_cert_provided(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        [ 'init', '--url', self.client_params.hostname, '--account',
-                         'someaccount','--self-signed', '--ca-cert',
-                          self.environment.path_provider.certificate_path], exit_code=1)
+                        ['init', '--url', self.client_params.hostname, '--account',
+                         'someaccount', '--self-signed', '--ca-cert',
+                         self.environment.path_provider.certificate_path], exit_code=1)
+
+    '''
+    Validates that cli will fail with http
+    '''
+
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_http_dns_fails_with_self_signed(self, mock_input):
+        self.setup_cli_params({})
+        output = self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', "http://localhost",
+                         '--account','someaccount', '--self-signed'], exit_code=1)
+        self.assertRegex(output, ".*The Conjur URL format provided.*")
+
+    @integration_test()
+    @patch('builtins.input', return_value='yes')
+    def test_http_dns_pass_with_insecure(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure','init', '--url', "http://localhost",
+                         '--account','someaccount'])
 
     '''
     Validates that the conjurrc was created on the machine
