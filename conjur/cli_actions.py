@@ -1,0 +1,194 @@
+"""
+CLI Actions module
+
+This module holds the run logic of each command.
+
+"""
+
+import sys
+
+# pylint: disable=too-many-arguments
+from conjur.controller.hostfactory_controller import HostFactoryController
+from conjur.data_object.create_host_data import CreateHostData
+from conjur.data_object.create_token_data import CreateTokenData
+from conjur.data_object.list_members_of_data import ListMembersOfData
+from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur.logic.hostfactory_logic import HostFactoryLogic
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+from conjur.controller import InitController, LoginController, \
+    LogoutController, ListController, VariableController, \
+    PolicyController, UserController, HostController
+from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, VariableLogic, \
+    PolicyLogic, UserLogic
+from conjur.data_object import ConjurrcData, CredentialsData, ListData, VariableData, \
+    PolicyData, UserInputData, HostResourceData
+
+from conjur.api import SSLClient
+
+
+def handle_init_logic(
+         url: str = None, account: str = None,
+        cert: str = None, force: bool = None,
+        ssl_verify: bool = True):
+    """
+    Method that wraps the init call logic
+    Initializes the client, creating the .conjurrc file
+    """
+    ssl_service = SSLClient()
+    conjurrc_data = ConjurrcData(conjur_url=url,
+                                 account=account,
+                                 cert_file=cert)
+
+    init_logic = InitLogic(ssl_service)
+    input_controller = InitController(conjurrc_data=conjurrc_data,
+                                      init_logic=init_logic,
+                                      force=force,
+                                      ssl_verify=ssl_verify)
+    input_controller.load()
+
+
+# pylint: disable=line-too-long
+def handle_login_logic(
+         credential_provider: CredentialsStoreInterface, identifier: str = None,
+        password: str = None, ssl_verify: bool = True):
+    """
+    Method that wraps the login call logic
+    """
+    credential_data = CredentialsData(login=identifier)
+    login_logic = LoginLogic(credential_provider)
+    login_controller = LoginController(ssl_verify=ssl_verify,
+                                       user_password=password,
+                                       credential_data=credential_data,
+                                       login_logic=login_logic)
+    login_controller.load()
+
+    sys.stdout.write("Successfully logged in to Conjur\n")
+
+
+def handle_logout_logic(
+         credential_provider: CredentialsStoreInterface,
+        ssl_verify: bool = True):
+    """
+    Method that wraps the logout call logic
+    """
+    logout_logic = LogoutLogic(credential_provider)
+    logout_controller = LogoutController(ssl_verify=ssl_verify,
+                                         logout_logic=logout_logic,
+                                         credentials_provider=credential_provider)
+    logout_controller.remove_credentials()
+
+
+def handle_list_logic( args: list = None, client=None):
+    """
+    Method that wraps the list call logic
+    """
+    list_logic = ListLogic(client)
+    list_controller = ListController(list_logic=list_logic)
+
+    if args.permitted_roles_identifier:
+        list_permitted_roles_data = ListPermittedRolesData(
+                                        identifier=args.permitted_roles_identifier,
+                                        privilege=args.privilege)
+        list_controller.get_permitted_roles(list_permitted_roles_data)
+    elif args.members_of:
+        list_role_members_data = ListMembersOfData(kind=args.kind,
+                                                   identifier=args.members_of,
+                                                   inspect=args.inspect,
+                                                   search=args.search,
+                                                   limit=args.limit,
+                                                   offset=args.offset)
+        list_controller.get_role_members(list_role_members_data)
+    else:
+        list_data = ListData(kind=args.kind, inspect=args.inspect,
+                             search=args.search, limit=args.limit,
+                             offset=args.offset, role=args.role)
+        list_controller.load(list_data)
+
+
+def handle_hostfactory_logic( args: list = None, client=None):
+    """
+        Method that wraps the hostfactory call logic
+    """
+    if args.action_type == 'create_token':
+        hostfactory_logic = HostFactoryLogic(client)
+
+        create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
+                                            cidr=args.cidr,
+                                            days=args.duration_days,
+                                            hours=args.duration_hours,
+                                            minutes=args.duration_minutes)
+        hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+        hostfactory_controller.create_token(create_token_data)
+    elif args.action_type == 'create_host':
+        hostfactory_logic = HostFactoryLogic(client)
+
+        create_host_data = CreateHostData(host_id=args.id,
+                                          token=args.token)
+        hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+        hostfactory_controller.create_host(create_host_data)
+    elif args.action_type == 'revoke_token':
+        hostfactory_logic = HostFactoryLogic(client)
+        hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
+        hostfactory_controller.revoke_token(args.token)
+
+
+def handle_variable_logic( args: list = None, client=None):
+    """
+    Method that wraps the variable call logic
+    """
+    variable_logic = VariableLogic(client)
+    if args.action == 'get':
+        variable_data = VariableData(action=args.action, id=args.identifier, value=None,
+                                     variable_version=args.version)
+        variable_controller = VariableController(variable_logic=variable_logic,
+                                                 variable_data=variable_data)
+        variable_controller.get_variable()
+    elif args.action == 'set':
+        variable_data = VariableData(action=args.action, id=args.identifier, value=args.value,
+                                     variable_version=None)
+        variable_controller = VariableController(variable_logic=variable_logic,
+                                                 variable_data=variable_data)
+        variable_controller.set_variable()
+
+
+def handle_policy_logic( policy_data: PolicyData = None, client=None):
+    """
+    Method that wraps the variable call logic
+    """
+    policy_logic = PolicyLogic(client)
+    policy_controller = PolicyController(policy_logic=policy_logic,
+                                         policy_data=policy_data)
+    policy_controller.load()
+
+
+def handle_user_logic(
+         credential_provider: CredentialsStoreInterface,
+        args=None, client=None):
+    """
+    Method that wraps the user call logic
+    """
+    user_logic = UserLogic(ConjurrcData, credential_provider, client)
+    if args.action == 'rotate-api-key':
+        user_input_data = UserInputData(action=args.action,
+                                        id=args.id,
+                                        new_password=None)
+
+        user_controller = UserController(user_logic=user_logic,
+                                         user_input_data=user_input_data)
+        user_controller.rotate_api_key()
+    elif args.action == 'change-password':
+        user_input_data = UserInputData(action=args.action,
+                                        id=None,
+                                        new_password=args.password)
+        user_controller = UserController(user_logic=user_logic,
+                                         user_input_data=user_input_data)
+        user_controller.change_personal_password()
+
+
+def handle_host_logic( args, client):
+    """
+    Method that wraps the host call logic
+    """
+    host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
+    host_controller = HostController(client=client, host_resource_data=host_resource_data)
+    host_controller.rotate_api_key()
