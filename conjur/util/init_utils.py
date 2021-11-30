@@ -12,7 +12,10 @@ from conjur.errors import MissingRequiredParameterException, FileNotFoundExcepti
 
 
 # TODO edit this with the new init command UX
-def validate_init_action_input(ca_path, is_self_signed, ssl_verify):
+def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_verify):
+    """
+    Validate the input related to ssl verification for the init action
+    """
     use_ca_bundle = False
     if ca_path:
         use_ca_bundle = True

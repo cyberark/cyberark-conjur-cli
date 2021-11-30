@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- `Init` command is now strict to run in one of three modes described in `SslVerificationModes` enum
+- For CLI `Init` flow, Additional certificate validation steps where added. for --self-signed and 
+  --ca-cert flows 
 ### Added
 - The `hostfactory` method `create token` is now available in CLI and SDK to create a hostfactory token 
   to manage hosts and permissions in a dynamic way
