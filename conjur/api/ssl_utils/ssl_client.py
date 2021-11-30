@@ -7,13 +7,19 @@ This module is for all SSL operations
 """
 # Builtin
 from typing import Tuple
-# Third party
+from socket import gaierror
 import logging
 import os
 import socket
+
+# Third party
 from OpenSSL import SSL
-from conjur.api.ssl_utils.ssl_consts import CONJUR_TLS_METHODS
 from OpenSSL.crypto import FILETYPE_PEM, dump_certificate
+
+# Internals
+from conjur.api.ssl_utils.errors import TLSSocketConnectionException, TLSGeneralException
+from conjur.api.ssl_utils.ssl_consts import CONJUR_TLS_METHODS
+
 
 
 # pylint: disable=too-few-public-methods
@@ -30,14 +36,19 @@ class SSLClient:
         """
         Method for connecting to Conjur to fetch the certificate chain
         """
-        sock = cls.__connect(hostname, port)
-        chain = sock.get_peer_cert_chain()
-        fingerprint = chain[0].digest("sha1").decode("utf-8")
-        # pylint: disable=line-too-long
-        # Format the certificate chain to make it easier to later write to a file
-        readable_certificate = "".join(
-            [str(dump_certificate(FILETYPE_PEM, cert), "utf-8") for cert in chain])
-        return fingerprint, readable_certificate
+        try:
+            sock = cls.__connect(hostname, port)
+            chain = sock.get_peer_cert_chain()
+            fingerprint = chain[0].digest("sha1").decode("utf-8")
+            # pylint: disable=line-too-long
+            # Format the certificate chain to make it easier to later write to a file
+            readable_certificate = "".join(
+                [str(dump_certificate(FILETYPE_PEM, cert), "utf-8") for cert in chain])
+            return fingerprint, readable_certificate
+        except gaierror as socket_err:
+            raise TLSSocketConnectionException(socket_err) from socket_err
+        except Exception as err:
+            raise TLSGeneralException(err) from err
 
     @classmethod
     # pylint: disable=unused-private-member

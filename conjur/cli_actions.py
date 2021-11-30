@@ -29,12 +29,14 @@ from conjur.api import SSLClient
 def handle_init_logic(
         url: str = None, account: str = None,
         cert: str = None, force: bool = None,
-        ssl_verify: bool = True, is_self_signed: bool = True):
+        ssl_verify=None):
     """
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
     """
+
     ssl_service = SSLClient()
+    # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
                                  account=account,
                                  cert_file=cert)
@@ -52,7 +54,7 @@ def handle_login_logic(
         credential_provider: CredentialsStoreInterface, identifier: str = None,
         password: str = None, ssl_verify: bool = True):
     """
-    Method that wraps the login call logic
+    Method wraps the login call logic
     """
     credential_data = CredentialsData(login=identifier)
     login_logic = LoginLogic(credential_provider)
@@ -69,7 +71,7 @@ def handle_logout_logic(
         credential_provider: CredentialsStoreInterface,
         ssl_verify: bool = True):
     """
-    Method that wraps the logout call logic
+    Method wraps the logout call logic
     """
     logout_logic = LogoutLogic(credential_provider)
     logout_controller = LogoutController(ssl_verify=ssl_verify,
@@ -80,7 +82,7 @@ def handle_logout_logic(
 
 def handle_list_logic(args: list = None, client=None):
     """
-    Method that wraps the list call logic
+    Method wraps the list call logic
     """
     list_logic = ListLogic(client)
     list_controller = ListController(list_logic=list_logic)
@@ -107,7 +109,7 @@ def handle_list_logic(args: list = None, client=None):
 
 def handle_hostfactory_logic(args: list = None, client=None):
     """
-        Method that wraps the hostfactory call logic
+        Method wraps the hostfactory call logic
     """
     if args.action_type == 'create_token':
         hostfactory_logic = HostFactoryLogic(client)
@@ -134,7 +136,7 @@ def handle_hostfactory_logic(args: list = None, client=None):
 
 def handle_variable_logic(args: list = None, client=None):
     """
-    Method that wraps the variable call logic
+    Method wraps the variable call logic
     """
     variable_logic = VariableLogic(client)
     if args.action == 'get':
@@ -153,7 +155,7 @@ def handle_variable_logic(args: list = None, client=None):
 
 def handle_policy_logic(policy_data: PolicyData = None, client=None):
     """
-    Method that wraps the variable call logic
+    Method wraps the variable call logic
     """
     policy_logic = PolicyLogic(client)
     policy_controller = PolicyController(policy_logic=policy_logic,
@@ -165,7 +167,7 @@ def handle_user_logic(
         credential_provider: CredentialsStoreInterface,
         args=None, client=None):
     """
-    Method that wraps the user call logic
+    Method wraps the user call logic
     """
     user_logic = UserLogic(ConjurrcData, credential_provider, client)
     if args.action == 'rotate-api-key':
@@ -187,7 +189,7 @@ def handle_user_logic(
 
 def handle_host_logic(args, client):
     """
-    Method that wraps the host call logic
+    Method wraps the host call logic
     """
     host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
     host_controller = HostController(client=client, host_resource_data=host_resource_data)

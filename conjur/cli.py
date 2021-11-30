@@ -30,7 +30,7 @@ from conjur.constants import DEFAULT_CONFIG_FILE, LOGIN_IS_REQUIRED
 
 from conjur.data_object import ConjurrcData
 from conjur.data_object import PolicyData
-import conjur.cli_actions as cli_actions
+from conjur import cli_actions
 from conjur.version import __version__
 
 
@@ -115,7 +115,7 @@ class Cli:
 
         if resource == 'init':
             cli_actions.handle_init_logic(args.url, args.name, args.certificate, args.force,
-                                          args.ssl_verify, args.is_self_signed)
+                                          args.ssl_verify)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init

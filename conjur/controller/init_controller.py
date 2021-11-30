@@ -50,25 +50,25 @@ class InitController:
         Method that facilitates all method calls in this class
         """
         if self.conjurrc_data.conjur_url is None:
-            self.prompt_for_conjur_url()
+            self._prompt_for_conjur_url()
 
-        formatted_conjur_url = self.format_conjur_url()
-        self.validate_conjur_url(formatted_conjur_url)
+        formatted_conjur_url = self._format_conjur_url()
+        self._validate_conjur_url(formatted_conjur_url)
 
         if self.ssl_verify is True:
-            fetched_certificate = self.get_server_certificate(formatted_conjur_url)
+            fetched_certificate = self._get_server_certificate(formatted_conjur_url)
             # For a uniform experience, regardless if the certificate is self-signed
             # or CA-signed, we will write the certificate on the machine
-            self.write_certificate(fetched_certificate)
+            self._write_certificate(fetched_certificate)
         else:
             self.conjurrc_data.cert_file = ""
 
-        self.get_account_info(self.conjurrc_data)
+        self._get_account_info(self.conjurrc_data)
         self.write_conjurrc()
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
-    def prompt_for_conjur_url(self):
+    def _prompt_for_conjur_url(self):
         """
         Method to get the Conjur server URL if not provided
         """
@@ -80,7 +80,7 @@ class InitController:
                 raise InvalidURLFormatException("Error: URL is required")
 
     # TODO: Factor out the following URL validation to ConjurrcData class
-    def format_conjur_url(self) -> Tuple[str, str]:
+    def _format_conjur_url(self) -> Tuple[str, str]:
         """
         Method for formatting the Conjur server URL to
         break down the URL into segments
@@ -91,7 +91,7 @@ class InitController:
 
         return urlparse(self.conjurrc_data.conjur_url)
 
-    def validate_conjur_url(self, conjur_url: ParseResult):
+    def _validate_conjur_url(self, conjur_url: ParseResult):
         """
         Validates the specified url
 
@@ -103,7 +103,7 @@ class InitController:
                                f"'{self.conjurrc_data.conjur_url}' is not supported.")
 
     # pylint: disable=line-too-long
-    def get_server_certificate(self, conjur_url: ParseResult) -> Optional[str]:
+    def _get_server_certificate(self, conjur_url: ParseResult) -> Optional[str]:
         """
         Get the certificate from the specified conjur_url
 
@@ -131,7 +131,7 @@ class InitController:
         return fetched_certificate
 
     # pylint: disable=line-too-long,logging-fstring-interpolation,broad-except,raise-missing-from
-    def get_account_info(self, conjurrc_data: ParseResult):
+    def _get_account_info(self, conjurrc_data: ParseResult):
         """
         Method to fetch the account from the user
         """
@@ -153,7 +153,7 @@ class InitController:
                 else:
                     raise
 
-    def write_certificate(self, fetched_certificate: str):
+    def _write_certificate(self, fetched_certificate: str):
         """
         Method to write the certificate fetched from the Conjur endpoint on the user's machine
         """

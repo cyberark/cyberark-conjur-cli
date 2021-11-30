@@ -1,11 +1,12 @@
 import io
 import unittest
-from socket import gaierror as SocketGetAddressInfoException
+
 
 from unittest import mock
 from unittest.mock import patch, mock_open
 
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.api.ssl_utils.errors import TLSSocketConnectionException
 from conjur.errors import ConnectionToConjurFailedException
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -88,7 +89,7 @@ class InitLogicTest(unittest.TestCase):
     '''
 
     def test_dns_error_will_raise_exception(self):
-        with patch.object(SSLClient, 'get_certificate', side_effect=SocketGetAddressInfoException) as mock_get_cert:
+        with patch.object(SSLClient, 'get_certificate', side_effect=TLSSocketConnectionException) as mock_get_cert:
             with self.assertRaises(ConnectionToConjurFailedException) as context:
                 init_logic = InitLogic(self.ssl_service)
                 init_logic.get_certificate('https://url', None)
