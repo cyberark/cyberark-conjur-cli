@@ -24,17 +24,18 @@ from conjur.data_object import ConjurrcData, CredentialsData, ListData, Variable
     PolicyData, UserInputData, HostResourceData
 
 from conjur.api import SSLClient
+from conjur.util.init_utils import validate_init_action_input
 
 
 def handle_init_logic(
         url: str = None, account: str = None,
         cert: str = None, force: bool = None,
-        ssl_verify=None):
+        ssl_verify=None, is_self_signed: bool = False):
     """
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
     """
-
+    validate_init_action_input(cert, is_self_signed, ssl_verify)
     ssl_service = SSLClient()
     # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
@@ -67,15 +68,12 @@ def handle_login_logic(
     sys.stdout.write("Successfully logged in to Conjur\n")
 
 
-def handle_logout_logic(
-        credential_provider: CredentialsStoreInterface,
-        ssl_verify: bool = True):
+def handle_logout_logic(credential_provider: CredentialsStoreInterface):
     """
     Method wraps the logout call logic
     """
     logout_logic = LogoutLogic(credential_provider)
-    logout_controller = LogoutController(ssl_verify=ssl_verify,
-                                         logout_logic=logout_logic,
+    logout_controller = LogoutController(logout_logic=logout_logic,
                                          credentials_provider=credential_provider)
     logout_controller.remove_credentials()
 
