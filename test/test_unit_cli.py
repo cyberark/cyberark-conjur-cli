@@ -13,6 +13,7 @@ from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
+from conjur import cli_actions
 
 RESOURCE_LIST = [
     'some_id1',
@@ -226,24 +227,24 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_invokes_whoami_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "conjur_account": "myaccount"\n}\n', output)
 
-    @patch.object(Cli, 'handle_init_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
     def test_cli_init_functions_are_properly_called(self, mock_init):
-        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False)
+        cli_actions.handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False)
         mock_init.assert_called_once()
 
     @patch.object(InitController, 'load')
     def test_cli_init_load_function_is_properly_called(self, mock_load):
-        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False, ssl_verify=True)
+        cli_actions.handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False, ssl_verify=True)
         mock_load.assert_called_once()
 
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
-        Cli().handle_login_logic(credential_provider=FileCredentialsProvider, identifier='someidentifier', password='somepassword', ssl_verify=True)
+        cli_actions.handle_login_logic(credential_provider=FileCredentialsProvider, identifier='someidentifier', password='somepassword', ssl_verify=True)
         mock_load.assert_called_once()
 
     @patch.object(LogoutController, 'remove_credentials')
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):
-        Cli().handle_logout_logic(credential_provider=FileCredentialsProvider, ssl_verify=True)
+        cli_actions.handle_logout_logic(credential_provider=FileCredentialsProvider, ssl_verify=True)
         mock_remove_creds.assert_called_once()
 
     @patch.object(UserController, 'rotate_api_key')
@@ -252,7 +253,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'rotate-api-key'
         mock_obj.id = 'someid'
 
-        Cli().handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj, client='someclient')
+        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj, client='someclient')
         mock_rotate_api_key.assert_called_once()
 
     @patch.object(UserController, 'change_personal_password')
@@ -261,7 +262,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'change-password'
         mock_obj.password = 'somepass'
 
-        Cli().handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj, client='someclient')
+        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj, client='someclient')
         mock_change_password.assert_called_once()
 
     @patch.object(HostController, 'rotate_api_key')
@@ -270,10 +271,10 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'someaction'
         mock_obj.id = 'someid'
 
-        Cli().handle_host_logic(args=mock_obj, client='someclient')
+        cli_actions.handle_host_logic(args=mock_obj, client='someclient')
         mock_rotate_api_key.assert_called_once()
 
-    @patch.object(Cli, 'handle_init_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
     @patch.object(Client, 'setup_logging')
     def test_run_action_runs_init_logic(self, mock_setup_logging, mock_handle_init):
         mock_obj = MockArgs()
@@ -292,8 +293,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     a command will be run to completion. In this case, variable.
     '''
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_init_logic')
-    @patch.object(Cli, 'handle_variable_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
+    @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[False, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 1])
@@ -313,8 +314,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     Verifies that if a user didn't run login, they are prompted to do so and that after they login,
     a command will be run to completion. In this case, variable.
     '''
-    @patch.object(Cli, 'handle_login_logic')
-    @patch.object(Cli, 'handle_variable_logic')
+    @patch('conjur.cli_actions.handle_login_logic')
+    @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[True, False])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 0])
@@ -332,7 +333,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             mock_handle_login.assert_called_once()
 
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_user_logic')
+    @patch('conjur.cli_actions.handle_user_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
@@ -349,7 +350,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             mock_handle_user.assert_called_once()
 
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_host_logic')
+    @patch('conjur.cli_actions.handle_host_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
@@ -377,5 +378,5 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.cidr = '[]'
         mock_obj.count = 1
 
-        Cli().handle_hostfactory_logic(args=mock_obj, client='someclient')
+        cli_actions.handle_hostfactory_logic(args=mock_obj, client='someclient')
         mock_hostfactory_create_token.assert_called_once()
