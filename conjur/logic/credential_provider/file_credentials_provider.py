@@ -73,6 +73,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         # For when the netrc exists but is completely empty. In the future
         # we might want to trigger the LOGIN command by creating
         # a custom error
+        # pylint: use-implicit-booleaness-not-comparison
         if netrc_obj.hosts == {}:
             return False
 
