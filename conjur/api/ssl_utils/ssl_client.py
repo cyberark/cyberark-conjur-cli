@@ -64,7 +64,7 @@ class SSLClient:
         conjur_conn = SSL.Connection(context=ctx, socket=conjur_sock)
         conjur_conn.connect((hostname, port))
         # handle SNI
-        conjur_conn.set_tlsext_host_name(hostname)
+        conjur_conn.set_tlsext_host_name(hostname.encode())
         conjur_conn.do_handshake()
 
         logging.debug("TLS connection established. "
