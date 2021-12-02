@@ -1,3 +1,5 @@
+import tempfile
+
 import unittest
 from unittest.mock import patch, MagicMock
 import time
@@ -13,6 +15,7 @@ from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
 from conjur.cli import Cli
+from conjur import cli_actions
 
 RESOURCE_LIST = [
     'some_id1',
@@ -22,13 +25,16 @@ WHOAMI_RESPONSE = {
     "conjur_account": "myaccount"
 }
 
+
 class MockConjurrc:
     conjur_url = 'https://someurl'
     conjur_account = 'someacc'
     cert_file = 'some/path/to/pem'
 
+
 class MockArgs(object):
     pass
+
 
 class CliTest(unittest.TestCase):
     @cli_test()
@@ -83,15 +89,18 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         client.get.assert_called_once_with("foo", None)
 
     @cli_test(["variable", "get", "-i", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
-    def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output, client):
+    def test_cli_invokes_variable_get_correctly_with_multiple_vars(self, cli_invocation, output,
+                                                                   client):
         client.get_many.assert_called_once_with('foo', 'bar')
 
     @cli_test(["variable", "get", "-i", "foo", "bar"], get_many_output={})
-    def test_cli_variable_get_with_multiple_vars_doesnt_break_on_empty_input(self, cli_invocation, output, client):
+    def test_cli_variable_get_with_multiple_vars_doesnt_break_on_empty_input(self, cli_invocation,
+                                                                             output, client):
         self.assertEquals('{}\n', output)
 
     @cli_test(["variable", "get", "-i", "foo", "bar"], get_many_output={"foo": "A", "bar": "B"})
-    def test_cli_variable_get_with_multiple_vars_outputs_formatted_json(self, cli_invocation, output, client):
+    def test_cli_variable_get_with_multiple_vars_outputs_formatted_json(self, cli_invocation,
+                                                                        output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
     @cli_test(["policy"])
@@ -138,7 +147,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_policy_load_doesnt_break_on_empty_input(self, cli_invocation, output, client):
         self.assertEquals('{}\n', output)
 
-    @cli_test(["policy", "load", "-b", "foo", "-f", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    @cli_test(["policy", "load", "-b", "foo", "-f", "foopolicy"],
+              policy_change_output={"foo": "A", "bar": "B"})
     def test_cli_policy_load_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
@@ -150,7 +160,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_policy_replace_doesnt_break_on_empty_input(self, cli_invocation, output, client):
         self.assertEquals('{}\n', output)
 
-    @cli_test(["policy", "replace", "-b", "foo", "-f", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    @cli_test(["policy", "replace", "-b", "foo", "-f", "foopolicy"],
+              policy_change_output={"foo": "A", "bar": "B"})
     def test_cli_policy_replace_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
@@ -162,7 +173,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_policy_update_doesnt_break_on_empty_input(self, cli_invocation, output, client):
         self.assertEquals('{}\n', output)
 
-    @cli_test(["policy", "update", "-b", "foo", "-f", "foopolicy"], policy_change_output={"foo": "A", "bar": "B"})
+    @cli_test(["policy", "update", "-b", "foo", "-f", "foopolicy"],
+              policy_change_output={"foo": "A", "bar": "B"})
     def test_cli_policy_update_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
@@ -187,19 +199,23 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         self.assertIn("Name:\n  user", output)
 
     @cli_test(["user", "rotate-api-key", "-h"])
-    def test_cli_user_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+    def test_cli_user_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation,
+                                                                            output, client):
         self.assertIn("Name:\n  rotate-api-key", output)
 
-    @cli_test(["user",  "rotate-api-key", "--help"])
-    def test_cli_user_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+    @cli_test(["user", "rotate-api-key", "--help"])
+    def test_cli_user_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation,
+                                                                           output, client):
         self.assertIn("Name:\n  rotate-api-key", output)
 
     @cli_test(["user", "change-password", "-h"])
-    def test_cli_user_change_password_short_help_returns_change_password_help(self, cli_invocation, output, client):
+    def test_cli_user_change_password_short_help_returns_change_password_help(self, cli_invocation,
+                                                                              output, client):
         self.assertIn("Name:\n  change-password", output)
 
     @cli_test(["user", "change-password", "--help"])
-    def test_cli_user_change_password_long_help_returns_change_password_help(self, cli_invocation, output, client):
+    def test_cli_user_change_password_long_help_returns_change_password_help(self, cli_invocation,
+                                                                             output, client):
         self.assertIn("Name:\n  change-password", output)
 
     @cli_test(["host", "-h"])
@@ -211,11 +227,13 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         self.assertIn("Name:\n  host", output)
 
     @cli_test(["host", "rotate-api-key", "-h"])
-    def test_cli_host_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+    def test_cli_host_rotate_api_key_short_help_returns_rotate_api_key_help(self, cli_invocation,
+                                                                            output, client):
         self.assertIn("Name:\n  rotate-api-key", output)
 
-    @cli_test(["host",  "rotate-api-key", "--help"])
-    def test_cli_host_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation, output, client):
+    @cli_test(["host", "rotate-api-key", "--help"])
+    def test_cli_host_rotate_api_key_long_help_returns_rotate_api_key_help(self, cli_invocation,
+                                                                           output, client):
         self.assertIn("Name:\n  rotate-api-key", output)
 
     @cli_test(["whoami"], whoami_output=WHOAMI_RESPONSE)
@@ -226,24 +244,30 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_invokes_whoami_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "conjur_account": "myaccount"\n}\n', output)
 
-    @patch.object(Cli, 'handle_init_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
     def test_cli_init_functions_are_properly_called(self, mock_init):
-        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False)
+        cli_actions.handle_init_logic(url="https://someurl", account="somename",
+                                      cert="/path/to/pem", force=False)
         mock_init.assert_called_once()
 
     @patch.object(InitController, 'load')
     def test_cli_init_load_function_is_properly_called(self, mock_load):
-        Cli().handle_init_logic(url="https://someurl", account="somename", cert="/path/to/pem", force=False, ssl_verify=True)
-        mock_load.assert_called_once()
+        with tempfile.NamedTemporaryFile() as t:
+            file_path = f"{t.name}"
+            cli_actions.handle_init_logic(url="https://someurl", account="somename",
+                                          cert=file_path, force=False, ssl_verify=True)
+            mock_load.assert_called_once()
 
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
-        Cli().handle_login_logic(credential_provider=FileCredentialsProvider, identifier='someidentifier', password='somepassword', ssl_verify=True)
+        cli_actions.handle_login_logic(credential_provider=FileCredentialsProvider,
+                                       identifier='someidentifier', password='somepassword',
+                                       ssl_verify=True)
         mock_load.assert_called_once()
 
     @patch.object(LogoutController, 'remove_credentials')
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):
-        Cli().handle_logout_logic(credential_provider=FileCredentialsProvider, ssl_verify=True)
+        cli_actions.handle_logout_logic(credential_provider=FileCredentialsProvider)
         mock_remove_creds.assert_called_once()
 
     @patch.object(UserController, 'rotate_api_key')
@@ -252,7 +276,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'rotate-api-key'
         mock_obj.id = 'someid'
 
-        Cli().handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj, client='someclient')
+        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj,
+                                      client='someclient')
         mock_rotate_api_key.assert_called_once()
 
     @patch.object(UserController, 'change_personal_password')
@@ -261,7 +286,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'change-password'
         mock_obj.password = 'somepass'
 
-        Cli().handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj, client='someclient')
+        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj,
+                                      client='someclient')
         mock_change_password.assert_called_once()
 
     @patch.object(HostController, 'rotate_api_key')
@@ -270,10 +296,10 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.action = 'someaction'
         mock_obj.id = 'someid'
 
-        Cli().handle_host_logic(args=mock_obj, client='someclient')
+        cli_actions.handle_host_logic(args=mock_obj, client='someclient')
         mock_rotate_api_key.assert_called_once()
 
-    @patch.object(Cli, 'handle_init_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
     @patch.object(Client, 'setup_logging')
     def test_run_action_runs_init_logic(self, mock_setup_logging, mock_handle_init):
         mock_obj = MockArgs()
@@ -283,23 +309,30 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.certificate = 'somecert'
         mock_obj.force = 'force'
         mock_obj.debug = 'somedebug'
+        mock_obj.is_self_signed = False
 
         Cli().run_action('init', mock_obj)
-        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force', True)
+        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force',
+                                                 True, False)
 
     '''
     Verifies that if a user didn't run init, they are prompted to do so and that after they initialize,
     a command will be run to completion. In this case, variable.
     '''
+
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_init_logic')
-    @patch.object(Cli, 'handle_variable_logic')
+    @patch('conjur.cli_actions.handle_init_logic')
+    @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[False, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 1])
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
+           return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_init, mock_exists):
+    def test_run_action_runs_init_if_conjurrc_not_found(self, mock_keyring, mock_conjurrc,
+                                                        mock_size, mock_getenv, mock_path_exists,
+                                                        mock_variable_init, mock_handle_init,
+                                                        mock_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -313,14 +346,18 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     Verifies that if a user didn't run login, they are prompted to do so and that after they login,
     a command will be run to completion. In this case, variable.
     '''
-    @patch.object(Cli, 'handle_login_logic')
-    @patch.object(Cli, 'handle_variable_logic')
+
+    @patch('conjur.cli_actions.handle_login_logic')
+    @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[True, False])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 0])
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
+           return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_login_if_netrc_not_found(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_variable_init, mock_handle_login):
+    def test_run_action_runs_login_if_netrc_not_found(self, mock_keyring, mock_conjurrc, mock_size,
+                                                      mock_getenv, mock_path_exists,
+                                                      mock_variable_init, mock_handle_login):
         with patch('conjur.cli.Client') as mock_client:
             mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
@@ -332,13 +369,15 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             mock_handle_login.assert_called_once()
 
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_user_logic')
+    @patch('conjur.cli_actions.handle_user_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
+           return_value=MockConjurrc)
     @patch('keyring.get_keyring')
-    def test_run_action_runs_user_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_user, mock_is_exists):
+    def test_run_action_runs_user_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv,
+                                        mock_path_exists, mock_handle_user, mock_is_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_client.return_value = MagicMock()
             mock_obj = MockArgs()
@@ -349,13 +388,15 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             mock_handle_user.assert_called_once()
 
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch.object(Cli, 'handle_host_logic')
+    @patch('conjur.cli_actions.handle_host_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', return_value=1)
     @patch('keyring.get_keyring')
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)
-    def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv, mock_path_exists, mock_handle_host, mock_is_exists):
+    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
+           return_value=MockConjurrc)
+    def test_run_action_runs_host_logic(self, mock_keyring, mock_conjurrc, mock_size, mock_getenv,
+                                        mock_path_exists, mock_handle_host, mock_is_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
@@ -367,7 +408,8 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             mock_handle_host.assert_called_once()
 
     @patch.object(HostFactoryController, 'create_token')
-    def test_cli_hostfactory_token_create_functions_are_properly_called(self, mock_hostfactory_create_token):
+    def test_cli_hostfactory_token_create_functions_are_properly_called(self,
+                                                                        mock_hostfactory_create_token):
         mock_obj = MockArgs()
         mock_obj.action_type = 'create_token'
         mock_obj.hostfactoryid = "some-id"
@@ -377,5 +419,5 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.cidr = '[]'
         mock_obj.count = 1
 
-        Cli().handle_hostfactory_logic(args=mock_obj, client='someclient')
+        cli_actions.handle_hostfactory_logic(args=mock_obj, client='someclient')
         mock_hostfactory_create_token.assert_called_once()

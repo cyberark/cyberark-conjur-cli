@@ -13,6 +13,7 @@ from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.errors import NotLoggedInException, LoggedOutFailedException
 
+
 # pylint: disable=too-few-public-methods
 class LogoutController:
     """
@@ -20,9 +21,8 @@ class LogoutController:
 
     This class represents the Presentation Layer for the LOGOUT command
     """
-    def __init__(self, ssl_verify:bool, logout_logic,
-            credentials_provider: CredentialsStoreInterface):
-        self.ssl_verify = ssl_verify
+
+    def __init__(self, logout_logic, credentials_provider: CredentialsStoreInterface):
         self.logout_logic = logout_logic
         self.credentials_provider = credentials_provider
 

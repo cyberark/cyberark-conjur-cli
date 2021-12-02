@@ -99,6 +99,17 @@ class InvalidConfigurationException(Exception):
         self.message = message
         super().__init__(self.message)
 
+class FileNotFoundException(Exception):
+    """ Exception for when configuration file (from .conjurrc) is in invalid format """
+    def __init__(self, message: str = ""):
+        self.message = message
+        super().__init__(self.message)
+
+class InvalidFilePermissionsException(Exception):
+    """ Exception for when configuration file (from .conjurrc) is in invalid format """
+    def __init__(self, message: str = ""):
+        self.message = message
+        super().__init__(self.message)
 
 class InvalidHostFactoryTokenException(Exception):
     """

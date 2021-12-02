@@ -18,34 +18,24 @@ import traceback
 import requests
 
 # Internals
-from conjur.api import SSLClient
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
-from conjur.controller.hostfactory_controller import HostFactoryController
-from conjur.data_object.create_token_data import CreateTokenData
-from conjur.data_object.create_host_data import CreateHostData
-from conjur.data_object.list_members_of_data import ListMembersOfData
-from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
-from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty
 from conjur.wrapper import ArgparseWrapper
 from conjur.api.client import Client
 from conjur.constants import DEFAULT_CONFIG_FILE, LOGIN_IS_REQUIRED
-from conjur.controller import HostController, ListController, LogoutController, InitController
-from conjur.controller import LoginController, PolicyController, UserController, VariableController
-from conjur.logic import ListLogic, LoginLogic, LogoutLogic, PolicyLogic, UserLogic, \
-    VariableLogic, InitLogic
-from conjur.data_object import ConjurrcData, CredentialsData, HostResourceData, ListData
-from conjur.data_object import PolicyData, UserInputData, VariableData
+
+from conjur.data_object import ConjurrcData
+from conjur.data_object import PolicyData
+from conjur import cli_actions
 from conjur.version import __version__
 
 
 # pylint: disable=too-many-statements
-class Cli():
+class Cli:
     """
     Main wrapper around CLI-like usages of this module. Provides various
     helpers around parsing of parameters and running client commands.
@@ -53,8 +43,13 @@ class Cli():
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
 
-    # pylint: disable=no-self-use, too-many-locals
-    def run(self, *args):
+    def __init__(self):
+        # TODO stop using testing_env
+        self.is_testing_env = str(os.getenv('TEST_ENV')).lower() == 'true'
+
+        self.credential_provider, _ = CredentialStoreFactory.create_credential_store()
+
+    def run(self):
         """
         Main entrypoint for the class invocation from both CLI, Package, and
         test sources. Parses CLI args and invokes the appropriate client command.
@@ -76,234 +71,51 @@ class Cli():
             .add_main_screen_options() \
             .build()
 
-        resource, args = Cli._parse_args(parser)
+        resource, args = self._parse_args(parser)
         # pylint: disable=broad-except
         try:
-            Cli.run_action(resource, args)
+            self.run_action(resource, args)
         except KeyboardInterrupt:
-            # A new line required so when the CLI is packaged as an exec,
-            # it won't erase the previous line
-            sys.stdout.write("\n")
-            sys.exit(0)
-        except FileNotFoundError as not_found_error:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Error: No such file or directory: '{not_found_error.filename}'\n")
-            sys.exit(1)
+            self._handle_keyboard_interrupt_exception()
+        except FileNotFoundError as file_not_found_error:
+            self._handle_file_not_found_exception(file_not_found_error)
         except requests.exceptions.HTTPError as server_error:
-            logging.debug(traceback.format_exc())
-            # pylint: disable=no-member
-            if hasattr(server_error.response, 'status_code'):
-                sys.stdout.write(determine_status_code_specific_error_messages(server_error))
-            else:
-                sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
-
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_http_exception(server_error, args)
         except CertificateVerificationException:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: "
-                             f"{INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_certificate_verification_exception(args)
         except Exception as error:
-            logging.debug(traceback.format_exc())
-            sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
-            if args.debug is False:
-                sys.stdout.write("Run the command again in debug mode for more information.\n")
-            sys.exit(1)
+            self._handle_general_exception(args, error)
+
         else:
             # Explicit exit (required for tests)
             sys.exit(0)
 
-    @classmethod
-    # pylint: disable=too-many-arguments
-    def handle_init_logic(
-            cls, url: str = None, account: str = None,
-            cert: str = None, force: bool = None,
-            ssl_verify: bool = True):
-        """
-        Method that wraps the init call logic
-        Initializes the client, creating the .conjurrc file
-        """
-        ssl_service = SSLClient()
-        conjurrc_data = ConjurrcData(conjur_url=url,
-                                     account=account,
-                                     cert_file=cert)
-
-        init_logic = InitLogic(ssl_service)
-        input_controller = InitController(conjurrc_data=conjurrc_data,
-                                          init_logic=init_logic,
-                                          force=force,
-                                          ssl_verify=ssl_verify)
-        input_controller.load()
-
-    @classmethod
-    # pylint: disable=line-too-long
-    def handle_login_logic(
-            cls, credential_provider: CredentialsStoreInterface, identifier: str = None,
-            password: str = None, ssl_verify: bool = True):
-        """
-        Method that wraps the login call logic
-        """
-        credential_data = CredentialsData(login=identifier)
-        login_logic = LoginLogic(credential_provider)
-        login_controller = LoginController(ssl_verify=ssl_verify,
-                                           user_password=password,
-                                           credential_data=credential_data,
-                                           login_logic=login_logic)
-        login_controller.load()
-
-        sys.stdout.write("Successfully logged in to Conjur\n")
-
-    @classmethod
-    def handle_logout_logic(
-            cls, credential_provider: CredentialsStoreInterface,
-            ssl_verify: bool = True):
-        """
-        Method that wraps the logout call logic
-        """
-        logout_logic = LogoutLogic(credential_provider)
-        logout_controller = LogoutController(ssl_verify=ssl_verify,
-                                             logout_logic=logout_logic,
-                                             credentials_provider=credential_provider)
-        logout_controller.remove_credentials()
-
-    @classmethod
-    def handle_list_logic(cls, args: list = None, client=None):
-        """
-        Method that wraps the list call logic
-        """
-        list_logic = ListLogic(client)
-        list_controller = ListController(list_logic=list_logic)
-
-        if args.permitted_roles_identifier:
-            list_permitted_roles_data = ListPermittedRolesData(
-                                            identifier=args.permitted_roles_identifier,
-                                            privilege=args.privilege)
-            list_controller.get_permitted_roles(list_permitted_roles_data)
-        elif args.members_of:
-            list_role_members_data = ListMembersOfData(kind=args.kind,
-                                                       identifier=args.members_of,
-                                                       inspect=args.inspect,
-                                                       search=args.search,
-                                                       limit=args.limit,
-                                                       offset=args.offset)
-            list_controller.get_role_members(list_role_members_data)
-        else:
-            list_data = ListData(kind=args.kind, inspect=args.inspect,
-                                 search=args.search, limit=args.limit,
-                                 offset=args.offset, role=args.role)
-            list_controller.load(list_data)
-
-    @classmethod
-    def handle_hostfactory_logic(cls, args: list = None, client=None):
-        """
-            Method that wraps the hostfactory call logic
-        """
-        if args.action_type == 'create_token':
-            hostfactory_logic = HostFactoryLogic(client)
-
-            create_token_data = CreateTokenData(host_factory=args.hostfactoryid,
-                                                cidr=args.cidr,
-                                                days=args.duration_days,
-                                                hours=args.duration_hours,
-                                                minutes=args.duration_minutes)
-            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
-            hostfactory_controller.create_token(create_token_data)
-        elif args.action_type == 'create_host':
-            hostfactory_logic = HostFactoryLogic(client)
-
-            create_host_data = CreateHostData(host_id=args.id,
-                                              token=args.token)
-            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
-            hostfactory_controller.create_host(create_host_data)
-        elif args.action_type == 'revoke_token':
-            hostfactory_logic = HostFactoryLogic(client)
-            hostfactory_controller = HostFactoryController(hostfactory_logic=hostfactory_logic)
-            hostfactory_controller.revoke_token(args.token)
-
-    @classmethod
-    def handle_variable_logic(cls, args: list = None, client=None):
-        """
-        Method that wraps the variable call logic
-        """
-        variable_logic = VariableLogic(client)
-        if args.action == 'get':
-            variable_data = VariableData(action=args.action, id=args.identifier, value=None,
-                                         variable_version=args.version)
-            variable_controller = VariableController(variable_logic=variable_logic,
-                                                     variable_data=variable_data)
-            variable_controller.get_variable()
-        elif args.action == 'set':
-            variable_data = VariableData(action=args.action, id=args.identifier, value=args.value,
-                                         variable_version=None)
-            variable_controller = VariableController(variable_logic=variable_logic,
-                                                     variable_data=variable_data)
-            variable_controller.set_variable()
-
-    @classmethod
-    def handle_policy_logic(cls, policy_data: PolicyData = None, client=None):
-        """
-        Method that wraps the variable call logic
-        """
-        policy_logic = PolicyLogic(client)
-        policy_controller = PolicyController(policy_logic=policy_logic,
-                                             policy_data=policy_data)
-        policy_controller.load()
-
-    @classmethod
-    def handle_user_logic(
-            cls, credential_provider: CredentialsStoreInterface,
-            args=None, client=None):
-        """
-        Method that wraps the user call logic
-        """
-        user_logic = UserLogic(ConjurrcData, credential_provider, client)
-        if args.action == 'rotate-api-key':
-            user_input_data = UserInputData(action=args.action,
-                                            id=args.id,
-                                            new_password=None)
-
-            user_controller = UserController(user_logic=user_logic,
-                                             user_input_data=user_input_data)
-            user_controller.rotate_api_key()
-        elif args.action == 'change-password':
-            user_input_data = UserInputData(action=args.action,
-                                            id=None,
-                                            new_password=args.password)
-            user_controller = UserController(user_logic=user_logic,
-                                             user_input_data=user_input_data)
-            user_controller.change_personal_password()
-
-    @classmethod
-    def handle_host_logic(cls, args, client):
-        """
-        Method that wraps the host call logic
-        """
-        host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
-        host_controller = HostController(client=client, host_resource_data=host_resource_data)
-        host_controller.rotate_api_key()
-
-    @staticmethod
     # pylint: disable=too-many-branches,logging-fstring-interpolation
-    def run_action(resource: str, args):
+    def run_action(self, resource: str, args):
         """
         Helper for creating the Client instance and invoking the appropriate
         api class method with the specified parameters.
         """
-        Client.setup_logging(Client, args.debug)
+        Client.setup_logging(args.debug)
 
-        credential_provider, _ = CredentialStoreFactory.create_credential_store()
+        # Needed for unit tests so that they do not require configuring
+
+        if resource in ['logout', 'init', 'login']:
+            self._run_auth_flow(args, resource)
+            return
+        self._perofrm_auth_if_not_login(args)
+        self._run_command_flow(args, resource)
+
+    def _run_auth_flow(self, args, resource):
         # pylint: disable=no-else-return,line-too-long
         if resource == 'logout':
-            Cli.handle_logout_logic(credential_provider, args.ssl_verify)
+            cli_actions.handle_logout_logic(self.credential_provider)
             sys.stdout.write("Successfully logged out from Conjur\n")
             return
 
         if resource == 'init':
-            Cli.handle_init_logic(args.url, args.name, args.certificate, args.force, args.ssl_verify)
+            cli_actions.handle_init_logic(args.url, args.name, args.certificate, args.force,
+                                          args.ssl_verify, args.is_self_signed)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init
@@ -311,54 +123,59 @@ class Cli():
                              "running `conjur login`\n")
             return
 
-        # Needed for unit tests so that they do not require configuring
-        is_testing_env = os.getenv('TEST_ENV') in ('true', 'True')
-
-        # If the user runs a command without configuring the CLI,
-        # we request they do so before executing their request
-        # pylint: disable=line-too-long
-        if not is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
-            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
-            Cli.handle_init_logic()
-
         if resource == 'login':
-            Cli.handle_login_logic(credential_provider, args.identifier, args.password, args.ssl_verify)
+            # If the user runs a command without configuring the CLI,
+            # we request they do so before executing their request
+            # pylint: disable=line-too-long
+            self._run_init_if_not_occur()
+
+            cli_actions.handle_login_logic(self.credential_provider,
+                                           args.identifier, args.password, args.ssl_verify)
             return
 
-        # If the user runs a command without logging into the CLI,
-        # we request they do so before executing their request
-        if not is_testing_env:
-            loaded_conjurrc = ConjurrcData.load_from_file()
-            if not credential_provider.is_exists(loaded_conjurrc.conjur_url):
-                # The below message when a user implicitly requested to init
-                # pylint: disable=logging-fstring-interpolation
-                sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
-                Cli.handle_login_logic(credential_provider, ssl_verify=args.ssl_verify)
+    def _run_command_flow(self, args, resource):
 
         client = Client(ssl_verify=args.ssl_verify, debug=args.debug)
 
         if resource == 'list':
-            Cli.handle_list_logic(args, client)
+            cli_actions.handle_list_logic(args, client)
 
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
 
         elif resource == 'variable':
-            Cli.handle_variable_logic(args, client)
+            cli_actions.handle_variable_logic(args, client)
 
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)
-            Cli.handle_policy_logic(policy_data, client)
+            cli_actions.handle_policy_logic(policy_data, client)
 
         elif resource == 'user':
-            Cli.handle_user_logic(credential_provider, args, client)
+            cli_actions.handle_user_logic(self.credential_provider, args, client)
 
         elif resource == 'host':
-            Cli.handle_host_logic(args, client)
+            cli_actions.handle_host_logic(args, client)
 
         elif resource == 'hostfactory':
-            Cli.handle_hostfactory_logic(args, client)
+            cli_actions.handle_hostfactory_logic(args, client)
+
+    def _run_init_if_not_occur(self):
+        if not self.is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
+            sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
+            cli_actions.handle_init_logic()
+
+    def _perofrm_auth_if_not_login(self, args):
+        self._run_init_if_not_occur()
+        # If the user runs a command without logging into the CLI,
+        # we request they do so before executing their request
+        if not self.is_testing_env:
+            loaded_conjurrc = ConjurrcData.load_from_file()
+            if not self.credential_provider.is_exists(loaded_conjurrc.conjur_url):
+                # The below message when a user implicitly requested to init
+                # pylint: disable=logging-fstring-interpolation
+                sys.stdout.write(f"{LOGIN_IS_REQUIRED}\n")
+                cli_actions.handle_login_logic(self.credential_provider, ssl_verify=args.ssl_verify)
 
     @staticmethod
     def _parse_args(parser: ArgparseWrapper):
@@ -382,6 +199,48 @@ class Cli():
         Static wrapper around instantiating and invoking the CLI that
         """
         Cli().run()
+
+    @staticmethod
+    def _handle_keyboard_interrupt_exception():
+        # A new line required so when the CLI is packaged as an exec,
+        # it won't erase the previous line
+        sys.stdout.write("\n")
+        sys.exit(0)
+
+    @staticmethod
+    def _handle_file_not_found_exception(file_not_found_error: FileNotFoundError):
+        sys.stdout.write(f"Error: No such file or directory: '{file_not_found_error.filename}'\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_http_exception(server_error, args):
+        logging.debug(traceback.format_exc())
+        # pylint: disable=no-member
+        if hasattr(server_error.response, 'status_code'):
+            sys.stdout.write(determine_status_code_specific_error_messages(server_error))
+        else:
+            sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")
+
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_certificate_verification_exception(args):
+        logging.debug(traceback.format_exc())
+        sys.stdout.write(f"Failed to execute command. Reason: "
+                         f"{INCONSISTENT_VERIFY_MODE_MESSAGE}\n")
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
+
+    @staticmethod
+    def _handle_general_exception(args, error):
+        logging.debug(traceback.format_exc())
+        sys.stdout.write(f"Failed to execute command. Reason: {str(error)}\n")
+        if args.debug is False:
+            sys.stdout.write("Run the command again in debug mode for more information.\n")
+        sys.exit(1)
 
 
 if __name__ == '__main__':

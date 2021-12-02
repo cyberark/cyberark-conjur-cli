@@ -29,7 +29,7 @@ class ScreenOptionsParser:
                                      help='Enable debugging output',
                                      action='store_true')
 
-        global_optional.add_argument('--insecure',
+        global_optional.add_argument('-i', '--insecure',
                                      help='Skip verification of server certificate '
                                           '(not recommended for production).\nThis makes your '
                                           'system vulnerable to security attacks!\n',

@@ -13,7 +13,7 @@ from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormat
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.api.ssl_client import SSLClient
+from conjur.api.ssl_utils.ssl_client import SSLClient
 
 MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 
@@ -53,7 +53,7 @@ class InitControllerTest(unittest.TestCase):
         with self.assertRaises(MissingRequiredParameterException):
             mock_conjurrc_data.conjur_url = 'https://someurl'
             mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
-            mock_init_controller.get_account_info(mock_conjurrc_data)
+            mock_init_controller._get_account_info(mock_conjurrc_data)
 
     @patch('builtins.input', return_value='someaccount')
     @patch('conjur.logic.init_logic')
@@ -64,7 +64,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData()
         mock_conjurrc_data.conjur_url="https://someaccount"
         mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
-        mock_init_controller.get_account_info(mock_conjurrc_data)
+        mock_init_controller._get_account_info(mock_conjurrc_data)
         self.assertEquals(mock_conjurrc_data.conjur_account, 'someaccount')
 
     '''
@@ -80,7 +80,7 @@ class InitControllerTest(unittest.TestCase):
 
         with self.assertRaises(CertificateNotTrustedException):
             init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.get_server_certificate(MOCK_FORMATTED_URL)
+            init_controller._get_server_certificate(MOCK_FORMATTED_URL)
 
     '''
     When user trusts the certificate, the certificate should be returned
@@ -91,20 +91,20 @@ class InitControllerTest(unittest.TestCase):
         self.conjurrc_data.conjur_url = "https://someurl"
         self.init_logic.get_certificate = MagicMock(return_value = ["12:AB", mock_certificate])
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-        fetched_certificate = init_controller.get_server_certificate(MOCK_FORMATTED_URL)
+        fetched_certificate = init_controller._get_server_certificate(MOCK_FORMATTED_URL)
         self.assertEquals(fetched_certificate, mock_certificate)
 
     @patch('builtins.input', side_effect=['http://someurl'])
     def test_user_supplied_certificate_returns_none(self, mock_input):
         self.conjurrc_data.cert_file = "/some/path/somepem.pem"
         init_controller = InitController(self.conjurrc_data,self.init_logic, self.force_overwrite, self.ssl_verify)
-        fetched_certificate = init_controller.get_server_certificate(MOCK_FORMATTED_URL)
+        fetched_certificate = init_controller._get_server_certificate(MOCK_FORMATTED_URL)
         assert self.conjurrc_data.cert_file == "/some/path/somepem.pem"
         self.assertEquals(fetched_certificate, None)
 
     @patch('conjur.logic.init_logic')
     def test_user_supplies_cert_writes_to_file_not_called(self, mock_init_logic):
-        InitController.write_certificate(self, "https://some/cert/path")
+        InitController._write_certificate(self, "https://some/cert/path")
         mock_init_logic.write_certificate_to_file.assert_not_called()
 
     '''
@@ -122,7 +122,7 @@ class InitControllerTest(unittest.TestCase):
             init_controller = InitController(self.conjurrc_data, mock_init_logic, False, True)
             # Mock that a certificate file already exists
             mock_init_logic.write_certificate_to_file.return_value = False
-            init_controller.write_certificate('some_cert')
+            init_controller._write_certificate('some_cert')
 
         self.assertRegex(self.capture_stream.getvalue(), "Certificate written to")
         mock_init_logic.write_certificate_to_file.assert_called_with('some_cert', '/root/conjur-server.pem', True)
@@ -153,7 +153,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url=None)
         with self.assertRaises(InvalidURLFormatException) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.prompt_for_conjur_url()
+            init_controller._prompt_for_conjur_url()
         self.assertRegex(str(context.exception), 'Error: URL is required')
 
     @patch('builtins.input', return_value=MockConjurrcData.conjur_url)
@@ -161,7 +161,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData(conjur_url='somehost')
         with self.assertRaises(InvalidURLFormatException) as context:
             init_controller = InitController(mock_conjurrc_data, self.init_logic, self.force_overwrite, self.ssl_verify)
-            init_controller.validate_conjur_url(MOCK_FORMATTED_URL)
+            init_controller._validate_conjur_url(MOCK_FORMATTED_URL)
         self.assertRegex(str(context.exception), 'Error: undefined behavior')
 
     @patch('builtins.input', return_value='no')
@@ -175,4 +175,4 @@ class InitControllerTest(unittest.TestCase):
         mock_init_logic.fetch_account_from_server = MagicMock(side_effect=CertificateHostnameMismatchException)
         init_controller = InitController(ConjurrcData, mock_init_logic, False, True)
         with self.assertRaises(CertificateHostnameMismatchException):
-            init_controller.get_account_info(ConjurrcData(account=None))
+            init_controller._get_account_info(ConjurrcData(account=None))
