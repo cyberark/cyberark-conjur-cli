@@ -12,4 +12,4 @@ class SslVerificationMode(Enum):
     WITH_TRUST_STORE = 0
     WITH_CA_BUNDLE = 1
     SELF_SIGN = 2
-    NO_SSL = 3
+    NO_SSL = 3 # TODO rename to no_cert_validation
