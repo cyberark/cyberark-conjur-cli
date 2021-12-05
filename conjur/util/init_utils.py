@@ -24,9 +24,10 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
         use_ca_bundle = True
     options = [use_ca_bundle, is_self_signed, not ssl_verify]
     if sum(options) > 1:
-        raise MissingRequiredParameterException("SSL verification method can be one of three:"
+        raise MissingRequiredParameterException("Can't accept more than one of the following "
+                                                "arguments:"
                                                 "\n1. --ca-cert with '< Full path to RootCA PEM"
-                                                " file >' (recommended)"
+                                                " file >'"
                                                 "\n2. --self-signed"
                                                 "\n3. --insecure (skip certificate validation)")
 
@@ -44,7 +45,8 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
             raise InvalidFilePermissionsException(f"No read access for: {ca_path}")
 
 
-def get_ssl_verification_meta_data_from_cli_params(ca_path, is_self_signed, ssl_verify):
+def get_ssl_verification_meta_data_from_cli_params(ca_path, is_self_signed,
+                                                   ssl_verify) -> SslVerificationMetaData:
     if ca_path:
         return SslVerificationMetaData(SslVerificationModes.WITH_CA_BUNDLE, ca_path)
     if is_self_signed:

@@ -18,9 +18,12 @@ from urllib.parse import ParseResult
 
 # Internals
 from typing import Optional, Tuple
+
+from conjur.api.models import SslVerificationMetaData, SslVerificationModes
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, \
-    ConfirmationException, MissingRequiredParameterException, HttpStatusError
+from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
+    CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException, \
+    OperationNotCompletedException
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -37,11 +40,15 @@ class InitController:
     init_logic = None
 
     def __init__(self, conjurrc_data: ConjurrcData, init_logic: InitLogic, force: bool,
-                 ssl_verify: bool):
-        self.ssl_verify = ssl_verify
-        if self.ssl_verify is False:
+                 ssl_verification_data: SslVerificationMetaData):
+        self.ssl_verification_data = ssl_verification_data
+
+        if self.ssl_verification_data.mode == SslVerificationModes.NO_SSL:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
+
+        if self.ssl_verification_data.mode == SslVerificationModes.SELF_SIGN:
+            self._prompt_warning_for_self_signed_flow()
 
         self.conjurrc_data = conjurrc_data
         self.init_logic = init_logic
@@ -50,25 +57,50 @@ class InitController:
     def load(self):
         """
         Method that facilitates all method calls in this class
+        In more details this function job is to create the conjurrcData object and write it to disk
         """
+        # the following methods validate and fill the self.conjurrc_data object.
+        # Note that these calls might perform user interaction actions as well as alter
+        # self.conjurrc_data object
+
+        # validate the url and write to self.conjurrc_data if needed
+        formatted_conjur_url = self._run_url_flow()
+
+        # get certificate and write to disk in a case of self-signed. write the cert_file property
+        # to self.conjurrc_data
+        self._run_certificate_flow(formatted_conjur_url)
+
+        # get the account if needed and fill it to self.conjurrc_data
+        self._run_account_flow()
+
+        self._validate_coonnection_to_server()
+
+        sys.stdout.write("Successfully initialized the Conjur CLI\n")
+
+    def _run_url_flow(self):
         if self.conjurrc_data.conjur_url is None:
             self._prompt_for_conjur_url()
 
         formatted_conjur_url = self._format_conjur_url()
-        self._validate_conjur_url(formatted_conjur_url, self.ssl_verify)
+        allow_http_only = self.ssl_verification_data.mode != SslVerificationModes.NO_SSL
+        self._validate_conjur_url(formatted_conjur_url, allow_http_only)
+        return formatted_conjur_url
 
-        if self.ssl_verify is True:
+    def _run_certificate_flow(self, formatted_conjur_url):
+        mode = self.ssl_verification_data.mode
+        if mode == SslVerificationModes.WITH_CA_BUNDLE:
+            self.conjurrc_data.cert_file = self.ssl_verification_data.ca_cert_path
+        if mode == SslVerificationModes.SELF_SIGN:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
             # For a uniform experience, regardless if the certificate is self-signed
             # or CA-signed, we will write the certificate on the machine
             self._write_certificate(fetched_certificate)
-        else:
+        if mode == SslVerificationModes.NO_SSL:
             self.conjurrc_data.cert_file = ""
 
+    def _run_account_flow(self):
         self._get_account_info()
         self.write_conjurrc()
-
-        sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
     def _prompt_for_conjur_url(self):
         """
@@ -101,7 +133,7 @@ class InitController:
         Raises a RuntimeError in case of an invalid url format
         """
         valid_scheme = conjur_url.scheme == 'https' or (
-                    not allow_https_only and conjur_url.scheme == 'http')
+                not allow_https_only and conjur_url.scheme == 'http')
         if not valid_scheme:
             raise InvalidURLFormatException(f"Error: undefined behavior. "
                                             f" Reason: The Conjur URL format provided. "
@@ -188,6 +220,18 @@ class InitController:
                                            self.conjurrc_data,
                                            True)
         sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
+
+    def _validate_coonnection_to_server(self):
+        pass
+
+    @staticmethod
+    def _prompt_warning_for_self_signed_flow():
+        user_answer = input("Using self-signed certificates is not recommended and could lead to "
+                            "exposure of sensitive data.\n Continue? yes/no (Default: no): "
+                            "").strip() or "no"
+        if user_answer.lower() not in VALID_CONFIRMATIONS:
+            raise OperationNotCompletedException(
+                "User decided to not work with self signed certificate")
 
     @classmethod
     def ensure_overwrite_file(cls, config_file: str):

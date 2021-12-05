@@ -24,7 +24,7 @@ from conjur.data_object import ConjurrcData, CredentialsData, ListData, Variable
     PolicyData, UserInputData, HostResourceData
 
 from conjur.api import SSLClient
-from conjur.util.init_utils import validate_init_action_ssl_verification_input
+from conjur.util import init_utils
 
 
 def handle_init_logic(
@@ -35,7 +35,10 @@ def handle_init_logic(
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
     """
-    validate_init_action_ssl_verification_input(cert, is_self_signed, ssl_verify)
+    init_utils.validate_init_action_ssl_verification_input(cert, is_self_signed, ssl_verify)
+    ssl_verification_data = init_utils.get_ssl_verification_meta_data_from_cli_params(cert,
+                                                                                      is_self_signed
+                                                                                      , ssl_verify)
     ssl_service = SSLClient()
     # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
@@ -46,7 +49,7 @@ def handle_init_logic(
     input_controller = InitController(conjurrc_data=conjurrc_data,
                                       init_logic=init_logic,
                                       force=force,
-                                      ssl_verify=ssl_verify)
+                                      ssl_verification_data=ssl_verification_data)
     input_controller.load()
 
 
