@@ -30,11 +30,11 @@ class CredentialStoreFactory:
         """
         Factory method for determining which store to use
         """
-        key_store_wrapper = KeystoreWrapper()
-        if key_store_wrapper.get_keyring_name() in SUPPORTED_BACKENDS:
+
+        if KeystoreWrapper.get_keyring_name() in SUPPORTED_BACKENDS:
             # If the keyring is unlocked then we will use it
-            if key_store_wrapper.is_keyring_accessible():
+            if KeystoreWrapper.is_keyring_accessible():
                 # pylint: disable=line-too-long
-                return KeystoreCredentialsProvider(), f'{key_store_wrapper.get_keyring_name()} credential store'
+                return KeystoreCredentialsProvider(), f'{KeystoreWrapper.get_keyring_name()} credential store'
 
         return FileCredentialsProvider(), DEFAULT_NETRC_FILE

@@ -24,7 +24,6 @@ from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.resource import Resource
-from conjur.wrapper import KeystoreWrapper
 
 # pylint: disable=pointless-string-statement
 """

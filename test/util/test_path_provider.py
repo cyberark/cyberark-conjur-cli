@@ -2,9 +2,10 @@ from pathlib import Path
 
 # Internals
 from conjur.constants import *
+from conjur.util.design_patterns_base_classes.singelton import Singleton
 
 
-class TestRunnerPathProvider():  # pragma: no cover
+class TestRunnerPathProvider(metaclass=Singleton):  # pragma: no cover
     """
     used to generate the files path's in all tests
     in particular this file is helping with the
