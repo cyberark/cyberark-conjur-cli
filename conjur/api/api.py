@@ -14,18 +14,21 @@ from urllib import parse
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_response import HttpResponse
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
 from conjur.resource import Resource
+from conjur.data_object import ConjurrcData
 
 
-# pylint: disable=unspecified-encoding
+# pylint: disable=unspecified-encoding,too-many-public-methods
 class Api:
     """
     This module provides a high-level programmatic access to the HTTP API
@@ -46,48 +49,48 @@ class Api:
     # pylint: disable=unused-argument,too-many-arguments
     def __init__(
             self,
-            account: str = 'default',
-            api_key: str = None,
-            ca_bundle: str = None,
-            http_debug: bool = False,
-            login_id: str = None,
-            ssl_verify: bool = True,
-            url: str = None
+            conjurrc_data: ConjurrcData,
+            credentials_provider: CredentialsStoreInterface,
+            ssl_verification_mode: SslVerificationMode = SslVerificationMode.WITH_TRUST_STORE,
+            debug: bool = False,
+            http_debug=False,
     ):
+        # Sanity checks
+        self.ssl_verification_data = SslVerificationMetadata(ssl_verification_mode,
+                                                             conjurrc_data.cert_file)
 
-        self._url = url
-        self._ca_bundle = ca_bundle
-
-        self._account = account
-        if not self._account:
-            raise MissingRequiredParameterException("Account cannot be empty!")
-
-        self._ssl_verify = ssl_verify
-        if ca_bundle:
-            self._ssl_verify = ca_bundle
-
-        self.api_key = api_key
-        self.login_id = login_id
-
+        self._account = conjurrc_data.conjur_account
+        self._url = conjurrc_data.conjur_url
+        self._api_key = None
+        self.credentials_provider: CredentialsStoreInterface = credentials_provider
+        self.debug = debug
+        self.http_debug = http_debug
         self.api_token_expiration = None
+        self._login_id = None
 
-        self._default_params = {
-            'url': url,
-            'account': account
+        self._default_params = {  # TODO remove, pass to invoke enpoint conjurrcData
+            'url': self._url,
+            'account': self._account
         }
 
         # WARNING: ONLY FOR DEBUGGING - DO NOT CHECK IN LINES BELOW UNCOMMENTED
         # from .http import enable_http_logging
         # if http_debug: enable_http_logging()
 
-        # Sanity checks
-        if not self._url:
-            raise MissingRequiredParameterException("Error: API instantiation 'url' "
-                                                    "cannot be empty!")
+    @property
+    def api_key(self) -> str:
+        """
+        Property returns api_key. if no api_key we try the password as sometimes
+        @return: api_key
+        """
+        return self._api_key
 
     @property
     # pylint: disable=missing-docstring
     def api_token(self) -> str:
+        """
+        @return: Conjur api_token
+        """
         if not self._api_token or datetime.now() > self.api_token_expiration:
             logging.debug("API token missing or expired. Fetching new one...")
             self.api_token_expiration = datetime.now() + timedelta(minutes=self.API_TOKEN_DURATION)
@@ -98,21 +101,48 @@ class Api:
         logging.debug("Using cached API token...")
         return self._api_token
 
-    def login(self, login_id: str = None, password: str = None) -> str:
+    @property
+    def password(self) -> str:
+        """
+        password as being saved inside credentials_provider
+        @return:
+        """
+        return self.credentials_provider.load(self._url).password
+
+    @property
+    def ssl_verify(self):
+        """
+        Should be removed once http_wrapper accept ssl_validation_meta_data
+        @return:
+        """
+        ret = self.ssl_verification_data.mode != SslVerificationMode.NO_SSL
+        if ret and self.ssl_verification_data.mode != SslVerificationMode.WITH_TRUST_STORE:
+            ret = self.ssl_verification_data.ca_cert_path
+        return ret
+
+    @property
+    def login_id(self) -> str:
+        """
+        @return: The login_id (username)
+        """
+        if not self._login_id:
+            self._login_id = self.credentials_provider.load(self._url).login
+        return self._login_id
+
+    def login(self) -> str:
         """
         This method uses the basic auth login id (username) and password
         to retrieve an api key from the server that can be later used to
         retrieve short-lived api tokens.
         """
-        if not login_id or not password:
-            raise MissingRequiredParameterException("Missing parameters in login invocation!")
-
         logging.debug("Logging in to %s...", self._url)
-        self.api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
-                                       self._default_params, auth=(login_id, password),
-                                       ssl_verify=self._ssl_verify).text
-        self.login_id = login_id
+        password = self.password
+        if not password:
+            raise MissingRequiredParameterException("password requires when login")
 
+        self._api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
+                                        self._default_params, auth=(self.login_id, password),
+                                        ssl_verify=self.ssl_verify).text
         return self.api_key
 
     def authenticate(self) -> str:
@@ -121,6 +151,11 @@ class Api:
         for a limited time will allow you to interact fully with the Conjur
         vault.
         """
+        if not self.api_key and self.login_id and self.password:
+            # TODO we do this since api_key is not provided. it should be stored like username,
+            # password inside credentials_data
+            self.login()
+
         if not self.login_id or not self.api_key:
             raise MissingRequiredParameterException("Missing parameters in "
                                                     "authentication invocation")
@@ -131,8 +166,12 @@ class Api:
         params.update(self._default_params)
 
         logging.debug("Authenticating to %s...", self._url)
-        return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.AUTHENTICATE, params,
-                               self.api_key, ssl_verify=self._ssl_verify).text
+        return invoke_endpoint(
+            HttpVerb.POST,
+            ConjurEndpoint.AUTHENTICATE,
+            params,
+            self.api_key,
+            ssl_verify=self.ssl_verify).text
 
     def resources_list(self, list_constraints: dict = None) -> dict:
         """
@@ -152,12 +191,12 @@ class Api:
                                             params,
                                             query=list_constraints,
                                             api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).text
+                                            ssl_verify=self.ssl_verify).text
         else:
             json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
                                             params,
                                             api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).text
+                                            ssl_verify=self.ssl_verify).text
 
         resources = json.loads(json_response)
         # Returns the result as a list of resource ids instead of the raw JSON only
@@ -169,7 +208,8 @@ class Api:
             return list(resource_list)
 
         # To see the full resources response see
-        # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
+        # https://docs.conjur.org/Latest/en/Content/Developer/Conjur_API_List_Resources.htm
+        # ?tocpath=Developer%7CREST%C2%A0APIs%7C_____17
         return resources
 
     def get_variable(self, variable_id: str, version: str = None) -> Optional[bytes]:
@@ -193,11 +233,11 @@ class Api:
         if version is not None:
             return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                    api_token=self.api_token, query=query_params,
-                                   ssl_verify=self._ssl_verify).content
+                                   ssl_verify=self.ssl_verify).content
         else:
             return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                    api_token=self.api_token,
-                                   ssl_verify=self._ssl_verify).content
+                                   ssl_verify=self.ssl_verify).content
 
     def get_variables(self, *variable_ids) -> dict:
         """
@@ -218,7 +258,7 @@ class Api:
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.BATCH_SECRETS,
                                         self._default_params,
                                         api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify,
+                                        ssl_verify=self.ssl_verify,
                                         query=query_params,
                                         ).content
 
@@ -258,7 +298,7 @@ class Api:
                                params,
                                create_token_data,
                                api_token=self.api_token,
-                               ssl_verify=self._ssl_verify,
+                               ssl_verify=self.ssl_verify,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def create_host(self, create_host_data: CreateHostData) -> HttpResponse:
@@ -275,7 +315,7 @@ class Api:
                                params,
                                request_body_parameters,
                                api_token=create_host_data.token,
-                               ssl_verify=self._ssl_verify,
+                               ssl_verify=self.ssl_verify,
                                decode_token=False,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
@@ -297,7 +337,7 @@ class Api:
                                ConjurEndpoint.HOST_FACTORY_REVOKE_TOKEN,
                                params,
                                api_token=self.api_token,
-                               ssl_verify=self._ssl_verify)
+                               ssl_verify=self.ssl_verify)
 
     def set_variable(self, variable_id: str, value: str) -> str:
         """
@@ -312,10 +352,11 @@ class Api:
 
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
                                value, api_token=self.api_token,
-                               ssl_verify=self._ssl_verify).text
+                               ssl_verify=self.ssl_verify).text
 
-    def _load_policy_file(self, policy_id: str, policy_file: str,
-                          http_verb: HttpVerb) -> dict:
+    def _load_policy_file(
+            self, policy_id: str, policy_file: str,
+            http_verb: HttpVerb) -> dict:
         """
         This method is used to load, replace or update a file-based policy into the desired
         name.
@@ -330,7 +371,7 @@ class Api:
 
         json_response = invoke_endpoint(http_verb, ConjurEndpoint.POLICIES, params,
                                         policy_data, api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).text
+                                        ssl_verify=self.ssl_verify).text
 
         policy_changes = json.loads(json_response)
         return policy_changes
@@ -371,23 +412,25 @@ class Api:
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    api_token=self.api_token,
-                                   ssl_verify=self._ssl_verify,
+                                   ssl_verify=self.ssl_verify,
                                    query=query_params).text
         return response
 
-    def rotate_personal_api_key(self, logged_in_user: str,
-                                current_password: str) -> str:
+    def rotate_personal_api_key(
+            self, logged_in_user: str,
+            current_password: str) -> str:
         """
         This method is used to rotate a personal API key
         """
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    auth=(logged_in_user, current_password),
-                                   ssl_verify=self._ssl_verify).text
+                                   ssl_verify=self.ssl_verify).text
         return response
 
-    def change_personal_password(self, logged_in_user: str, current_password: str,
-                                 new_password: str) -> str:
+    def change_personal_password(
+            self, logged_in_user: str, current_password: str,
+            new_password: str) -> str:
         """
         This method is used to change own password
         """
@@ -395,7 +438,7 @@ class Api:
                                    self._default_params,
                                    new_password,
                                    auth=(logged_in_user, current_password),
-                                   ssl_verify=self._ssl_verify
+                                   ssl_verify=self.ssl_verify
                                    ).text
         return response
 
@@ -406,7 +449,7 @@ class Api:
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.WHOAMI,
                                         self._default_params,
                                         api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).content
+                                        ssl_verify=self.ssl_verify).content
 
         return json.loads(json_response.decode('utf-8'))
 
@@ -439,7 +482,7 @@ class Api:
                                         params,
                                         query=request_parameters,
                                         api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).content
+                                        ssl_verify=self.ssl_verify).content
 
         resources = json.loads(json_response.decode('utf-8'))
 
@@ -474,6 +517,6 @@ class Api:
                                         ConjurEndpoint.RESOURCES_PERMITTED_ROLES,
                                         params,
                                         api_token=self.api_token,
-                                        ssl_verify=self._ssl_verify).content
+                                        ssl_verify=self.ssl_verify).content
 
         return json.loads(json_response.decode('utf-8'))

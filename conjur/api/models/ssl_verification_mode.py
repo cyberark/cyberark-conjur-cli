@@ -5,7 +5,7 @@ This module is used to represent different types of SSL verification options
 from enum import Enum
 
 
-class SslVerificationModes(Enum):
+class SslVerificationMode(Enum):
     """
     Enumeration of all possible certificate methods that we may use against
     """

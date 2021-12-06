@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - The `hostfactory` method `create token` is now available in CLI and SDK to create a hostfactory token 
   to manage hosts and permissions in a dynamic way
   [cyberark/conjur-api-python3#339](https://github.com/cyberark/conjur-api-python3/pull/339)
+- Stop supporting `Client` initialization from disk.
 
 ## [7.0.1] - 2020-04-12
 

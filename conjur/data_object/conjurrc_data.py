@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
-from conjur.errors import InvalidConfigurationException
+from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
 
 
 class ConjurrcData:
@@ -43,6 +43,8 @@ class ConjurrcData:
                                     loaded_conjurrc['cert_file'])
         except KeyError as key_error:
             raise InvalidConfigurationException from key_error
+        except FileNotFoundError as not_found_err:
+            raise ConfigurationMissingException from not_found_err
 
     # pylint: disable=line-too-long
     def __repr__(self) -> str:
