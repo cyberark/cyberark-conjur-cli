@@ -73,8 +73,7 @@ class InitController:
         # get the account if needed and fill it to self.conjurrc_data
         self._run_account_flow()
 
-        self._validate_coonnection_to_server()
-
+        self.write_conjurrc()
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
     def _run_url_flow(self):
@@ -95,7 +94,7 @@ class InitController:
             # For a uniform experience, regardless if the certificate is self-signed
             # or CA-signed, we will write the certificate on the machine
             self._write_certificate(fetched_certificate)
-        if mode == SslVerificationModes.NO_SSL:
+        if mode in [SslVerificationModes.NO_SSL, SslVerificationModes.WITH_TRUST_STORE]:
             self.conjurrc_data.cert_file = ""
 
     def _run_account_flow(self):
@@ -220,9 +219,6 @@ class InitController:
                                            self.conjurrc_data,
                                            True)
         sys.stdout.write(f"Configuration written to {DEFAULT_CONFIG_FILE}\n\n")
-
-    def _validate_coonnection_to_server(self):
-        pass
 
     @staticmethod
     def _prompt_warning_for_self_signed_flow():
