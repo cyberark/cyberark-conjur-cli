@@ -152,7 +152,6 @@ class Client:
         Configures the logging for the client
         """
         # Suppress third party logs
-        KeystoreWrapper.configure_keyring_log_to_info()
 
         if debug:
             logging.basicConfig(level=logging.DEBUG, format=cls.LOGGING_FORMAT)

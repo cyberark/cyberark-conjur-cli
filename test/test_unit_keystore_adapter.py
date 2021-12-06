@@ -16,25 +16,25 @@ from conjur.wrapper import KeystoreWrapper
 class KeystoreWrapperTest(unittest.TestCase):
     @patch.object(keyring, "delete_password")
     def test_delete_password_calls_keyring_delete_password(self, mock_keyring):
-        KeystoreWrapper.delete_password(TEST_HOSTNAME, "key")
+        KeystoreWrapper().delete_password(TEST_HOSTNAME, "key")
         mock_keyring.assert_called_once_with(TEST_HOSTNAME, "key")
 
     @patch.object(keyring, "delete_password", side_effect=keyring.errors.KeyringError)
     def test_delete_password_raises_keyring_error(self, mock_delete_password):
         with self.assertRaises(KeyringWrapperGeneralError):
-            KeystoreWrapper.delete_password(TEST_HOSTNAME, "some_key")
+            KeystoreWrapper().delete_password(TEST_HOSTNAME, "some_key")
 
     @patch.object(keyring, "delete_password", side_effect=keyring.errors.PasswordDeleteError)
     def test_delete_password_raises_expected_exceptions(self, mock_delete_password):
         with self.assertRaises(KeyringWrapperDeletionError):
-            KeystoreWrapper.delete_password(TEST_HOSTNAME, "some_key")
+            KeystoreWrapper().delete_password(TEST_HOSTNAME, "some_key")
 
     @patch.object(keyring, "get_password", return_value=None)
     def test_is_keyring_accessible_return_true_when_get_password(self, mock_keyring):
-        keyring_accessible = KeystoreWrapper.is_keyring_accessible()
+        keyring_accessible = KeystoreWrapper().is_keyring_accessible()
         mock_keyring.assert_called_once_with('test-system', 'test-accessibility')
         self.assertEquals(True, keyring_accessible)
 
     @patch.object(keyring, "get_password", side_effect=keyring.errors.KeyringError)
     def test_is_keyring_accessible_returns_false_on_keyring_error(self, mock_keyring):
-        self.assertEquals(False, KeystoreWrapper.is_keyring_accessible())
+        self.assertEquals(False, KeystoreWrapper().is_keyring_accessible())
