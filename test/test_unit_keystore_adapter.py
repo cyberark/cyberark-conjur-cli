@@ -38,3 +38,8 @@ class KeystoreWrapperTest(unittest.TestCase):
     @patch.object(keyring, "get_password", side_effect=keyring.errors.KeyringError)
     def test_is_keyring_accessible_returns_false_on_keyring_error(self, mock_keyring):
         self.assertEquals(False, KeystoreWrapper().is_keyring_accessible())
+
+    def test_wrapper_is_singelton(self):
+        wrapper = KeystoreWrapper()
+        object_id = id(wrapper)
+        self.assertEquals(object_id, id(KeystoreWrapper()))

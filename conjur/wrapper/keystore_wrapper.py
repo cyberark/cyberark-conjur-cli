@@ -19,13 +19,14 @@ import keyring
 from conjur.errors import KeyringWrapperDeletionError, KeyringWrapperGeneralError \
     , KeyringWrapperSetError
 from conjur.util.util_functions import configure_env_var_with_keyring
+from conjur.util.singelton import Singleton
 
 # Function is called in the module so that before accessing the
 # system’s keyring, the environment will be configured correctly
 configure_env_var_with_keyring()
 
 
-class KeystoreWrapper:
+class KeystoreWrapper(metaclass=Singleton):
     """
     KeystoreWrapper
 
@@ -105,3 +106,8 @@ class KeystoreWrapper:
             return False
 
         return True
+
+
+if __name__ == '__main__':
+    KeystoreWrapper()
+    KeystoreWrapper()
