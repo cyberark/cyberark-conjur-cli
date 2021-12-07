@@ -39,6 +39,8 @@ import uuid
 import ssl
 
 # Internals
+# here for packing reason
+from conjur.util.design_patterns_base_classes.singelton import Singleton
 from test.test_integration_policy import CliIntegrationPolicy
 from test.test_integration_variable import CliIntegrationTestVariable
 from test.test_integration_configurations import CliIntegrationTestConfigurations

@@ -1,7 +1,7 @@
 # Builtin
-import importlib
 import unittest
 from unittest.mock import patch
+import logging
 
 # Third-Party
 import keyring
@@ -38,3 +38,26 @@ class KeystoreWrapperTest(unittest.TestCase):
     @patch.object(keyring, "get_password", side_effect=keyring.errors.KeyringError)
     def test_is_keyring_accessible_returns_false_on_keyring_error(self, mock_keyring):
         self.assertEquals(False, KeystoreWrapper.is_keyring_accessible())
+
+    def test_get_keyring_name_use_proper_log_level(self):
+        logging.getLogger('keyring').setLevel(logging.DEBUG)
+        KeystoreWrapper.get_keyring_name()
+        self.assertEquals(logging.getLogger('keyring').level, logging.INFO)
+
+    @patch.object(keyring, "get_password", return_value=None)
+    def test_get_password_use_proper_log_level(self, mock):
+        logging.getLogger('keyring').setLevel(logging.DEBUG)
+        KeystoreWrapper.get_password("", "")
+        self.assertEquals(logging.getLogger('keyring').level, logging.INFO)
+
+    @patch.object(keyring, "delete_password", return_value=None)
+    def test_get_delete_password_use_proper_log_level(self, mock):
+        logging.getLogger('keyring').setLevel(logging.DEBUG)
+        KeystoreWrapper.delete_password("", "")
+        self.assertEquals(logging.getLogger('keyring').level, logging.INFO)
+
+    @patch.object(keyring, "set_password", return_value=None)
+    def test_get_set_password_use_proper_log_level(self, mock):
+        logging.getLogger('keyring').setLevel(logging.DEBUG)
+        KeystoreWrapper.set_password("", "", "")
+        self.assertEquals(logging.getLogger('keyring').level, logging.INFO)

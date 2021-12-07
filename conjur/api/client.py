@@ -24,7 +24,6 @@ from conjur.util import util_functions
 from conjur.api import Api
 from conjur.config import Config as ApiConfig
 from conjur.resource import Resource
-from conjur.wrapper import KeystoreWrapper
 
 # pylint: disable=pointless-string-statement
 """
@@ -152,7 +151,6 @@ class Client:
         Configures the logging for the client
         """
         # Suppress third party logs
-        KeystoreWrapper.configure_keyring_log_to_info()
 
         if debug:
             logging.basicConfig(level=logging.DEBUG, format=cls.LOGGING_FORMAT)

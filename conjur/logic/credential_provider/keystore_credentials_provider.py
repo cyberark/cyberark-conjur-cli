@@ -20,6 +20,7 @@ from conjur.interface.credentials_store_interface import CredentialsStoreInterfa
 from conjur.wrapper import KeystoreWrapper
 from conjur.data_object.conjurrc_data import ConjurrcData
 
+
 # pylint: disable=logging-fstring-interpolation
 class KeystoreCredentialsProvider(CredentialsStoreInterface):
     """
@@ -29,7 +30,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
     in the system's keystore
     """
 
-    def __init__(self): # pragma: no cover
+    def __init__(self):  # pragma: no cover
         pass
 
     # pylint: disable=line-too-long,logging-fstring-interpolation
@@ -44,11 +45,13 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             KeystoreWrapper.set_password(credential_id, MACHINE, credential_data.machine)
             KeystoreWrapper.set_password(credential_id, LOGIN, credential_data.login)
             KeystoreWrapper.set_password(credential_id, PASSWORD, credential_data.password)
-            logging.debug(f"Credentials saved to the '{KeystoreWrapper.get_keyring_name()}' credential store")
+            logging.debug(
+                f"Credentials saved to the '{KeystoreWrapper.get_keyring_name()}'"
+                f" credential store")
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
-    def load(self, conjurrc_conjur_url:str) -> CredentialsData:
+    def load(self, conjurrc_conjur_url: str) -> CredentialsData:
         """
         Method for fetching user credentials from the system's keyring
         """
@@ -57,7 +60,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             raise CredentialRetrievalException
 
         for attr in KEYSTORE_ATTRIBUTES:
-            loaded_credentials[attr] = KeystoreWrapper.get_password(conjurrc_conjur_url, attr)
+            loaded_credentials[attr] = KeystoreWrapper.get_password(conjurrc_conjur_url,
+                                                                           attr)
         return CredentialsData.convert_dict_to_obj(loaded_credentials)
 
     def is_exists(self, conjurrc_conjur_url) -> bool:
@@ -66,19 +70,21 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 return False
         return True
 
-    def update_api_key_entry(self, user_to_update:str, credential_data:CredentialsData, new_api_key:str):
+    def update_api_key_entry(self, user_to_update: str, credential_data: CredentialsData,
+                             new_api_key: str):
         """
         Method for updating user credentials in the system's keyring
         """
         try:
-            KeystoreWrapper.set_password(credential_data.machine, MACHINE, credential_data.machine)
+            KeystoreWrapper.set_password(credential_data.machine, MACHINE,
+                                                credential_data.machine)
             KeystoreWrapper.set_password(credential_data.machine, LOGIN, user_to_update)
             KeystoreWrapper.set_password(credential_data.machine, PASSWORD, new_api_key)
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
-    def remove_credentials(self, conjurrc:ConjurrcData):
+    def remove_credentials(self, conjurrc: ConjurrcData):
         """
         Method for removing user credentials in the system's keyring
         """
@@ -97,7 +103,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         logging.debug("Successfully removed credentials from the "
                       f"'{KeystoreWrapper.get_keyring_name()}' credential store")
 
-    def cleanup_if_exists(self, conjurrc_conjur_url:str):
+    def cleanup_if_exists(self, conjurrc_conjur_url: str):
         """
         For each credential attribute, check if exists for
         the conjurrc_conjur_url identifier and delete if exists
@@ -110,5 +116,6 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             # the user has already logged out. we still try to remove other leftovers
             except Exception:  # pylint: disable=broad-except
                 logging.debug(
-                    f"Cleanup failed for key '{attr}' from the '{KeystoreWrapper.get_keyring_name()}' "
+                    f"Cleanup failed for key '{attr}' from the '"
+                    f"{KeystoreWrapper.get_keyring_name()}' "
                     f"credential store.\n{traceback.format_exc()}")

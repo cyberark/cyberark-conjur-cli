@@ -16,13 +16,27 @@ from typing import Optional
 import keyring
 
 # Internals
-from conjur.errors import KeyringWrapperDeletionError, KeyringWrapperGeneralError\
+from conjur.errors import KeyringWrapperDeletionError, KeyringWrapperGeneralError \
     , KeyringWrapperSetError
 from conjur.util.util_functions import configure_env_var_with_keyring
 
 # Function is called in the module so that before accessing the
 # system’s keyring, the environment will be configured correctly
 configure_env_var_with_keyring()
+
+
+def validate_log_level(func):
+    """
+    Method decorator that make sure no sensitive log is written
+    """
+
+    def inner(*args, **kwargs):
+        if logging.getLogger("keyring").level <= logging.INFO:
+            logging.getLogger("keyring").setLevel(logging.INFO)
+        return func(*args, **kwargs)
+
+    return inner
+
 
 class KeystoreWrapper:
     """
@@ -31,8 +45,9 @@ class KeystoreWrapper:
     A class for wrapping used functionality from the keyring library
     """
 
-    @classmethod
-    def set_password(cls, identifier:str, key:str, val:str):
+    @staticmethod
+    @validate_log_level
+    def set_password(identifier: str, key: str, val: str):
         """
         Method for setting a password in keyring
         """
@@ -46,8 +61,9 @@ class KeystoreWrapper:
                                                      f"(Failed to set '{key}')'") from exception
 
     # pylint: disable=try-except-raise
-    @classmethod
-    def get_password(cls, identifier:str, key:str):
+    @staticmethod
+    @validate_log_level
+    def get_password(identifier: str, key: str):
         """
         Method for getting a password in keyring
         """
@@ -58,8 +74,9 @@ class KeystoreWrapper:
                                                      f"(Failed to get '{key}')'") from exception
 
     # pylint: disable=try-except-raise
-    @classmethod
-    def delete_password(cls, identifier:str, key:str):
+    @staticmethod
+    @validate_log_level
+    def delete_password(identifier: str, key: str):
         """
         Method for deleting a password in keyring
         """
@@ -71,8 +88,10 @@ class KeystoreWrapper:
         except Exception as exception:
             raise KeyringWrapperGeneralError(message=f"General keyring error has occurred "
                                                      f"(Failed to delete '{key}')'") from exception
-    @classmethod
-    def get_keyring_name(cls) -> Optional[str]:
+
+    @staticmethod
+    @validate_log_level
+    def get_keyring_name() -> Optional[str]:
         """
         Method to get the system's keyring name
         """
@@ -86,8 +105,9 @@ class KeystoreWrapper:
             logging.debug(err)
             return None
 
-    @classmethod
-    def is_keyring_accessible(cls) -> bool:
+    @staticmethod
+    @validate_log_level
+    def is_keyring_accessible() -> bool:
         """
         Method to check if the keyring is accessible
         """
@@ -105,10 +125,3 @@ class KeystoreWrapper:
             return False
 
         return True
-
-    @classmethod
-    def configure_keyring_log_to_info(cls):
-        """
-        Method to configure the keyring logs to info
-        """
-        logging.getLogger('keyring').setLevel(logging.INFO)

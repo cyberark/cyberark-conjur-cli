@@ -2,9 +2,10 @@ from pathlib import Path
 
 # Internals
 from conjur.constants import *
+from conjur.util.design_patterns_base_classes.singelton import Singleton
 
 
-class TestRunnerPathProvider():  # pragma: no cover
+class TestRunnerPathProvider(metaclass=Singleton):  # pragma: no cover
     """
     used to generate the files path's in all tests
     in particular this file is helping with the
@@ -14,23 +15,8 @@ class TestRunnerPathProvider():  # pragma: no cover
     the constants module to be more stable. we use abstract
     class so that every enviornment could easily setup it's own files structure.
     """
-    __instance = None
-
-    @staticmethod
-    def getInstance():
-        """
-        Implement the singelton design pattern. so we will be sure all path's are stable
-        @return:  TestPathProvider
-        """
-        if TestRunnerPathProvider.__instance is None:
-            TestRunnerPathProvider()
-        return TestRunnerPathProvider.__instance
 
     def __init__(self, root_dir=None, file_helper_dir=None):
-        if TestRunnerPathProvider.__instance is not None:
-            raise Exception("This class is a singleton!")
-        else:
-            TestRunnerPathProvider.__instance = self
 
         if root_dir:
             self.ROOT_DIR = root_dir
