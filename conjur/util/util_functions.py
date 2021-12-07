@@ -7,13 +7,13 @@ This module holds the common logic across the codebase
 """
 
 # Builtins
+import http
 import logging
 import platform
 import os
-from requests.exceptions import HTTPError
 
 # Internals
-from conjur.errors import MissingRequiredParameterException
+from conjur.errors import MissingRequiredParameterException, HttpError
 from conjur.util.os_types import OSTypes
 from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME, \
     MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, WINDOWS_KEYRING_NAME
@@ -55,9 +55,9 @@ def get_insecure_warning_in_debug():
                   "makes your system vulnerable to security attacks")
 
 
-def determine_status_code_specific_error_messages(server_error: HTTPError) -> str:
+def determine_status_code_specific_error_messages(server_error: HttpError) -> str:
     """ Method for returning status code-specific error messages """
-    if str(server_error.response.status_code) == '401':
+    if server_error.status == http.HTTPStatus.UNAUTHORIZED:
         return "Failed to log in to Conjur. Unable to authenticate with Conjur. " \
                f"Reason: {server_error}. Check your credentials and try again.\n"
     return f"Failed to execute command. Reason: {server_error}\n"

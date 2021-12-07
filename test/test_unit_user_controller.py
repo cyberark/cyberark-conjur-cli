@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import MagicMock, patch
 import requests
 
-from conjur.errors import OperationNotCompletedException, InvalidPasswordComplexityException
+from conjur.errors import OperationNotCompletedException, InvalidPasswordComplexityException, \
+    HttpError, HttpStatusError
 from conjur.controller.user_controller import UserController
 from conjur.logic.user_logic import UserLogic
 from conjur.data_object.user_input_data import UserInputData
@@ -36,14 +37,11 @@ class UserControllerTest(unittest.TestCase):
 
     @patch('conjur.logic.user_logic')
     def test_change_password_can_raise_authn_error(self, mock_user_logic):
-        # mock the status code of the error received
-        mock_response = MagicMock()
-        mock_response.status_code = 401
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
         mock_user_logic.change_personal_password = MagicMock(
-            side_effect=requests.exceptions.HTTPError(response=mock_response))
-        with self.assertRaises(requests.exceptions.HTTPError):
+            side_effect=HttpStatusError(status=401))
+        with self.assertRaises(HttpError):
             user_controller.change_personal_password()
 
     @patch('conjur.logic.user_logic')
@@ -54,7 +52,7 @@ class UserControllerTest(unittest.TestCase):
         user_controller = UserController(mock_user_logic, self.user_input_data)
         user_controller.prompt_for_password = MagicMock()
         mock_user_logic.change_personal_password = MagicMock(
-            side_effect=requests.exceptions.HTTPError(response=mock_response))
+            side_effect=HttpError(response=mock_response))
         with self.assertRaises(InvalidPasswordComplexityException):
             user_controller.change_personal_password()
 

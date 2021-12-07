@@ -8,17 +8,19 @@ This module is the controller that facilitates all user actions
 
 # Builtins
 import getpass
+import http
 import logging
 import sys
-import requests
 
 # Internals
 from conjur.errors import InvalidPasswordComplexityException, \
-    OperationNotCompletedException
+    OperationNotCompletedException, HttpError, HttpStatusError
 from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 from conjur.logic.user_logic import UserLogic
 from conjur.data_object.user_input_data import UserInputData
-class UserController():
+
+
+class UserController:
     """
     UserController
 
@@ -49,8 +51,9 @@ class UserController():
         self.prompt_for_password()
         try:
             self.user_input_data.user_id, _ = self.user_logic.change_personal_password(self.user_input_data.new_password)
-        except requests.exceptions.HTTPError as http_error:
-            if http_error.response.status_code == 401:
+        except HttpError as http_error:
+            # pylint: disable=no-member
+            if isinstance(http_error, HttpStatusError) and http_error.status == http.HTTPStatus.UNAUTHORIZED:
                 raise
 
             logging.debug(f"Invalid password {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}")

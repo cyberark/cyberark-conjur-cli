@@ -14,7 +14,8 @@ from urllib.parse import quote
 import requests
 import urllib3
 
-from conjur.errors import CertificateHostnameMismatchException
+from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, \
+    HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 
 
@@ -73,7 +74,7 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
                                   ssl_verify=True,
                                   auth=auth,
                                   headers=headers)
-    except requests.exceptions.SSLError:
+    except HttpSslError:
         response = invoke_request(http_verb,
                                   url, *args,
                                   query=query,
@@ -88,12 +89,18 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
             response.raise_for_status()
         except requests.exceptions.HTTPError as http_error:
             if response.text:
-                logging.debug(requests.exceptions.HTTPError(f"{http_error.response.status_code}"
-                                                            f" {http_error.response.reason}"
-                                                            f" {response.text}"))
-            raise http_error
+                logging.debug(HttpError(f"{http_error.response.status_code} "
+                                        f"{http_error.response.reason} "
+                                        f"{response.text}"))
+
+            if hasattr(http_error.response, 'status_code'):
+                raise HttpStatusError(status=http_error.response.status_code,
+                                      message=str(http_error),
+                                      response=http_error.response.text) from http_error
+
+            raise HttpError from http_error
         except Exception as general_error:
-            raise general_error
+            raise HttpError from general_error
 
     return response
 
@@ -117,7 +124,9 @@ def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify
         host_mismatch_message = re.search("hostname '.+' doesn't match", str(ssl_error))
         if host_mismatch_message:
             raise CertificateHostnameMismatchException from ssl_error
-        raise ssl_error
+        raise HttpSslError(message=str(ssl_error)) from ssl_error
+    except requests.exceptions.RequestException as request_error:
+        raise HttpError() from request_error
 
 
 # Not coverage tested since this code should never be hit

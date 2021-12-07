@@ -8,6 +8,7 @@ required to successfully configure the conjurrc
 """
 
 # Builtins
+import http
 import logging
 import sys
 
@@ -18,8 +19,8 @@ from urllib.parse import ParseResult
 # Internals
 from typing import Optional, Tuple
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
-    CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException
+from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, \
+    ConfirmationException, MissingRequiredParameterException, HttpStatusError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -143,16 +144,11 @@ class InitController:
         if conjurrc_data.conjur_account is None:
             try:
                 self.init_logic.fetch_account_from_server(self.conjurrc_data)
-            except CertificateHostnameMismatchException:
-                raise
-            except Exception as error:
+            except HttpStatusError as error:
                 # Check for catching if the endpoint is exists. If the endpoint does not exist,
                 # a 401 status code will be returned.
                 # If the endpoint does not exist, the user will be prompted to enter in their account.
-                # pylint: disable=no-member
-                # TODO: If respone not exist in error then we will have a ecxption here
-                if hasattr(error.response, 'status_code') and str(
-                        error.response.status_code) == '401':
+                if error.status == http.HTTPStatus.UNAUTHORIZED:
                     conjurrc_data.conjur_account = input(
                         "Enter the Conjur account name (required): ").strip()
                     if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':

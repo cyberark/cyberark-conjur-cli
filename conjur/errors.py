@@ -168,3 +168,21 @@ class KeyringWrapperSetError(KeyringWrapperGeneralError):
     def __init__(self, message: str = ""):
         self.message = message
         super().__init__(self.message)
+
+class HttpError(Exception):
+    """ Base exception for general HTTP failures """
+    def __init__(self, message: str = "HTTP request failed", response: str = ""):
+        self.message = message
+        self.response = response
+        super().__init__(self.message)
+
+class HttpStatusError(HttpError):
+    """ Exception for HTTP status failures """
+    def __init__(self, status: str, message: str = "HTTP request failed", response: str = ""):
+        self.status = status
+        super().__init__(message=message, response=response)
+
+class HttpSslError(HttpError):
+    """ Exception for HTTP SSL failures """
+    def __init__(self, message: str = "HTTP request failed with SSL error"):
+        super().__init__(message=message)

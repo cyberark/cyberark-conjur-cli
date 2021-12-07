@@ -14,13 +14,10 @@ import os
 import sys
 import traceback
 
-# Third party
-import requests
-
 # Internals
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
-from conjur.errors import CertificateVerificationException
+from conjur.errors import CertificateVerificationException, HttpError, HttpStatusError
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty
@@ -79,7 +76,7 @@ class Cli:
             self._handle_keyboard_interrupt_exception()
         except FileNotFoundError as file_not_found_error:
             self._handle_file_not_found_exception(file_not_found_error)
-        except requests.exceptions.HTTPError as server_error:
+        except HttpError as server_error:
             self._handle_http_exception(server_error, args)
         except CertificateVerificationException:
             self._handle_certificate_verification_exception(args)
@@ -215,8 +212,7 @@ class Cli:
     @staticmethod
     def _handle_http_exception(server_error, args):
         logging.debug(traceback.format_exc())
-        # pylint: disable=no-member
-        if hasattr(server_error.response, 'status_code'):
+        if isinstance(server_error, HttpStatusError):
             sys.stdout.write(determine_status_code_specific_error_messages(server_error))
         else:
             sys.stdout.write(f"Failed to execute command. Reason: {server_error}\n")

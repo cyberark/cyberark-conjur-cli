@@ -8,8 +8,8 @@ import requests
 from OpenSSL import SSL
 
 from conjur.constants import TEST_HOSTNAME
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException,\
-    CertificateNotTrustedException, MissingRequiredParameterException
+from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
+    CertificateNotTrustedException, MissingRequiredParameterException, HttpSslError, HttpStatusError
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -46,9 +46,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value='')
     @patch('conjur.logic.init_logic')
     def test_init_without_host_raises_error(self, mock_init_logic, mock_input):
-        mock_response = MagicMock()
-        mock_response.status_code = 401
-        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
+        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=HttpStatusError(status=401))
         mock_conjurrc_data = ConjurrcData()
         with self.assertRaises(MissingRequiredParameterException):
             mock_conjurrc_data.conjur_url = 'https://someurl'
@@ -58,9 +56,7 @@ class InitControllerTest(unittest.TestCase):
     @patch('builtins.input', return_value='someaccount')
     @patch('conjur.logic.init_logic')
     def test_init_host_is_added_to_conjurrc_object(self, mock_init_logic, mock_input):
-        mock_response = MagicMock()
-        mock_response.status_code = 401
-        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=requests.exceptions.SSLError(response=mock_response))
+        mock_init_logic.fetch_account_from_server = MagicMock(side_effect=HttpStatusError(status=401))
         mock_conjurrc_data = ConjurrcData()
         mock_conjurrc_data.conjur_url="https://someaccount"
         mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)

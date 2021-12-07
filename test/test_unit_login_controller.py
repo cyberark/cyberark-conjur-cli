@@ -2,7 +2,8 @@ import unittest
 from unittest.mock import MagicMock, patch
 import requests
 
-from conjur.errors import CertificateVerificationException, MissingRequiredParameterException
+from conjur.errors import CertificateVerificationException, MissingRequiredParameterException, \
+    HttpError
 from conjur.util import util_functions
 from conjur.data_object.credentials_data import CredentialsData
 from conjur.controller.login_controller import LoginController
@@ -95,7 +96,7 @@ class LoginControllerTest(unittest.TestCase):
         mock_response = MagicMock()
         mock_response.status_code = 401
         with patch('conjur.logic.login_logic') as mock_logic:
-            mock_logic.get_api_key = MagicMock(side_effect=requests.exceptions.HTTPError(response=mock_response))
+            mock_logic.get_api_key = MagicMock(side_effect=HttpError(response=mock_response))
             mock_login_controller = LoginController(True, None, MockCredentialsData, mock_logic)
-            with self.assertRaises(requests.exceptions.HTTPError):
+            with self.assertRaises(HttpError):
                 mock_login_controller.get_api_key(MockCredentialsData)

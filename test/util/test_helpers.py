@@ -211,9 +211,7 @@ def save_credentials(credentials):
 
 
 def is_netrc_exists():
-    if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
-        return False
-    return True
+    return os.path.exists(DEFAULT_NETRC_FILE) and os.path.getsize(DEFAULT_NETRC_FILE) > 0
 
 
 # *************************************************
