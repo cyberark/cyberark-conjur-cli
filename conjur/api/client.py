@@ -132,7 +132,8 @@ class Client:
                             **loaded_config)
             self._api.login(login_id, password)
         else:
-            credential_provider, credential_location = CredentialStoreFactory.create_credential_store()
+            credential_provider = CredentialStoreFactory.create_credential_store()
+            credential_location = credential_provider.get_store_location()
             logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")
             loaded_credentials = credential_provider.load(loaded_config['url'])
             logging.debug(f"Successfully retrieved credentials from the '{credential_location}'")

@@ -27,6 +27,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
     This class holds logic when credentials are kept in the netrc
     """
+
     FIRST_TIME_LOG_INSECURE_STORE_WARNING = True  # Static
 
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
@@ -180,3 +181,9 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         # This is more relevant for the Keyring scenario than the
         # netrc for now.
         pass
+
+    def get_store_location(self):
+        """
+        Method to return the source of the credentials
+        """
+        return self.netrc_path

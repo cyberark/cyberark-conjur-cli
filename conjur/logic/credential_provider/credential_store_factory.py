@@ -26,7 +26,7 @@ class CredentialStoreFactory:
     """
 
     @classmethod
-    def create_credential_store(cls) -> Tuple[CredentialsStoreInterface, str]:
+    def create_credential_store(cls) -> CredentialsStoreInterface:
         """
         Factory method for determining which store to use
         """
@@ -34,7 +34,6 @@ class CredentialStoreFactory:
         if keyring_name in SUPPORTED_BACKENDS:
             # If the keyring is unlocked then we will use it
             if KeystoreWrapper.is_keyring_accessible():
-                # pylint: disable=line-too-long
-                return KeystoreCredentialsProvider(), f'{keyring_name} credential store'
+                return KeystoreCredentialsProvider()
 
-        return FileCredentialsProvider(), DEFAULT_NETRC_FILE
+        return FileCredentialsProvider()

@@ -61,7 +61,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
 
         for attr in KEYSTORE_ATTRIBUTES:
             loaded_credentials[attr] = KeystoreWrapper.get_password(conjurrc_conjur_url,
-                                                                           attr)
+                                                                    attr)
         return CredentialsData.convert_dict_to_obj(loaded_credentials)
 
     def is_exists(self, conjurrc_conjur_url) -> bool:
@@ -70,14 +70,15 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                 return False
         return True
 
-    def update_api_key_entry(self, user_to_update: str, credential_data: CredentialsData,
-                             new_api_key: str):
+    def update_api_key_entry(
+            self, user_to_update: str, credential_data: CredentialsData,
+            new_api_key: str):
         """
         Method for updating user credentials in the system's keyring
         """
         try:
             KeystoreWrapper.set_password(credential_data.machine, MACHINE,
-                                                credential_data.machine)
+                                         credential_data.machine)
             KeystoreWrapper.set_password(credential_data.machine, LOGIN, user_to_update)
             KeystoreWrapper.set_password(credential_data.machine, PASSWORD, new_api_key)
         except Exception as incomplete_operation:
@@ -97,7 +98,8 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
             # the user has already logged out. we still try to remove other leftovers
             except KeyringWrapperDeletionError:
                 logging.debug(
-                    f"Unable to delete key '{attr}' from the '{KeystoreWrapper.get_keyring_name()}' "
+                    f"Unable to delete key '{attr}' from the '"
+                    f"{KeystoreWrapper.get_keyring_name()}' "
                     f"credential store. Key may not exist.\n{traceback.format_exc()}")
 
         logging.debug("Successfully removed credentials from the "
@@ -119,3 +121,9 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                     f"Cleanup failed for key '{attr}' from the '"
                     f"{KeystoreWrapper.get_keyring_name()}' "
                     f"credential store.\n{traceback.format_exc()}")
+
+    def get_store_location(self):
+        """
+        Method to return the source of the credentials
+        """
+        return f'{KeystoreWrapper.get_keyring_name()} credential store'

@@ -62,3 +62,10 @@ class CredentialsStoreInterface(metaclass=abc.ABCMeta):  # pragma: no cover
         this function will make sure no leftovers left.
         """
         raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_store_location(self):
+        """
+        Method to return the source of the credentials
+        """
+        raise NotImplementedError()

@@ -60,7 +60,7 @@ class LogoutControllerTest(unittest.TestCase):
                                                                      mock_logout_logic, mock_exists,
                                                                      mock_size):
         with self.assertRaises(Exception):
-            mock_credentials_provider, _ = CredentialStoreFactory.create_credential_store()
+            mock_credentials_provider = CredentialStoreFactory.create_credential_store()
             mock_logout_controller = LogoutController(mock_logout_logic,
                                                       mock_credentials_provider)
             mock_logout_controller.remove_credentials()
