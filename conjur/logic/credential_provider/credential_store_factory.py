@@ -5,11 +5,9 @@ CredentialStoreFactory module
 
 This module is a factory for determining which credential store to use
 """
-# Builtin
-from typing import Tuple
 
 # Internals
-from conjur.constants import SUPPORTED_BACKENDS, DEFAULT_NETRC_FILE
+from conjur.constants import SUPPORTED_BACKENDS
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.credential_provider.keystore_credentials_provider \
