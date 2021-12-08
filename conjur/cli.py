@@ -44,7 +44,7 @@ class Cli:
         # TODO stop using testing_env
         self.is_testing_env = str(os.getenv('TEST_ENV')).lower() == 'true'
 
-        self.credential_provider, _ = CredentialStoreFactory.create_credential_store()
+        self.credential_provider = CredentialStoreFactory.create_credential_store()
 
     def run(self):
         """

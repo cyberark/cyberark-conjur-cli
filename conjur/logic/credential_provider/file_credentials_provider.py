@@ -27,6 +27,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
     This class holds logic when credentials are kept in the netrc
     """
+
     FIRST_TIME_LOG_INSECURE_STORE_WARNING = True  # Static
 
     def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
@@ -101,7 +102,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         """
         Method that removes the described login entry from netrc
         """
-        logging.debug(f"Attempting to remove credentials from '{DEFAULT_NETRC_FILE}'...")
+        logging.debug(f"Attempting to remove credentials from '{self.netrc_path}'...")
         # pylint: disable=no-else-return
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
@@ -118,7 +119,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         else:
             raise NotLoggedInException("You are already logged out.")
 
-        logging.debug(f"Successfully removed credentials from '{DEFAULT_NETRC_FILE}'")
+        logging.debug(f"Successfully removed credentials from '{self.netrc_path}'")
 
     # TODO check if we are using outside of this class. if not make private
     @classmethod
@@ -180,3 +181,9 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         # This is more relevant for the Keyring scenario than the
         # netrc for now.
         pass
+
+    def get_store_location(self):
+        """
+        Method to return the source of the credentials
+        """
+        return self.netrc_path

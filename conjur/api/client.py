@@ -52,17 +52,19 @@ class Client:
 
     # The method signature is long but we want to explicitly control
     # what parameters are allowed
-    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,try-except-raise,too-many-statements
-    def __init__(self,
-                 account: str = None,
-                 api_key: str = None,
-                 ca_bundle: str = None,
-                 debug: bool = False,
-                 http_debug=False,
-                 login_id: str = None,
-                 password: str = None,
-                 ssl_verify: bool = True,
-                 url: str = None):
+    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,
+    # try-except-raise,too-many-statements
+    def __init__(
+            self,
+            account: str = None,
+            api_key: str = None,
+            ca_bundle: str = None,
+            debug: bool = False,
+            http_debug=False,
+            login_id: str = None,
+            password: str = None,
+            ssl_verify: bool = True,
+            url: str = None):
 
         if ssl_verify is False:
             util_functions.get_insecure_warning_in_debug()
@@ -104,14 +106,17 @@ class Client:
                 raise CertificateVerificationException(
                     cause="The client was initialized without certificate verification, "
                           "even though the command was ran with certificate verification enabled.",
-                    solution="To continue communicating with the server insecurely, run the command "
-                             "again with ssl_verify = False. Otherwise, reinitialize the client.") from cert_verify
+                    solution="To continue communicating with the server insecurely, "
+                             "run the command "
+                             "again with ssl_verify = False. Otherwise, reinitialize the "
+                             "client.") from cert_verify
             except ConfigurationMissingException as missing_config_exec:
                 raise ConfigurationMissingException from missing_config_exec
             except InvalidConfigurationException as invalid_config_exec:
                 raise InvalidConfigurationException from invalid_config_exec
-            except Exception:
-                raise
+            # pylint: disable =try-except-raise
+            except Exception as error:
+                raise error
 
         # We only want to override missing account info with "default"
         # if we can't find it anywhere else.
@@ -132,7 +137,8 @@ class Client:
                             **loaded_config)
             self._api.login(login_id, password)
         else:
-            credential_provider, credential_location = CredentialStoreFactory.create_credential_store()
+            credential_provider = CredentialStoreFactory.create_credential_store()
+            credential_location = credential_provider.get_store_location()
             logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")
             loaded_credentials = credential_provider.load(loaded_config['url'])
             logging.debug(f"Successfully retrieved credentials from the '{credential_location}'")
@@ -251,8 +257,9 @@ class Client:
         """
         return self._api.rotate_personal_api_key(logged_in_user, current_password)
 
-    def change_personal_password(self, logged_in_user: str, current_password: str,
-                                 new_password: str) -> str:
+    def change_personal_password(
+            self, logged_in_user: str, current_password: str,
+            new_password: str) -> str:
         """
         Change personal password of logged-in user
         """

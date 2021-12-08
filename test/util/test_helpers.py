@@ -171,7 +171,7 @@ def update_policy_from_string(self, policy):
 # *************** CREDENTIALS ***************
 
 def create_cred_store():
-    cred_store, _ = CredentialStoreFactory.create_credential_store()
+    cred_store = CredentialStoreFactory.create_credential_store()
     return cred_store
 
 
