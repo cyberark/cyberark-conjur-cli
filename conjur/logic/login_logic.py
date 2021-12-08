@@ -60,7 +60,7 @@ class LoginLogic:
         logging.debug("API key retrieved from Conjur")
         return api_key
 
-    def save(self, credential_data:CredentialsData):
+    def save(self, credential_data: CredentialsData):
         """
         Method to save credentials during login
         """

@@ -121,7 +121,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         with redirect_stderr(self.capture_stream):
             output = utils.load_policy_from_string(self, policy_with_bad_syntax, exit_code=1)
         self.assertIn("{\"error\":{\"code\":\"validation_failed\",\"message\":", output, 
-                        "Could not find detailed error in the output."
+                        "Could not find detailed error in the output. "
                         "Expected to find:"
                         "{\"error\":{\"code\":\"validation_failed\",\"message\":"
                         "Result:"
@@ -134,7 +134,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
                            ['policy', 'load', '-b', 'wrong-branch', '-f', 
                            self.environment.path_provider.get_policy_path("resource")], exit_code=1)
         self.assertIn("{\"error\":{\"code\":\"not_found\",\"message\":", output, 
-                        "Could not find detailed error in the output."
+                        "Could not find detailed error in the output. "
                         "Expected to find:"
                         "{\"error\":{\"code\":\"not_found\",\"message\":"
                         "Result:"

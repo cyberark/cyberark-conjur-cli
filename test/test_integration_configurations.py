@@ -13,6 +13,7 @@ from unittest.mock import patch
 import requests
 
 from conjur.data_object import CredentialsData
+from conjur.errors import HttpSslError
 from conjur.errors_messages import FETCH_CONFIGURATION_FAILURE_MESSAGE
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -242,7 +243,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         cred_store.save(credential_data)
         self.setup_cli_params({})
 
-        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+        self.print_instead_of_raise_error(HttpSslError, "SSLError", exit_code=1)
 
     """
     DEVELOPER NOTE:
@@ -266,7 +267,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         cred_store.save(credential_data)
         self.setup_cli_params({})
 
-        self.print_instead_of_raise_error(requests.exceptions.SSLError, "SSLError", exit_code=1)
+        self.print_instead_of_raise_error(HttpSslError, "SSLError", exit_code=1)
 
     """
     This test checks that a conjurrc in an improper format (v4 format) fails on the proper, 

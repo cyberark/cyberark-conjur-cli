@@ -12,7 +12,7 @@ from typing import Tuple
 import requests
 
 # Internals
-from conjur.errors import OperationNotCompletedException
+from conjur.errors import OperationNotCompletedException, HttpError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.resource import Resource
 from conjur.data_object import ConjurrcData, CredentialsData
@@ -101,10 +101,10 @@ class UserLogic:
             self.update_api_key_in_credential_store(logged_in_username,
                                                     logged_in_credentials,
                                                     new_api_key)
-        except requests.exceptions.HTTPError:
+        except HttpError:
             raise
         except Exception as incomplete_operation:
-            raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
+            raise OperationNotCompletedException(str(incomplete_operation)) from incomplete_operation
         return new_api_key
 
     # pylint: disable=line-too-long

@@ -10,11 +10,9 @@ import logging
 import sys
 import traceback
 
-# Third party
-import requests
-
 # Internals
-from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException
+from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException, \
+    HttpError, HttpStatusError
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
@@ -65,13 +63,13 @@ class HostFactoryController:
             sys.stdout.write(result + '\n')
             logging.debug("Successfully created host using Host Factory: host_id:"
                           f"'{create_host_data.host_id}'")
-        except requests.exceptions.HTTPError as server_error:
+        except HttpStatusError as server_error:
             logging.debug(traceback.format_exc())
-            # pylint: disable=no-member
-            if hasattr(server_error.response, 'status_code') \
-                    and server_error.response.status_code == http.HTTPStatus.UNAUTHORIZED:
+            if server_error.status == http.HTTPStatus.UNAUTHORIZED:
                 raise InvalidHostFactoryTokenException(
                     INVALID_TOKEN_ERROR.format(server_error)) from server_error
+        except HttpError:
+            logging.debug(traceback.format_exc())
 
     def revoke_token(self, token: str):
         """

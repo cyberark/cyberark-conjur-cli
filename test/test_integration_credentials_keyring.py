@@ -70,7 +70,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
         self.assertIn("The client was initialized without", output)
-        self.assertEquals(utils.is_netrc_exists(), False)
+        self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validates that if a user configures the CLI in insecure mode and runs a command in 
@@ -79,6 +79,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
     def test_cli_configured_in_insecure_mode_and_run_in_insecure_mode_passes_keyring(self, mock_input):
+        utils.remove_file(DEFAULT_NETRC_FILE)
         self.invoke_cli(self.cli_auth_params,
                         ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
                          self.client_params.account])
@@ -86,7 +87,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
         self.assertIn('Successfully logged in to Conjur', output)
-        self.assertEquals(utils.is_netrc_exists(), False)
+        self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validates that if a user runs in insecure mode without supplying inputs, 
@@ -141,7 +142,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertIn("Successfully logged in to Conjur", output.strip())
         utils.get_credentials()
         self.validate_credentials(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
-        self.assertEquals(utils.is_netrc_exists(), False)
+        self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validate that login create valid credentials
@@ -153,7 +154,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
                         ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
         utils.get_credentials()
         self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
-        self.assertEquals(utils.is_netrc_exists(), False)
+        self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validate correct message when try to logout already logout user
@@ -219,7 +220,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             self.assertIn("Successfully logged in to Conjur", output.strip())
 
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
-            self.assertEquals(utils.is_netrc_exists(), False)
+            self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validates interactively provided params create credentials
@@ -233,7 +234,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             assert utils.get_credentials() is not None
             self.assertIn("Successfully logged in to Conjur", output.strip())
             self.validate_credentials(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
-            self.assertEquals(utils.is_netrc_exists(), False)
+            self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validates login is successful for hosts
@@ -264,7 +265,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
 
         self.validate_credentials(f"{self.client_params.hostname}", "host/somehost", extract_api_key_from_message)
         self.assertIn("Successfully logged in to Conjur", output.strip())
-        self.assertEquals(utils.is_netrc_exists(), False)
+        self.assertFalse(utils.is_netrc_exists())
 
     '''
     Validates logout doesn't remove an irrelevant entry
