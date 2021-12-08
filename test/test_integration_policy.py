@@ -111,7 +111,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         with self.assertLogs('', level='DEBUG') as mock_log:
             with redirect_stderr(self.capture_stream):
                 output = utils.load_policy_from_string(self, policy, exit_code=1)
-            self.assertIn("422 Client Error", output)
+            self.assertIn("422 (Unprocessable Entity) for url:", output)
         self.assertIn("422 Unprocessable Entity {\"error\":{\"code\":\"validation_failed\",\"message\":",
                   str(mock_log.output))
 
@@ -161,7 +161,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- ! user bad syntax"
         output = utils.replace_policy_from_string(self, policy, exit_code=1)
 
-        self.assertIn("422 Client Error", output)
+        self.assertIn("422 (Unprocessable Entity) for url:", output)
 
     @integration_test()
     def test_https_load_policy_doesnt_break_if_no_created_roles(self):
@@ -204,7 +204,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
             utils.assert_set_and_get(self, new_variable)
 
         for old_variable in old_variables:
-            utils.print_instead_of_raise_error(self, old_variable, "404 Client Error: Not Found for url")
+            utils.print_instead_of_raise_error(self, old_variable, "404 (Not Found) for url:")
         os.remove(file_name)
 
     @integration_test()

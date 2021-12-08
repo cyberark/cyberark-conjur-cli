@@ -80,7 +80,7 @@ class InitLogic:
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,
                                    params,
-                                   ssl_verify=certificate_path).json()
+                                   ssl_verify=certificate_path).json
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation

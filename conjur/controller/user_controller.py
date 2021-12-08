@@ -50,7 +50,7 @@ class UserController:
         """
         self.prompt_for_password()
         try:
-            self.user_input_data.user_id, _ = self.user_logic.change_personal_password(self.user_input_data.new_password)
+            self.user_input_data.user_id = self.user_logic.change_personal_password(self.user_input_data.new_password)
         except HttpError as http_error:
             # pylint: disable=no-member
             if isinstance(http_error, HttpStatusError) and http_error.status == http.HTTPStatus.UNAUTHORIZED:

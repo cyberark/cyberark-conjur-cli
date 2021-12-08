@@ -207,19 +207,19 @@ class Client:
         """
         Create token/s for hosts with restrictions
         """
-        return self._api.create_token(create_token_data).json()
+        return self._api.create_token(create_token_data).json
 
     def create_host(self, create_host_data: CreateHostData) -> json:
         """
         Create host using the hostfactory
         """
-        return self._api.create_host(create_host_data).json()
+        return self._api.create_host(create_host_data).json
 
     def revoke_token(self, token: str) -> int:
         """
         Revokes the given token
         """
-        return self._api.revoke_token(token).status_code
+        return self._api.revoke_token(token).status
 
     def set(self, variable_id: str, value: str) -> str:
         """

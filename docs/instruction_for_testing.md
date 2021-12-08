@@ -98,7 +98,7 @@ The following is an example of how you would run the `integrations_tests_runner`
 
 Where `url`, `account`, `login`, `password` detail the Conjur server-specific information you previously deployed. The 
 type Conjur server deployed impacts where certain tests will pass or fail. For example, if you have configured a Conjur 
-server with a verifiable CA-signed certificate, then `test_https_cli_fails_if_cert_is_bad` and 
+server with a verifiable CA-signed certificate, then `test_https_cli_fails_if_cert_is_badtest_https_cli_fails_if_cert_is_bad` and 
 `test_https_cli_fails_if_cert_is_not_provided` should fail. "Why"? See the developer note above each test 
 or see the issue created [here](https://github.com/cyberark/conjur-api-python3/issues/209). For all other flows, these 
 tests should pass.

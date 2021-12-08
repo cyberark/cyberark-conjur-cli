@@ -16,10 +16,9 @@ from test.host_factory.test_integration_hostfactory import CliIntegrationTestHos
     HOST_FACTORY_ID, FULLY_QUALIFIED_HOST_FACTORY_ID, ERROR_PATTERN_401, ERROR_PATTERN_422
 from test.util.test_infrastructure import integration_test
 
-INVALID_TOKEN_ERROR = 'Failed to execute command. Reason: Cannot create host ' \
-    'using Host Factory token provided. Reason: 401 Client ' \
-    'Error: Unauthorized for url: .*\/host_factories\/hosts. ' \
-    'Check that the token is valid\/has not been revoked and try again.\\n'
+INVALID_TOKEN_ERROR = 'Failed to execute command. Reason: Cannot create host using Host Factory ' \
+    r'token provided. Reason: 401 \(Unauthorized\) for url: .*\/host_factories\/hosts. ' \
+    r'Check that the token is valid\/has not been revoked and try again.\n'
 
 
 class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragma: no cover

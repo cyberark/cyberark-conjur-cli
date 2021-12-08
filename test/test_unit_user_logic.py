@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import MagicMock, patch
-import requests
 
 from conjur import Client
 from conjur.data_object import CredentialsData
@@ -62,7 +61,7 @@ class UserLogicTest(unittest.TestCase):
             client = MagicMock(return_value=None)
             mock_user_logic = UserLogic(ConjurrcData, FileCredentialsProvider, client)
             mock_user_logic.client.change_personal_password = MagicMock(return_value='success!')
-            resource_to_update, _ = mock_user_logic.change_personal_password('someNewPassword')
+            resource_to_update = mock_user_logic.change_personal_password('someNewPassword')
             self.assertEquals(resource_to_update, 'someuser')
 
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file', return_value=MockConjurrc)

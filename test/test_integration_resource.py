@@ -7,6 +7,7 @@ This test file handles the main test flows for the user/host command
 """
 # Builtins
 import io
+import json
 from contextlib import redirect_stderr
 from unittest.mock import patch
 
@@ -108,12 +109,12 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         # Verify that an unprivileged user cannot rotate an another's API key
         attempt_to_rotate_user_key = self.invoke_cli(self.cli_auth_params,
                                                      ['user', 'rotate-api-key', '-i', 'someuser'], exit_code=1)
-        self.assertIn("401 Client Error", attempt_to_rotate_user_key)
+        self.assertIn("401 (Unauthorized) for url:", attempt_to_rotate_user_key)
 
         # Verify that a user cannot rotate an admin's API key
         attempt_to_rotate_admin_key = self.invoke_cli(self.cli_auth_params,
                                                       ['user', 'rotate-api-key', '-i', 'admin'], exit_code=1)
-        self.assertIn("500 Server Error", attempt_to_rotate_admin_key)
+        self.assertIn("500 (Internal Server Error) for url:", attempt_to_rotate_admin_key)
 
     @integration_test()
     def test_user_rotate_api_key_without_flag_returns_error(self):
@@ -128,11 +129,6 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
             self.invoke_cli(self.cli_auth_params,
                             ['user', 'rotate-api-key', '-i'], exit_code=1)
         self.assertIn('Error argument -i/--id', self.capture_stream.getvalue())
-
-    def test_logged_in_user_rotate_api_key_with_their_user_as_flag_returns_error(self):
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['user', 'rotate-api-key', '-i', 'admin'])
-        self.assertIn("Error: To rotate the API key of the currently logged-in user use this command without any flags or options", output)
 
     @integration_test()
     def test_user_change_password_does_not_provide_password_prompts_input(self):

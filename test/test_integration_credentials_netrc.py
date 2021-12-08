@@ -76,7 +76,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
 
         unsuccessful_run = self.invoke_cli(self.cli_auth_params,
                                            ['login', '-i', 'someinvaliduser', '-p', 'somewrongpassword'], exit_code=1)
-        self.assertRegex(unsuccessful_run, "Reason: 401 Client Error: Unauthorized for")
+        self.assertIn("Reason: 401 (Unauthorized) for url:", unsuccessful_run)
         self.validate_netrc(f"{self.client_params.hostname}", "admin", self.client_params.env_api_key)
 
     '''

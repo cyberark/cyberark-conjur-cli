@@ -65,7 +65,7 @@ class InitController:
         else:
             self.conjurrc_data.cert_file = ""
 
-        self._get_account_info(self.conjurrc_data)
+        self._get_account_info()
         self.write_conjurrc()
 
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
@@ -137,11 +137,11 @@ class InitController:
         return fetched_certificate
 
     # pylint: disable=line-too-long,logging-fstring-interpolation,broad-except,raise-missing-from
-    def _get_account_info(self, conjurrc_data: ParseResult):
+    def _get_account_info(self):
         """
         Method to fetch the account from the user
         """
-        if conjurrc_data.conjur_account is None:
+        if self.conjurrc_data.conjur_account is None:
             try:
                 self.init_logic.fetch_account_from_server(self.conjurrc_data)
             except HttpStatusError as error:
@@ -149,9 +149,9 @@ class InitController:
                 # a 401 status code will be returned.
                 # If the endpoint does not exist, the user will be prompted to enter in their account.
                 if error.status == http.HTTPStatus.UNAUTHORIZED:
-                    conjurrc_data.conjur_account = input(
+                    self.conjurrc_data.conjur_account = input(
                         "Enter the Conjur account name (required): ").strip()
-                    if conjurrc_data.conjur_account is None or conjurrc_data.conjur_account == '':
+                    if self.conjurrc_data.conjur_account is None or self.conjurrc_data.conjur_account == '':
                         raise MissingRequiredParameterException("Error: account is required")
                 else:
                     raise

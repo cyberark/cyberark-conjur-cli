@@ -178,9 +178,9 @@ class HttpError(Exception):
 
 class HttpStatusError(HttpError):
     """ Exception for HTTP status failures """
-    def __init__(self, status: str, message: str = "HTTP request failed", response: str = ""):
+    def __init__(self, status: str, message: str = "HTTP request failed", url: str = "", response: str = ""):
         self.status = status
-        super().__init__(message=message, response=response)
+        super().__init__(message=f"{status} ({message}) for url: {url}", response=response)
 
 class HttpSslError(HttpError):
     """ Exception for HTTP SSL failures """

@@ -1,8 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
 
-import requests
-
 import conjur
 from conjur import Client
 from conjur.errors import HttpStatusError
