@@ -102,7 +102,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         """
         Method that removes the described login entry from netrc
         """
-        logging.debug(f"Attempting to remove credentials from '{DEFAULT_NETRC_FILE}'...")
+        logging.debug(f"Attempting to remove credentials from '{self.netrc_path}'...")
         # pylint: disable=no-else-return
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
@@ -119,7 +119,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         else:
             raise NotLoggedInException("You are already logged out.")
 
-        logging.debug(f"Successfully removed credentials from '{DEFAULT_NETRC_FILE}'")
+        logging.debug(f"Successfully removed credentials from '{self.netrc_path}'")
 
     # TODO check if we are using outside of this class. if not make private
     @classmethod
