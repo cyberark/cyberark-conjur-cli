@@ -3,10 +3,19 @@
 # RHEL8 test container since RHEL base image does not contain the repos of these RPMs
 #
 
-[appstream]
+[centos-appstream]
 name=CentOS Linux $releasever - AppStream
 mirrorlist=http://mirrorlist.centos.org/?release=8-stream&arch=$basearch&repo=AppStream&infra=$infra
 #baseurl=http://mirror.centos.org/centos/8-stream/AppStream/$basearch/kickstart/
 gpgcheck=1
 enabled=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
+[centos-baseos]
+name=CentOS Linux $releasever - BaseOS
+mirrorlist=http://mirrorlist.centos.org/?release=8-stream&arch=$basearch&repo=BaseOS&infra=$infra
+#baseurl=http://mirror.centos.org/centos/8-stream/BaseOS/$basearch/
+gpgcheck=1
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
+
