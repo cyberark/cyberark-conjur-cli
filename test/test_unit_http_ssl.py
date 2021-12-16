@@ -30,12 +30,10 @@ invalid_badssl_endpoints = [
     "https://self-signed.badssl.com",
     "https://untrusted-root.badssl.com",
     "https://wrong.host.badssl.com",
-    # "https://dh-composite.badssl.com",  # TODO Uncomment once python upgraded to 3.10
-    # "https://dh-small-subgroup.badssl.com",  # TODO Uncomment once python upgraded to 3.10
-    # "https://dh1024.badssl.com",  # TODO Uncomment once python upgraded to 3.10
-    # "https://dh2048.badssl.com",  # TODO Uncomment once python upgraded to 3.10
-    # "https://dh480.badssl.com",  # TODO Uncomment once python upgraded to 3.10
-    # "https://dh512.badssl.com",  # TODO Uncomment once python upgraded to 3.10
+    "https://dh-composite.badssl.com",
+    "https://dh1024.badssl.com",
+    "https://dh480.badssl.com",
+    "https://dh512.badssl.com",
     # "https://static-rsa.badssl.com",  # Currently supported but shouldn't.
     # "https://ssl-v2.badssl.com",
     # "https://ssl-v3.badssl.com",

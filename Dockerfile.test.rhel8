@@ -10,9 +10,8 @@ RUN yum --disableplugin=subscription-manager -y \
                                             git \
                                             jq \
                                             libffi-devel \
-                                            python3 \
+                                            openssl-devel \
                                             python3-devel \
-                                            python3-pip \
                                             procps \
                                             zlib-devel \
          && yum --disableplugin=subscription-manager clean all
@@ -38,9 +37,17 @@ WORKDIR $INSTALL_DIR
 # Generate unique machne-id file required by dbus-11
 RUN dbus-uuidgen > /var/lib/dbus/machine-id
 
+# Install Python 3.10.1 using pyenv, wheel and required libs
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+
 COPY ./requirements.txt $INSTALL_DIR/
-RUN pip3 install wheel && \
-    pip3 install -r requirements.txt
+RUN curl -L -s https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
+    && eval "$(pyenv init --path)" \
+    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10.1 \
+    && pyenv global 3.10.1 \
+    && pip install wheel \
+    && pip install -r requirements.txt
 
 COPY ./bin/build_integrations_tests_runner ./test/configure_test_executor.sh /
 COPY . $INSTALL_DIR

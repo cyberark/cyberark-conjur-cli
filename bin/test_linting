@@ -6,7 +6,7 @@ SRC_DIRS=( "./conjur"
 DISABLED_ERRORS="fixme"
 
 echo "Building API container..."
-docker-compose build
+docker-compose build test
 
 for src_dir in "${SRC_DIRS[@]}"; do
   echo "Checking linting in $src_dir..."

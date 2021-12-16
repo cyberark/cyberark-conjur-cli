@@ -37,7 +37,7 @@ class ArgparserWrapperTest(unittest.TestCase):
         with redirect_stderr(self.capture_stream):
             output = self.arg_parse.parse_args(['testCommand'])
 
-        self.assertIn("Namespace(action=None, resource='testCommand')", str(output))
+        self.assertEquals("Namespace(resource='testCommand', action=None)", str(output))
 
     '''
     Returns namespace when not given any flags and does not error
@@ -90,7 +90,7 @@ class ArgparserWrapperTest(unittest.TestCase):
     def test_correct_arg_should_pass(self):
         output = self.arg_parse.parse_args(["testCommand", "subCommand"])
 
-        self.assertEquals(str(output), "Namespace(action='subCommand', resource='testCommand')")
+        self.assertEquals(str(output), "Namespace(resource='testCommand', action='subCommand')")
 
     def test_no_resource_namespace(self):
         with patch.object(self.arg_parse, '_get_resource_namespace', return_value=None):
