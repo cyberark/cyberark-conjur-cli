@@ -9,7 +9,6 @@ This module is the business logic for handling all user-related activity
 # Builtins
 import logging
 from typing import Tuple
-import requests
 
 # Internals
 from conjur.errors import OperationNotCompletedException, HttpError
@@ -55,7 +54,7 @@ class UserLogic:
         return resource_to_update, new_api_key
 
     # pylint: disable=logging-fstring-interpolation
-    def change_personal_password(self, new_password: str) -> Tuple[str, requests.Response]:
+    def change_personal_password(self, new_password: str) -> str:
         """
         Method to call the client to change the logged in user's password
         """
@@ -63,8 +62,8 @@ class UserLogic:
         resource_to_update = logged_in_credentials.login
         logging.debug(f"Changing password for '{resource_to_update}'")
         # pylint: disable=line-too-long
-        return resource_to_update, self.client.change_personal_password(resource_to_update,
-                                                                        logged_in_credentials.password, new_password)
+        self.client.change_personal_password(resource_to_update, logged_in_credentials.password, new_password)
+        return resource_to_update
 
     def extract_credentials_from_credential_store(self) -> CredentialsData:
         """

@@ -88,11 +88,11 @@ def assert_variable_set_fails(self, variable_id, error_class, exit_code=0):
         self.set_variable(variable_id, uuid.uuid4().hex, exit_code)
 
 
-def print_instead_of_raise_error(self, variable_id, error_message_regex):
+def print_instead_of_raise_error(self, variable_id, error_message):
     output = self.invoke_cli(self.cli_auth_params,
                              ['variable', 'set', '-i', variable_id, '-v', uuid.uuid4().hex], exit_code=1)
 
-    self.assertRegex(output, error_message_regex)
+    self.assertIn(error_message, output)
 
 
 # *************** POLICY ***************

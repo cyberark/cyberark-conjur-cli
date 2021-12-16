@@ -554,7 +554,7 @@ class ApiTest(unittest.TestCase):
     # List resources
 
     @patch('conjur.api.api.invoke_endpoint', \
-           return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
+           return_value=MockClientResponse(text=json.dumps(MOCK_RESOURCE_LIST)))
     def test_get_resources_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
 
@@ -570,7 +570,7 @@ class ApiTest(unittest.TestCase):
                               ssl_verify=True)
 
     @patch('conjur.api.api.invoke_endpoint', \
-           return_value=MockClientResponse(content=json.dumps(MOCK_RESOURCE_LIST)))
+           return_value=MockClientResponse(text=json.dumps(MOCK_RESOURCE_LIST)))
     def test_get_resources_with_constraints_invokes_http_client_correctly(self, mock_http_client):
         api = Api(url='http://localhost', login_id='mylogin', api_key='apikey')
 
@@ -613,6 +613,7 @@ class ApiTest(unittest.TestCase):
         api.rotate_personal_api_key("mylogin", "somepass")
 
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
+                              api_token='',
                               auth=('mylogin', 'somepass'),
                               ssl_verify=True)
 
@@ -658,5 +659,6 @@ class ApiTest(unittest.TestCase):
 
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
                               "somenewpass",
+                              api_token='',
                               auth=('someloggedinuser', 'somecurrentpass'),
                               ssl_verify=True)

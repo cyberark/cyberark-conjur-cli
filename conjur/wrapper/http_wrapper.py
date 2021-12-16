@@ -9,14 +9,21 @@ HTTP-based endpoints in a generic way
 import base64
 import logging
 import re
+import ssl
 from enum import Enum
+from typing import Union
 from urllib.parse import quote
-import requests
+import asyncio
+from aiohttp import BasicAuth, ClientError, ClientResponseError, ClientSSLError, ClientSession
+import async_timeout
 import urllib3
 
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, \
     HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
+from conjur.wrapper.http_response import HttpResponse
+
+REQUEST_TIMEOUT_SECONDS = 10
 
 
 class HttpVerb(Enum):
@@ -31,15 +38,21 @@ class HttpVerb(Enum):
     PATCH = 5
 
 
-# pylint: disable=too-many-locals,consider-using-f-string
-# ssl_verify can accept Boolean or String as per requests docs
-# https://requests.readthedocs.io/en/master/api/#main-interface
-def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict, *args,
-                    check_errors: bool = True, ssl_verify: bool = True,
-                    auth: tuple = None, api_token: str = None,
-                    query: dict = None, headers=None, decode_token=True) -> requests.Response:
+# pylint: disable=too-many-locals,consider-using-f-string,too-many-arguments
+# ssl_verify can accept Boolean or String of the path to certificate file
+def invoke_endpoint(http_verb: HttpVerb,
+                    endpoint: ConjurEndpoint,
+                    params: dict,
+                    data: str = "",
+                    check_errors: bool = True,
+                    ssl_verify: Union[bool, str] = True,
+                    auth: tuple = None,
+                    api_token: str = None,
+                    query: dict = None,
+                    headers=None,
+                    decode_token=True) -> HttpResponse:
     """
-    This method flexibly invokes HTTP calls from 'requests' module
+    This method flexibly invokes HTTP calls from 'aiohttp' module
     """
     if headers is None:
         headers = {}
@@ -67,36 +80,40 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     # server pem received during initialization of the client
     # pylint: disable=not-callable
 
+    loop = asyncio.get_event_loop()
     try:
-        response = invoke_request(http_verb,
-                                  url, *args,
-                                  query=query,
-                                  ssl_verify=True,
-                                  auth=auth,
-                                  headers=headers)
+        response = loop.run_until_complete(invoke_request(http_verb,
+                                                          url,
+                                                          data,
+                                                          query=query,
+                                                          ssl_verify=True,
+                                                          auth=auth,
+                                                          headers=headers))
     except HttpSslError:
-        response = invoke_request(http_verb,
-                                  url, *args,
-                                  query=query,
-                                  ssl_verify=ssl_verify,
-                                  auth=auth,
-                                  headers=headers)
+        response = loop.run_until_complete(invoke_request(http_verb,
+                                                          url,
+                                                          data,
+                                                          query=query,
+                                                          ssl_verify=ssl_verify,
+                                                          auth=auth,
+                                                          headers=headers))
 
     if check_errors:
-        # takes the "requests" response object and expands the
-        # raise_for_status method to return more helpful errors for debug logs
+        # takes the response object and expands the raise_for_status method
+        # to return more helpful errors for debug logs
         try:
             response.raise_for_status()
-        except requests.exceptions.HTTPError as http_error:
+        except ClientResponseError as http_error:
             if response.text:
-                logging.debug(HttpError(f"{http_error.response.status_code} "
-                                        f"{http_error.response.reason} "
+                logging.debug(HttpError(f"{http_error.status} "
+                                        f"{http_error.message} "
                                         f"{response.text}"))
 
-            if hasattr(http_error.response, 'status_code'):
-                raise HttpStatusError(status=http_error.response.status_code,
-                                      message=str(http_error),
-                                      response=http_error.response.text) from http_error
+            if http_error.status != 0:
+                raise HttpStatusError(status=http_error.status,
+                                      message=http_error.message,
+                                      url=str(http_error.request_info.real_url),
+                                      response=response.text) from http_error
 
             raise HttpError from http_error
         except Exception as general_error:
@@ -105,28 +122,56 @@ def invoke_endpoint(http_verb: HttpVerb, endpoint: ConjurEndpoint, params: dict,
     return response
 
 
-def invoke_request(http_verb: HttpVerb, url: str, *args, query: dict, ssl_verify: bool, auth: tuple,
-                   headers: dict) -> requests.Response:
+# pylint: disable=too-many-arguments
+async def invoke_request(http_verb: HttpVerb,
+                         url: str,
+                         data: str,
+                         query: dict,
+                         ssl_verify: Union[bool, str],
+                         auth: tuple,
+                         headers: dict) -> HttpResponse:
     """
     This method preforms the actual request and catches possible SSLErrors to
     perform more user-friendly messages
     """
-    request_method = getattr(requests, http_verb.name.lower())
+    async with ClientSession() as session:
+        async with async_timeout.timeout(REQUEST_TIMEOUT_SECONDS):
+            ssl_context = __create_ssl_context(ssl_verify)
 
-    try:
-        return request_method(url, *args,
-                              params=query,
-                              verify=ssl_verify,
-                              auth=auth,
-                              headers=headers)
+            try:
+                async with session.request(http_verb.name,
+                                           url,
+                                           data=data,
+                                           params=query,
+                                           ssl=ssl_context,
+                                           auth=BasicAuth(*auth) if auth else None,
+                                           headers=headers) as response:
+                    return await HttpResponse.from_client_response(response)
 
-    except requests.exceptions.SSLError as ssl_error:
-        host_mismatch_message = re.search("hostname '.+' doesn't match", str(ssl_error))
-        if host_mismatch_message:
-            raise CertificateHostnameMismatchException from ssl_error
-        raise HttpSslError(message=str(ssl_error)) from ssl_error
-    except requests.exceptions.RequestException as request_error:
-        raise HttpError() from request_error
+            except ClientSSLError as ssl_error:
+                host_mismatch_message = re.search("hostname '.+' doesn't match", str(ssl_error))
+                if host_mismatch_message:
+                    raise CertificateHostnameMismatchException from ssl_error
+                raise HttpSslError(message=str(ssl_error)) from ssl_error
+            except ClientError as request_error:
+                raise HttpError() from request_error
+
+
+def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
+    if not ssl_verify:
+        return False
+
+    if ssl_verify is True:
+        ssl_context = ssl.create_default_context()
+    else:
+        ssl_context = ssl.create_default_context(cafile=ssl_verify)
+
+    # TODO Replace the ssl options with the commented line once upgraded to python 3.10
+    # ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+    # ssl_context.verify_flags |= ssl.OP_NO_TICKET
+    ssl_context.verify_flags |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+
+    return ssl_context
 
 
 # Not coverage tested since this code should never be hit

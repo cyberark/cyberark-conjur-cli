@@ -4,7 +4,6 @@ from contextlib import redirect_stdout
 from unittest.mock import patch, MagicMock
 
 import OpenSSL
-import requests
 from OpenSSL import SSL
 
 from conjur.constants import TEST_HOSTNAME
@@ -51,7 +50,7 @@ class InitControllerTest(unittest.TestCase):
         with self.assertRaises(MissingRequiredParameterException):
             mock_conjurrc_data.conjur_url = 'https://someurl'
             mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
-            mock_init_controller._get_account_info(mock_conjurrc_data)
+            mock_init_controller._get_account_info()
 
     @patch('builtins.input', return_value='someaccount')
     @patch('conjur.logic.init_logic')
@@ -60,7 +59,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data = ConjurrcData()
         mock_conjurrc_data.conjur_url="https://someaccount"
         mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False, True)
-        mock_init_controller._get_account_info(mock_conjurrc_data)
+        mock_init_controller._get_account_info()
         self.assertEquals(mock_conjurrc_data.conjur_account, 'someaccount')
 
     '''
@@ -169,6 +168,6 @@ class InitControllerTest(unittest.TestCase):
     @patch('conjur.logic.init_logic')
     def test_user_raises_certificate_hostname_mismatch_error(self, mock_init_logic):
         mock_init_logic.fetch_account_from_server = MagicMock(side_effect=CertificateHostnameMismatchException)
-        init_controller = InitController(ConjurrcData, mock_init_logic, False, True)
+        init_controller = InitController(ConjurrcData(account=None), mock_init_logic, False, True)
         with self.assertRaises(CertificateHostnameMismatchException):
-            init_controller._get_account_info(ConjurrcData(account=None))
+            init_controller._get_account_info()

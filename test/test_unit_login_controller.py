@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import MagicMock, patch
-import requests
 
 from conjur.errors import CertificateVerificationException, MissingRequiredParameterException, \
     HttpError

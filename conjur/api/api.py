@@ -12,15 +12,13 @@ from typing import Optional
 from datetime import datetime, timedelta
 from urllib import parse
 
-# Third Parties
-import requests
-
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur.wrapper.http_response import HttpResponse
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 from conjur.errors import InvalidResourceException, MissingRequiredParameterException
 # pylint: disable=too-many-instance-attributes
@@ -145,22 +143,26 @@ class Api:
             'account': self._account
         }
         params.update(self._default_params)
+
+        # Remove 'inspect' from query as it is client-side param that shouldn't get to the server.
+        inspect = list_constraints.pop('inspect', None) if list_constraints else None
+
         if list_constraints is not None:
             json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
                                             params,
                                             query=list_constraints,
                                             api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).content
+                                            ssl_verify=self._ssl_verify).text
         else:
             json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
                                             params,
                                             api_token=self.api_token,
-                                            ssl_verify=self._ssl_verify).content
+                                            ssl_verify=self._ssl_verify).text
 
-        resources = json.loads(json_response.decode('utf-8'))
+        resources = json.loads(json_response)
         # Returns the result as a list of resource ids instead of the raw JSON only
         # when the user does not provide `inspect` as one of their filters
-        if list_constraints is not None and 'inspect' not in list_constraints:
+        if not inspect:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['id'], resources)
             # TODO method signature returns dict, need to check who is expecting list
@@ -232,7 +234,7 @@ class Api:
 
         return remapped_keys_dict
 
-    def create_token(self, create_token_data: CreateTokenData) -> requests.Response:
+    def create_token(self, create_token_data: CreateTokenData) -> HttpResponse:
         """
         This method is used to create token/s for hosts with restrictions.
         """
@@ -259,7 +261,7 @@ class Api:
                                ssl_verify=self._ssl_verify,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
-    def create_host(self, create_host_data: CreateHostData) -> requests.Response:
+    def create_host(self, create_host_data: CreateHostData) -> HttpResponse:
         """
         This method is used to create host using the hostfactory.
         """
@@ -277,7 +279,7 @@ class Api:
                                decode_token=False,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
-    def revoke_token(self, token: str) -> requests.Response:
+    def revoke_token(self, token: str) -> HttpResponse:
         """
         This method is used to revoke a hostfactory token.
         """
@@ -380,7 +382,6 @@ class Api:
         """
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
-                                   api_token=self.api_token,
                                    auth=(logged_in_user, current_password),
                                    ssl_verify=self._ssl_verify).text
         return response
@@ -393,7 +394,6 @@ class Api:
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.CHANGE_PASSWORD,
                                    self._default_params,
                                    new_password,
-                                   api_token=self.api_token,
                                    auth=(logged_in_user, current_password),
                                    ssl_verify=self._ssl_verify
                                    ).text
@@ -430,6 +430,10 @@ class Api:
         request_parameters = parameters.list_dictify()
         del request_parameters['identifier']
         del request_parameters['resource']
+
+        # Remove 'inspect' from query as it is client-side param that shouldn't get to the server.
+        inspect = request_parameters.pop('inspect', None) if request_parameters else None
+
         json_response = invoke_endpoint(HttpVerb.GET,
                                         ConjurEndpoint.ROLES_MEMBERS_OF,
                                         params,
@@ -439,7 +443,7 @@ class Api:
 
         resources = json.loads(json_response.decode('utf-8'))
 
-        if not parameters.inspect:
+        if not inspect:
             # For each element (resource) in the resources sequence, we extract the resource id
             resource_list = map(lambda resource: resource['member'], resources)
             return list(resource_list)

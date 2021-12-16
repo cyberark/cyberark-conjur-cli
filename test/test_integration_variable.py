@@ -157,7 +157,7 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_unknown_variable_raises_not_found_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'unknown'], exit_code=1)
-        self.assertRegex(output, "404 Client Error: Not Found for url:")
+        self.assertIn("404 (Not Found) for url:", output)
 
     @integration_test()
     def test_cli_can_batch_get_multiple_variables(self):
@@ -186,13 +186,13 @@ class CliIntegrationTestVariable(IntegrationTestCaseBase):  # pragma: no cover
     def test_batch_existing_and_nonexistent_variable_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password', 'unknown'], exit_code=1)
-        self.assertIn("404 Client Error", output)
+        self.assertIn("404 (Not Found) for url:", output)
 
     @integration_test(True)
     def test_batch_existing_and_nonexistent_variable_with_spaces_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params,
                                  ['variable', 'get', '-i', 'one/password', '"unknown password"'], exit_code=1)
-        self.assertIn("404 Client Error", output)
+        self.assertIn("404 (Not Found) for url:", output)
 
     @integration_test(True)
     def test_subcommand_get_short_help_returns_help(self):

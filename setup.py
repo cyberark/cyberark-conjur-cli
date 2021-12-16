@@ -49,7 +49,9 @@ setup(
         "pyopenssl>=20.0.0",
         "PyInstaller>=4.0",
         "PyYAML>=5.3.1",
-        "requests>=2.24.0",
+        "aiohttp>=3.8.1",
+        "asynctest>=0.13.0",
+        "setuptools>=57.0.0",
         "twine>=3.2.0",
         "urllib3>=1.25.9"
     ],
