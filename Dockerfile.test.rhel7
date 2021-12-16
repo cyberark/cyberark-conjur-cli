@@ -1,7 +1,7 @@
 # Dockerfile.test.rhel
 #
-# Dockerfile for running tests on RHEL 7. Python3.9 on RHEL 7
-# Python3.9 isinstalled using pyenv.
+# Dockerfile for running tests on RHEL 7. Python3.10.1 on RHEL 7
+# Python3.10.1 is installed using pyenv.
 # The Centos repo files enables access to RPMs required by pip and PyInstaller
 # that are not available on the RHEL7 built-in repos (e.g devtools7).
 
@@ -45,7 +45,6 @@ RUN yum update -y \
       zlib-devel \
       bzip2 \
       wget \
-      openssl-devel \
       bzip2-devel \
       dbus-x11 \
       git \
@@ -53,6 +52,15 @@ RUN yum update -y \
       centos-release-scl \
       devtoolset-7 \
       && yum --disableplugin=subscription-manager clean all
+
+# Download, compile and install openssl 1.1.1k since rhel 7 doesn't have an official package for it
+RUN wget https://ftp.openssl.org/source/openssl-1.1.1k.tar.gz \
+    && tar -xzf openssl-1.1.1k.tar.gz \
+    && cd openssl-1.1.1k \
+    && ./config --prefix=/usr --openssldir=/etc/ssl --libdir=lib no-shared zlib-dynamic \
+    && make \
+    && make install
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
 
 # Generate unique machne-id file required by dbus-11
 RUN dbus-uuidgen > /var/lib/dbus/machine-id
@@ -63,14 +71,14 @@ WORKDIR $INSTALL_DIR
 # Copy project's requirements file
 COPY ./requirements.txt $INSTALL_DIR/
 
-# Install Python 3.9.7 using pyenv, wheel and required libs
+# Install Python 3.10.1 using pyenv, wheel and required libs
 ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 RUN curl -L -s https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
     && eval "$(pyenv init --path)" \
-    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.9.7 \
-    && pyenv global 3.9.7 \
+    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10.1 \
+    && pyenv global 3.10.1 \
     && pip install wheel \
     && pip install -r requirements.txt
 

@@ -80,23 +80,22 @@ def invoke_endpoint(http_verb: HttpVerb,
     # server pem received during initialization of the client
     # pylint: disable=not-callable
 
-    loop = asyncio.get_event_loop()
     try:
-        response = loop.run_until_complete(invoke_request(http_verb,
-                                                          url,
-                                                          data,
-                                                          query=query,
-                                                          ssl_verify=True,
-                                                          auth=auth,
-                                                          headers=headers))
+        response = asyncio.run(invoke_request(http_verb,
+                                              url,
+                                              data,
+                                              query=query,
+                                              ssl_verify=True,
+                                              auth=auth,
+                                              headers=headers))
     except HttpSslError:
-        response = loop.run_until_complete(invoke_request(http_verb,
-                                                          url,
-                                                          data,
-                                                          query=query,
-                                                          ssl_verify=ssl_verify,
-                                                          auth=auth,
-                                                          headers=headers))
+        response = asyncio.run(invoke_request(http_verb,
+                                              url,
+                                              data,
+                                              query=query,
+                                              ssl_verify=ssl_verify,
+                                              auth=auth,
+                                              headers=headers))
 
     if check_errors:
         # takes the response object and expands the raise_for_status method
@@ -166,10 +165,9 @@ def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLCon
     else:
         ssl_context = ssl.create_default_context(cafile=ssl_verify)
 
-    # TODO Replace the ssl options with the commented line once upgraded to python 3.10
-    # ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
-    # ssl_context.verify_flags |= ssl.OP_NO_TICKET
-    ssl_context.verify_flags |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+    # pylint: disable=no-member
+    ssl_context.verify_flags |= ssl.OP_NO_TICKET
 
     return ssl_context
 
