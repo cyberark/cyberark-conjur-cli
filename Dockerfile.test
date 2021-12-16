@@ -1,5 +1,7 @@
-FROM ubuntu:18.04
+FROM ubuntu:21.10
 ENV INSTALL_DIR=/opt/conjur-api-python3
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update && \
   apt-get install -y bash \
                     binutils \

@@ -1,7 +1,9 @@
 # ========== BUILD CONTAINER ===========
-FROM ubuntu:18.04 as conjur-cli-builder
+FROM ubuntu:21.10 as conjur-cli-builder
 
 ENV INSTALL_DIR=/opt/conjur-api-python3
+ENV DEBIAN_FRONTEND noninteractive
+
 
 RUN apt-get update && \
   apt-get install -y bash \
@@ -35,7 +37,7 @@ RUN pyinstaller --onefile pkg_bin/conjur
 
 
 # ========== MAIN CONTAINER ===========
-FROM ubuntu:18.04 as conjur-python-cli
+FROM ubuntu:21.10 as conjur-python-cli
 
 ENTRYPOINT [ "/usr/local/bin/conjur" ]
 
