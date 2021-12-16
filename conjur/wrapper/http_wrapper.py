@@ -136,12 +136,7 @@ async def invoke_request(http_verb: HttpVerb,
     """
     async with ClientSession() as session:
         async with async_timeout.timeout(REQUEST_TIMEOUT_SECONDS):
-            if not ssl_verify:
-                ssl_context = False
-            elif ssl_verify is True:
-                ssl_context = ssl.create_default_context()
-            else:
-                ssl_context = ssl.create_default_context(cafile=ssl_verify)
+            ssl_context = __create_ssl_context(ssl_verify)
 
             try:
                 async with session.request(http_verb.name,
@@ -160,6 +155,23 @@ async def invoke_request(http_verb: HttpVerb,
                 raise HttpSslError(message=str(ssl_error)) from ssl_error
             except ClientError as request_error:
                 raise HttpError() from request_error
+
+
+def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
+    if not ssl_verify:
+        return False
+
+    if ssl_verify is True:
+        ssl_context = ssl.create_default_context()
+    else:
+        ssl_context = ssl.create_default_context(cafile=ssl_verify)
+
+    # TODO Replace the ssl options with the commented line once upgraded to python 3.10
+    # ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+    # ssl_context.verify_flags |= ssl.OP_NO_TICKET
+    ssl_context.verify_flags |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+
+    return ssl_context
 
 
 # Not coverage tested since this code should never be hit
