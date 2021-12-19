@@ -13,19 +13,20 @@ import logging
 from typing import Optional
 
 # Internals
+from conjur.api.models import SslVerificationMode
 from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
-from conjur.errors import CertificateVerificationException, ConfigurationMissingException, \
-    InvalidConfigurationException, ResourceNotFoundException, MissingRequiredParameterException
-from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
+from conjur.errors import ResourceNotFoundException, MissingRequiredParameterException
+from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.util import util_functions
 from conjur.api import Api
-from conjur.config import Config as ApiConfig
+from conjur.data_object import ConjurrcData
 from conjur.resource import Resource
 
-# pylint: disable=pointless-string-statement
+# pylint: disable=pointless-string-statement,too-many-arguments
+
 """
 *************** DEVELOPER NOTE ***************
 For backwards capability purposes, do not remove existing functionality
@@ -43,125 +44,45 @@ class Client:
 
     This class is used to construct a client for API interaction
     """
-    _api = None
-    _login_id = None
-    _api_key = None
 
     LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
     LOGGING_FORMAT_WARNING = 'WARNING: %(message)s'
 
     # The method signature is long but we want to explicitly control
     # what parameters are allowed
-    # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,line-too-long,
-    # try-except-raise,too-many-statements
+    # pylint: disable=try-except-raise,too-many-statements
     def __init__(
             self,
-            account: str = None,
-            api_key: str = None,
-            ca_bundle: str = None,
+            conjurrc_data: ConjurrcData,
+            ssl_verification_mode: SslVerificationMode = SslVerificationMode.WITH_TRUST_STORE,
             debug: bool = False,
-            http_debug=False,
-            login_id: str = None,
-            password: str = None,
-            ssl_verify: bool = True,
-            url: str = None):
+            http_debug: bool = False,
+            credentials_provider: CredentialsStoreInterface = None):
 
-        if ssl_verify is False:
+        self.configure_logger(debug)
+
+        if ssl_verification_mode == SslVerificationMode.NO_SSL:
             util_functions.get_insecure_warning_in_debug()
-
-        self.setup_logging(debug)
 
         logging.debug("Initializing configuration...")
 
-        self._login_id = login_id
-
-        loaded_config = {
-            'url': url,
-            'account': account,
-            'ca_bundle': ca_bundle,
-        }
-        # Parameters from initialized client are missing and
-        # will try to search for them in the conjurrc
-        if not url or not login_id or (not password and not api_key):
-            try:
-                # Loads in the conjurrc
-                on_disk_config = dict(ApiConfig())
-                # We want to retain any overrides that the user provided from params
-                # but only if those values are valid
-                for field_name, field_value in loaded_config.items():
-                    if field_value:
-                        on_disk_config[field_name] = field_value
-                loaded_config = on_disk_config
-
-                # Raise exception if the client was initialized with verify=False
-                # but a follow-up request is run with verify=True
-                if ssl_verify is True and loaded_config['ca_bundle'] == '':
-                    raise CertificateVerificationException
-
-                logging.debug("Fetched connection details: "
-                              f"{{'conjur_account': {loaded_config['account']}, "
-                              f"'conjur_url': {loaded_config['url']}, "
-                              f"'cert_file': {loaded_config['ca_bundle']}}}")
-            except CertificateVerificationException as cert_verify:
-                raise CertificateVerificationException(
-                    cause="The client was initialized without certificate verification, "
-                          "even though the command was ran with certificate verification enabled.",
-                    solution="To continue communicating with the server insecurely, "
-                             "run the command "
-                             "again with ssl_verify = False. Otherwise, reinitialize the "
-                             "client.") from cert_verify
-            except ConfigurationMissingException as missing_config_exec:
-                raise ConfigurationMissingException from missing_config_exec
-            except InvalidConfigurationException as invalid_config_exec:
-                raise InvalidConfigurationException from invalid_config_exec
-            # pylint: disable =try-except-raise
-            except Exception as error:
-                raise error
-
-        # We only want to override missing account info with "default"
-        # if we can't find it anywhere else.
-        if loaded_config['account'] is None:
-            loaded_config['account'] = "default"
-
-        if api_key:
-            logging.debug("Using API key from parameters...")
-            self._api = Api(api_key=api_key,
-                            http_debug=http_debug,
-                            login_id=login_id,
-                            ssl_verify=ssl_verify,
-                            **loaded_config)
-        elif password:
-            logging.debug("Creating API key with login ID/password combo...")
-            self._api = Api(http_debug=http_debug,
-                            ssl_verify=ssl_verify,
-                            **loaded_config)
-            self._api.login(login_id, password)
-        else:
-            credential_provider = CredentialStoreFactory.create_credential_store()
-            credential_location = credential_provider.get_store_location()
-            logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")
-            loaded_credentials = credential_provider.load(loaded_config['url'])
-            logging.debug(f"Successfully retrieved credentials from the '{credential_location}'")
-
-            self._api = Api(http_debug=http_debug,
-                            ssl_verify=ssl_verify,
-                            login_id=loaded_credentials.login,
-                            api_key=loaded_credentials.password,
-                            **loaded_config)
+        self.ssl_verification_mode = ssl_verification_mode
+        self.conjurrc_data = conjurrc_data
+        self.debug = debug
+        self._api = self._create_api(http_debug, credentials_provider)
 
         logging.debug("Client initialized")
 
-    @classmethod
-    def setup_logging(cls, debug: bool):
+    def configure_logger(self, debug: bool):
         """
         Configures the logging for the client
         """
         # Suppress third party logs
 
         if debug:
-            logging.basicConfig(level=logging.DEBUG, format=cls.LOGGING_FORMAT)
+            logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
         else:
-            logging.basicConfig(level=logging.WARN, format=cls.LOGGING_FORMAT_WARNING)
+            logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT_WARNING)
 
     ### API passthrough
 
@@ -296,3 +217,16 @@ class Client:
                 f"({', '.join([res.full_id() for res in resources])})")
 
         return resources[0]
+
+    def _create_api(self, http_debug, credentials_provider):
+
+        credential_location = credentials_provider.get_store_location()
+        logging.debug(f"Attempting to retrieve credentials from the '{credential_location}'...")
+        logging.debug(f"Successfully retrieved credentials from the '{credential_location}'")
+
+        return Api(
+            conjurrc_data=self.conjurrc_data,
+            ssl_verification_mode=self.ssl_verification_mode,
+            credentials_provider=credentials_provider,
+            debug=self.debug,
+            http_debug=http_debug)
