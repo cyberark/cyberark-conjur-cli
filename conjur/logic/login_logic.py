@@ -58,7 +58,7 @@ class LoginLogic:
                                   ConjurEndpoint.LOGIN,
                                   params,
                                   auth=(credential_data.login, password),
-                                  ssl_verify=ssl_verification_metadata).text
+                                  ssl_verification_metadata=ssl_verification_metadata).text
 
         logging.debug("API key retrieved from Conjur")
         return api_key

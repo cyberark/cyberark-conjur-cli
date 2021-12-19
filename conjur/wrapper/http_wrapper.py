@@ -21,7 +21,7 @@ import urllib3
 
 from conjur.api.ssl_utils import ssl_context_factory
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
-from conjur.api.models import SslVerificationMetadata
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
@@ -140,7 +140,7 @@ async def invoke_request(http_verb: HttpVerb,
                          url: str,
                          data: str,
                          query: dict,
-                         ssl_verify: Union[bool, str],
+                         ssl_verification_metadata: SslVerificationMetadata,
                          auth: tuple,
                          headers: dict) -> HttpResponse:
     """
@@ -149,8 +149,7 @@ async def invoke_request(http_verb: HttpVerb,
     """
     async with ClientSession() as session:
         async with async_timeout.timeout(REQUEST_TIMEOUT_SECONDS):
-            ssl_context = __create_ssl_context(ssl_verify)
-
+            ssl_context = __create_ssl_context(ssl_verification_metadata)
             try:
                 async with session.request(http_verb.name,
                                            url,

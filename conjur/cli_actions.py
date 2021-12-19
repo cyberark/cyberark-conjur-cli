@@ -63,7 +63,7 @@ def handle_login_logic(
     credential_data = CredentialsData(login=identifier)
     login_logic = LoginLogic(credential_provider)
     ssl_verification_metadata = util_functions.get_ssl_verification_meta_data_from_conjurrc(ssl_verify)
-    login_controller = LoginController(ssl_verify=ssl_verify,
+    login_controller = LoginController(ssl_verification_metadata=ssl_verification_metadata,
                                        user_password=password,
                                        credential_data=credential_data,
                                        login_logic=login_logic)
