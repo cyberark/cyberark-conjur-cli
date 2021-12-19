@@ -18,6 +18,7 @@ from aiohttp import BasicAuth, ClientError, ClientResponseError, ClientSSLError,
 import async_timeout
 import urllib3
 
+from conjur.api.ssl_utils.ssl_context_factory import SslContextFactory
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
@@ -160,7 +161,7 @@ def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLCon
         return False
 
     if ssl_verify is True:
-        ssl_context = ssl.create_default_context()
+        ssl_context = SslContextFactory.create_platform_specific_ssl_context()
     else:
         ssl_context = ssl.create_default_context(cafile=ssl_verify)
 
