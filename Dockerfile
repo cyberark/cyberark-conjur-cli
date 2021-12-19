@@ -4,14 +4,15 @@ FROM ubuntu:18.04 as conjur-cli-builder
 ENV INSTALL_DIR=/opt/conjur-api-python3
 
 RUN apt-get update && \
-    apt-get install -y bash \
-                       binutils \
-                       build-essential \
-                       git \
-                       libffi-dev \
-                       libssl-dev \
-                       python3-dev \
-                       zlib1g-dev
+  apt-get install -y bash \
+                    binutils \
+                    build-essential \
+                    curl \
+                    git \
+                    libffi-dev \
+                    libssl-dev \
+                    python3-dev \
+                    zlib1g-dev
 
 RUN mkdir -p $INSTALL_DIR
 WORKDIR $INSTALL_DIR
