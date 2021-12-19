@@ -23,7 +23,7 @@ from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
     CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException, \
-    OperationNotCompletedException, HttpStatusError
+    OperationNotCompletedException, HttpStatusError, HttpSslError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -61,9 +61,8 @@ class InitController:
         """
         # the following methods validate and fill the self.conjurrc_data object.
         # Note that these calls might perform user interaction actions as well as alter
-        # self.conjurrc_data object
+        # self.conjurrc_data ob
 
-        # validate the url and write to self.conjurrc_data if needed
         formatted_conjur_url = self._run_url_flow()
 
         # get certificate and write to disk in a case of self-signed. write the cert_file property
@@ -99,7 +98,6 @@ class InitController:
 
     def _run_account_flow(self):
         self._get_account_info()
-        self.write_conjurrc()
 
     def _prompt_for_conjur_url(self):
         """
@@ -174,7 +172,11 @@ class InitController:
         """
         if self.conjurrc_data.conjur_account is None:
             try:
-                self.init_logic.fetch_account_from_server(self.conjurrc_data)
+                self.init_logic.fetch_account_from_server(self.conjurrc_data, self.ssl_verification_data)
+            except HttpSslError as ssl_err:
+                raise HttpSslError("SSL Error. Make sure Conjur "
+                                   "server's root certificate is trusted in this machine. "
+                                   "If this problem continues, visit docs fo more help") from ssl_err
             except HttpStatusError as error:
                 # Check for catching if the endpoint is exists. If the endpoint does not exist,
                 # a 401 status code will be returned.

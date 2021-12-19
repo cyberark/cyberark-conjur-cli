@@ -26,8 +26,7 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
     if sum(options) > 1:
         raise MissingRequiredParameterException("Can't accept more than one of the following "
                                                 "arguments:"
-                                                "\n1. --ca-cert with '< Full path to RootCA PEM"
-                                                " file >'"
+                                                "\n1. --ca-cert"
                                                 "\n2. --self-signed"
                                                 "\n3. --insecure (skip certificate validation)")
 

@@ -11,6 +11,7 @@ to the user's machine as well as fetching certificates from Conjur
 import logging
 import os.path
 
+from conjur.api.models import SslVerificationMetadata
 from conjur.api.ssl_utils.errors import TLSSocketConnectionException
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
@@ -59,7 +60,7 @@ class InitLogic:
         return fingerprint, readable_certificate
 
     @classmethod
-    def fetch_account_from_server(cls, conjurrc_data: ConjurrcData):
+    def fetch_account_from_server(cls, conjurrc_data: ConjurrcData, ssl_verification_metadata: SslVerificationMetadata):
         """
         Fetches the account from the Conjur Enterprise server by making a
         request to the /info endpoint. This endpoint only exists in the
@@ -80,7 +81,7 @@ class InitLogic:
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,
                                    params,
-                                   ssl_verify=certificate_path).json
+                                   ssl_verification_metadata=ssl_verification_metadata).json
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation

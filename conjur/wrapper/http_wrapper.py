@@ -179,6 +179,7 @@ def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLCon
     return False
 
 
+
 # Not coverage tested since this code should never be hit
 # from checked-in code
 def enable_http_logging():  # pragma: no cover

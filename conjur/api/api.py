@@ -143,7 +143,7 @@ class Api:
 
         self._api_key = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.LOGIN,
                                         self._default_params, auth=(self.login_id, password),
-                                        ssl_verify=self.ssl_verify).text
+                                        ssl_verification_metadata=self.ssl_verification_data).text
         return self.api_key
 
     def authenticate(self) -> str:
@@ -172,7 +172,7 @@ class Api:
             ConjurEndpoint.AUTHENTICATE,
             params,
             self.api_key,
-            ssl_verify=self.ssl_verify).text
+            ssl_verification_metadata=self.ssl_verification_data).text
 
     def resources_list(self, list_constraints: dict = None) -> dict:
         """
@@ -192,12 +192,12 @@ class Api:
                                             params,
                                             query=list_constraints,
                                             api_token=self.api_token,
-                                            ssl_verify=self.ssl_verify).text
+                                            ssl_verification_metadata=self.ssl_verification_data).text
         else:
             json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.RESOURCES,
                                             params,
                                             api_token=self.api_token,
-                                            ssl_verify=self.ssl_verify).text
+                                            ssl_verification_metadata=self.ssl_verification_data).text
 
         resources = json.loads(json_response)
         # Returns the result as a list of resource ids instead of the raw JSON only
@@ -234,11 +234,11 @@ class Api:
         if version is not None:
             return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                    api_token=self.api_token, query=query_params,
-                                   ssl_verify=self.ssl_verify).content
+                                   ssl_verification_metadata=self.ssl_verification_data).content
         else:
             return invoke_endpoint(HttpVerb.GET, ConjurEndpoint.SECRETS, params,
                                    api_token=self.api_token,
-                                   ssl_verify=self.ssl_verify).content
+                                   ssl_verification_metadata=self.ssl_verification_data).content
 
     def get_variables(self, *variable_ids) -> dict:
         """
@@ -259,7 +259,7 @@ class Api:
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.BATCH_SECRETS,
                                         self._default_params,
                                         api_token=self.api_token,
-                                        ssl_verify=self.ssl_verify,
+                                        ssl_verification_metadata=self.ssl_verification_data,
                                         query=query_params,
                                         ).content
 
@@ -299,7 +299,7 @@ class Api:
                                params,
                                create_token_data,
                                api_token=self.api_token,
-                               ssl_verify=self.ssl_verify,
+                               ssl_verification_metadata=self.ssl_verification_data,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
     def create_host(self, create_host_data: CreateHostData) -> HttpResponse:
@@ -316,7 +316,7 @@ class Api:
                                params,
                                request_body_parameters,
                                api_token=create_host_data.token,
-                               ssl_verify=self.ssl_verify,
+                               ssl_verification_metadata=self.ssl_verification_data,
                                decode_token=False,
                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
@@ -338,7 +338,7 @@ class Api:
                                ConjurEndpoint.HOST_FACTORY_REVOKE_TOKEN,
                                params,
                                api_token=self.api_token,
-                               ssl_verify=self.ssl_verify)
+                               ssl_verification_metadata=self.ssl_verification_data)
 
     def set_variable(self, variable_id: str, value: str) -> str:
         """
@@ -353,7 +353,7 @@ class Api:
 
         return invoke_endpoint(HttpVerb.POST, ConjurEndpoint.SECRETS, params,
                                value, api_token=self.api_token,
-                               ssl_verify=self.ssl_verify).text
+                               ssl_verification_metadata=self.ssl_verification_data).text
 
     def _load_policy_file(
             self, policy_id: str, policy_file: str,
@@ -372,7 +372,7 @@ class Api:
 
         json_response = invoke_endpoint(http_verb, ConjurEndpoint.POLICIES, params,
                                         policy_data, api_token=self.api_token,
-                                        ssl_verify=self.ssl_verify).text
+                                        ssl_verification_metadata=self.ssl_verification_data).text
 
         policy_changes = json.loads(json_response)
         return policy_changes
@@ -413,7 +413,7 @@ class Api:
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    api_token=self.api_token,
-                                   ssl_verify=self.ssl_verify,
+                                   ssl_verification_metadata=self.ssl_verification_data,
                                    query=query_params).text
         return response
 
@@ -426,7 +426,7 @@ class Api:
         response = invoke_endpoint(HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                                    self._default_params,
                                    auth=(logged_in_user, current_password),
-                                   ssl_verify=self.ssl_verify).text
+                                   ssl_verification_metadata=self.ssl_verification_data).text
         return response
 
     def change_personal_password(
@@ -439,7 +439,7 @@ class Api:
                                    self._default_params,
                                    new_password,
                                    auth=(logged_in_user, current_password),
-                                   ssl_verify=self.ssl_verify
+                                   ssl_verification_metadata=self.ssl_verification_data
                                    ).text
         return response
 
@@ -450,7 +450,7 @@ class Api:
         json_response = invoke_endpoint(HttpVerb.GET, ConjurEndpoint.WHOAMI,
                                         self._default_params,
                                         api_token=self.api_token,
-                                        ssl_verify=self.ssl_verify).content
+                                        ssl_verification_metadata=self.ssl_verification_data).content
 
         return json.loads(json_response.decode('utf-8'))
 
@@ -483,7 +483,7 @@ class Api:
                                         params,
                                         query=request_parameters,
                                         api_token=self.api_token,
-                                        ssl_verify=self.ssl_verify).content
+                                        ssl_verification_metadata=self.ssl_verification_data).content
 
         resources = json.loads(json_response.decode('utf-8'))
 
@@ -518,6 +518,6 @@ class Api:
                                         ConjurEndpoint.RESOURCES_PERMITTED_ROLES,
                                         params,
                                         api_token=self.api_token,
-                                        ssl_verify=self.ssl_verify).content
+                                        ssl_verification_metadata=self.ssl_verification_data).content
 
         return json.loads(json_response.decode('utf-8'))

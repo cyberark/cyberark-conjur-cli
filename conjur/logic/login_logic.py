@@ -13,7 +13,7 @@ import logging
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.errors import CertificateVerificationException
+from conjur.errors import CertificateVerificationException, HttpSslError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.data_object import CredentialsData, ConjurrcData
@@ -54,12 +54,17 @@ class LoginLogic:
 
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur...")
-        api_key = invoke_endpoint(HttpVerb.GET,
-                                  ConjurEndpoint.LOGIN,
-                                  params,
-                                  auth=(credential_data.login, password),
-                                  ssl_verification_metadata=ssl_verification_metadata).text
-
+        try:
+            api_key = invoke_endpoint(HttpVerb.GET,
+                                      ConjurEndpoint.LOGIN,
+                                      params,
+                                      auth=(credential_data.login, password),
+                                      ssl_verification_metadata=ssl_verification_metadata).text
+        except HttpSslError:
+            if conjurrc.cert_file == '' and ssl_verification_metadata.mode != SslVerificationMode.NO_SSL:
+                raise CertificateVerificationException
+        except Exception:
+            raise
         logging.debug("API key retrieved from Conjur")
         return api_key
 

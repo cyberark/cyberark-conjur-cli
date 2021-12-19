@@ -12,6 +12,7 @@ import logging
 import platform
 import os
 
+
 # Internals
 from conjur.api.models import SslVerificationMetadata
 from conjur.api.models import SslVerificationMode
