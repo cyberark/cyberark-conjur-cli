@@ -18,8 +18,7 @@ from aiohttp import BasicAuth, ClientError, ClientResponseError, ClientSSLError,
 import async_timeout
 import urllib3
 
-from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, \
-    HttpStatusError
+from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
 
