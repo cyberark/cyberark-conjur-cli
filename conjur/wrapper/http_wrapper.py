@@ -21,6 +21,8 @@ import urllib3
 
 from conjur.api.ssl_utils import ssl_context_factory
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
+from conjur.api.models import SslVerificationMetadata
+from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
 
@@ -46,7 +48,7 @@ def invoke_endpoint(http_verb: HttpVerb,
                     params: dict,
                     data: str = "",
                     check_errors: bool = True,
-                    ssl_verify: Union[bool, str] = True,
+                    ssl_verification_metadata: SslVerificationMetadata = None,
                     auth: tuple = None,
                     api_token: str = None,
                     query: dict = None,
@@ -93,7 +95,7 @@ def invoke_endpoint(http_verb: HttpVerb,
                                               url,
                                               data,
                                               query=query,
-                                              ssl_verify=True,
+                                              ssl_verification_metadata=ssl_verification_metadata,
                                               auth=auth,
                                               headers=headers))
     except HttpSslError:
@@ -101,7 +103,7 @@ def invoke_endpoint(http_verb: HttpVerb,
                                               url,
                                               data,
                                               query=query,
-                                              ssl_verify=ssl_verify,
+                                              ssl_verification_metadata=ssl_verification_metadata,
                                               auth=auth,
                                               headers=headers))
 

@@ -24,7 +24,7 @@ from conjur.data_object import ConjurrcData, CredentialsData, ListData, Variable
     PolicyData, UserInputData, HostResourceData
 
 from conjur.api import SSLClient
-from conjur.util import init_utils
+from conjur.util import init_utils, util_functions
 
 
 def handle_init_logic(
@@ -62,6 +62,7 @@ def handle_login_logic(
     """
     credential_data = CredentialsData(login=identifier)
     login_logic = LoginLogic(credential_provider)
+    ssl_verification_metadata = util_functions.get_ssl_verification_meta_data_from_conjurrc(ssl_verify)
     login_controller = LoginController(ssl_verify=ssl_verify,
                                        user_password=password,
                                        credential_data=credential_data,

@@ -7,8 +7,8 @@ It functionality will move into the init_action once we implement the cli action
 import os
 
 # Internals
-from conjur.api.models.ssl_verification_meta_data import SslVerificationMetaData
-from conjur.api.models.ssl_verification_modes import SslVerificationModes
+from conjur.api.models import SslVerificationMetadata
+from conjur.api.models import SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
 from conjur.errors import MissingRequiredParameterException, FileNotFoundException, \
     InvalidFilePermissionsException
@@ -46,11 +46,11 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
 
 
 def get_ssl_verification_meta_data_from_cli_params(ca_path, is_self_signed,
-                                                   ssl_verify) -> SslVerificationMetaData:
+                                                   ssl_verify) -> SslVerificationMetadata:
     if ca_path:
-        return SslVerificationMetaData(SslVerificationModes.WITH_CA_BUNDLE, ca_path)
+        return SslVerificationMetadata(SslVerificationMode.WITH_CA_BUNDLE, ca_path)
     if is_self_signed:
-        return SslVerificationMetaData(SslVerificationModes.SELF_SIGN, DEFAULT_CERTIFICATE_FILE)
+        return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, DEFAULT_CERTIFICATE_FILE)
     if not ssl_verify:
-        return SslVerificationMetaData(SslVerificationModes.NO_SSL)
-    return SslVerificationMetaData(SslVerificationModes.WITH_TRUST_STORE)
+        return SslVerificationMetadata(SslVerificationMode.NO_SSL)
+    return SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)

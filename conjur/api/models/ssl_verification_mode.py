@@ -1,5 +1,5 @@
 """
-SslVerificationModes module
+SslVerificationMode module
 This module is used to represent different types of SSL verification options
 """
 from enum import Enum

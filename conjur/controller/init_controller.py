@@ -19,11 +19,11 @@ from urllib.parse import ParseResult
 # Internals
 from typing import Optional, Tuple
 
-from conjur.api.models import SslVerificationMetaData, SslVerificationModes
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
     CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException, \
-    OperationNotCompletedException
+    OperationNotCompletedException, HttpStatusError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -40,14 +40,14 @@ class InitController:
     init_logic = None
 
     def __init__(self, conjurrc_data: ConjurrcData, init_logic: InitLogic, force: bool,
-                 ssl_verification_data: SslVerificationMetaData):
+                 ssl_verification_data: SslVerificationMetadata):
         self.ssl_verification_data = ssl_verification_data
 
-        if self.ssl_verification_data.mode == SslVerificationModes.NO_SSL:
+        if self.ssl_verification_data.mode == SslVerificationMode.NO_SSL:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
 
-        if self.ssl_verification_data.mode == SslVerificationModes.SELF_SIGN:
+        if self.ssl_verification_data.mode == SslVerificationMode.SELF_SIGN:
             self._prompt_warning_for_self_signed_flow()
 
         self.conjurrc_data = conjurrc_data
@@ -81,20 +81,20 @@ class InitController:
             self._prompt_for_conjur_url()
 
         formatted_conjur_url = self._format_conjur_url()
-        allow_http_only = self.ssl_verification_data.mode != SslVerificationModes.NO_SSL
+        allow_http_only = self.ssl_verification_data.mode != SslVerificationMode.NO_SSL
         self._validate_conjur_url(formatted_conjur_url, allow_http_only)
         return formatted_conjur_url
 
     def _run_certificate_flow(self, formatted_conjur_url):
         mode = self.ssl_verification_data.mode
-        if mode == SslVerificationModes.WITH_CA_BUNDLE:
+        if mode == SslVerificationMode.WITH_CA_BUNDLE:
             self.conjurrc_data.cert_file = self.ssl_verification_data.ca_cert_path
-        if mode == SslVerificationModes.SELF_SIGN:
+        if mode == SslVerificationMode.SELF_SIGN:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
             # For a uniform experience, regardless if the certificate is self-signed
             # or CA-signed, we will write the certificate on the machine
             self._write_certificate(fetched_certificate)
-        if mode in [SslVerificationModes.NO_SSL, SslVerificationModes.WITH_TRUST_STORE]:
+        if mode in [SslVerificationMode.NO_SSL, SslVerificationMode.WITH_TRUST_STORE]:
             self.conjurrc_data.cert_file = ""
 
     def _run_account_flow(self):
