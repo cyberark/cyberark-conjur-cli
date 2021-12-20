@@ -12,7 +12,7 @@ import platform
 from functools import lru_cache
 from typing import Union
 
-from conjur.errors import UnknownOSError, MacCertificatesError, NoCertificatesError
+from conjur.errors import UnknownOSError, MacCertificatesError
 from conjur.util.os_types import OSTypes
 from conjur.util.util_functions import get_current_os
 

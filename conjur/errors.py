@@ -193,12 +193,6 @@ class UnknownOSError(Exception):
         self.message = message
         super().__init__(self.message)
 
-class NoCertificatesError(Exception):
-    """ Exception when no CA certificates were found for TLS validation """
-    def __init__(self, message: str = "No CA certificates were found for TLS validation"):
-        self.message = message
-        super().__init__(self.message)
-
 class MacCertificatesError(Exception):
     """ Exception when failing to get root CA certificates from keychain in mac """
     def __init__(self, message: str = "Failed to get root CA certificates from keychain"):
