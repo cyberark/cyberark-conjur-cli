@@ -20,7 +20,6 @@ import async_timeout
 import urllib3
 
 from conjur.api.ssl_utils import ssl_context_factory
-from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
@@ -41,7 +40,6 @@ class HttpVerb(Enum):
     PATCH = 5
 
 
-# ssl_verify can accept Boolean or String of the path to certificate file
 # pylint: disable=too-many-locals,consider-using-f-string,too-many-arguments
 def invoke_endpoint(http_verb: HttpVerb,
                     endpoint: ConjurEndpoint,
@@ -61,9 +59,10 @@ def invoke_endpoint(http_verb: HttpVerb,
         ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
     # pylint: disable=logging-fstring-interpolation
     logging.debug(f"Invoke endpoint. Verb: '{http_verb.name}', Endpoint: '{endpoint.name}', Params: '{params}', "
-                  f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verify: '{ssl_verify}', "
-                  f"Basic auth user: '{auth[0] if auth else ''}', using API token: '{api_token is not None}', "
-                  f"Query params: '{query}', Headers: '{headers}', Decode token: '{decode_token}'")
+                  f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verification metadata: "
+                  f"'{ssl_verification_metadata}', Basic auth user: '{auth[0] if auth else ''}', using API token: "
+                  f"'{api_token is not None}', Query params: '{query}', Headers: '{headers}', Decode token: "
+                  f"'{decode_token}'")
     start = time.monotonic()
 
     if headers is None:
@@ -86,11 +85,6 @@ def invoke_endpoint(http_verb: HttpVerb,
             api_token = base64.b64encode(api_token.encode()).decode('utf-8')
 
         headers['Authorization'] = f'Token token="{api_token}"'
-
-    # By default, on each request the certificate will be verified. If there is
-    # a failure in verification, the fallback solution will be passing in the
-    # server pem received during initialization of the client
-    # pylint: disable=not-callable
 
     response = asyncio.run(invoke_request(http_verb,
                                           url,
@@ -121,7 +115,7 @@ def invoke_endpoint(http_verb: HttpVerb,
         except Exception as general_error:
             raise HttpError from general_error
 
-    duration_ms = int((time.monotonic() - start)*1000)
+    duration_ms = int((time.monotonic() - start) * 1000)
     logging.debug("Invoke endpoint succeeded. Duration: %dms, Request: %s %s, Response: %s",
                   duration_ms, http_verb.name, url, response)
 
@@ -162,14 +156,14 @@ async def invoke_request(http_verb: HttpVerb,
                 raise HttpError() from request_error
 
 
-def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
+def __create_ssl_context(ssl_verification_metadata: SslVerificationMetadata) -> Union[bool, ssl.SSLContext]:
     """
     Return new SSLContext object to verify the TLS.
     If ssl_verify is False/None/empty, return False which instructs SSL usage without certificate validation.
     """
-    if ssl_verify:
-        return ssl_context_factory.create_ssl_context(ssl_verify)
-    return False
+    if ssl_verification_metadata.is_insecure_mode:
+        return False
+    return ssl_context_factory.create_ssl_context(ssl_verification_metadata)
 
 
 # Not coverage tested since this code should never be hit

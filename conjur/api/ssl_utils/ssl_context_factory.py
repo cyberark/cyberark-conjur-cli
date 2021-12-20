@@ -5,27 +5,29 @@ SslContextFactory module
 This module job is to encapsulate the creation of SSLContext in the dependent of each os environment
 """
 
+# Builtin
 import logging
 import ssl
 import subprocess
 import platform
 from functools import lru_cache
-from typing import Union
 
+# Internals
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import UnknownOSError, MacCertificatesError
 from conjur.util.os_types import OSTypes
 from conjur.util.util_functions import get_current_os
 
 
 # pylint: disable=too-few-public-methods
-def create_ssl_context(ssl_verify: Union[bool, str]) -> ssl.SSLContext:
+def create_ssl_context(ssl_verification_metadata: SslVerificationMetadata) -> ssl.SSLContext:
     """
     Factory method to create SSLContext loaded with system RootCA's
     @return: SSLContext configured with the system certificates
     """
     os_name = platform.system()
 
-    if ssl_verify is True:
+    if ssl_verification_metadata.mode == SslVerificationMode.WITH_TRUST_STORE:
         logging.debug("Creating SSLContext from OS TrustStore for '%s'", os_name)
 
         current_os = get_current_os()
@@ -36,7 +38,7 @@ def create_ssl_context(ssl_verify: Union[bool, str]) -> ssl.SSLContext:
         else:
             raise UnknownOSError(f"Cannot find CA certificates for OS '{os_name}'")
     else:
-        ssl_context = ssl.create_default_context(cafile=ssl_verify)
+        ssl_context = ssl.create_default_context(cafile=ssl_verification_metadata.ca_cert_path)
 
     ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
     # pylint: disable=no-member
