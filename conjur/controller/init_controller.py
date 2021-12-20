@@ -43,11 +43,11 @@ class InitController:
                  ssl_verification_data: SslVerificationMetadata):
         self.ssl_verification_data = ssl_verification_data
 
-        if self.ssl_verification_data.mode == SslVerificationMode.NO_SSL:
+        if self.ssl_verification_data.is_insecure_mode():
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
 
-        if self.ssl_verification_data.mode == SslVerificationMode.SELF_SIGN:
+        if self.ssl_verification_data.is_self_signed_mode:
             self._prompt_warning_for_self_signed_flow()
 
         self.conjurrc_data = conjurrc_data
@@ -80,7 +80,7 @@ class InitController:
             self._prompt_for_conjur_url()
 
         formatted_conjur_url = self._format_conjur_url()
-        allow_http_only = self.ssl_verification_data.mode != SslVerificationMode.NO_SSL
+        allow_http_only = not self.ssl_verification_data.is_insecure_mode
         self._validate_conjur_url(formatted_conjur_url, allow_http_only)
         return formatted_conjur_url
 

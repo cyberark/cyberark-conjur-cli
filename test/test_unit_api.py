@@ -61,6 +61,11 @@ def create_api(url='http://localhost', account='default',
                credentials_provider=FileCredentialsProvider())
 
 
+def create_ssl_verification_metadata(ssl_verification_mode=SslVerificationMode.SELF_SIGN,
+                                     cert_path=DEFAULT_CERTIFICATE_FILE):
+    return SslVerificationMetadata(ssl_verification_mode, cert_path)
+
+
 class ApiTest(unittest.TestCase):
     class MockClientResponse():
         def __init__(self, text='myretval', content='mycontent'):
@@ -70,7 +75,7 @@ class ApiTest(unittest.TestCase):
     POLICY_FILE = './test/test_config/policies/variables.yml'
 
     def verify_http_call(self, http_client, method, endpoint, *args,
-                         ssl_verify=None, api_token='apitoken', auth=None, query=None,
+                         ssl_verification_metadata=None, api_token='apitoken', auth=None, query=None,
                          account='default', headers={}, **kwargs):
 
         params = {
@@ -88,7 +93,7 @@ class ApiTest(unittest.TestCase):
 
         http_client.assert_called_once_with(method, endpoint, params, *args,
                                             **extra_args,
-                                            ssl_verify=ssl_verify)
+                                            ssl_verification_metadata=ssl_verification_metadata)
 
     def test_new_client_throws_error_when_no_url(self):
         with self.assertRaises(Exception):
@@ -114,7 +119,7 @@ class ApiTest(unittest.TestCase):
                               query={},
                               api_token='apitoken',
                               headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_host_factory_create_token_with_no_cidr_invokes_http_client_correctly(self,
@@ -136,7 +141,7 @@ class ApiTest(unittest.TestCase):
                               query={},
                               api_token='apitoken',
                               headers={'Content-Type': 'application/x-www-form-urlencoded'},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load',
            return_value=MockCredentials)
@@ -146,7 +151,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
                               api_token=False,
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load',
            return_value=MockCredentials)
@@ -158,7 +163,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
                               api_token=False,
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load',
            return_value=MockCredentials)
@@ -168,7 +173,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
                               auth=('myuser', 'mypass'),
                               api_token=False,
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load',
            return_value=CredentialsData("machine", login=""))
@@ -233,7 +238,7 @@ class ApiTest(unittest.TestCase):
                               kind='variable',
                               identifier='myvar',
                               query={},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_with_version_invokes_http_client_correctly(self, mock_http_client):
@@ -250,12 +255,15 @@ class ApiTest(unittest.TestCase):
                               kind='variable',
                               identifier='myvar',
                               query={'version': '1'},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_passes_down_ssl_verify_param(self, mock_http_client):
         api = create_api(ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
                          cert_path='verify')
+        ssl_verification_metadata = create_ssl_verification_metadata(
+            ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+            cert_path='verify')
 
         # ssl_verify='verify')
 
@@ -270,7 +278,7 @@ class ApiTest(unittest.TestCase):
                               kind='variable',
                               identifier='myvar',
                               query={},
-                              ssl_verify='verify')
+                              ssl_verification_metadata=ssl_verification_metadata)
 
     # Set variable
 
@@ -289,11 +297,13 @@ class ApiTest(unittest.TestCase):
                               'myvalue',
                               kind='variable',
                               identifier='myvar',
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_set_variable_passes_down_ssl_verify_param(self, mock_http_client):
-        api = create_api(cert_path='verify')
+        cert_path = 'verify'
+        ssl_verification_metadata = create_ssl_verification_metadata(cert_path=cert_path)
+        api = create_api(cert_path=cert_path)
 
         def mock_auth():
             return 'apitoken'
@@ -301,12 +311,11 @@ class ApiTest(unittest.TestCase):
         api.authenticate = mock_auth
 
         api.set_variable('myvar', 'myvalue')
-
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.SECRETS,
                               'myvalue',
                               kind='variable',
                               identifier='myvar',
-                              ssl_verify='verify')
+                              ssl_verification_metadata=ssl_verification_metadata)
 
     # Policy load
 
@@ -328,7 +337,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint',
            return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
@@ -358,13 +367,15 @@ class ApiTest(unittest.TestCase):
         api.load_policy_file('mypolicyname', self.POLICY_FILE)
 
         policy_data = None
+        ssl_verification_metadata = create_ssl_verification_metadata(cert_path="ssl_verify",
+                                                                     ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE)
         with open(self.POLICY_FILE, 'r') as content_file:
             policy_data = content_file.read()
 
         self.verify_http_call(mock_http_client, HttpVerb.POST, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
-                              ssl_verify='ssl_verify')
+                              ssl_verification_metadata=ssl_verification_metadata)
 
     # Policy replace
 
@@ -386,7 +397,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint',
            return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
@@ -419,7 +430,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
-                              ssl_verify='ssl_verify')
+                              ssl_verification_metadata=create_ssl_verification_metadata(cert_path='ssl_verify'))
 
     # Policy update
 
@@ -441,7 +452,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.PATCH, ConjurEndpoint.POLICIES,
                               policy_data,
                               identifier='mypolicyname',
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint',
            return_value=MockClientResponse(text=json.dumps(MOCK_POLICY_CHANGE_OBJECT)))
@@ -474,7 +485,7 @@ class ApiTest(unittest.TestCase):
                               query={
                                   'variable_ids': 'default:variable:myvar,default:variable:myvar2'
                               },
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint',
            return_value=MockClientResponse(content=MOCK_BATCH_GET_RESPONSE))
@@ -498,6 +509,9 @@ class ApiTest(unittest.TestCase):
     def test_get_variables_passes_down_ssl_verify_parameter(self, mock_http_client):
         api = create_api(ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
                          cert_path='sslverify')
+        ssl_verification_metadata = create_ssl_verification_metadata(
+            ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+            cert_path='sslverify')
 
         def mock_auth():
             return 'apitoken'
@@ -510,7 +524,7 @@ class ApiTest(unittest.TestCase):
                               query={
                                   'variable_ids': 'default:variable:myvar,default:variable:myvar2'
                               },
-                              ssl_verify='sslverify')
+                              ssl_verification_metadata=ssl_verification_metadata)
 
     # List resources
 
@@ -528,7 +542,7 @@ class ApiTest(unittest.TestCase):
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
                               query={},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(text=json.dumps(MOCK_RESOURCE_LIST)))
@@ -544,10 +558,9 @@ class ApiTest(unittest.TestCase):
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.RESOURCES,
                               query={'limit': 1},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
-    @patch('conjur.api.api.invoke_endpoint', \
-           return_value=MockClientResponse(content=json.dumps({})))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(content=json.dumps({})))
     def test_whoami_invokes_http_client_correctly(self, mock_http_client):
         api = create_api()
 
@@ -559,10 +572,9 @@ class ApiTest(unittest.TestCase):
         api.whoami()
 
         self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.WHOAMI,
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
-    @patch('conjur.api.api.invoke_endpoint', \
-           return_value=MockClientResponse(content=json.dumps({})))
+    @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(content=json.dumps({})))
     def test_rotate_personal_api_key_invokes_http_client_correctly(self, mock_http_client):
         api = create_api()
 
@@ -576,7 +588,7 @@ class ApiTest(unittest.TestCase):
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                               api_token='',
                               auth=('mylogin', 'somepass'),
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps({})))
@@ -592,7 +604,7 @@ class ApiTest(unittest.TestCase):
 
         self.verify_http_call(mock_http_client, HttpVerb.PUT, ConjurEndpoint.ROTATE_API_KEY,
                               query={'role': 'user:somename'},
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())
 
     @patch('conjur.api.api.invoke_endpoint', \
            return_value=MockClientResponse(content=json.dumps({})))
@@ -623,4 +635,4 @@ class ApiTest(unittest.TestCase):
                               "somenewpass",
                               api_token='',
                               auth=('someloggedinuser', 'somecurrentpass'),
-                              ssl_verify=DEFAULT_CERTIFICATE_FILE)
+                              ssl_verification_metadata=create_ssl_verification_metadata())

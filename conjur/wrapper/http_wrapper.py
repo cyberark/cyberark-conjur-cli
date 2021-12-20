@@ -22,7 +22,7 @@ import urllib3
 from conjur.api.ssl_utils import ssl_context_factory
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
+from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
 
@@ -41,8 +41,8 @@ class HttpVerb(Enum):
     PATCH = 5
 
 
-# pylint: disable=too-many-locals,consider-using-f-string,too-many-arguments
 # ssl_verify can accept Boolean or String of the path to certificate file
+# pylint: disable=too-many-locals,consider-using-f-string,too-many-arguments
 def invoke_endpoint(http_verb: HttpVerb,
                     endpoint: ConjurEndpoint,
                     params: dict,
@@ -57,6 +57,8 @@ def invoke_endpoint(http_verb: HttpVerb,
     """
     This method flexibly invokes HTTP calls from 'aiohttp' module
     """
+    if ssl_verification_metadata is None:
+        ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
     # pylint: disable=logging-fstring-interpolation
     logging.debug(f"Invoke endpoint. Verb: '{http_verb.name}', Endpoint: '{endpoint.name}', Params: '{params}', "
                   f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verify: '{ssl_verify}', "
@@ -90,22 +92,13 @@ def invoke_endpoint(http_verb: HttpVerb,
     # server pem received during initialization of the client
     # pylint: disable=not-callable
 
-    try:
-        response = asyncio.run(invoke_request(http_verb,
-                                              url,
-                                              data,
-                                              query=query,
-                                              ssl_verification_metadata=ssl_verification_metadata,
-                                              auth=auth,
-                                              headers=headers))
-    except HttpSslError:
-        response = asyncio.run(invoke_request(http_verb,
-                                              url,
-                                              data,
-                                              query=query,
-                                              ssl_verification_metadata=ssl_verification_metadata,
-                                              auth=auth,
-                                              headers=headers))
+    response = asyncio.run(invoke_request(http_verb,
+                                          url,
+                                          data,
+                                          query=query,
+                                          ssl_verification_metadata=ssl_verification_metadata,
+                                          auth=auth,
+                                          headers=headers))
 
     if check_errors:
         # takes the response object and expands the raise_for_status method
@@ -177,7 +170,6 @@ def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLCon
     if ssl_verify:
         return ssl_context_factory.create_ssl_context(ssl_verify)
     return False
-
 
 
 # Not coverage tested since this code should never be hit

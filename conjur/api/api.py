@@ -116,7 +116,7 @@ class Api:
         Should be removed once http_wrapper accept ssl_validation_meta_data
         @return:
         """
-        ret = self.ssl_verification_data.mode != SslVerificationMode.NO_SSL
+        ret = not self.ssl_verification_data.is_insecure_mode
         if ret and self.ssl_verification_data.mode != SslVerificationMode.WITH_TRUST_STORE:
             ret = self.ssl_verification_data.ca_cert_path
         return ret

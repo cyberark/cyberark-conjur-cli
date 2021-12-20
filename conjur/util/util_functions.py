@@ -12,7 +12,6 @@ import logging
 import platform
 import os
 
-
 # Internals
 from conjur.api.models import SslVerificationMetadata
 from conjur.api.models import SslVerificationMode
@@ -107,11 +106,13 @@ def get_current_os() -> OSTypes:  # pragma: no cover
     return OSTypes.UNKNOWN
 
 
-def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool) -> SslVerificationMetadata:
+def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool,
+                                                 conjur_data: ConjurrcData = None) -> SslVerificationMetadata:
     """
     Determine SslVerificationMetaData from conjurrc file
     """
-    conjur_data = ConjurrcData.load_from_file()
+    if not conjur_data:
+        conjur_data = ConjurrcData.load_from_file()
     cert_path = conjur_data.cert_file
     if not ssl_verify:
         return SslVerificationMetadata(SslVerificationMode.NO_SSL)

@@ -10,6 +10,7 @@ from asynctest import CoroutineMock, patch
 
 from aiohttp import BasicAuth
 
+from conjur.api.models import SslVerificationMode, SslVerificationMetadata
 from conjur.errors import HttpSslError
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 
@@ -43,6 +44,10 @@ class HttpVerbTest(unittest.TestCase):
         self.assertTrue(HttpVerb.POST)
         self.assertTrue(HttpVerb.DELETE)
         self.assertTrue(HttpVerb.PATCH)
+
+
+def create_ssl_verification_metadata(mode=SslVerificationMode.WITH_TRUST_STORE, cert_path=None):
+    return SslVerificationMetadata(mode, cert_path)
 
 
 class HttpInvokeEndpointTest(unittest.TestCase):
@@ -140,7 +145,8 @@ class HttpInvokeEndpointTest(unittest.TestCase):
         ssl_context = ssl.create_default_context()
         with patch.object(ssl, 'create_default_context', return_value=ssl_context) as mock_create_ssl_context:
             mock_request.return_value = MockResponse('', 200)
-            invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, ssl_verify='foo')
+            invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None,
+                            ssl_verification_metadata=create_ssl_verification_metadata())
 
             mock_create_ssl_context.assert_called_once_with()
             mock_request.assert_called_once_with('GET', 'no/params', auth=None, data='', ssl=ssl_context, headers={},
@@ -149,15 +155,19 @@ class HttpInvokeEndpointTest(unittest.TestCase):
     @patch('aiohttp.ClientSession.request')
     def test_invoke_endpoint_raises_hostname_mismatch_error(self, mock_request):
         mock_request.side_effect = ClientSSLError(ConnectionKey(None, None, None, None, None, None, None),
-                                                          OSError())
+                                                  OSError())
         ssl_context = ssl.create_default_context()
         with patch.object(ssl, 'create_default_context', return_value=ssl_context) as mock_create_ssl_context:
             with self.assertRaises(HttpSslError):
-                invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None, ssl_verify='foo', check_errors=False)
+                invoke_endpoint(HttpVerb.GET, self.MockEndpoint.NO_PARAMS, None,
+                                ssl_verification_metadata=create_ssl_verification_metadata(
+                                    SslVerificationMode.SELF_SIGN, 'foo'),
+                                check_errors=False)
 
-            ssl_context_calls = [call(), call(cafile='foo')]
+            ssl_context_calls = [call(cafile='foo')]
             mock_create_ssl_context.assert_has_calls(ssl_context_calls)
-            mock_request.assert_called_with('GET', 'no/params', auth=None, data='', ssl=ssl_context, headers={}, params=None)
+            mock_request.assert_called_with('GET', 'no/params', auth=None, data='', ssl=ssl_context, headers={},
+                                            params=None)
 
     @patch('aiohttp.ClientSession.request')
     def test_invoke_endpoint_passes_auth_param_to_http_client_if_provided(self, mock_request):

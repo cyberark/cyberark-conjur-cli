@@ -42,16 +42,6 @@ class LoginLogic:
             'account': conjurrc.conjur_account
         }
 
-        # if ssl_verification_metadata.mode == SslVerificationMode.NO_SSL:
-        #     certificate_path = False
-        # elif ssl_verify and credential_data.machine.startswith("https"):
-        #     # Catches the case where a user does not run in insecure mode but the
-        #     # .conjurrc cert_file entry is empty
-        #     if conjurrc.cert_file == '':
-        #         raise CertificateVerificationException
-        #
-        #     certificate_path = conjurrc.cert_file
-
         # pylint: disable=logging-fstring-interpolation
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur...")
         try:
@@ -61,7 +51,7 @@ class LoginLogic:
                                       auth=(credential_data.login, password),
                                       ssl_verification_metadata=ssl_verification_metadata).text
         except HttpSslError:
-            if conjurrc.cert_file == '' and ssl_verification_metadata.mode != SslVerificationMode.NO_SSL:
+            if not conjurrc.cert_file and not ssl_verification_metadata.is_insecure_mode:
                 raise CertificateVerificationException
         except Exception:
             raise

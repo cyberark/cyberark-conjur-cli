@@ -18,6 +18,14 @@ class SslVerificationMetadata:
         self.ca_cert_path = ca_cert_path
         self._validate_input()
 
+    @property
+    def is_insecure_mode(self):
+        return self.mode == SslVerificationMode.NO_SSL
+
+    @property
+    def is_self_signed_mode(self):
+        return self.mode == SslVerificationMode.SELF_SIGN
+
     def _validate_input(self):
         requires_cert_options = [SslVerificationMode.WITH_CA_BUNDLE,
                                  SslVerificationMode.SELF_SIGN]
@@ -29,3 +37,6 @@ class SslVerificationMetadata:
 
     def __eq__(self, other):
         return self.mode == other.mode and self.ca_cert_path == other.ca_cert_path
+
+    def __repr__(self):
+        return str(self.__dict__)
