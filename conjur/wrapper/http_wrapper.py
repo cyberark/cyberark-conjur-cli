@@ -10,6 +10,7 @@ import base64
 import logging
 import re
 import ssl
+import time
 from enum import Enum
 from typing import Union
 from urllib.parse import quote
@@ -18,7 +19,8 @@ from aiohttp import BasicAuth, ClientError, ClientResponseError, ClientSSLError,
 import async_timeout
 import urllib3
 
-from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError,HttpStatusError
+from conjur.api.ssl_utils import ssl_context_factory
+from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
 
@@ -53,6 +55,13 @@ def invoke_endpoint(http_verb: HttpVerb,
     """
     This method flexibly invokes HTTP calls from 'aiohttp' module
     """
+    # pylint: disable=logging-fstring-interpolation
+    logging.debug(f"Invoke endpoint. Verb: '{http_verb.name}', Endpoint: '{endpoint.name}', Params: '{params}', "
+                  f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verify: '{ssl_verify}', "
+                  f"Basic auth user: '{auth[0] if auth else ''}', using API token: '{api_token is not None}', "
+                  f"Query params: '{query}', Headers: '{headers}', Decode token: '{decode_token}'")
+    start = time.monotonic()
+
     if headers is None:
         headers = {}
 
@@ -117,6 +126,10 @@ def invoke_endpoint(http_verb: HttpVerb,
         except Exception as general_error:
             raise HttpError from general_error
 
+    duration_ms = int((time.monotonic() - start)*1000)
+    logging.debug("Invoke endpoint succeeded. Duration: %dms, Request: %s %s, Response: %s",
+                  duration_ms, http_verb.name, url, response)
+
     return response
 
 
@@ -156,19 +169,13 @@ async def invoke_request(http_verb: HttpVerb,
 
 
 def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
-    if not ssl_verify:
-        return False
-
-    if ssl_verify is True:
-        ssl_context = ssl.create_default_context()
-    else:
-        ssl_context = ssl.create_default_context(cafile=ssl_verify)
-
-    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
-    # pylint: disable=no-member
-    ssl_context.verify_flags |= ssl.OP_NO_TICKET
-
-    return ssl_context
+    """
+    Return new SSLContext object to verify the TLS.
+    If ssl_verify is False/None/empty, return False which instructs SSL usage without certificate validation.
+    """
+    if ssl_verify:
+        return ssl_context_factory.create_ssl_context(ssl_verify)
+    return False
 
 
 # Not coverage tested since this code should never be hit

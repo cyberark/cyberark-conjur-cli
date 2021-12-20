@@ -38,8 +38,6 @@ class Cli:
     helpers around parsing of parameters and running client commands.
     """
 
-    LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-
     def __init__(self):
         # TODO stop using testing_env
         self.is_testing_env = str(os.getenv('TEST_ENV')).lower() == 'true'
@@ -69,6 +67,9 @@ class Cli:
             .build()
 
         resource, args = self._parse_args(parser)
+
+        Client.configure_logger(debug=args.debug)
+
         # pylint: disable=broad-except
         try:
             self.run_action(resource, args)

@@ -36,6 +36,9 @@ use these parameters defined in this class to initialize our Python
 SDK in their code.
 """
 
+LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
+LOGGING_FORMAT_WARNING = 'WARNING: %(message)s'
+
 
 # pylint: disable=logging-fstring-interpolation,line-too-long
 class Client:
@@ -44,9 +47,6 @@ class Client:
 
     This class is used to construct a client for API interaction
     """
-
-    LOGGING_FORMAT = '%(asctime)s %(levelname)s: %(message)s'
-    LOGGING_FORMAT_WARNING = 'WARNING: %(message)s'
 
     # The method signature is long but we want to explicitly control
     # what parameters are allowed
@@ -73,16 +73,16 @@ class Client:
 
         logging.debug("Client initialized")
 
-    def configure_logger(self, debug: bool):
+    @staticmethod
+    def configure_logger(debug: bool):
         """
         Configures the logging for the client
         """
         # Suppress third party logs
-
         if debug:
-            logging.basicConfig(level=logging.DEBUG, format=self.LOGGING_FORMAT)
+            logging.basicConfig(level=logging.DEBUG, format=LOGGING_FORMAT)
         else:
-            logging.basicConfig(level=logging.WARN, format=self.LOGGING_FORMAT_WARNING)
+            logging.basicConfig(level=logging.WARN, format=LOGGING_FORMAT_WARNING)
 
     ### API passthrough
 

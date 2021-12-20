@@ -186,3 +186,15 @@ class HttpSslError(HttpError):
     """ Exception for HTTP SSL failures """
     def __init__(self, message: str = "HTTP request failed with SSL error"):
         super().__init__(message=message)
+
+class UnknownOSError(Exception):
+    """ Exception when using OS specific logic for unknown OS """
+    def __init__(self, message: str = "Unknown OS"):
+        self.message = message
+        super().__init__(self.message)
+
+class MacCertificatesError(Exception):
+    """ Exception when failing to get root CA certificates from keychain in mac """
+    def __init__(self, message: str = "Failed to get root CA certificates from keychain"):
+        self.message = message
+        super().__init__(self.message)
