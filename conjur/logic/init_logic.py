@@ -13,7 +13,6 @@ import os.path
 
 from conjur.api.models import SslVerificationMetadata
 from conjur.api.ssl_utils.errors import TLSSocketConnectionException
-from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
 from conjur.api.ssl_utils.ssl_client import SSLClient
@@ -69,14 +68,6 @@ class InitLogic:
         params = {
             'url': conjurrc_data.conjur_url
         }
-        # If the user provides us with the certificate path, we will use it
-        # to make a request to /info
-        if conjurrc_data.cert_file is None and conjurrc_data.conjur_url.startswith("https"):
-            certificate_path = os.path.join(os.path.dirname(DEFAULT_CONFIG_FILE),
-                                            "conjur-server.pem")
-        else:
-            certificate_path = conjurrc_data.cert_file
-
         logging.debug("Attempting to fetch the account from the Conjur server...")
         response = invoke_endpoint(HttpVerb.GET,
                                    ConjurEndpoint.INFO,

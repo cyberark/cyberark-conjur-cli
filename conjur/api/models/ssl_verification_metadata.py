@@ -20,10 +20,16 @@ class SslVerificationMetadata:
 
     @property
     def is_insecure_mode(self):
+        """
+        @return: True, if mode is NO_SSL
+        """
         return self.mode == SslVerificationMode.NO_SSL
 
     @property
     def is_self_signed_mode(self):
+        """
+        @return: True, if mode is SELF_SIGN
+        """
         return self.mode == SslVerificationMode.SELF_SIGN
 
     def _validate_input(self):

@@ -21,9 +21,8 @@ from typing import Optional, Tuple
 
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
-    CertificateNotTrustedException, ConfirmationException, MissingRequiredParameterException, \
-    OperationNotCompletedException, HttpStatusError, HttpSslError
+from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, ConfirmationException, \
+    MissingRequiredParameterException, OperationNotCompletedException, HttpStatusError, HttpSslError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic
@@ -43,7 +42,7 @@ class InitController:
                  ssl_verification_data: SslVerificationMetadata):
         self.ssl_verification_data = ssl_verification_data
 
-        if self.ssl_verification_data.is_insecure_mode():
+        if self.ssl_verification_data.is_insecure_mode:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
 

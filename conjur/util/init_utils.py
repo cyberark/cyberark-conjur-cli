@@ -46,6 +46,13 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
 
 def get_ssl_verification_meta_data_from_cli_params(ca_path, is_self_signed,
                                                    ssl_verify) -> SslVerificationMetadata:
+    """
+    Create SslVerificationMetadata according to input
+    @param ca_path:
+    @param is_self_signed:
+    @param ssl_verify:
+    @return: SslVerificationMetadata
+    """
     if ca_path:
         return SslVerificationMetadata(SslVerificationMode.WITH_CA_BUNDLE, ca_path)
     if is_self_signed:

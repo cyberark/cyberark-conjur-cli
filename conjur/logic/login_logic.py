@@ -12,7 +12,7 @@ import logging
 
 # Internals
 from conjur.api.endpoints import ConjurEndpoint
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur.api.models import SslVerificationMetadata
 from conjur.errors import CertificateVerificationException, HttpSslError
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
@@ -31,7 +31,7 @@ class LoginLogic:
         self.credentials_provider = credentials_provider
 
     @classmethod
-    # pylint: disable=line-too-long,logging-fstring-interpolation
+    # pylint: disable=logging-fstring-interpolation,try-except-raise,raise-missing-from
     def get_api_key(cls, ssl_verification_metadata: SslVerificationMetadata, credential_data: CredentialsData,
                     password: str, conjurrc: ConjurrcData) -> str:
         """
