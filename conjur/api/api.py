@@ -83,7 +83,8 @@ class Api:
         Property returns api_key. if no api_key we try the password as sometimes
         @return: api_key
         """
-        return self._api_key
+        # TODO do not use password after credentials store is fixed to also store API key
+        return self._api_key or self.password
 
     @property
     # pylint: disable=missing-docstring
