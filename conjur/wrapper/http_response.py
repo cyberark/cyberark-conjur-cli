@@ -34,7 +34,7 @@ class HttpResponse:
         self._client_response.raise_for_status()
 
     @property
-    def status(self) -> str:
+    def status(self) -> int:
         """ Return the response body as utf-8 text """
         return self._client_response.status
 
@@ -52,3 +52,6 @@ class HttpResponse:
     def json(self) -> json:
         """ Return the response body as json object based on utf-8 text """
         return json.loads(self.text)
+
+    def __repr__(self):
+        return f"{{'status': {self.status}, 'content length': '{len(self.content)}'}}"

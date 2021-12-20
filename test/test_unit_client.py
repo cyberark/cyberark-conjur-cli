@@ -4,7 +4,7 @@ import unittest
 import uuid
 from unittest.mock import patch
 
-from conjur.api.client import  Client
+from conjur.api.client import Client, LOGGING_FORMAT_WARNING, LOGGING_FORMAT
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 
 from conjur.data_object import CredentialsData
@@ -70,7 +70,7 @@ class ClientTest(unittest.TestCase):
     def test_client_initializes_logging(self, mock_logging, mock_api, mock_creds, mock):
         create_client(debug=False)
 
-        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT_WARNING,
+        mock_logging.assert_called_once_with(format=LOGGING_FORMAT_WARNING,
                                              level=logging.WARNING)
 
     @patch('conjur.api.client.Api')
@@ -78,7 +78,7 @@ class ClientTest(unittest.TestCase):
     def test_client_increases_logging_with_debug_flag(self, mock_logging, mock_api):
         create_client()
 
-        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
+        mock_logging.assert_called_once_with(format=LOGGING_FORMAT, level=logging.DEBUG)
 
     @patch('conjur.api.Api')
     @patch('conjur.logic.credential_provider.FileCredentialsProvider.load',
@@ -99,7 +99,7 @@ class ClientTest(unittest.TestCase):
                credentials_provider=FileCredentialsProvider(),
                debug=True)
 
-        mock_logging.assert_called_once_with(format=Client.LOGGING_FORMAT, level=logging.DEBUG)
+        mock_logging.assert_called_once_with(format=LOGGING_FORMAT, level=logging.DEBUG)
 
     @patch('conjur.wrapper.keystore_wrapper.KeystoreWrapper.is_keyring_accessible',
            return_value=False)

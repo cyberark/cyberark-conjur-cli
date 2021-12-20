@@ -7,75 +7,58 @@ This module job is to encapsulate the creation of SSLContext in the dependent of
 
 import logging
 import ssl
-from subprocess import Popen, PIPE
+import subprocess
 import platform
-import os
+from functools import lru_cache
+from typing import Union
 
+from conjur.errors import UnknownOSError, MacCertificatesError, NoCertificatesError
 from conjur.util.os_types import OSTypes
 from conjur.util.util_functions import get_current_os
 
 
 # pylint: disable=too-few-public-methods
-class SslContextFactory:
+def create_ssl_context(ssl_verify: Union[bool, str]) -> ssl.SSLContext:
     """
-    Factory to create SSLContext object
+    Factory method to create SSLContext loaded with system RootCA's
+    @return: SSLContext configured with the system certificates
     """
+    os_name = platform.system()
 
-    @classmethod
-    def create_platform_specific_ssl_context(cls) -> ssl.SSLContext:
-        """
-        Factory method to create SSLContext loaded with system RootCA's
-        @return: SSLContext configured with the system certificates
-        """
-        ctx = ssl.create_default_context()
-        if len(ctx.get_ca_certs()) > 0:
-            return ctx
-        current_platform = get_current_os()
-        if current_platform == OSTypes.MAC_OS:
-            cls._configure_ctx_for_mac(ctx)
-        elif current_platform == OSTypes.LINUX:
-            cls._configure_ctx_for_linux(ctx)
-        elif current_platform == OSTypes.WINDOWS:
-            # Windows certs should already be configured in SSLContext
-            pass
+    if ssl_verify is True:
+        logging.debug("Creating SSLContext from OS TrustStore for '%s'", os_name)
+
+        current_os = get_current_os()
+        if current_os == OSTypes.MAC_OS:
+            ssl_context = ssl.create_default_context(cadata=_get_mac_ca_certs())
+        elif current_os in (OSTypes.LINUX, OSTypes.WINDOWS):
+            ssl_context = ssl.create_default_context()
         else:
-            logging.debug("Platform %s not supported", platform.system())
-        return ctx
+            raise UnknownOSError(f"Cannot find CA certificates for OS '{os_name}'")
+    else:
+        ssl_context = ssl.create_default_context(cafile=ssl_verify)
 
-    @staticmethod
-    def _configure_ctx_for_mac(ctx):
-        """
-        load RootCA's to SSLContext in mac environment
-        @param ctx:
-        @return: ctx loaded with mac system RootCA's
-        """
-        mac_cmd_to_fetch_root_certificates = ["security",
-                                              "find-certificate",
-                                              "-a",
-                                              "-p",
-                                              "/System/Library/Keychains/SystemRootCertificates.keychain"]
+    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+    # pylint: disable=no-member
+    ssl_context.verify_flags |= ssl.OP_NO_TICKET
 
-        with Popen(mac_cmd_to_fetch_root_certificates, stdout=PIPE, stderr=PIPE) as process:
-            stdout, _ = process.communicate()
-            ctx.load_verify_locations(cadata=stdout.decode('unicode_escape'))
+    logging.debug("SSLContext created successfully")
 
-    @staticmethod
-    def _configure_ctx_for_linux(ctx):
-        """
-        load RootCA's to SSLContext in linux environments
-        @param ctx:
-        @return: ctx loaded with mac system RootCA's
-        """
-        # Taken from https://golang.org/src/crypto/x509/root_linux.go
-        certificate_file_locations = [
-            "/etc/ssl/certs/ca-certificates.crt",  # Debian/Ubuntu/Gentoo etc.
-            "/etc/pki/tls/certs/ca-bundle.crt",  # Fedora/RHEL 6
-            "/etc/ssl/ca-bundle.pem",  # OpenSUSE
-            "/etc/pki/tls/cacert.pem",  # OpenELEC
-            "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",  # CentOS/RHEL 7
-            "/etc/ssl/cert.pem"  # Alpine Linux
-        ]
-        for file_path in certificate_file_locations:
-            if os.path.isfile(file_path):
-                ctx.load_verify_locations(cafile=file_path)
-                break
+    return ssl_context
+
+
+@lru_cache
+def _get_mac_ca_certs() -> str:
+    """ Get Root CAs from mac Keychain. """
+    logging.debug("Get CA certs from mac keychain")
+
+    try:
+        get_ca_certs_process = subprocess.run(
+            ["security", "find-certificate", "-a", "-p", "/System/Library/Keychains/SystemRootCertificates.keychain"],
+            capture_output=True,
+            timeout=10,
+            check=True,
+            text=True)
+        return get_ca_certs_process.stdout
+    except Exception as ex:
+        raise MacCertificatesError() from ex
