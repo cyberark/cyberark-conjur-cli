@@ -55,7 +55,7 @@ class InitControllerTest(unittest.TestCase):
             mock_conjurrc_data.conjur_url = 'https://someurl'
             mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False,
                                                   self.ssl_verification_metadata)
-            mock_init_controller._get_account_info()
+            mock_init_controller._get_account_info_if_not_exist()
 
     @patch('builtins.input', return_value='someaccount')
     @patch('conjur.logic.init_logic')
@@ -65,7 +65,7 @@ class InitControllerTest(unittest.TestCase):
         mock_conjurrc_data.conjur_url = "https://someaccount"
         mock_init_controller = InitController(mock_conjurrc_data, mock_init_logic, False,
                                               self.ssl_verification_metadata)
-        mock_init_controller._get_account_info()
+        mock_init_controller._get_account_info_if_not_exist()
         self.assertEquals(mock_conjurrc_data.conjur_account, 'someaccount')
 
     '''
@@ -188,4 +188,4 @@ class InitControllerTest(unittest.TestCase):
         init_controller = InitController(ConjurrcData(account=None), mock_init_logic, False,
                                          self.ssl_verification_metadata)
         with self.assertRaises(CertificateHostnameMismatchException):
-            init_controller._get_account_info()
+            init_controller._get_account_info_if_not_exist()

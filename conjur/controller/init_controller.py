@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 from urllib.parse import ParseResult
 
 # Internals
-from typing import Optional, Tuple
+from typing import Optional
 
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
@@ -58,45 +58,26 @@ class InitController:
         Method that facilitates all method calls in this class
         In more details this function job is to create the conjurrcData object and write it to disk
         """
-        # the following methods validate and fill the self.conjurrc_data object.
-        # Note that these calls might perform user interaction actions as well as alter
-        # self.conjurrc_data ob
+        if self.conjurrc_data.conjur_url is None:
+            self.conjurrc_data.conjur_url = self._prompt_for_conjur_url()
+        formatted_conjur_url = self._format_conjur_url()
 
-        formatted_conjur_url = self._run_url_flow()
+        self._validate_conjur_url(formatted_conjur_url)
 
-        # get certificate and write to disk in a case of self-signed. write the cert_file property
-        # to self.conjurrc_data
-        self._run_certificate_flow(formatted_conjur_url)
-
-        # get the account if needed and fill it to self.conjurrc_data
-        self._run_account_flow()
-
+        self._fetch_certificate_if_needed_and_update_conjurrc(formatted_conjur_url)
+        self._get_account_info_if_not_exist()
         self.write_conjurrc()
         sys.stdout.write("Successfully initialized the Conjur CLI\n")
 
-    def _run_url_flow(self):
-        if self.conjurrc_data.conjur_url is None:
-            self._prompt_for_conjur_url()
-
-        formatted_conjur_url = self._format_conjur_url()
-        allow_http_only = not self.ssl_verification_data.is_insecure_mode
-        self._validate_conjur_url(formatted_conjur_url, allow_http_only)
-        return formatted_conjur_url
-
-    def _run_certificate_flow(self, formatted_conjur_url):
+    def _fetch_certificate_if_needed_and_update_conjurrc(self, formatted_conjur_url):
         mode = self.ssl_verification_data.mode
         if mode == SslVerificationMode.WITH_CA_BUNDLE:
             self.conjurrc_data.cert_file = self.ssl_verification_data.ca_cert_path
         if mode == SslVerificationMode.SELF_SIGN:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
-            # For a uniform experience, regardless if the certificate is self-signed
-            # or CA-signed, we will write the certificate on the machine
             self._write_certificate(fetched_certificate)
         if mode in [SslVerificationMode.NO_SSL, SslVerificationMode.WITH_TRUST_STORE]:
             self.conjurrc_data.cert_file = ""
-
-    def _run_account_flow(self):
-        self._get_account_info()
 
     def _prompt_for_conjur_url(self):
         """
@@ -104,14 +85,15 @@ class InitController:
         """
         # pylint: disable=line-too-long
         if self.conjurrc_data.conjur_url is None:
-            self.conjurrc_data.conjur_url = input(
+            conjur_url = input(
                 "Enter the URL of your Conjur server (use HTTPS prefix): ").strip()
-            if self.conjurrc_data.conjur_url == '':
+            if conjur_url == '':
                 # pylint: disable=raise-missing-from
                 raise InvalidURLFormatException("Error: URL is required")
+        return conjur_url
 
     # TODO: Factor out the following URL validation to ConjurrcData class
-    def _format_conjur_url(self) -> Tuple[str, str]:
+    def _format_conjur_url(self) -> ParseResult:
         """
         Method for formatting the Conjur server URL to
         break down the URL into segments
@@ -122,12 +104,13 @@ class InitController:
 
         return urlparse(self.conjurrc_data.conjur_url)
 
-    def _validate_conjur_url(self, conjur_url: ParseResult, allow_https_only: bool = True):
+    def _validate_conjur_url(self, conjur_url: ParseResult):
         """
         Validates the specified url
 
         Raises a RuntimeError in case of an invalid url format
         """
+        allow_https_only = not self.ssl_verification_data.is_insecure_mode
         valid_scheme = conjur_url.scheme == 'https' or (
                 not allow_https_only and conjur_url.scheme == 'http')
         if not valid_scheme:
@@ -165,7 +148,7 @@ class InitController:
         return fetched_certificate
 
     # pylint: disable=line-too-long,logging-fstring-interpolation,broad-except,raise-missing-from
-    def _get_account_info(self):
+    def _get_account_info_if_not_exist(self):
         """
         Method to fetch the account from the user
         """
