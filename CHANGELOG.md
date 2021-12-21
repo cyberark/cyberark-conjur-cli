@@ -6,15 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [7.1.0] - 2021-12-21
+
 ### Added
 - `Init` command is now strict to run in one of three modes described in `SslVerificationMode` enum
-- For CLI `Init` flow, Additional certificate validation steps where added. for --self-signed and 
-  --ca-cert flows
+- For CLI `Init` flow, Additional certificate validation steps where added. for --self-signed and --ca-cert flows
 - Support http domains if working in insecure mode
-- The `hostfactory` method `create token` is now available in CLI and SDK to create a hostfactory token 
-  to manage hosts and permissions in a dynamic way
+- The `hostfactory` method `create token` is now available in CLI and SDK to create a hostfactory token to manage hosts
+  and permissions in a dynamic way
   [cyberark/conjur-api-python3#339](https://github.com/cyberark/conjur-api-python3/pull/339)
 - Stop supporting `Client` initialization from disk.
+
+### Fixed
+- Fixed Load policy "hides" the error message
 
 ## [7.0.1] - 2020-04-12
 
@@ -34,23 +38,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#89](https://github.com/cyberark/conjur-api-python3/issues/89)
 
 ### Changed
-- The CLI and SDK now use a system's native credential store to save credentials instead of a netrc file by default. 
-  If a store is not available, the credentials will be saved to the netrc as a fallback. [cyberark/conjur-api-python3#NO]()
+- The CLI and SDK now use a system's native credential store to save credentials instead of a netrc file by default. If
+  a store is not available, the credentials will be saved to the netrc as a fallback. [cyberark/conjur-api-python3#NO]()
 - The CLI/SDK package pushed to Pypi has changed from `conjur-client` to `conjur`. [cyberark/conjur-api-python3#NO]()
-- The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`.
-  Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
+- The .conjurrc parameters have been renamed from `account` to `conjur_account` and from `appliance_url` to `conjur_url`
+  . Additionally, the plugins parameter has been removed. This is a breaking change for users who generate their own
   .conjurrc file for use in the SDK and will need to update accordingly.
   [cyberark/conjur-api-python3#206](https://github.com/cyberark/conjur-api-python3/issues/206)
-- Policy functions `apply_policy_file` and `delete_policy_file` have been replaced with `load_policy_file` and 
-  `update_policy_file` respectively. This is a breaking change and users who import the SDK will need to update 
-  these references in their projects [cyberark/conjur-api-python3#112](https://github.com/cyberark/conjur-api-python3/issues/112)
+- Policy functions `apply_policy_file` and `delete_policy_file` have been replaced with `load_policy_file` and
+  `update_policy_file` respectively. This is a breaking change and users who import the SDK will need to update these
+  references in their
+  projects [cyberark/conjur-api-python3#112](https://github.com/cyberark/conjur-api-python3/issues/112)
 - CLI command UX has been improved according to UX guidelines
   [cyberark/conjur-api-python3#132](https://github.com/cyberark/conjur-api-python3/issues/132)
   See [design guidelines](https://ljfz3b.axshare.com/#id=x8ktq8&p=conjur_help__init&g=1)
 - Update help screens according to [these guidelines](https://ljfz3b.axshare.com/#id=yokln4&p=conjur_main_help&g=1).
   [cyberark/conjur-api-python3#92](https://github.com/cyberark/conjur-api-python3/issues/92)
-- Directory structure has been refactored. See [design document](https://github.com/cyberark/conjur-api-python3/blob/main/design/general_refactorings.md) for more details.
-  This is a breaking change. Users who import the SDK in their projects should change their import statement from
+- Directory structure has been refactored.
+  See [design document](https://github.com/cyberark/conjur-api-python3/blob/main/design/general_refactorings.md) for
+  more details. This is a breaking change. Users who import the SDK in their projects should change their import
+  statement from
   `from conjur.client import Client` to `from conjur.api import Client`
   [cyberark/conjur-api-python3#121](https://github.com/cyberark/conjur-api-python3/issues/121)
 
@@ -65,6 +72,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   [cyberark/conjur-api-python3#43](https://github.com/cyberark/conjur-api-python3/issues/43)
 
 ## [0.1.0] - 2020-01-03
+
 ### Added
 - Added ability to publish the container to DockerHub
   [cyberark/conjur-api-python3#28](https://github.com/cyberark/conjur-api-python3/issues/28)
@@ -73,7 +81,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.0.5] - 2019-12-06
 
 ### Added
-- Added ability to delete policies [cyberark/conjur-api-python3#23](https://github.com/cyberark/conjur-api-python3/issues/23)
+- Added ability to delete
+  policies [cyberark/conjur-api-python3#23](https://github.com/cyberark/conjur-api-python3/issues/23)
 
 ## [0.0.4] - 2019-11-21
 
@@ -102,10 +111,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fatal exception is raised when this module is run on Python2
 
 ## [0.0.1] - 2019-05-01
+
 ### Added
 - The first tagged version.
 
-[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v7.0.1...HEAD
+[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v7.1.0...HEAD
+[7.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v7.0.1...v7.1.0
 [7.0.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.1...v7.0.1
 [0.1.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.5...v0.1.0
