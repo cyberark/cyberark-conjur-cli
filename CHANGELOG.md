@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   and permissions in a dynamic way
   [cyberark/conjur-api-python3#339](https://github.com/cyberark/conjur-api-python3/pull/339)
 - Stop supporting `Client` initialization from disk.
+- The list options `--members-of`, `--permitted-roles`, and `--privilege` are now available in the Conjur CLI
 
 ### Fixed
 - Fixed Load policy "hides" the error message
