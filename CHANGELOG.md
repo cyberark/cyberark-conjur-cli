@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## [7.1.0] - 2021-12-21
+## [7.1.1] - 2021-12-21
 
 ### Added
 - `Init` command is now strict to run in one of three modes described in `SslVerificationMode` enum
@@ -116,8 +116,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - The first tagged version.
 
-[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v7.1.0...HEAD
-[7.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v7.0.1...v7.1.0
+[Unreleased]: https://github.com/conjurinc/conjur-api-python3/compare/v7.1.1...HEAD
+[7.1.1]: https://github.com/conjurinc/conjur-api-python3/compare/v7.0.1...v7.1.1
 [7.0.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.1...v7.0.1
 [0.1.1]: https://github.com/conjurinc/conjur-api-python3/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/conjurinc/conjur-api-python3/compare/v0.0.5...v0.1.0
