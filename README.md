@@ -104,7 +104,7 @@ To start using the SDK in your applications, create a Client instance and then i
 from conjur import Client
 
 client = Client(conjurrc_data=ConjurrcData(...),
-                ssl_verification_mode=SslVerificationMode.WITH_TRUST_STORE.,
+                ssl_verification_mode=SslVerificationMode.TRUST_STORE,
                 credentials_provider=FileCredentialsProvider(),
                 debug=False)
 

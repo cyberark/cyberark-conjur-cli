@@ -37,7 +37,7 @@ class LoginControllerTest(unittest.TestCase):
         self.assertEquals(mock_login_controller.login_logic, mock_login_logic)
 
     def test_login_controller_constructor_with_ssl_verify_false_calls_warning_message(self):
-        mock_ssl_verify = SslVerificationMetadata(SslVerificationMode.NO_SSL)
+        mock_ssl_verify = SslVerificationMetadata(SslVerificationMode.INSECURE)
         util_functions.get_insecure_warning_in_debug = MagicMock()
         LoginController(mock_ssl_verify, None, None, None)
         util_functions.get_insecure_warning_in_debug.assert_called_once()

@@ -71,12 +71,12 @@ class InitController:
 
     def _fetch_certificate_if_needed_and_update_conjurrc(self, formatted_conjur_url):
         mode = self.ssl_verification_data.mode
-        if mode == SslVerificationMode.WITH_CA_BUNDLE:
+        if mode == SslVerificationMode.CA_BUNDLE:
             self.conjurrc_data.cert_file = self.ssl_verification_data.ca_cert_path
-        if mode == SslVerificationMode.SELF_SIGN:
+        elif mode == SslVerificationMode.SELF_SIGN:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
             self._write_certificate(fetched_certificate)
-        if mode in [SslVerificationMode.NO_SSL, SslVerificationMode.WITH_TRUST_STORE]:
+        elif mode in [SslVerificationMode.INSECURE, SslVerificationMode.TRUST_STORE]:
             self.conjurrc_data.cert_file = ""
 
     def _prompt_for_conjur_url(self):
@@ -110,9 +110,9 @@ class InitController:
 
         Raises a RuntimeError in case of an invalid url format
         """
-        allow_https_only = not self.ssl_verification_data.is_insecure_mode
-        valid_scheme = conjur_url.scheme == 'https' or (
-                not allow_https_only and conjur_url.scheme == 'http')
+        valid_scheme = conjur_url.scheme == 'https'
+        if self.ssl_verification_data.is_insecure_mode:
+            valid_scheme |= conjur_url.scheme == 'http'
         if not valid_scheme:
             raise InvalidURLFormatException(f"Error: undefined behavior. "
                                             f" Reason: The Conjur URL format provided. "
@@ -207,8 +207,7 @@ class InitController:
     @staticmethod
     def _prompt_warning_for_self_signed_flow():
         user_answer = input("Using self-signed certificates is not recommended and could lead to "
-                            "exposure of sensitive data.\n Continue? yes/no (Default: no): "
-                            "").strip() or "no"
+                            "exposure of sensitive data.\n Continue? yes/no (Default: no): ").strip()
         if user_answer.lower() not in VALID_CONFIRMATIONS:
             raise OperationNotCompletedException(
                 "User decided to not work with self signed certificate")

@@ -74,7 +74,7 @@ class TestDemonstrateSubtest(TestCase):
                                     endpoint=self.MockEndpoint.BADSSL_URL,
                                     params={'url': badssl_url},
                                     ssl_verification_metadata=SslVerificationMetadata(
-                                        SslVerificationMode.WITH_TRUST_STORE),
+                                        SslVerificationMode.TRUST_STORE),
                                     check_errors=False)
 
     def test_http_wrapper_get_valid_badssl_endpoints_successfully(self):
@@ -83,5 +83,5 @@ class TestDemonstrateSubtest(TestCase):
                 invoke_endpoint(HttpVerb.GET,
                                 endpoint=self.MockEndpoint.BADSSL_URL,
                                 params={'url': badssl_url},
-                                ssl_verification_metadata=SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE),
+                                ssl_verification_metadata=SslVerificationMetadata(SslVerificationMode.TRUST_STORE),
                                 check_errors=False)

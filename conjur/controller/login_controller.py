@@ -33,7 +33,7 @@ class LoginController:
         check if the user supplied --insecure
         """
         self.ssl_verification_metadata = ssl_verification_metadata
-        if self.ssl_verification_metadata.mode == SslVerificationMode.NO_SSL:
+        if self.ssl_verification_metadata.mode == SslVerificationMode.INSECURE:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
         self.user_password = user_password

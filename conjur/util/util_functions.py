@@ -13,8 +13,7 @@ import platform
 import os
 
 # Internals
-from conjur.api.models import SslVerificationMetadata
-from conjur.api.models import SslVerificationMode
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import MissingRequiredParameterException, HttpError
 from conjur.util.os_types import OSTypes
 from conjur.data_object.conjurrc_data import ConjurrcData
@@ -115,9 +114,9 @@ def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool,
         conjur_data = ConjurrcData.load_from_file()
     cert_path = conjur_data.cert_file
     if not ssl_verify:
-        return SslVerificationMetadata(SslVerificationMode.NO_SSL)
+        return SslVerificationMetadata(SslVerificationMode.INSECURE)
     if not cert_path:
-        return SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
+        return SslVerificationMetadata(SslVerificationMode.TRUST_STORE)
     if cert_path and cert_path != DEFAULT_CERTIFICATE_FILE:
-        return SslVerificationMetadata(SslVerificationMode.WITH_CA_BUNDLE, cert_path)
+        return SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, cert_path)
     return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, cert_path)

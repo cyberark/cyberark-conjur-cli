@@ -259,10 +259,10 @@ class ApiTest(unittest.TestCase):
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_get_variable_passes_down_ssl_verify_param(self, mock_http_client):
-        api = create_api(ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+        api = create_api(ssl_verification_mode=SslVerificationMode.CA_BUNDLE,
                          cert_path='verify')
         ssl_verification_metadata = create_ssl_verification_metadata(
-            ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+            ssl_verification_mode=SslVerificationMode.CA_BUNDLE,
             cert_path='verify')
 
         # ssl_verify='verify')
@@ -354,7 +354,7 @@ class ApiTest(unittest.TestCase):
 
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse(text='{}'))
     def test_load_policy_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = create_api(ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+        api = create_api(ssl_verification_mode=SslVerificationMode.CA_BUNDLE,
                          cert_path="ssl_verify")
 
         # ssl_verify='ssl_verify')
@@ -368,7 +368,7 @@ class ApiTest(unittest.TestCase):
 
         policy_data = None
         ssl_verification_metadata = create_ssl_verification_metadata(cert_path="ssl_verify",
-                                                                     ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE)
+                                                                     ssl_verification_mode=SslVerificationMode.CA_BUNDLE)
         with open(self.POLICY_FILE, 'r') as content_file:
             policy_data = content_file.read()
 
@@ -507,10 +507,10 @@ class ApiTest(unittest.TestCase):
     @patch('conjur.api.api.invoke_endpoint',
            return_value=MockClientResponse(content='{"foo": "a", "bar": "b"}'))
     def test_get_variables_passes_down_ssl_verify_parameter(self, mock_http_client):
-        api = create_api(ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+        api = create_api(ssl_verification_mode=SslVerificationMode.CA_BUNDLE,
                          cert_path='sslverify')
         ssl_verification_metadata = create_ssl_verification_metadata(
-            ssl_verification_mode=SslVerificationMode.WITH_CA_BUNDLE,
+            ssl_verification_mode=SslVerificationMode.CA_BUNDLE,
             cert_path='sslverify')
 
         def mock_auth():

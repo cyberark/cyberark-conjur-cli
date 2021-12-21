@@ -52,7 +52,7 @@ class LoginLogicTest(unittest.TestCase):
             with patch('conjur.logic.login_logic.invoke_endpoint', side_effect=HttpSslError) as mock:
                 mock_credential_store = FileCredentialsProvider()
                 mock_login_logic = LoginLogic(mock_credential_store)
-                ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
+                ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.TRUST_STORE)
                 mock_login_logic.get_api_key(ssl_verification_metadata, MockCredentialsData, 'somepass', ConjurrcData())
 
     @patch('conjur.logic.login_logic.invoke_endpoint', return_value=MockClientResponse())

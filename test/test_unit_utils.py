@@ -11,7 +11,7 @@ class UserInputDataTest(unittest.TestCase):
     def test_get_ssl_verification_meta_data_from_conjurrc_no_ssl(self):
         data = ConjurrcData(conjur_url="https://foo.com", account="some_account", cert_file="cert")
         res = utils.get_ssl_verification_meta_data_from_conjurrc(False, data)
-        self.assertEquals(res.mode, SslVerificationMode.NO_SSL)
+        self.assertEquals(res.mode, SslVerificationMode.INSECURE)
 
     def test_get_ssl_verification_meta_data_from_conjurrc_self_sign(self):
         data = ConjurrcData(conjur_url="https://foo.com", account="some_account",
@@ -22,10 +22,10 @@ class UserInputDataTest(unittest.TestCase):
     def test_get_ssl_verification_meta_data_from_conjurrc_trust_store(self):
         data = ConjurrcData(conjur_url="https://foo.com", account="some_account", cert_file="")
         res = utils.get_ssl_verification_meta_data_from_conjurrc(True, data)
-        self.assertEquals(res.mode, SslVerificationMode.WITH_TRUST_STORE)
+        self.assertEquals(res.mode, SslVerificationMode.TRUST_STORE)
 
     def test_get_ssl_verification_meta_data_from_conjurrc_ca_bundle(self):
         data = ConjurrcData(conjur_url="https://foo.com", account="some_account",
                             cert_file="cert")
         res = utils.get_ssl_verification_meta_data_from_conjurrc(True, data)
-        self.assertEquals(res.mode, SslVerificationMode.WITH_CA_BUNDLE)
+        self.assertEquals(res.mode, SslVerificationMode.CA_BUNDLE)

@@ -46,7 +46,7 @@ class HttpVerbTest(unittest.TestCase):
         self.assertTrue(HttpVerb.PATCH)
 
 
-def create_ssl_verification_metadata(mode=SslVerificationMode.WITH_TRUST_STORE, cert_path=None):
+def create_ssl_verification_metadata(mode=SslVerificationMode.TRUST_STORE, cert_path=None):
     return SslVerificationMetadata(mode, cert_path)
 
 

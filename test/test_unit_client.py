@@ -19,7 +19,7 @@ MockConjurrcApi = ConjurrcData(conjur_url="apiconfigurl",
                                account="apiconfigaccount",
                                cert_file="apiconfigcabundle")
 MockSslVerificationMetaDataApi = SslVerificationMetadata(
-    mode=SslVerificationMode.WITH_CA_BUNDLE,
+    mode=SslVerificationMode.CA_BUNDLE,
     ca_cert_path="apiconfigcabundle")
 # endregion
 
@@ -29,7 +29,7 @@ MockConjurrc = ConjurrcData(conjur_url="http://foo",
                             account="myacct",
                             cert_file=None)
 MockSslVerificationMetaData = SslVerificationMetadata(
-    mode=SslVerificationMode.WITH_TRUST_STORE)
+    mode=SslVerificationMode.TRUST_STORE)
 
 
 # endregion

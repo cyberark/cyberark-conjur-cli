@@ -56,7 +56,7 @@ def invoke_endpoint(http_verb: HttpVerb,
     This method flexibly invokes HTTP calls from 'aiohttp' module
     """
     if ssl_verification_metadata is None:
-        ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
+        ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.TRUST_STORE)
     # pylint: disable=logging-fstring-interpolation
     logging.debug(f"Invoke endpoint. Verb: '{http_verb.name}', Endpoint: '{endpoint.name}', Params: '{params}', "
                   f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verification metadata: "

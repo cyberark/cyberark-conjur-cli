@@ -31,9 +31,12 @@ class LoginLogic:
         self.credentials_provider = credentials_provider
 
     @classmethod
-    # pylint: disable=logging-fstring-interpolation,try-except-raise,raise-missing-from
-    def get_api_key(cls, ssl_verification_metadata: SslVerificationMetadata, credential_data: CredentialsData,
-                    password: str, conjurrc: ConjurrcData) -> str:
+    # pylint: disable=logging-fstring-interpolation
+    def get_api_key(cls,
+                    ssl_verification_metadata: SslVerificationMetadata,
+                    credential_data: CredentialsData,
+                    password: str,
+                    conjurrc: ConjurrcData) -> str:
         """
         Method to fetch the user/host's API key from Conjur
         """
@@ -53,8 +56,6 @@ class LoginLogic:
         except HttpSslError:
             if not conjurrc.cert_file and not ssl_verification_metadata.is_insecure_mode:
                 raise CertificateVerificationException
-        except Exception:
-            raise
         logging.debug("API key retrieved from Conjur")
         return api_key
 

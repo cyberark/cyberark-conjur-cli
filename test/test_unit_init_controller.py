@@ -30,13 +30,13 @@ class InitControllerTest(unittest.TestCase):
     ssl_service = SSLClient
     init_logic = InitLogic(ssl_service)
     force_overwrite = False
-    ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.WITH_TRUST_STORE)
+    ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.TRUST_STORE)
 
     def test_init_constructor(self):
         mock_conjurrc_data = None
         mock_init_logic = None
         mock_force = False
-        mock_ssl_verification_data = SslVerificationMetadata(SslVerificationMode.NO_SSL)
+        mock_ssl_verification_data = SslVerificationMetadata(SslVerificationMode.INSECURE)
         InitController(mock_conjurrc_data, mock_init_logic, mock_force, mock_ssl_verification_data)
         assert InitController.conjurrc_data == mock_conjurrc_data
         assert InitController.init_logic == mock_init_logic
@@ -103,7 +103,7 @@ class InitControllerTest(unittest.TestCase):
     def test_user_supplied_certificate_returns_none(self, mock_input):
         cert_file = "/some/path/somepem.pem"
         self.conjurrc_data.cert_file = cert_file
-        ssl_verification_data = SslVerificationMetadata(SslVerificationMode.WITH_CA_BUNDLE, cert_file)
+        ssl_verification_data = SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, cert_file)
         init_controller = InitController(self.conjurrc_data, self.init_logic, self.force_overwrite,
                                          ssl_verification_data)
         fetched_certificate = init_controller._get_server_certificate(MOCK_FORMATTED_URL)

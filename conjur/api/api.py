@@ -51,7 +51,7 @@ class Api:
             self,
             conjurrc_data: ConjurrcData,
             credentials_provider: CredentialsStoreInterface,
-            ssl_verification_mode: SslVerificationMode = SslVerificationMode.WITH_TRUST_STORE,
+            ssl_verification_mode: SslVerificationMode = SslVerificationMode.TRUST_STORE,
             debug: bool = False,
             http_debug=False,
     ):

@@ -27,7 +27,7 @@ def create_ssl_context(ssl_verification_metadata: SslVerificationMetadata) -> ss
     """
     os_name = platform.system()
 
-    if ssl_verification_metadata.mode == SslVerificationMode.WITH_TRUST_STORE:
+    if ssl_verification_metadata.mode == SslVerificationMode.TRUST_STORE:
         logging.debug("Creating SSLContext from OS TrustStore for '%s'", os_name)
 
         current_os = get_current_os()
