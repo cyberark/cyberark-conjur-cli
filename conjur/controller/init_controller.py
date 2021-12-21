@@ -110,10 +110,10 @@ class InitController:
 
         Raises a RuntimeError in case of an invalid url format
         """
-        valid_scheme = conjur_url.scheme == 'https'
+        valid_schema = ['https']
         if self.ssl_verification_data.is_insecure_mode:
-            valid_scheme |= conjur_url.scheme == 'http'
-        if not valid_scheme:
+            valid_schema += ['http']
+        if conjur_url.scheme not in valid_schema:
             raise InvalidURLFormatException(f"Error: undefined behavior. "
                                             f" Reason: The Conjur URL format provided. "
                                             f"'{self.conjurrc_data.conjur_url}' is not supported.")
