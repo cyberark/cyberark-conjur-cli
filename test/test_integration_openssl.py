@@ -4,6 +4,7 @@
 CLI OpenSSL Integration tests
 This test file handles the main test flows for the variable command
 """
+import ssl
 
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
@@ -18,21 +19,10 @@ class CliIntegrationTestOpenSSL(IntegrationTestCaseBase):  # pragma: no cover
     # *************** HELPERS ***************
 
     def setUp(self):
-        self.setup_cli_params({})
-        # Used to configure the CLI and login to run tests
-        utils.setup_cli(self)
-        return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'replace', '-b', 'root', '-f',
-                                self.environment.path_provider.get_policy_path("initial")])
+        pass
 
-    # *************** TESTS ***************
-
-    @integration_test()
+    @integration_test(True)
     def test_open_ssl_version_is_sufficient(self):
-        import ssl
         version = ssl.OPENSSL_VERSION.split(' ')[1]
-        result = version in ['1.1.1k', '1.1.1l']
-        self.assertTrue(result,
-                        f"Insufficient OpenSSL version, 1.1.1k and above is expected got '{ssl.OPENSSL_VERSION}'")
-
-    test_open_ssl_version_is_sufficient.id1 = True
+        self.assertGreaterEqual(version, "1.1.1k",
+                                f"Insufficient OpenSSL version, 1.1.1k and above is expected got '{ssl.OPENSSL_VERSION}'")
