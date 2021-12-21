@@ -27,7 +27,7 @@ from conjur.data_object import ConjurrcData, CredentialsData, ListData, Variable
 from conjur.api import SSLClient
 from conjur.util import init_utils, util_functions
 
-
+# pylint: disable=raise-missing-from
 def handle_init_logic(
         url: str = None, account: str = None,
         cert: str = None, force: bool = None,

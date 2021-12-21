@@ -10,8 +10,7 @@ import os
 from conjur.api.models import SslVerificationMetadata
 from conjur.api.models import SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
-from conjur.errors import MissingRequiredParameterException, FileNotFoundException, \
-    InvalidFilePermissionsException, ConflictingParametersException
+from conjur.errors import FileNotFoundException, InvalidFilePermissionsException, ConflictingParametersException
 
 
 def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_verify):

@@ -45,7 +45,7 @@ class LoginLogic:
             'account': conjurrc.conjur_account
         }
 
-        # pylint: disable=logging-fstring-interpolation
+        # pylint: disable=logging-fstring-interpolation,raise-missing-from
         logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur...")
         try:
             api_key = invoke_endpoint(HttpVerb.GET,
