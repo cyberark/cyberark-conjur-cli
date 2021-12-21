@@ -47,10 +47,10 @@ class CliIntegrationTestOSS(IntegrationTestCaseBase):
 
     @integration_test(True)
     def test_https_conjurrc_is_created_with_no_parameters_given(self):
-        with patch('builtins.input', side_effect=[self.client_params.hostname, 'yes', 'someotheraccount']):
+        with patch('builtins.input', side_effect=['yes', self.client_params.hostname, 'yes', 'someotheraccount']):
             self.setup_cli_params({})
             self.invoke_cli(self.cli_auth_params,
-                            ['init'])
+                            ['init', '--self-signed'])
 
             with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
                 lines = conjurrc.readlines()

@@ -20,6 +20,7 @@ import async_timeout
 import urllib3
 
 from conjur.api.ssl_utils import ssl_context_factory
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import CertificateHostnameMismatchException, HttpSslError, HttpError, HttpStatusError
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.wrapper.http_response import HttpResponse
@@ -40,13 +41,12 @@ class HttpVerb(Enum):
 
 
 # pylint: disable=too-many-locals,consider-using-f-string,too-many-arguments
-# ssl_verify can accept Boolean or String of the path to certificate file
 def invoke_endpoint(http_verb: HttpVerb,
                     endpoint: ConjurEndpoint,
                     params: dict,
                     data: str = "",
                     check_errors: bool = True,
-                    ssl_verify: Union[bool, str] = True,
+                    ssl_verification_metadata: SslVerificationMetadata = None,
                     auth: tuple = None,
                     api_token: str = None,
                     query: dict = None,
@@ -55,11 +55,14 @@ def invoke_endpoint(http_verb: HttpVerb,
     """
     This method flexibly invokes HTTP calls from 'aiohttp' module
     """
+    if ssl_verification_metadata is None:
+        ssl_verification_metadata = SslVerificationMetadata(SslVerificationMode.TRUST_STORE)
     # pylint: disable=logging-fstring-interpolation
     logging.debug(f"Invoke endpoint. Verb: '{http_verb.name}', Endpoint: '{endpoint.name}', Params: '{params}', "
-                  f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verify: '{ssl_verify}', "
-                  f"Basic auth user: '{auth[0] if auth else ''}', using API token: '{api_token is not None}', "
-                  f"Query params: '{query}', Headers: '{headers}', Decode token: '{decode_token}'")
+                  f"Data length: '{len(data)}', Check errors: '{check_errors}', SSL verification metadata: "
+                  f"'{ssl_verification_metadata}', Basic auth user: '{auth[0] if auth else ''}', using API token: "
+                  f"'{api_token is not None}', Query params: '{query}', Headers: '{headers}', Decode token: "
+                  f"'{decode_token}'")
     start = time.monotonic()
 
     if headers is None:
@@ -83,27 +86,13 @@ def invoke_endpoint(http_verb: HttpVerb,
 
         headers['Authorization'] = f'Token token="{api_token}"'
 
-    # By default, on each request the certificate will be verified. If there is
-    # a failure in verification, the fallback solution will be passing in the
-    # server pem received during initialization of the client
-    # pylint: disable=not-callable
-
-    try:
-        response = asyncio.run(invoke_request(http_verb,
-                                              url,
-                                              data,
-                                              query=query,
-                                              ssl_verify=True,
-                                              auth=auth,
-                                              headers=headers))
-    except HttpSslError:
-        response = asyncio.run(invoke_request(http_verb,
-                                              url,
-                                              data,
-                                              query=query,
-                                              ssl_verify=ssl_verify,
-                                              auth=auth,
-                                              headers=headers))
+    response = asyncio.run(invoke_request(http_verb,
+                                          url,
+                                          data,
+                                          query=query,
+                                          ssl_verification_metadata=ssl_verification_metadata,
+                                          auth=auth,
+                                          headers=headers))
 
     if check_errors:
         # takes the response object and expands the raise_for_status method
@@ -126,7 +115,7 @@ def invoke_endpoint(http_verb: HttpVerb,
         except Exception as general_error:
             raise HttpError from general_error
 
-    duration_ms = int((time.monotonic() - start)*1000)
+    duration_ms = int((time.monotonic() - start) * 1000)
     logging.debug("Invoke endpoint succeeded. Duration: %dms, Request: %s %s, Response: %s",
                   duration_ms, http_verb.name, url, response)
 
@@ -138,7 +127,7 @@ async def invoke_request(http_verb: HttpVerb,
                          url: str,
                          data: str,
                          query: dict,
-                         ssl_verify: Union[bool, str],
+                         ssl_verification_metadata: SslVerificationMetadata,
                          auth: tuple,
                          headers: dict) -> HttpResponse:
     """
@@ -147,8 +136,7 @@ async def invoke_request(http_verb: HttpVerb,
     """
     async with ClientSession() as session:
         async with async_timeout.timeout(REQUEST_TIMEOUT_SECONDS):
-            ssl_context = __create_ssl_context(ssl_verify)
-
+            ssl_context = __create_ssl_context(ssl_verification_metadata)
             try:
                 async with session.request(http_verb.name,
                                            url,
@@ -168,14 +156,14 @@ async def invoke_request(http_verb: HttpVerb,
                 raise HttpError() from request_error
 
 
-def __create_ssl_context(ssl_verify: Union[bool, str]) -> Union[bool, ssl.SSLContext]:
+def __create_ssl_context(ssl_verification_metadata: SslVerificationMetadata) -> Union[bool, ssl.SSLContext]:
     """
     Return new SSLContext object to verify the TLS.
     If ssl_verify is False/None/empty, return False which instructs SSL usage without certificate validation.
     """
-    if ssl_verify:
-        return ssl_context_factory.create_ssl_context(ssl_verify)
-    return False
+    if ssl_verification_metadata.is_insecure_mode:
+        return False
+    return ssl_context_factory.create_ssl_context(ssl_verification_metadata)
 
 
 # Not coverage tested since this code should never be hit

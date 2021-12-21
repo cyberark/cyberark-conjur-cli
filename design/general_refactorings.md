@@ -342,7 +342,7 @@ The following is a mapping of builtin and third-party exceptions that are curren
 
       ```python
       try:
-          self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verify,
+          self.credential_data.api_key = self.login_logic.get_api_key(self.ssl_verification_metadata,
                                                          self.credential_data,
                                                          self.user_password,
                                                          conjurrc)

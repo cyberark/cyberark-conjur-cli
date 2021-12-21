@@ -33,8 +33,11 @@ class InitParser:
                         description=command_description(init_name,
                                                         input_usage),
                         epilog=command_epilog(
-                            'conjur init -a my_org -u https://conjur-server\t'
-                            'Initializes Conjur configuration and writes to file (.conjurrc)'),
+                            'conjur init -a my_org -u https://conjur\t'
+                            'Initializes Conjur configuration and writes to file (.conjurrc)\n'
+                            '    conjur init -u https://conjur-server\t'
+                            'Initializes Conjur configuration and writes to file (.conjurrc)\n'
+                                ),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
@@ -53,10 +56,10 @@ class InitParser:
                                        'the value on the Conjur Enterprise server')
         init_options.add_argument('-c', '--ca-cert', metavar='VALUE',
                                   action='store', dest='certificate',
-                                  help='Optional- provide path to Conjur SSL certificate RootCA')
+                                  help='Optional- use this option to provide Conjur server RootCA '
+                                       'to the cli in case it is not already trusted by this machine')
         init_options.add_argument('-s', '--self-signed', action='store_true', dest='is_self_signed',
-                                  help='Optional- state if you want to work with self signed '
-                                       'certificate')
+                                  help='Optional- state if you want to work with self-signed certificate')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Optional- force overwrite of existing files')

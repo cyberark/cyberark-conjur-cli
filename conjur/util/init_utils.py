@@ -7,11 +7,12 @@ It functionality will move into the init_action once we implement the cli action
 import os
 
 # Internals
-from conjur.errors import MissingRequiredParameterException, FileNotFoundException, \
-    InvalidFilePermissionsException
+from conjur.api.models import SslVerificationMetadata
+from conjur.api.models import SslVerificationMode
+from conjur.constants import DEFAULT_CERTIFICATE_FILE
+from conjur.errors import FileNotFoundException, InvalidFilePermissionsException, ConflictingParametersException
 
 
-# TODO edit this with the new init command UX
 def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_verify):
     """
     Validate the input related to ssl verification for the init action
@@ -21,16 +22,11 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
         use_ca_bundle = True
     options = [use_ca_bundle, is_self_signed, not ssl_verify]
     if sum(options) > 1:
-        raise MissingRequiredParameterException("SSL verification method can be one of three:"
-                                                "\n1. --ca-cert with '< Full path to RootCA PEM"
-                                                " file >' (recommended)"
-                                                "\n2. --self-signed"
-                                                "\n3. --insecure (skip certificate validation)")
+        raise ConflictingParametersException
 
     if use_ca_bundle:
         if not os.path.exists(ca_path):
-            raise FileNotFoundException(
-                f"Couldn't find '{ca_path}'. Make sure correct path is provided")
+            raise FileNotFoundException
 
         try:
             # pylint: disable=unspecified-encoding
@@ -38,4 +34,23 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
                 pass
         except Exception:
             # pylint: disable=raise-missing-from
-            raise InvalidFilePermissionsException(f"No read access for: {ca_path}")
+            raise InvalidFilePermissionsException
+
+
+def get_ssl_verification_meta_data_from_cli_params(ca_path,
+                                                   is_self_signed,
+                                                   ssl_verify) -> SslVerificationMetadata:
+    """
+    Create SslVerificationMetadata according to input
+    @param ca_path:
+    @param is_self_signed:
+    @param ssl_verify:
+    @return: SslVerificationMetadata
+    """
+    if ca_path:
+        return SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, ca_path)
+    if is_self_signed:
+        return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, DEFAULT_CERTIFICATE_FILE)
+    if not ssl_verify:
+        return SslVerificationMetadata(SslVerificationMode.INSECURE)
+    return SslVerificationMetadata(SslVerificationMode.TRUST_STORE)

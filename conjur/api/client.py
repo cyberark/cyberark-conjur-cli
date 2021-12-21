@@ -54,14 +54,14 @@ class Client:
     def __init__(
             self,
             conjurrc_data: ConjurrcData,
-            ssl_verification_mode: SslVerificationMode = SslVerificationMode.WITH_TRUST_STORE,
+            ssl_verification_mode: SslVerificationMode = SslVerificationMode.TRUST_STORE,
             debug: bool = False,
             http_debug: bool = False,
             credentials_provider: CredentialsStoreInterface = None):
 
         self.configure_logger(debug)
 
-        if ssl_verification_mode == SslVerificationMode.NO_SSL:
+        if ssl_verification_mode == SslVerificationMode.INSECURE:
             util_functions.get_insecure_warning_in_debug()
 
         logging.debug("Initializing configuration...")

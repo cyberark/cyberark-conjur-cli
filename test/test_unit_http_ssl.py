@@ -11,6 +11,7 @@ from asynctest import CoroutineMock, patch
 
 from aiohttp import BasicAuth
 
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import HttpSslError, CertificateHostnameMismatchException
 from conjur.wrapper.http_wrapper import HttpVerb, invoke_endpoint
 
@@ -72,7 +73,8 @@ class TestDemonstrateSubtest(TestCase):
                     invoke_endpoint(HttpVerb.GET,
                                     endpoint=self.MockEndpoint.BADSSL_URL,
                                     params={'url': badssl_url},
-                                    ssl_verify=True,
+                                    ssl_verification_metadata=SslVerificationMetadata(
+                                        SslVerificationMode.TRUST_STORE),
                                     check_errors=False)
 
     def test_http_wrapper_get_valid_badssl_endpoints_successfully(self):
@@ -81,5 +83,5 @@ class TestDemonstrateSubtest(TestCase):
                 invoke_endpoint(HttpVerb.GET,
                                 endpoint=self.MockEndpoint.BADSSL_URL,
                                 params={'url': badssl_url},
-                                ssl_verify=True,
+                                ssl_verification_metadata=SslVerificationMetadata(SslVerificationMode.TRUST_STORE),
                                 check_errors=False)

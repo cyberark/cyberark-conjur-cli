@@ -18,8 +18,22 @@ class SslVerificationMetadata:
         self.ca_cert_path = ca_cert_path
         self._validate_input()
 
+    @property
+    def is_insecure_mode(self):
+        """
+        @return: True, if mode is NO_SSL
+        """
+        return self.mode == SslVerificationMode.INSECURE
+
+    @property
+    def is_self_signed_mode(self):
+        """
+        @return: True, if mode is SELF_SIGN
+        """
+        return self.mode == SslVerificationMode.SELF_SIGN
+
     def _validate_input(self):
-        requires_cert_options = [SslVerificationMode.WITH_CA_BUNDLE,
+        requires_cert_options = [SslVerificationMode.CA_BUNDLE,
                                  SslVerificationMode.SELF_SIGN]
         if self.mode in requires_cert_options and not self.ca_cert_path:
             # TODO check if file exist and have read permissions
@@ -29,3 +43,6 @@ class SslVerificationMetadata:
 
     def __eq__(self, other):
         return self.mode == other.mode and self.ca_cert_path == other.ca_cert_path
+
+    def __repr__(self):
+        return str(self.__dict__)

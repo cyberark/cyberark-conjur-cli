@@ -105,8 +105,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     def test_http_dns_fails_with_self_signed(self, mock_input):
         self.setup_cli_params({})
         output = self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', "http://localhost",
-                         '--account','someaccount', '--self-signed'], exit_code=1)
+                                 ['init', '--url', "http://localhost",
+                                  '--account', 'someaccount', '--self-signed'], exit_code=1)
         self.assertRegex(output, ".*The Conjur URL format provided.*")
 
     @integration_test()
@@ -114,8 +114,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     def test_http_dns_pass_with_insecure(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        ['--insecure','init', '--url', "http://localhost",
-                         '--account','someaccount'])
+                        ['--insecure', 'init', '--url', "http://localhost",
+                         '--account', 'someaccount'])
 
     '''
     Validates that the conjurrc was created on the machine
@@ -126,7 +126,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount', '--self-signed'])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path)
@@ -141,7 +141,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
-                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount'])
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount', '--self-signed'])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path)
@@ -155,15 +155,15 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     @integration_test(True)
     def test_https_conjurrc_is_created_when_user_provides_y_instead_of_yes_for_overwrite(self):
         self.setup_cli_params({})
-        with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
+        with patch('builtins.input', side_effect=['Y','Y', 'Y', 'Y', 'Y']):
             self.invoke_cli(self.cli_auth_params,
                             ['init', '--url', self.client_params.hostname, '--account',
-                             'someaccount'])
+                             'someaccount', '--self-signed'])
         # Intentional double init here to test that the overwriting of the file prompt can take 'Y'
-        with patch('builtins.input', side_effect=['Y', 'Y', 'Y', 'Y']):
+        with patch('builtins.input', side_effect=['Y','Y', 'Y', 'Y', 'Y']):
             self.invoke_cli(self.cli_auth_params,
                             ['init', '--url', self.client_params.hostname, '--account',
-                             'someaccount'])
+                             'someaccount', '--self-signed'])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path)
@@ -179,7 +179,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname + "/", '--account',
-                         'someaccount'])
+                         'someaccount', '--self-signed'])
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path)
@@ -192,10 +192,10 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
     @integration_test(True)
     def test_https_conjurrc_user_does_not_trust_cert(self):
-        with patch('builtins.input', side_effect=[self.client_params.hostname, 'no']):
+        with patch('builtins.input', side_effect=['y',self.client_params.hostname, 'no']):
             self.setup_cli_params({})
             output = self.invoke_cli(self.cli_auth_params,
-                                     ['init'], exit_code=1)
+                                     ['init','--self-signed'], exit_code=1)
 
             self.assertRegex(output, "You decided not to trust the certificate")
             assert not os.path.isfile(DEFAULT_CERTIFICATE_FILE)

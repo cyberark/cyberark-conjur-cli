@@ -10,10 +10,12 @@ required to successfully configure the Credentials
 # Builtins
 import getpass
 
+from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.data_object.credentials_data import CredentialsData
 from conjur.errors import MissingRequiredParameterException
+
 
 class LoginController:
     """
@@ -22,16 +24,16 @@ class LoginController:
     This class represents the Presentation Layer for the LOGIN command
     """
 
-    def __init__(self, ssl_verify:bool, user_password,
-                 credential_data:CredentialsData, login_logic):
+    def __init__(self, ssl_verification_metadata: SslVerificationMetadata, user_password,
+                 credential_data: CredentialsData, login_logic):
         """
         For init/login commands, the client (client.py) is not initialized
         because we don't yet have enough user-specific information to
         successfully initialize one. Therefore, we need to separately
         check if the user supplied --insecure
         """
-        self.ssl_verify = ssl_verify
-        if self.ssl_verify is False:
+        self.ssl_verification_metadata = ssl_verification_metadata
+        if self.ssl_verification_metadata.mode == SslVerificationMode.INSECURE:
             util_functions.get_insecure_warning_in_debug()
             util_functions.get_insecure_warning_in_warning()
         self.user_password = user_password
@@ -69,7 +71,8 @@ class LoginController:
             # pylint: disable=line-too-long
             self.user_password = getpass.getpass(prompt="Enter your password or API key (this will not be echoed): ")
             while self.user_password == '':
-                self.user_password = getpass.getpass(prompt="Invalid format. Enter your password or API key (this will not be echoed): ")
+                self.user_password = getpass.getpass(
+                    prompt="Invalid format. Enter your password or API key (this will not be echoed): ")
 
     def load_conjurrc_data(self) -> ConjurrcData:
         """
@@ -86,7 +89,7 @@ class LoginController:
         """
         Method to fetch the user/host's API key from Conjur which is to be added to the netrc
         """
-        self.credential_data.password = self.login_logic.get_api_key(self.ssl_verify,
-                                                                    self.credential_data,
-                                                                    self.user_password,
-                                                                    conjurrc)
+        self.credential_data.password = self.login_logic.get_api_key(self.ssl_verification_metadata,
+                                                                     self.credential_data,
+                                                                     self.user_password,
+                                                                     conjurrc)

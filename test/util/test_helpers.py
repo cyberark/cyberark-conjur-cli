@@ -37,8 +37,11 @@ def run_func_with_timeout(timeout, func, *args):
 
 @patch('builtins.input', return_value='yes')
 def init_to_cli(self, mock_input):
-    self.invoke_cli(self.cli_auth_params,
-                    ['init', '-u', self.client_params.hostname, '-a', self.client_params.account])
+    insecure = '--insecure' in self.cli_auth_params
+    cli_params = ['init', '-u', self.client_params.hostname, '-a', self.client_params.account]
+    if not insecure:
+        cli_params.append('--self-signed')
+    self.invoke_cli(self.cli_auth_params, cli_params)
 
 
 def login_to_cli(self):

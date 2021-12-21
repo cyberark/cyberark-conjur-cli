@@ -120,7 +120,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         policy_with_bad_syntax = "- ! user bad syntax"
         with redirect_stderr(self.capture_stream):
             output = utils.load_policy_from_string(self, policy_with_bad_syntax, exit_code=1)
-        self.assertIn("{\"error\":{\"code\":\"validation_failed\",\"message\":", output, 
+        self.assertIn("{\"error\":{\"code\":\"validation_failed\",\"message\":", output,
                         "Could not find detailed error in the output. "
                         "Expected to find:"
                         "{\"error\":{\"code\":\"validation_failed\",\"message\":"
@@ -131,9 +131,9 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
     def test_policy_load_bad_branch_recieve_detailed_error(self):
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
-                           ['policy', 'load', '-b', 'wrong-branch', '-f', 
+                           ['policy', 'load', '-b', 'wrong-branch', '-f',
                            self.environment.path_provider.get_policy_path("resource")], exit_code=1)
-        self.assertIn("{\"error\":{\"code\":\"not_found\",\"message\":", output, 
+        self.assertIn("{\"error\":{\"code\":\"not_found\",\"message\":", output,
                         "Could not find detailed error in the output. "
                         "Expected to find:"
                         "{\"error\":{\"code\":\"not_found\",\"message\":"
@@ -345,7 +345,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
 
     @integration_test()
     def test_https_can_get_whoami_insecure(self):
-        self.setup_insecure()
+        utils.setup_cli(self)
         output = self.invoke_cli(self.cli_auth_params, ['whoami'])
         response = json.loads(output)
         self.assertIn(f'{self.client_params.account}', response.get('account'))

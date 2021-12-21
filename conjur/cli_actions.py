@@ -13,6 +13,7 @@ from conjur.data_object.create_host_data import CreateHostData
 from conjur.data_object.create_token_data import CreateTokenData
 from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur.errors import ConflictingParametersException, FileNotFoundException, InvalidFilePermissionsException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.controller import InitController, LoginController, \
@@ -24,9 +25,9 @@ from conjur.data_object import ConjurrcData, CredentialsData, ListData, Variable
     PolicyData, UserInputData, HostResourceData
 
 from conjur.api import SSLClient
-from conjur.util.init_utils import validate_init_action_ssl_verification_input
+from conjur.util import init_utils, util_functions
 
-
+# pylint: disable=raise-missing-from
 def handle_init_logic(
         url: str = None, account: str = None,
         cert: str = None, force: bool = None,
@@ -35,7 +36,20 @@ def handle_init_logic(
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
     """
-    validate_init_action_ssl_verification_input(cert, is_self_signed, ssl_verify)
+    try:
+        init_utils.validate_init_action_ssl_verification_input(cert, is_self_signed, ssl_verify)
+    except ConflictingParametersException:
+        raise ConflictingParametersException("Can't accept more than one of the following "
+                                             "arguments:"
+                                             "\n1. --ca-cert"
+                                             "\n2. --self-signed"
+                                             "\n3. --insecure (skip certificate validation)")
+    except FileNotFoundException:
+        raise FileNotFoundException(f"Couldn't find '{cert}'. Make sure correct path is provided")
+    except InvalidFilePermissionsException:
+        raise InvalidFilePermissionsException(f"No read access for: {cert}")
+
+    ssl_verification_data = init_utils.get_ssl_verification_meta_data_from_cli_params(cert, is_self_signed, ssl_verify)
     ssl_service = SSLClient()
     # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
@@ -46,7 +60,7 @@ def handle_init_logic(
     input_controller = InitController(conjurrc_data=conjurrc_data,
                                       init_logic=init_logic,
                                       force=force,
-                                      ssl_verify=ssl_verify)
+                                      ssl_verification_data=ssl_verification_data)
     input_controller.load()
 
 
@@ -59,7 +73,8 @@ def handle_login_logic(
     """
     credential_data = CredentialsData(login=identifier)
     login_logic = LoginLogic(credential_provider)
-    login_controller = LoginController(ssl_verify=ssl_verify,
+    ssl_verification_metadata = util_functions.get_ssl_verification_meta_data_from_conjurrc(ssl_verify)
+    login_controller = LoginController(ssl_verification_metadata=ssl_verification_metadata,
                                        user_password=password,
                                        credential_data=credential_data,
                                        login_logic=login_logic)
