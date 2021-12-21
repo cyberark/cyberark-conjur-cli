@@ -158,7 +158,7 @@ class InitController:
             except HttpSslError as ssl_err:
                 raise HttpSslError("SSL Error. Make sure Conjur "
                                    "server's root certificate is trusted in this machine. "
-                                   "If this problem continues, visit docs fo more help") from ssl_err
+                                   "If this problem continues, visit docs for more help") from ssl_err
             except HttpStatusError as error:
                 # Check for catching if the endpoint is exists. If the endpoint does not exist,
                 # a 401 status code will be returned.
@@ -210,7 +210,7 @@ class InitController:
                             "exposure of sensitive data.\n Continue? yes/no (Default: no): ").strip()
         if user_answer.lower() not in VALID_CONFIRMATIONS:
             raise OperationNotCompletedException(
-                "User decided to not work with self signed certificate")
+                "User chose not to use self-signed certificate")
 
     @classmethod
     def ensure_overwrite_file(cls, config_file: str):
