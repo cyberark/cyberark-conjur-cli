@@ -327,19 +327,6 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         assert not cred_store.is_exists(self.client_params.hostname)
 
     '''
-    Validates that if a user configures the CLI in insecure mode and runs the command not in 
-    insecure mode, then they will fail
-    '''
-    @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_netrc(self, keystore_disable_mock):
-        utils.setup_cli(self)
-        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
-                    self.environment.path_provider.conjurrc_path)
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
-        self.assertIn("The client was initialized without", output)
-
-    '''
     Validate that logout indeed remove credentials and terminate access to conjur
     '''
     @integration_test()

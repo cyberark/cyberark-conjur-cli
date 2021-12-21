@@ -320,19 +320,6 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         assert not utils.is_credentials_exist()
 
     '''
-    Validates that if a user configures the CLI in insecure mode and runs the command not in 
-    insecure mode, then they will fail
-    '''
-
-    @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring(self):
-        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
-                    self.environment.path_provider.conjurrc_path)
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
-        self.assertIn("The client was initialized without", output)
-
-    '''
     Validate logout flow when using the system's keyring
     '''
 
@@ -346,19 +333,6 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
                                  ['logout'])
 
         self.assertIn('Successfully logged out from Conjur', output.strip())
-
-    '''
-    Validates that if a user configures the CLI in insecure mode and runs the command not in 
-    insecure mode, then they will fail
-    '''
-
-    @integration_test(True)
-    def test_cli_configured_in_insecure_mode_but_run_in_secure_mode_raises_error_keyring(self):
-        shutil.copy(self.environment.path_provider.test_insecure_conjurrc_file_path,
-                    self.environment.path_provider.conjurrc_path)
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'admin', '-p', self.client_params.env_api_key], exit_code=1)
-        self.assertIn("The client was initialized without", output)
 
     '''
     Validate that logout indeed remove credentials and terminate access to Conjur
