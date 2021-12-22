@@ -35,9 +35,9 @@ git_description=$(git describe --tags)
 
 # Always push the tag with the commit hash to internal registry
 echo "Tagging $INTERNAL_REGISTRY/$IMAGE_NAME:${FULL_VERSION_TAG}"
-docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
+#docker tag "$IMAGE_NAME:$FULL_VERSION_TAG" "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
 echo "Pushing $INTERNAL_REGISTRY/$IMAGE_NAME:${FULL_VERSION_TAG}"
-docker push "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
+#docker push "$INTERNAL_REGISTRY/$IMAGE_NAME:$FULL_VERSION_TAG"
 
 # if the tag matches the VERSION, push VERSION and latest releases
 # and x and x.y releases

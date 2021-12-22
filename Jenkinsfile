@@ -13,66 +13,66 @@ pipeline {
   }
 
    stages {
-    stage('Linting') {
-      parallel {
-        stage('Code') {
-          steps { sh './bin/test_linting' }
-        }
-
-        stage('Changelog') {
-          steps { sh './bin/test_changelog' }
-        }
-      }
-    }
-
-    stage('Unit tests') {
-      steps {
-        sh './bin/test_unit'
-      }
-      post {
-        always {
-          junit 'output/**/*.xml'
-          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-          ccCoverage("coverage.py")
-        }
-      }
-    }
-
-    stage('Integration tests') {
-      steps {
-        sh './bin/test_integration'
-      }
-
-      post {
-        always {
-          junit 'output/**/*.xml'
-        }
-      }
-    }
-
-    stage('RHEL7 Integration tests') {
-      steps {
-        sh 'summon -e common ./bin/test_integration_rhel --rhel-version=7'
-      }
-
-      post {
-        always {
-          junit 'output/**/*.xml'
-        }
-      }
-    }
-
-    stage('RHEL8 Integration tests') {
-      steps {
-        sh 'summon -e common ./bin/test_integration_rhel --rhel-version=8'
-      }
-
-      post {
-        always {
-          junit 'output/**/*.xml'
-        }
-      }
-    }
+//     stage('Linting') {
+//       parallel {
+//         stage('Code') {
+//           steps { sh './bin/test_linting' }
+//         }
+//
+//         stage('Changelog') {
+//           steps { sh './bin/test_changelog' }
+//         }
+//       }
+//     }
+//
+//     stage('Unit tests') {
+//       steps {
+//         sh './bin/test_unit'
+//       }
+//       post {
+//         always {
+//           junit 'output/**/*.xml'
+//           cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '50, 0, 50', failUnhealthy: true, failUnstable: false, lineCoverageTargets: '50, 0, 50', maxNumberOfBuilds: 0, methodCoverageTargets: '50, 0, 50', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+//           ccCoverage("coverage.py")
+//         }
+//       }
+//     }
+//
+//     stage('Integration tests') {
+//       steps {
+//         sh './bin/test_integration'
+//       }
+//
+//       post {
+//         always {
+//           junit 'output/**/*.xml'
+//         }
+//       }
+//     }
+//
+//     stage('RHEL7 Integration tests') {
+//       steps {
+//         sh 'summon -e common ./bin/test_integration_rhel --rhel-version=7'
+//       }
+//
+//       post {
+//         always {
+//           junit 'output/**/*.xml'
+//         }
+//       }
+//     }
+//
+//     stage('RHEL8 Integration tests') {
+//       steps {
+//         sh 'summon -e common ./bin/test_integration_rhel --rhel-version=8'
+//       }
+//
+//       post {
+//         always {
+//           junit 'output/**/*.xml'
+//         }
+//       }
+//     }
 
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
@@ -81,21 +81,17 @@ pipeline {
           steps {
             sh 'summon -e production ./bin/publish_package'
           }
-          when {
-            tag "v*"
-          }
         }
 
         stage('Publish containers') {
           steps {
             sh './bin/publish_container'
           }
-          when {
-            branch "main"
-          }
+
         }
       }
     }
+
 
     stage('Scan Docker image') {
       parallel {
