@@ -53,6 +53,7 @@ elif [ "$SERVER_MODE" == "appliance" ]; then
     append_to_file "set +x"
     append_to_file "$(_tests_runner_cmd)"
     append_to_file "set -x"
+    append_to_file "rm -f ./dist/integrations_tests_runner"
 else
   # Server mode is Conjur OSS
   # Add nose2 command
