@@ -31,31 +31,6 @@ class CliIntegrationTestHostFactory(IntegrationTestCaseBase):  # pragma: no cove
     def __init__(self, test_name, client_params=None, environment_params=None):
         super(CliIntegrationTestHostFactory, self).__init__(test_name, client_params, environment_params)
 
-    @staticmethod
-    def time_iso_format_exclude_seconds(duration: timedelta):
-        return ''.join((datetime.utcnow().replace(microsecond=0) + duration).isoformat()[:-2])
-
-    @staticmethod
-    def one_hour_from_now():
-        return CliIntegrationTestHostFactory.time_iso_format_exclude_seconds(timedelta(hours=1))
-
-    @staticmethod
-    def token_response_regex(cidr: str):
-        return '\[\n    {\n        "cidr": \[\n' \
-               f'            "{cidr}"\n' \
-               '        \],\n        "expiration": "' \
-               f'{CliIntegrationTestHostFactory.one_hour_from_now()}\d\dZ",\n        "token": ".*"\n' \
-               '    }\n\]\n'
-
-    @staticmethod
-    def token_response_empty_cidr_regex(duration: str):
-        return '\[\n    {\n' \
-               '        "cidr": \[],\n' \
-               f'        "expiration": "' \
-               f'{duration}\d\dZ",\n        ' \
-               '"token": ".*"\n' \
-               '    }\n]\n'
-
     def setUp(self):
         self.setup_cli_params({})
         # Used to configure the CLI and login to run tests

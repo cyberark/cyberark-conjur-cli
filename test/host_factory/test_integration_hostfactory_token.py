@@ -8,16 +8,11 @@ This test file handles the main test flows for the hostfactory command
 
 # Not coverage tested since integration tests doesn't run in
 # the same build step
-from datetime import timedelta
+import json
+from datetime import timedelta, datetime
 from test.util.test_infrastructure import integration_test
-from test.host_factory.test_integration_hostfactory import CliIntegrationTestHostFactory, \
-    ERROR_PATTERN_404, ERROR_PATTERN_422, INVALID_DURATION_ERROR_MSG
-
-# Helper methods
-token_response_empty_cidr_regex = CliIntegrationTestHostFactory.token_response_empty_cidr_regex
-one_hour_from_now = CliIntegrationTestHostFactory.one_hour_from_now
-token_response_regex = CliIntegrationTestHostFactory.token_response_regex
-time_iso_format_exclude_seconds = CliIntegrationTestHostFactory.time_iso_format_exclude_seconds
+from test.host_factory.test_integration_hostfactory import CliIntegrationTestHostFactory, ERROR_PATTERN_404, \
+    ERROR_PATTERN_422, INVALID_DURATION_ERROR_MSG
 
 
 class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # pragma: no cover
@@ -25,11 +20,26 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
     def __init__(self, test_name, client_params=None, environment_params=None):
         super(CliIntegrationTestHostFactoryToken, self).__init__(test_name, client_params, environment_params)
 
-    # *************** TESTS ***************
+    def assert_create_token_response(self,
+                                     create_token_response: str,
+                                     expected_cidrs: list = [],
+                                     expected_expiration_duration: timedelta = timedelta(hours=1)):
+        create_token_response_json = json.loads(create_token_response)
+        self.assertEquals(1, len(create_token_response_json))
+        response_token = create_token_response_json[0]
 
-    @integration_test(True)
-    def test_hostfactory_create_token_returns_correct_response(self):
-        self.assertRegex(self._create_token(), token_response_empty_cidr_regex(one_hour_from_now()))
+        self.assertEquals(expected_cidrs, response_token['cidr'])
+
+        self.assertIsNotNone(response_token['expiration'])
+        expiration_time = datetime.fromisoformat(response_token['expiration'].rstrip('Z'))
+        expiration_duration = expiration_time - datetime.utcnow()
+        self.assertAlmostEquals(expected_expiration_duration.total_seconds(),
+                                expiration_duration.total_seconds(),
+                                delta=10)  # delta=10 means that the time diff can't be more than 10 seconds.
+
+        self.assertIsNotNone(response_token['token'])
+
+    # *************** TESTS ***************
 
     @integration_test(True)
     def test_hostfactory_create_token_without_id_returns_menu(self):
@@ -45,21 +55,23 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
 
     @integration_test(True)
     def test_hostfactory_create_token_with_no_cidr_returns_empty_cidr_list_in_response(self):
-        self.assertRegex(self._create_token(), token_response_empty_cidr_regex(one_hour_from_now()))
+        response = self._create_token()
+        self.assert_create_token_response(response)
 
     @integration_test(True)
     def test_hostfactory_create_token_with_single_cidr_returns_cidr_in_response(self):
-        self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4'),
-                         token_response_regex('1.2.3.4/32'))
+        response = self.create_one_hour_token(cidr='1.2.3.4')
+        self.assert_create_token_response(response, expected_cidrs=['1.2.3.4/32'])
 
     @integration_test(True)
     def test_hostfactory_create_token_with_multiple_ciders_returns_cidrs_in_response(self):
-        self.assertRegex(self.create_one_hour_token(cidr='1.2.3.4,2.2.2.2'),
-                         token_response_regex('1.2.3.4/32",\n            "2.2.2.2/32'))
+        response = self.create_one_hour_token(cidr='1.2.3.4,2.2.2.2')
+        self.assert_create_token_response(response, expected_cidrs=['1.2.3.4/32', '2.2.2.2/32'])
 
     @integration_test(True)
     def test_hostfactory_create_token_with_low_cidr_range_returns_cidrs_in_response(self):
-        self.assertRegex(self.create_one_hour_token(cidr='1.2.0.0/16'), token_response_regex('1.2.0.0/16'))
+        response = self.create_one_hour_token(cidr='1.2.0.0/16')
+        self.assert_create_token_response(response, expected_cidrs=['1.2.0.0/16'])
 
     @integration_test(True)
     def test_hostfactory_create_token_wrong_cidr_format_raises_error(self):
@@ -81,26 +93,26 @@ class CliIntegrationTestHostFactoryToken(CliIntegrationTestHostFactory):  # prag
     @integration_test(True)
     def test_hostfactory_create_token_with_all_duration_flags_returns_correct_response(self):
         duration = timedelta(days=1, hours=1, minutes=1)
-        self.assertRegex(self._create_token(duration=duration),
-                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(duration)))
+        response = self._create_token(duration=duration)
+        self.assert_create_token_response(response, expected_expiration_duration=duration)
 
     @integration_test(True)
     def test_hostfactory_create_token_with_only_days_duration_flags_returns_correct_response(self):
-        self.assertRegex(self.cli_create_token('--duration-days', '365'),
-                         token_response_empty_cidr_regex(
-                             duration=time_iso_format_exclude_seconds(timedelta(days=365, hours=0, minutes=0))))
+        duration = timedelta(days=365)
+        response = self.cli_create_token('--duration-days', str(duration.days))
+        self.assert_create_token_response(response, expected_expiration_duration=duration)
 
     @integration_test(True)
     def test_hostfactory_create_token_with_only_hours_duration_flags_returns_correct_response(self):
-        self.assertRegex(self.cli_create_token('--duration-hours', '24'),
-                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(
-                             timedelta(days=0, hours=24, minutes=0))))
+        duration_hours = 24
+        response = self.cli_create_token('--duration-hours', str(duration_hours))
+        self.assert_create_token_response(response, expected_expiration_duration=timedelta(hours=duration_hours))
 
     @integration_test(True)
     def test_hostfactory_create_token_with_only_minutes_duration_flags_returns_correct_response(self):
-        self.assertRegex(self.cli_create_token('--duration-minutes', '60'),
-                         token_response_empty_cidr_regex(duration=time_iso_format_exclude_seconds(
-                             timedelta(days=0, hours=0, minutes=60))))
+        duration_minutes = 60
+        response = self.cli_create_token('--duration-minutes', str(duration_minutes))
+        self.assert_create_token_response(response, expected_expiration_duration=timedelta(minutes=duration_minutes))
 
     @integration_test(True)
     def test_hostfactory_create_token_with_negative_duration_days_flags_raises_error(self):
