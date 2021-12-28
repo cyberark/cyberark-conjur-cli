@@ -61,6 +61,27 @@ pipeline {
         }
       }
     }
+
+    stage('Scan Docker image') {
+      parallel {
+        stage('Scan Docker image for fixable vulns') {
+          steps {
+            scanAndReport("conjur-python-cli:latest", "HIGH", false)
+          }
+        }
+
+        stage('Scan Docker image for total vulns') {
+          steps {
+            scanAndReport("conjur-python-cli:latest", "NONE", true)
+          }
+        }
+      }
+
+      when {
+        branch "main"
+      }
+    }
+
     // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {
@@ -81,26 +102,6 @@ pipeline {
             branch "main"
           }
         }
-      }
-    }
-
-    stage('Scan Docker image') {
-      parallel {
-        stage('Scan Docker image for fixable vulns') {
-          steps {
-            scanAndReport("conjur-python-cli:latest", "HIGH", false)
-          }
-        }
-
-        stage('Scan Docker image for total vulns') {
-          steps {
-            scanAndReport("conjur-python-cli:latest", "NONE", true)
-          }
-        }
-      }
-
-      when {
-        branch "main"
       }
     }
   }
