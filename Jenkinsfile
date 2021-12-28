@@ -8,6 +8,10 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '30'))
   }
 
+  parameters {
+    booleanParam(name: 'PUBLISH_TO_PYPI', defaultValue: false, description: 'Boolean condition for whether we need to publish the package to PyPi')
+  }
+
   triggers {
     cron(getDailyCronString())
   }
@@ -82,15 +86,15 @@ pipeline {
       }
     }
 
-    // Only publish if the HEAD is tagged with the same version as in __version__.py
     stage('Publish') {
       parallel {
+        // Only publish if the HEAD is tagged with the same version as in __version__.py
         stage('Publish to PyPI') {
           steps {
             sh 'summon -e production ./bin/publish_package'
           }
           when {
-            tag "v*"
+            expression { params.PUBLISH_TO_PYPI == true }
           }
         }
 
