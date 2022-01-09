@@ -229,7 +229,7 @@ Use hostfactory token to create host
 
 #### `def revoke_token(token: str)`
 
-Revokes the given token
+Revokes the given hostfactory token
 
 #### `rotate_other_api_key(resource: Resource)`
 
