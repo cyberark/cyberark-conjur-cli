@@ -163,38 +163,36 @@ password 1234....
 
 #### `get(variable_id)`
 
-Gets a variable value based on its ID. Variable is binary data that should be decoded to your
-system's encoding (e.g.
+Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding (e.g.
 `get(variable_id).decode('utf-8')`.
 
 #### `get_many(variable_id[,variable_id...])`
 
-Gets multiple variable values based on their IDs. Variables are returned in a dictionary that maps
-the variable name to its value.
+Gets multiple variable values based on their IDs. Variables are returned in a dictionary that maps the variable name to
+its value.
 
 #### `set(variable_id, value)`
 
 Sets a variable to a specific value based on its ID.
 
-Note: Policy to create the variable must have already been loaded otherwise you will get a 404 error
-during invocation.
+Note: Policy to create the variable must have already been loaded otherwise you will get a 404 error during invocation.
 
 #### `load_policy_file(policy_name, policy_file)`
 
-Applies a file-based YAML to a named policy. This method only supports additive changes. Result is a
-dictionary object constructed from the returned JSON data.
+Applies a file-based YAML to a named policy. This method only supports additive changes. Result is a dictionary object
+constructed from the returned JSON data.
 
 #### `replace_policy_file(policy_name, policy_file)`
 
-Replaces a named policy with one from the provided file. This is usually a destructive invocation.
-Result is a dictionary object constructed from the returned JSON data.
+Replaces a named policy with one from the provided file. This is usually a destructive invocation. Result is a
+dictionary object constructed from the returned JSON data.
 
 #### `update_policy_file(policy_name, policy_file)`
 
-Modifies an existing Conjur policy. Data may be explicitly deleted using the `!delete`, `!revoke`,
-and `!deny` statements. Unlike
-"replace" mode, no data is ever implicitly deleted. Result is a dictionary object constructed from
-the returned JSON data.
+Modifies an existing Conjur policy. Data may be explicitly deleted using the `!delete`, `!revoke`, and `!deny`
+statements. Unlike
+"replace" mode, no data is ever implicitly deleted. Result is a dictionary object constructed from the returned JSON
+data.
 
 #### `list(list_constraints)`
 
@@ -213,6 +211,26 @@ For example: `client.list({'kind': 'user', 'inspect': True})`
 | search           | Search for resources based on specified query                |
 | inspect          | List the metadata for resources                              |
 
+#### `def list_permitted_roles(list_permitted_roles_data: ListPermittedRolesData)`
+
+Lists the roles which have the named permission on a resource.
+
+#### `def list_members_of_role(data: ListMembersOfData)`
+
+Lists the roles which have the named permission on a resource.
+
+#### `def create_token(create_token_data: CreateTokenData)`
+
+Create token/s for hosts with restrictions
+
+#### `def create_host(create_host_data: CreateHostData)`
+
+Create new host using the hostfactory endpoint
+
+#### `def revoke_token(token: str)`
+
+Revokes the given token
+
 #### `rotate_other_api_key(resource: Resource)`
 
 Rotates another entity's API key and returns it as a string.
@@ -228,15 +246,15 @@ Rotates the personal API key of the logged-in user and returns it as a string.
 
 Updates the current, logged-in user's password with the password parameter provided.
 
-Note: the new password must meet the Conjur password complexity constraints. It must contain at
-least 12 characters: 2 uppercase, 2 lowercase, 1 digit, 1 special character.
+Note: the new password must meet the Conjur password complexity constraints. It must contain at least 12 characters: 2
+uppercase, 2 lowercase, 1 digit, 1 special character.
 
 #### `whoami()`
 
 _Note: This method requires Conjur v1.9+_
 
-Returns a Python dictionary of information about the Client making an API request (such as its IP
-address, user, account, token expiration date, etc).
+Returns a Python dictionary of information about the Client making an API request (such as its IP address, user,
+account, token expiration date, etc).
 
 ## Contributing
 
