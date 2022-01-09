@@ -6,11 +6,11 @@ from unittest.mock import patch, mock_open
 
 from conjur.api.endpoints import ConjurEndpoint
 from conjur.api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.api.ssl_utils.errors import TLSSocketConnectionException
+from conjur.util.ssl_utils import TLSSocketConnectionException
 from conjur.errors import ConnectionToConjurFailedException
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.api.ssl_utils.ssl_client import SSLClient
+from conjur.util.ssl_utils import SSLClient
 from conjur.wrapper.http_wrapper import HttpVerb
 
 MOCK_CERT = '''

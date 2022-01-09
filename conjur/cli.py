@@ -22,7 +22,7 @@ from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty, get_ssl_verification_meta_data_from_conjurrc
 from conjur.wrapper import ArgparseWrapper
-from conjur.api.client import Client
+from conjur_sdk.client import Client
 from conjur.constants import DEFAULT_CONFIG_FILE, LOGIN_IS_REQUIRED
 
 from conjur.data_object import ConjurrcData

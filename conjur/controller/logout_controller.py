@@ -7,10 +7,12 @@ This module is the controller that facilitates all logout actions
 required to successfully logout
 """
 
+# SDK
+from conjur_sdk.interface import CredentialsProviderInterface
+
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.errors import NotLoggedInException, LoggedOutFailedException
 
 
@@ -22,7 +24,7 @@ class LogoutController:
     This class represents the Presentation Layer for the LOGOUT command
     """
 
-    def __init__(self, logout_logic, credentials_provider: CredentialsStoreInterface):
+    def __init__(self, logout_logic, credentials_provider: CredentialsProviderInterface):
         self.logout_logic = logout_logic
         self.credentials_provider = credentials_provider
 

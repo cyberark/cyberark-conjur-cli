@@ -11,11 +11,10 @@ to the user's machine as well as fetching certificates from Conjur
 import logging
 import os.path
 
-from conjur.api.models import SslVerificationMetadata
-from conjur.api.ssl_utils.errors import TLSSocketConnectionException
-from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
-from conjur.api.ssl_utils.ssl_client import SSLClient
+from conjur_sdk.models import SslVerificationMetadata
+from conjur_sdk import Client
+from conjur.util.ssl_utils.errors import TLSSocketConnectionException
+from conjur.util.ssl_utils import SSLClient
 from conjur.data_object import ConjurrcData
 from conjur.errors import ConnectionToConjurFailedException, RetrieveCertificateException
 
@@ -69,10 +68,8 @@ class InitLogic:
             'url': conjurrc_data.conjur_url
         }
         logging.debug("Attempting to fetch the account from the Conjur server...")
-        response = invoke_endpoint(HttpVerb.GET,
-                                   ConjurEndpoint.INFO,
-                                   params,
-                                   ssl_verification_metadata=ssl_verification_metadata).json
+        client = Client(conjurrc_data=conjurrc_data, ssl_verification_mode=ssl_verification_metadata.mode)
+        response = client.get_server_info()  # TODO implement in SDK
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation
