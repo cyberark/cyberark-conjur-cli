@@ -221,7 +221,7 @@ Lists the roles which have the named permission on a resource.
 
 #### `def create_token(create_token_data: CreateTokenData)`
 
-Create token/s for hosts with restrictions
+Create hostfactory token/s for creating hosts
 
 #### `def create_host(create_host_data: CreateHostData)`
 
