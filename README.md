@@ -225,7 +225,7 @@ Create hostfactory token/s for creating hosts
 
 #### `def create_host(create_host_data: CreateHostData)`
 
-Create new host using the hostfactory endpoint
+Use hostfactory token to create host
 
 #### `def revoke_token(token: str)`
 
