@@ -17,11 +17,11 @@ import stat
 from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
 from conjur.data_object import CredentialsData, ConjurrcData
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+from conjur_sdk.interface import CredentialsProviderInterface
 
 
 # pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
-class FileCredentialsProvider(CredentialsStoreInterface):
+class FileCredentialsProvider(CredentialsProviderInterface):
     """
     FileCredentialsProvider
 

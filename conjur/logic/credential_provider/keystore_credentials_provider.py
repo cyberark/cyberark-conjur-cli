@@ -16,13 +16,13 @@ from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
 from conjur.data_object import CredentialsData
 from conjur.errors import OperationNotCompletedException, \
     CredentialRetrievalException, KeyringWrapperDeletionError
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+from conjur_sdk.interface import CredentialsProviderInterface
 from conjur.wrapper import KeystoreWrapper
 from conjur.data_object.conjurrc_data import ConjurrcData
 
 
 # pylint: disable=logging-fstring-interpolation
-class KeystoreCredentialsProvider(CredentialsStoreInterface):
+class KeystoreCredentialsProvider(CredentialsProviderInterface):
     """
     KeystoreCredentialsProvider
 

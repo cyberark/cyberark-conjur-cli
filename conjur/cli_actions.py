@@ -5,8 +5,13 @@ This module holds the run logic of each command.
 
 """
 
+# Builtin
 import sys
 
+# SDK
+from conjur_sdk.interface import CredentialsProviderInterface
+
+# Internal
 # pylint: disable=too-many-arguments
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.data_object.create_host_data import CreateHostData
@@ -15,7 +20,7 @@ from conjur.data_object.list_members_of_data import ListMembersOfData
 from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
 from conjur.errors import ConflictingParametersException, FileNotFoundException, InvalidFilePermissionsException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
     PolicyController, UserController, HostController
@@ -24,7 +29,7 @@ from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, Variable
 from conjur.data_object import ConjurrcData, CredentialsData, ListData, VariableData, \
     PolicyData, UserInputData, HostResourceData
 
-from conjur.api import SSLClient
+from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
 
 # pylint: disable=raise-missing-from
@@ -66,7 +71,7 @@ def handle_init_logic(
 
 # pylint: disable=line-too-long
 def handle_login_logic(
-        credential_provider: CredentialsStoreInterface, identifier: str = None,
+        credential_provider: CredentialsProviderInterface, identifier: str = None,
         password: str = None, ssl_verify: bool = True):
     """
     Method wraps the login call logic
@@ -83,7 +88,7 @@ def handle_login_logic(
     sys.stdout.write("Successfully logged in to Conjur\n")
 
 
-def handle_logout_logic(credential_provider: CredentialsStoreInterface):
+def handle_logout_logic(credential_provider: CredentialsProviderInterface):
     """
     Method wraps the logout call logic
     """
@@ -177,7 +182,7 @@ def handle_policy_logic(policy_data: PolicyData = None, client=None):
 
 
 def handle_user_logic(
-        credential_provider: CredentialsStoreInterface,
+        credential_provider: CredentialsProviderInterface,
         args=None, client=None):
     """
     Method wraps the user call logic

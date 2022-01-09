@@ -10,9 +10,12 @@ This module is the business logic for handling all user-related activity
 import logging
 from typing import Tuple
 
+# SDK
+from conjur_sdk.interface.credentials_store_interface import CredentialsProviderInterface
+
 # Internals
 from conjur.errors import OperationNotCompletedException, HttpError
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
+
 from conjur.resource import Resource
 from conjur.data_object import ConjurrcData, CredentialsData
 
@@ -23,9 +26,10 @@ class UserLogic:
 
     This class holds the business logic for handling user activity
     """
+
     # TODO : Check Client type
     def __init__(self, conjurrc_data: ConjurrcData,
-                 credential_provider: CredentialsStoreInterface, client):
+                 credential_provider: CredentialsProviderInterface, client):
         self.conjurrc_data = conjurrc_data
         self.credential_provider = credential_provider
         self.client = client

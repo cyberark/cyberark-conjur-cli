@@ -10,7 +10,10 @@ required to successfully configure the Credentials
 # Builtins
 import getpass
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+# SDK
+from conjur_sdk.models import SslVerificationMetadata, SslVerificationMode
+
+# Internals
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.data_object.credentials_data import CredentialsData

@@ -17,8 +17,8 @@ from OpenSSL import SSL
 from OpenSSL.crypto import FILETYPE_PEM, dump_certificate
 
 # Internals
-from conjur.api.ssl_utils.errors import TLSSocketConnectionException, TLSGeneralException
-from conjur.api.ssl_utils.ssl_consts import CONJUR_TLS_METHODS
+from conjur.util.ssl_utils.errors import TLSSocketConnectionException, TLSGeneralException
+from conjur.util.ssl_utils.ssl_consts import CONJUR_TLS_METHODS
 
 
 

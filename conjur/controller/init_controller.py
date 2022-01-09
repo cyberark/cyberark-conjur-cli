@@ -16,10 +16,12 @@ import sys
 from urllib.parse import urlparse
 from urllib.parse import ParseResult
 
+# SDK
+from conjur_sdk.models import SslVerificationMetadata, SslVerificationMode
+
 # Internals
 from typing import Optional
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, ConfirmationException, \
     MissingRequiredParameterException, OperationNotCompletedException, HttpStatusError, HttpSslError
