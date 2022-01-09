@@ -217,7 +217,7 @@ Lists the roles which have the named permission on a resource.
 
 #### `def list_members_of_role(data: ListMembersOfData)`
 
-Lists the roles which have the named permission on a resource.
+Lists the resources which are members of the given resource.
 
 #### `def create_token(create_token_data: CreateTokenData)`
 
