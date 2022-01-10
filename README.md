@@ -221,7 +221,7 @@ Lists the resources which are members of the given resource.
 
 #### `def create_token(create_token_data: CreateTokenData)`
 
-Create hostfactory token/s for creating hosts
+Creates Host Factory tokens for creating hosts
 
 #### `def create_host(create_host_data: CreateHostData)`
 
