@@ -253,7 +253,7 @@ uppercase, 2 lowercase, 1 digit, 1 special character.
 
 _Note: This method requires Conjur v1.9+_
 
-Returns a Python dictionary of information about the Client making an API request (such as its IP address, user,
+Returns a Python dictionary of information about the client making an API request (such as its IP address, user,
 account, token expiration date, etc).
 
 ## Contributing
