@@ -163,7 +163,7 @@ password 1234....
 
 #### `get(variable_id)`
 
-Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding (e.g.
+Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding. For example: 
 `get(variable_id).decode('utf-8')`.
 
 #### `get_many(variable_id[,variable_id...])`
