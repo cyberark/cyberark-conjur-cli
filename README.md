@@ -229,7 +229,7 @@ Uses Host Factory token to create host
 
 #### `def revoke_token(token: str)`
 
-Revokes the given hostfactory token
+Revokes the given Host Factory token
 
 #### `rotate_other_api_key(resource: Resource)`
 
