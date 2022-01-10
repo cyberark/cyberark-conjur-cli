@@ -175,7 +175,7 @@ its value.
 
 Sets a variable to a specific value based on its ID.
 
-Note: Policy to create the variable must have already been loaded otherwise you will get a 404 error during invocation.
+Note: Policy to create the variable must have already been loaded, otherwise you will get a 404 error during invocation.
 
 #### `load_policy_file(policy_name, policy_file)`
 
