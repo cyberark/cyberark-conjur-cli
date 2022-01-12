@@ -8,7 +8,7 @@ required to successfully logout
 """
 
 # SDK
-from conjur_sdk.interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE

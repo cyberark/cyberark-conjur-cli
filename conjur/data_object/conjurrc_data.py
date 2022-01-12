@@ -14,20 +14,22 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader as YamlLoader
 
+from conjur_api.models import ConjurrcData as SdkConjurrcData
+
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
 
 
-class ConjurrcData:
+class ConjurrcData(SdkConjurrcData):
     """
     Used for setting user input data
     """
 
-    def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
-        self.conjur_url = conjur_url
-        self.conjur_account = account
-        self.cert_file = cert_file
+    # def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
+    #     self.conjur_url = conjur_url
+    #     self.conjur_account = account
+    #     self.cert_file = cert_file
 
     # pylint: disable=unspecified-encoding
     @classmethod
@@ -45,10 +47,6 @@ class ConjurrcData:
             raise InvalidConfigurationException from key_error
         except FileNotFoundError as not_found_err:
             raise ConfigurationMissingException from not_found_err
-
-    # pylint: disable=line-too-long
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
 
     def write_to_file(self, dest: str):
         """

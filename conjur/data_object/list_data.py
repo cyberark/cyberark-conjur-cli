@@ -9,8 +9,8 @@ We use this DTO to build the list request
 
 
 # pylint: disable=too-few-public-methods
-from conjur.util import util_functions
-from conjur.util.util_functions import get_param
+from conjur_api.utils import util_functions
+from conjur_api.utils.util_functions import get_param
 
 
 class ListData:

@@ -13,7 +13,7 @@ import platform
 import os
 
 # Internals
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.errors import MissingRequiredParameterException, HttpError
 from conjur.util.os_types import OSTypes
 from conjur.data_object.conjurrc_data import ConjurrcData

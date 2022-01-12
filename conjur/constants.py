@@ -30,9 +30,9 @@ VALID_CONFIRMATIONS = ["yes", "y"]
 SUPPORTED_BACKENDS = ["macOS Keyring", "Windows WinVaultKeyring", "SecretService Keyring"]
 
 MACHINE = "machine"
-LOGIN = "login"
+USERNAME = "username"
 PASSWORD = "password"
-KEYSTORE_ATTRIBUTES = [MACHINE, LOGIN, PASSWORD]
+KEYSTORE_ATTRIBUTES = [MACHINE, USERNAME, PASSWORD]
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"

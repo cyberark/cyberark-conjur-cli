@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 from urllib.parse import ParseResult
 
 # SDK
-from conjur_sdk.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 
 # Internals
 from typing import Optional

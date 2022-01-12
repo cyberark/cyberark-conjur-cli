@@ -2,7 +2,7 @@ import json
 import unittest
 from unittest.mock import MagicMock
 
-from conjur.data_object.create_token_data import CreateTokenData
+from conjur_api.models import CreateTokenData
 from conjur.errors import MissingRequiredParameterException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from unittest.mock import patch

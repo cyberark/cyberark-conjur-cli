@@ -6,7 +6,7 @@ LogoutLogic module
 This module is the business logic for logging out of the Conjur CLI
 """
 # SDK
-from conjur_sdk.interface.credentials_store_interface import CredentialsProviderInterface
+from conjur_api.interface.credentials_store_interface import CredentialsProviderInterface
 # Internals
 from conjur.data_object import ConjurrcData
 

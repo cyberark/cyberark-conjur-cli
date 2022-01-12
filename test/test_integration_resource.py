@@ -12,7 +12,6 @@ from contextlib import redirect_stderr
 from unittest.mock import patch
 
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE
 from conjur.data_object import ConjurrcData
 from conjur.logic.credential_provider import CredentialStoreFactory
 from test.util.test_infrastructure import integration_test

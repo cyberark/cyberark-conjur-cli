@@ -10,7 +10,7 @@ import os
 import shutil
 from unittest.mock import patch
 
-from conjur.data_object import CredentialsData
+from conjur_api.models import CredentialsData
 from conjur.errors import HttpSslError
 from conjur.errors_messages import FETCH_CONFIGURATION_FAILURE_MESSAGE
 from test.util.test_infrastructure import integration_test
@@ -236,7 +236,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc.dump_to_file()
         cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
-                                          login="admin",
+                                          username="admin",
                                           password=self.client_params.env_api_key)
         cred_store.save(credential_data)
         self.setup_cli_params({})
@@ -260,7 +260,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         conjurrc.dump_to_file()
         cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
-                                          login="admin",
+                                          username="admin",
                                           password=self.client_params.env_api_key)
         cred_store.save(credential_data)
         self.setup_cli_params({})

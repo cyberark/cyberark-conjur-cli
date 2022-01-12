@@ -11,13 +11,14 @@ import logging
 from typing import Tuple
 
 # SDK
-from conjur_sdk.interface.credentials_store_interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 
 # Internals
 from conjur.errors import OperationNotCompletedException, HttpError
 
 from conjur.resource import Resource
-from conjur.data_object import ConjurrcData, CredentialsData
+from conjur.data_object import ConjurrcData
+from conjur_api.models import CredentialsData
 
 
 class UserLogic:
@@ -42,7 +43,7 @@ class UserLogic:
         2. Rotate another users API key
         """
         logged_in_credentials = self.extract_credentials_from_credential_store()
-        logged_in_username = logged_in_credentials.login
+        logged_in_username = logged_in_credentials.username
 
         # if the user provides their own user id and they are logged in,
         # then for the sake of a successful outcome, we will ignore the input.
@@ -63,7 +64,7 @@ class UserLogic:
         Method to call the client to change the logged in user's password
         """
         logged_in_credentials = self.extract_credentials_from_credential_store()
-        resource_to_update = logged_in_credentials.login
+        resource_to_update = logged_in_credentials.username
         logging.debug(f"Changing password for '{resource_to_update}'")
         # pylint: disable=line-too-long
         self.client.change_personal_password(resource_to_update, logged_in_credentials.password, new_password)

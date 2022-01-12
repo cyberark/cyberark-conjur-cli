@@ -12,11 +12,11 @@ import logging
 import traceback
 
 # Internals
-from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
-from conjur.data_object import CredentialsData
+from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, USERNAME, PASSWORD
+from conjur_api.models import CredentialsData
 from conjur.errors import OperationNotCompletedException, \
     CredentialRetrievalException, KeyringWrapperDeletionError
-from conjur_sdk.interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 from conjur.wrapper import KeystoreWrapper
 from conjur.data_object.conjurrc_data import ConjurrcData
 
@@ -43,7 +43,7 @@ class KeystoreCredentialsProvider(CredentialsProviderInterface):
         credential_id = credential_data.machine
         try:
             KeystoreWrapper.set_password(credential_id, MACHINE, credential_data.machine)
-            KeystoreWrapper.set_password(credential_id, LOGIN, credential_data.login)
+            KeystoreWrapper.set_password(credential_id, USERNAME, credential_data.username)
             KeystoreWrapper.set_password(credential_id, PASSWORD, credential_data.password)
             logging.debug(
                 f"Credentials saved to the '{self.keyring_name}'"
@@ -79,7 +79,7 @@ class KeystoreCredentialsProvider(CredentialsProviderInterface):
         try:
             KeystoreWrapper.set_password(credential_data.machine, MACHINE,
                                          credential_data.machine)
-            KeystoreWrapper.set_password(credential_data.machine, LOGIN, user_to_update)
+            KeystoreWrapper.set_password(credential_data.machine, USERNAME, user_to_update)
             KeystoreWrapper.set_password(credential_data.machine, PASSWORD, new_api_key)
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation

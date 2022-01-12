@@ -7,8 +7,10 @@ from unittest.mock import patch
 # *************************************************
 # *********** INTEGRATION TESTS HELPERS ***********
 # *************************************************
+from conjur_api.models import CredentialsData
+
 from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_NETRC_FILE
-from conjur.data_object import ConjurrcData, CredentialsData
+from conjur.data_object import ConjurrcData
 from conjur.logic.credential_provider import CredentialStoreFactory
 
 

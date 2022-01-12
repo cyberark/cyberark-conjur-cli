@@ -1,12 +1,10 @@
 import unittest
 from unittest.mock import patch
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.data_object import ConjurrcData
 from conjur.errors import CertificateVerificationException, HttpSslError
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
-from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrapper.http_wrapper import HttpVerb
 from conjur.logic.login_logic import LoginLogic
 
 

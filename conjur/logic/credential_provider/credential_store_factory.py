@@ -8,7 +8,7 @@ This module is a factory for determining which credential store to use
 
 # Internals
 from conjur.constants import SUPPORTED_BACKENDS
-from conjur_sdk.interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider

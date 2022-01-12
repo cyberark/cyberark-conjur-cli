@@ -1,8 +1,7 @@
 import unittest
 
 from conjur.controller.hostfactory_controller import HostFactoryController
-from conjur.data_object.create_host_data import CreateHostData
-from conjur.data_object.create_token_data import CreateTokenData
+from conjur_api.models import CreateHostData, CreateTokenData
 from conjur.errors import MissingRequiredParameterException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 

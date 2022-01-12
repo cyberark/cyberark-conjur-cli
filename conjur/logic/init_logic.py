@@ -11,8 +11,9 @@ to the user's machine as well as fetching certificates from Conjur
 import logging
 import os.path
 
-from conjur_sdk.models import SslVerificationMetadata
-from conjur_sdk import Client
+from conjur_api.models import SslVerificationMetadata
+from conjur_api import Client
+from conjur_api.providers import SimpleCredentialsProvider
 from conjur.util.ssl_utils.errors import TLSSocketConnectionException
 from conjur.util.ssl_utils import SSLClient
 from conjur.data_object import ConjurrcData
@@ -68,7 +69,9 @@ class InitLogic:
             'url': conjurrc_data.conjur_url
         }
         logging.debug("Attempting to fetch the account from the Conjur server...")
-        client = Client(conjurrc_data=conjurrc_data, ssl_verification_mode=ssl_verification_metadata.mode)
+        client = Client(conjurrc_data=conjurrc_data,
+                        ssl_verification_mode=ssl_verification_metadata.mode,
+                        credentials_provider=SimpleCredentialsProvider())
         response = client.get_server_info()  # TODO implement in SDK
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 

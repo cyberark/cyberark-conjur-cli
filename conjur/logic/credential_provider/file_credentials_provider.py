@@ -14,10 +14,11 @@ import os
 import stat
 
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
-from conjur.data_object import CredentialsData, ConjurrcData
+from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, USERNAME
+from conjur_api.models import CredentialsData
+from conjur.data_object import ConjurrcData
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
-from conjur_sdk.interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 
 
 # pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
@@ -44,12 +45,12 @@ class FileCredentialsProvider(CredentialsProviderInterface):
         if os.path.exists(self.netrc_path):
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
-            hosts[credential_data.machine] = (credential_data.login, None, credential_data.password)
+            hosts[credential_data.machine] = (credential_data.username, None, credential_data.password)
             self.build_netrc(netrc_obj)
         else:
             with open(self.netrc_path, "w+") as netrc_file:
                 netrc_file.write(f"machine {credential_data.machine}\n")
-                netrc_file.write(f"login {credential_data.login}\n")
+                netrc_file.write(f"login {credential_data.username}\n")
                 netrc_file.write(f"password {credential_data.password}\n")
 
         # Ensures that the netrc file is only available its owner
@@ -165,7 +166,7 @@ class FileCredentialsProvider(CredentialsProviderInterface):
             login, _, password = netrc_auth
             loaded_credentials[MACHINE] = netrc_host_url
             loaded_credentials[PASSWORD] = password
-            loaded_credentials[LOGIN] = login
+            loaded_credentials[USERNAME] = login
             return CredentialsData.convert_dict_to_obj(loaded_credentials)
         except netrc.NetrcParseError as netrc_error:
             raise InvalidFormatException("Error: netrc is in an invalid format. "

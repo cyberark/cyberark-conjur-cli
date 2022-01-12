@@ -11,19 +11,17 @@ import sys
 import traceback
 
 # Internals
-from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException, \
-    HttpError, HttpStatusError
-from conjur.data_object.create_token_data import CreateTokenData
-from conjur.data_object.create_host_data import CreateHostData
+from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException
+from conjur_api.errors.errors import HttpError, HttpStatusError
+from conjur_api.models import CreateTokenData, CreateHostData
 from conjur.logic.hostfactory_logic import HostFactoryLogic
-
 
 # pylint: disable=too-few-public-methods,logging-fstring-interpolation
 INVALID_TOKEN_ERROR = "Cannot create host using Host " \
-                         "Factory token provided." \
-                         " Reason: {}. " \
-                         "Check that the token is valid" \
-                         "/has not been revoked and try again."
+                      "Factory token provided." \
+                      " Reason: {}. " \
+                      "Check that the token is valid" \
+                      "/has not been revoked and try again."
 
 
 class HostFactoryController:

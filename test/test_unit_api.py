@@ -4,9 +4,9 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 from urllib import parse
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode, CreateTokenData
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
-from conjur.data_object.create_token_data import CreateTokenData
+
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.errors import MissingRequiredParameterException
 from conjur.wrapper.http_wrapper import HttpVerb
@@ -148,7 +148,7 @@ class ApiTest(unittest.TestCase):
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_new_client_delegates_ssl_verify_flag(self, mock_http_client, mock_creds):
         create_api().login()
-        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.USERNAME,
                               auth=('myuser', 'mypass'),
                               api_token=False,
                               ssl_verification_metadata=create_ssl_verification_metadata())
@@ -160,7 +160,7 @@ class ApiTest(unittest.TestCase):
                                                                              mock_http_client,
                                                                              mock_cres):
         create_api().login()
-        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.USERNAME,
                               auth=('myuser', 'mypass'),
                               api_token=False,
                               ssl_verification_metadata=create_ssl_verification_metadata())
@@ -170,7 +170,7 @@ class ApiTest(unittest.TestCase):
     @patch('conjur.api.api.invoke_endpoint', return_value=MockClientResponse())
     def test_login_invokes_http_client_correctly(self, mock_http_client, mock_creds):
         create_api().login()
-        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.LOGIN,
+        self.verify_http_call(mock_http_client, HttpVerb.GET, ConjurEndpoint.USERNAME,
                               auth=('myuser', 'mypass'),
                               api_token=False,
                               ssl_verification_metadata=create_ssl_verification_metadata())

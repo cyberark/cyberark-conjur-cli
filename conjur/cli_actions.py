@@ -9,15 +9,13 @@ This module holds the run logic of each command.
 import sys
 
 # SDK
-from conjur_sdk.interface import CredentialsProviderInterface
+from conjur_api.interface import CredentialsProviderInterface
 
 # Internal
 # pylint: disable=too-many-arguments
 from conjur.controller.hostfactory_controller import HostFactoryController
-from conjur.data_object.create_host_data import CreateHostData
-from conjur.data_object.create_token_data import CreateTokenData
-from conjur.data_object.list_members_of_data import ListMembersOfData
-from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData, ListPermittedRolesData, \
+    CredentialsData
 from conjur.errors import ConflictingParametersException, FileNotFoundException, InvalidFilePermissionsException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 
@@ -26,11 +24,12 @@ from conjur.controller import InitController, LoginController, \
     PolicyController, UserController, HostController
 from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, VariableLogic, \
     PolicyLogic, UserLogic
-from conjur.data_object import ConjurrcData, CredentialsData, ListData, VariableData, \
-    PolicyData, UserInputData, HostResourceData
+from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
+    PolicyData
 
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
+
 
 # pylint: disable=raise-missing-from
 def handle_init_logic(
@@ -76,7 +75,7 @@ def handle_login_logic(
     """
     Method wraps the login call logic
     """
-    credential_data = CredentialsData(login=identifier)
+    credential_data = CredentialsData(username=identifier)
     login_logic = LoginLogic(credential_provider)
     ssl_verification_metadata = util_functions.get_ssl_verification_meta_data_from_conjurrc(ssl_verify)
     login_controller = LoginController(ssl_verification_metadata=ssl_verification_metadata,
