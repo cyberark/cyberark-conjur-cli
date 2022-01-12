@@ -7,10 +7,27 @@ cleanup() {
 }
 
 DEBUG="false"
-if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
-  DEBUG="true"
-  shift
-fi
+SDK_REPO_PATH=""
+function get_parameters() {
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -d | --debug)
+      DEBUG="true"
+      shift # past argument
+      ;;
+    -s | --sdk-repo-path)
+      SDK_REPO_PATH="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    *)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    esac
+  done
+}
+get_parameters $@
 
 trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
@@ -36,7 +53,7 @@ export TEST_HOSTNAME=conjur-https
 
 # Docker-compose will pick this file up when starting containers
 # so we will have these variables in the container
-cat <<ENV > .env
+cat <<ENV >.env
 CONJUR_AUTHN_API_KEY=$admin_api_key
 DEBUG=$DEBUG
 ENV
@@ -45,6 +62,11 @@ echo "Starting test env..."
 docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
+
+if [[ "$SDK_REPO_PATH" != "" ]]; then
+  docker-compose cp "$SDK_REPO_PATH" test:/
+  docker-compose exec --privileged test /bin/sh -c " pip install /$SDK_REPO_PATH"
+fi
 
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
