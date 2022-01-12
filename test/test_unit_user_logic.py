@@ -1,14 +1,16 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur import Client
-from conjur.data_object import CredentialsData
-from conjur.errors import OperationNotCompletedException, HttpError
+from conjur_api import Client
+from conjur_api.models import CredentialsData
+from conjur_api.errors.errors import HttpError
+from conjur.errors import OperationNotCompletedException
+
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.user_logic import UserLogic
 
-MockCredentials = CredentialsData(login='someuser', password='someAPIKey')
+MockCredentials = CredentialsData(username='someuser', password='someAPIKey')
 
 class MockConjurrc:
     conjur_url = 'someurl'

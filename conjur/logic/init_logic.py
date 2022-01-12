@@ -72,7 +72,7 @@ class InitLogic:
         client = Client(conjurrc_data=conjurrc_data,
                         ssl_verification_mode=ssl_verification_metadata.mode,
                         credentials_provider=SimpleCredentialsProvider())
-        response = client.get_server_info()  # TODO implement in SDK
+        response = client.get_server_info()
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
         # pylint: disable=logging-fstring-interpolation

@@ -34,8 +34,8 @@ class LoginLogic:
         self.credentials_provider = credentials_provider
 
     # pylint: disable=logging-fstring-interpolation
-    def get_api_key(self,
-                    ssl_verification_metadata: SslVerificationMetadata,
+    @staticmethod
+    def get_api_key(ssl_verification_metadata: SslVerificationMetadata,
                     credential_data: CredentialsData,
                     password: str,
                     conjurrc: ConjurrcData) -> str:

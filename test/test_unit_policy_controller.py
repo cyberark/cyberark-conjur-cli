@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import MagicMock
 
 import conjur
-from conjur import Client
-from conjur.errors import HttpStatusError
+from conjur_api import Client
+from conjur_api.errors.errors import HttpStatusError
 from conjur.logic.policy_logic import PolicyLogic
 from conjur.controller.policy_controller import PolicyController
 

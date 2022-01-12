@@ -5,12 +5,13 @@ from unittest.mock import patch, call
 import keyring
 # Internal
 from conjur.constants import TEST_HOSTNAME, PASSWORD, USERNAME, MACHINE, TEST_KEYRING
-from conjur.data_object import CredentialsData, ConjurrcData
+from conjur.data_object import ConjurrcData
+from conjur_api.models import CredentialsData
 from conjur.errors import OperationNotCompletedException, CredentialRetrievalException, KeyringWrapperGeneralError
 from conjur.logic.credential_provider import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreWrapper
 
-MockCredentials = CredentialsData(machine=TEST_HOSTNAME, login='somelogin', password='somepass')
+MockCredentials = CredentialsData(machine=TEST_HOSTNAME, username='somelogin', password='somepass')
 MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 
 
@@ -52,7 +53,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         ]
         mock_store_wrapper.assert_has_calls(calls)
         self.assertEquals(MockCredentials.machine, credentials_data.machine)
-        self.assertEquals(MockCredentials.login, credentials_data.login)
+        self.assertEquals(MockCredentials.username, credentials_data.username)
         self.assertEquals(MockCredentials.password, credentials_data.password)
 
     @patch.object(KeystoreWrapper, 'set_password')

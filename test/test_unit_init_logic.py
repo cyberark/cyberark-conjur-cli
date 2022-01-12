@@ -4,14 +4,11 @@ import unittest
 from unittest import mock
 from unittest.mock import patch, mock_open
 
-from conjur.api.endpoints import ConjurEndpoint
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.util.ssl_utils import TLSSocketConnectionException
+from conjur.util.ssl_utils.errors import TLSSocketConnectionException
 from conjur.errors import ConnectionToConjurFailedException
 from conjur.logic.init_logic import InitLogic
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.util.ssl_utils import SSLClient
-from conjur.wrapper.http_wrapper import HttpVerb
 
 MOCK_CERT = '''
 -----BEGIN CERTIFICATE-----
@@ -103,7 +100,7 @@ class InitLogicTest(unittest.TestCase):
         with patch.object(SSLClient, 'get_certificate',
                           side_effect=TLSSocketConnectionException("err")) as mock_get_cert:
             with self.assertRaises(ConnectionToConjurFailedException) as context:
-                init_logic = InitLogic(self.ssl_service)
+                init_logic = InitLogic(self.ssl_service())
                 init_logic.get_certificate('https://url', None)
             self.assertRegex(str(context.exception), 'Unable to resolve server DNS ')
 
@@ -133,15 +130,3 @@ class InitLogicTest(unittest.TestCase):
                                                                                   443)
             self.assertEquals(fingerprint, "12:AB")
             self.assertEquals(readable_certificate, "cert")
-
-    @patch('conjur.logic.init_logic.invoke_endpoint')
-    def test_provided_cert_file_loads_provided_cert_location(self, mock_http_client):
-        mock_http_client.json.return_value = [{'release': 'somerelease'}]
-        conjurrc_data = ConjurrcData('https://someurl', 'someacc', '/some/path/conjur-server.pem')
-        ssl_verification_metadata = SslVerificationMetadata(
-            SslVerificationMode.SELF_SIGN, '/some/path/conjur-server.pem')
-        mock_init_logic = InitLogic('someservice')
-        mock_init_logic.fetch_account_from_server(conjurrc_data, ssl_verification_metadata)
-        mock_http_client.assert_called_once_with(HttpVerb.GET, ConjurEndpoint.INFO,
-                                                 {'url': 'https://someurl'},
-                                                 ssl_verification_metadata=ssl_verification_metadata)

@@ -4,8 +4,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 
-from conjur import Client
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api import Client
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.controller import InitController
 from conjur.controller.host_controller import HostController
 from conjur.controller.hostfactory_controller import HostFactoryController
