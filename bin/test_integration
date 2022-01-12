@@ -63,7 +63,7 @@ docker-compose up -d test
 
 rm -rf $CURRENT_DIR/output/*
 
-if [[ "$SDK_REPO_PATH" != "" ]]; then
+if [[ -n "$SDK_REPO_PATH" ]]; then
   docker-compose cp "$SDK_REPO_PATH" test:/
   docker-compose exec --privileged test /bin/sh -c " pip install /$SDK_REPO_PATH"
 fi
