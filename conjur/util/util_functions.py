@@ -14,7 +14,8 @@ import os
 
 # Internals
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.errors import MissingRequiredParameterException, HttpError
+from conjur.errors import MissingRequiredParameterException
+from conjur_api.errors.errors import HttpError
 from conjur.util.os_types import OSTypes
 from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME, \

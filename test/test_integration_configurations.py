@@ -11,7 +11,7 @@ import shutil
 from unittest.mock import patch
 
 from conjur_api.models import CredentialsData
-from conjur.errors import HttpSslError
+from conjur_api.errors.errors import HttpSslError
 from conjur.errors_messages import FETCH_CONFIGURATION_FAILURE_MESSAGE
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase

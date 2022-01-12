@@ -11,7 +11,8 @@ import sys
 
 # pylint: disable=too-few-public-methods
 
-from conjur.errors import InvalidFormatException, HttpStatusError
+from conjur.errors import InvalidFormatException
+from conjur_api.errors.errors import HttpStatusError
 from conjur.logic.policy_logic import PolicyLogic
 from conjur.data_object.policy_data import PolicyData
 

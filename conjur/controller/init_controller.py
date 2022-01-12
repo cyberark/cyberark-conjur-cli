@@ -24,7 +24,8 @@ from typing import Optional
 
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, ConfirmationException, \
-    MissingRequiredParameterException, OperationNotCompletedException, HttpStatusError, HttpSslError
+    MissingRequiredParameterException, OperationNotCompletedException
+from conjur_api.errors.errors import HttpStatusError, HttpSslError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic

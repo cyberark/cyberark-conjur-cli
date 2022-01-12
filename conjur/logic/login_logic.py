@@ -17,7 +17,8 @@ from conjur_api.interface import CredentialsProviderInterface
 from conjur_api.providers import SimpleCredentialsProvider
 
 # Internals
-from conjur.errors import CertificateVerificationException, HttpSslError
+from conjur.errors import CertificateVerificationException
+from conjur_api.errors.errors import HttpSslError
 from conjur.data_object import ConjurrcData
 
 

@@ -14,7 +14,8 @@ from typing import Tuple
 from conjur_api.interface import CredentialsProviderInterface
 
 # Internals
-from conjur.errors import OperationNotCompletedException, HttpError
+from conjur.errors import OperationNotCompletedException
+from conjur_api.errors.errors import HttpError
 
 from conjur.resource import Resource
 from conjur.data_object import ConjurrcData
