@@ -49,9 +49,10 @@ class LoginLogic:
             credentials_provider.save(CredentialsData(machine=conjurrc.conjur_url,
                                                       username=credential_data.username,
                                                       password=password))
-            client = Client(conjurrc_data=conjurrc,
+            client = Client(connection_info=conjurrc,
                             ssl_verification_mode=ssl_verification_metadata.mode,
-                            credentials_provider=credentials_provider)
+                            credentials_provider=credentials_provider,
+                            async_mode=False)
             api_key = client.login()
         except HttpSslError:
             if not conjurrc.cert_file and not ssl_verification_metadata.is_insecure_mode:

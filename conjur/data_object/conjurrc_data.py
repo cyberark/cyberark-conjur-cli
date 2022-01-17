@@ -14,14 +14,14 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader as YamlLoader
 
-from conjur_api.models import ConjurrcData as SdkConjurrcData
+from conjur_api.models import ConjurConnectionInfo
 
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
 
 
-class ConjurrcData(SdkConjurrcData):
+class ConjurrcData(ConjurConnectionInfo):
     """
     Used for setting user input data
     """

@@ -134,8 +134,9 @@ class Cli:
     def _run_command_flow(self, args, resource):
         ssl_verification_meta_data = get_ssl_verification_meta_data_from_conjurrc(args.ssl_verify)
         client = Client(ssl_verification_mode=ssl_verification_meta_data.mode,
-                        conjurrc_data=ConjurrcData.load_from_file(), debug=args.debug,
-                        credentials_provider=self.credential_provider)
+                        connection_info=ConjurrcData.load_from_file(), debug=args.debug,
+                        credentials_provider=self.credential_provider,
+                        async_mode=False)
 
         if resource == 'list':
             cli_actions.handle_list_logic(args, client)
