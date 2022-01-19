@@ -127,7 +127,7 @@ ConjurrcData is a data class containing all the 'non-credential' connection deta
 
 #### Step 3. Storing credentials
 
-The client uses credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
+The client uses a credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
 approach allow to keep the credentials in a safe location and provide it to the client on demand.
 
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
@@ -168,7 +168,7 @@ If credentials written to the `.netrc`, it is strongly recommended that you dele
 SDK. The file is located at the user home directory.
 
 Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the user who has
-created the file to have read/write permissions on it (`chmod 700 .netrc`).
+created the file to have read/write permissions on it (`chmod 600 .netrc`).
 
 ```
 # .netrc / _netrc
