@@ -1,7 +1,7 @@
 # conjur-api-python3
 
-This repository includes both the self-contained Conjur command-line tool (`conjur`) and the
-Python3-based SDK for accessing the Conjur API to manage Conjur resources.
+This repository includes both the self-contained Conjur command-line tool (`conjur`) and the Python3-based SDK for
+accessing the Conjur API to manage Conjur resources.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
 
@@ -13,10 +13,9 @@ Python3-based SDK for accessing the Conjur API to manage Conjur resources.
 
 ![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
-The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it
-will securely work with CyberArk Conjur Enterprise (previously known as DAP) as documented. In
-addition, CyberArk offers Enterprise-level support for these features. For more detailed information
-on our certification levels,
+The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will securely work
+with CyberArk Conjur Enterprise (previously known as DAP) as documented. In addition, CyberArk offers Enterprise-level
+support for these features. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
 .
 
@@ -25,8 +24,7 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 ![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
 The Conjur Python SDK is a **Community** level project. It's a community contributed project that **
-is not reviewed or supported by CyberArk**. For more detailed information on our certification
-levels,
+is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
 .
 
@@ -35,12 +33,11 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 Are you using this project with [Conjur Open Source](https://github.com/cyberark/conjur)? Then we
 **strongly** recommend choosing the version of this project to use from the
 latest [Conjur OSS suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
-. Conjur maintainers perform additional testing on the suite release versions to ensure
-compatibility. When possible, upgrade your Conjur Open Source version to match the
+. Conjur maintainers perform additional testing on the suite release versions to ensure compatibility. When possible,
+upgrade your Conjur Open Source version to match the
 [latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
-. When using integrations, choose the latest suite release that matches your Conjur Open Source
-version. For any questions, please contact us
-on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
+. When using integrations, choose the latest suite release that matches your Conjur Open Source version. For any
+questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
 ### Supported Services
 
@@ -64,11 +61,11 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 #### Install the SDK
 
-The SDK can be installed via PyPI. Note that the SDK is a **Community** level project meaning that
-the SDK is subject to alterations that may result in breaking change.
+The SDK can be installed via PyPI. Note that the SDK is a **Community** level project meaning that the SDK is subject to
+alterations that may result in breaking change.
 
-To avoid unanticipated breaking changes, make sure that you stay up-to-date on our latest releases
-and review the project's [CHANGELOG.md](CHANGELOG.md).
+To avoid unanticipated breaking changes, make sure that you stay up-to-date on our latest releases and review the
+project's [CHANGELOG.md](CHANGELOG.md).
 
 ```
 pip3 install conjur
@@ -76,8 +73,8 @@ pip3 install conjur
 conjur --help
 ```
 
-Alternatively, you can install the library from the source. Note that this will install the latest
-work from the cloned source and not necessarily an official release.
+Alternatively, you can install the library from the source. Note that this will install the latest work from the cloned
+source and not necessarily an official release.
 
 Clone the project and run:
 
@@ -96,32 +93,94 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 To start using the SDK in your applications, create a Client instance and then invoke the API on it:
 
-#### With login ID and password
+#### Define connection parameters
 
-```python3
-#!/usr/bin/env python3
+In order to login to conjur you need to have 5 parameters known from advance.
 
-from conjur import Client
+```
+conjur_url = "https://my_conjur.com"
+account = "my_account"
+username = "user1"
+password = "SomeStr@ngPassword!1"
+ssl_verification_mode = SslVerificationMode.TRUST_STORE
+```
 
-client = Client(conjurrc_data=ConjurrcData(...),
-                ssl_verification_mode=SslVerificationMode.TRUST_STORE,
-                credentials_provider=FileCredentialsProvider(),
-                debug=False)
+#### Define ConjurrcData
 
-print("Setting variable...")
-client.set('conjur/my/variable', 'new value')
+ConjurrcData is a data class containing all the non-credentials connection details.
 
-print("Fetching variable...")
-new_value = client.get('conjur/my/variable')
+`connection_info = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)`
 
-print("Variable value is:", new_value.decode('utf-8'))
+* conjur_url - url of conjur server
+* account - the account which we want to connect to
+* cert_file - a path to conjur rootCA file. we need it if we initialize the client in `SslVerificationMode.SELF_SIGN`
+  or `SslVerificationMode.CA_BUNDLE` mode
+
+#### Storing credentials
+
+The client uses credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
+approach allow to keep the credentials in a safe location and provide it to the client on demand.
+
+We provide the user with `CredentialStoreFactory` which create such Credential stores.
+
+By default, the `CredentialStoreFactory` will favor saving credentials (login ID and password) to the system's
+credential store. If the detected credential store is not one we support or is not accessible, the credentials will be
+written to a configuration file, `.netrc`, in plaintext.
+
+Example of usage:
+
+
+```
+credentials = CredentialsData(username=username, password=password, machine=conjur_url)
+
+credentials_provider = CredentialStoreFactory.create_credential_store()
+
+credentials_provider.save(credentials)
+
+del credentials
+```
+
+If written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the SDK. The
+file is located at the user home directory.
+
+The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
+and should consist of 'machine', 'login', and 'password'.
+
+Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the user who has
+created the file to have read/write permissions on it (`chmod 700 .netrc`).
+
+```
+# .netrc / _netrc
+machine https://conjur.myorg.com
+login admin
+password 1234....
+```
+
+#### Creating the client and use it
+
+Now that we have created `connection_info` and `credentials_provider`
+We can create our client
+
+```
+client = Client(connection_info, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
+```
+
+* ssl_verification_mode = `SslVerificationMode` enum that states what is the certificate verification technique we will
+  use when making the api request
+
+After creating the client we can login to conjur and start using it. Example of usage:
+
+```
+client.login() # login to conjur and return the api_key`
+
+client.list() # get list of all conjur resources that the user authorize to read`
 ```
 
 #### Defining the Conjur server endpoint
 
-A configuration file called `.conjurrc` is used to hold details required to communicate to the
-Conjur server. You can provide these details needed to open a connection to the Conjur endpoint in
-this file instead of passing them in (`url`, `account`, and `ca_bundle`)  
+A configuration file called `.conjurrc` is used to hold details required to communicate to the Conjur server. You can
+provide these details needed to open a connection to the Conjur endpoint in this file instead of passing them in (`url`
+, `account`, and `ca_bundle`)  
 during initialization of the Client.
 
 The `.conjurrc` file should be saved to your home directory and should contain `conjur_url`,
@@ -135,35 +194,12 @@ conjur_account: someaccount
 conjur_url: https://conjur-server
 ```
 
-#### Storing credentials
-
-When using the SDK, you can keep credentials in the system's native credential store instead of
-passing them in during initialization of the Client. By default, the Client will favor saving
-credentials (login ID and password) to the system's credential store. If the detected credential
-store is not one we support or is not accessible, the credentials will be written to a configuration
-file, `.netrc`, in plaintext.
-
-If written to the `.netrc`, it is strongly recommended that you log out when not using the Conjur
-CLI. This removes the credentials from the `.netrc` file.
-
-The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to
-the Conjur endpoint and should consist of 'machine', 'login', and 'password'.
-
-Note that if you choose to create this file yourself, ensure you follow least privilege, allowing
-only the user who has created the file to have read/write permissions on it (`chmod 700 .netrc`).
-
-```
-# .netrc / _netrc
-machine https://conjur.myorg.com
-login admin
-password 1234....
-```
-
 ## Supported Client methods
 
 #### `get(variable_id)`
 
-Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding. For example: 
+Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding. For
+example:
 `get(variable_id).decode('utf-8')`.
 
 #### `get_many(variable_id[,variable_id...])`
@@ -263,5 +299,5 @@ in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This project is [licensed under Apache License v2.0](LICENSE.md). Copyright (c) 2021 CyberArk
-Software Ltd. All rights reserved.
+This project is [licensed under Apache License v2.0](LICENSE.md). Copyright (c) 2021 CyberArk Software Ltd. All rights
+reserved.
