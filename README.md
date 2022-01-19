@@ -102,7 +102,7 @@ from conjur.logic.credential_provider import CredentialStoreFactory
 from conjur.api.client import Client
 ```
 
-#### Define connection parameters
+#### Step 1. Define connection parameters
 
 To log in to Conjur, define the following parameters, for example:
 
@@ -114,7 +114,7 @@ api_key = "SomeStr@ngPassword!1"
 ssl_verification_mode = SslVerificationMode.TRUST_STORE
 ```
 
-#### Define ConjurrcData
+#### Step 2. Define ConjurrcData
 
 ConjurrcData is a data class containing all the non-credentials connection details.
 
@@ -125,7 +125,7 @@ ConjurrcData is a data class containing all the non-credentials connection detai
 * cert_file - a path to conjur rootCA file. we need it if we initialize the client in `SslVerificationMode.SELF_SIGN`
   or `SslVerificationMode.CA_BUNDLE` mode
 
-#### Storing credentials
+#### Step 3. Storing credentials
 
 The client uses credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
 approach allow to keep the credentials in a safe location and provide it to the client on demand.
@@ -177,7 +177,7 @@ login admin
 password 1234....
 ```
 
-#### Creating the client and use it
+#### Step 4. Creating the client and use it
 
 Now that we have created `conjurrc_data` and `credentials_provider`
 We can create our client
