@@ -33,8 +33,8 @@ Are you using this project with [Conjur Open Source](https://github.com/cyberark
 latest [Conjur OSS suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
 . Conjur maintainers perform additional testing on the Suite release versions to ensure compatibility. When possible,
 upgrade your Conjur Open Source version to match the
-[latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
-. When using integrations, choose the latest suite release that matches your Conjur Open Source version. For any
+[latest Suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
+. When using integrations, choose the latest Suite release that matches your Conjur Open Source version. For any
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
 ### Supported Services
@@ -59,10 +59,10 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 #### Install the SDK
 
-The SDK can be installed via PyPI. Note that the SDK is a **Community** level project meaning that the SDK is subject to
-alterations that may result in breaking change.
+The SDK can be installed via PyPI. Note that the SDK is a **Community** level project, meaning that the SDK is subject to
+modifications that may result in breaking change.
 
-To avoid unanticipated breaking changes, make sure that you stay up-to-date on our latest releases and review the
+To avoid unanticipated breaking changes, make sure that you stay up to date on our latest releases and always review the
 project's [CHANGELOG.md](CHANGELOG.md).
 
 ```
@@ -194,14 +194,14 @@ After you create the client, you can start using it.
 Example of usage:
 
 ```
-client.list() # get list of all conjur resources that the user authorize to read`
+client.list() # get list of all Conjur resources that the user is authorized to read`
 ```
 
 ## Supported Client methods
 
 #### `get(variable_id)`
 
-Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding. For
+Gets a variable value based on its ID. A variable is binary data that should be decoded to your system's encoding. For
 example:
 `get(variable_id).decode('utf-8')`.
 
