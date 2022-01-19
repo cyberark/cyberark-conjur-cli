@@ -180,7 +180,7 @@ password 1234....
 #### Step 4. Creating the client and use it
 
 Now that we have created `conjurrc_data` and `credentials_provider`
-We can create our client
+you can create your client.
 
 ```
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
