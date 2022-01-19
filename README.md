@@ -122,7 +122,7 @@ ConjurrcData is a data class containing all the non-credentials connection detai
 
 * conjur_url - URL of the Conjur server
 * account - the organizational Conjur account name
-* cert_file - a path to conjur rootCA file. we need it if we initialize the client in `SslVerificationMode.SELF_SIGN`
+* cert_file - a path to the Conjur rootCA file. This is required if you are initializing the client in `SslVerificationMode.SELF_SIGN`
   or `SslVerificationMode.CA_BUNDLE` mode
 
 #### Step 3. Storing credentials
