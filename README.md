@@ -1,6 +1,6 @@
 # conjur-api-python3
 
-This repository includes both the self-contained Conjur command-line tool (`conjur`) and the Python3-based SDK for
+This repository includes both the self-contained Conjur CLI (`conjur`) and the Python3-based SDK for
 accessing the Conjur API to manage Conjur resources.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
@@ -13,8 +13,8 @@ accessing the Conjur API to manage Conjur resources.
 
 ![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
-The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will securely work
-with CyberArk Conjur Enterprise (previously known as DAP) as documented. In addition, CyberArk offers Enterprise-level
+The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will work securely
+with CyberArk Conjur Enterprise (previously known as Dynamic Access Provider). In addition, CyberArk offers Enterprise-level
 support for these features. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
 .
@@ -33,7 +33,7 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 Are you using this project with [Conjur Open Source](https://github.com/cyberark/conjur)? Then we
 **strongly** recommend choosing the version of this project to use from the
 latest [Conjur OSS suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
-. Conjur maintainers perform additional testing on the suite release versions to ensure compatibility. When possible,
+. Conjur maintainers perform additional testing on the Suite release versions to ensure compatibility. When possible,
 upgrade your Conjur Open Source version to match the
 [latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
 . When using integrations, choose the latest suite release that matches your Conjur Open Source version. For any
@@ -188,10 +188,11 @@ We can create our client
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
 ```
 
-* ssl_verification_mode = `SslVerificationMode` enum that states what is the certificate verification technique we will
-  use when making the api request
+* ssl_verification_mode = `SslVerificationMode` enum that states which certificate verification technique to 
+  use when making the API request.
 
-After creating the client we can login to conjur and start using it. Example of usage:
+After you create the client, you can log in to Conjur and start using it. 
+Example of usage:
 
 ```
 client.list() # get list of all conjur resources that the user authorize to read`
