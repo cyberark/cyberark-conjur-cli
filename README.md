@@ -16,8 +16,7 @@ accessing the Conjur API to manage Conjur resources.
 The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will work securely
 with CyberArk Conjur Enterprise (previously known as Dynamic Access Provider). In addition, CyberArk offers Enterprise-level
 support for these features. For more detailed information on our certification levels,
-see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
-.
+see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
 ### Conjur Python SDK
 
@@ -25,8 +24,7 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 
 The Conjur Python SDK is a **Community** level project. It's a community contributed project that 
 **is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
-see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
-.
+see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
 ### Using conjur-api-python3 with Conjur Open Source
 
@@ -44,7 +42,7 @@ questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/
 - Conjur Open Source v1.2.0 or later
 - Conjur Enterprise v11.2.1 (v5.6.3) or later
 
-### Sypported Platforms
+### Supported Platforms
 
 - macOS Catalina or later
 - Windows 10 or later
