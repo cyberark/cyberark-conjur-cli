@@ -93,6 +93,16 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 To start using the SDK in your applications, create a Client instance and then invoke the API on it:
 
+#### Imports
+
+Import The relevant modules
+
+```
+from conjur.api.models import SslVerificationMode
+from conjur.data_object import CredentialsData, ConjurrcData
+from conjur.logic.credential_provider import CredentialStoreFactory
+from conjur.api.client import Client
+```
 #### Define connection parameters
 
 In order to login to conjur you need to have 5 parameters known from advance.
@@ -101,7 +111,7 @@ In order to login to conjur you need to have 5 parameters known from advance.
 conjur_url = "https://my_conjur.com"
 account = "my_account"
 username = "user1"
-password = "SomeStr@ngPassword!1"
+api_key = "SomeStr@ngPassword!1"
 ssl_verification_mode = SslVerificationMode.TRUST_STORE
 ```
 
