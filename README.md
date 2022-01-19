@@ -103,6 +103,7 @@ from conjur.data_object import CredentialsData, ConjurrcData
 from conjur.logic.credential_provider import CredentialStoreFactory
 from conjur.api.client import Client
 ```
+
 #### Define connection parameters
 
 In order to login to conjur you need to have 5 parameters known from advance.
@@ -162,11 +163,11 @@ stored in the credentials store. In that case, we only need to get the credentia
 credentials_provider = CredentialStoreFactory.create_credential_store()
 ```
 
-If written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the SDK. The
-file is located at the user home directory.
-
 The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
 and should consist of 'machine', 'login', and 'password'.
+
+If credentials written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the
+SDK. The file is located at the user home directory.
 
 Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the user who has
 created the file to have read/write permissions on it (`chmod 700 .netrc`).
