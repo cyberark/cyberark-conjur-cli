@@ -23,8 +23,8 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 
 ![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
-The Conjur Python SDK is a **Community** level project. It's a community contributed project that **
-is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
+The Conjur Python SDK is a **Community** level project. It's a community contributed project that 
+**is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
 .
 
