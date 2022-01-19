@@ -285,5 +285,5 @@ in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This project is [licensed under Apache License v2.0](LICENSE.md). Copyright (c) 2021 CyberArk Software Ltd. All rights
+This project is [licensed under Apache License v2.0](LICENSE.md). Copyright (c) 2022 CyberArk Software Ltd. All rights
 reserved.
