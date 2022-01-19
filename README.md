@@ -120,7 +120,7 @@ ConjurrcData is a data class containing all the non-credentials connection detai
 
 `conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)`
 
-* conjur_url - url of conjur server
+* conjur_url - URL of the Conjur server
 * account - the organizational Conjur account name
 * cert_file - a path to conjur rootCA file. we need it if we initialize the client in `SslVerificationMode.SELF_SIGN`
   or `SslVerificationMode.CA_BUNDLE` mode
