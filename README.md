@@ -167,7 +167,7 @@ and should consist of 'machine', 'login', and 'password'.
 If credentials written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the
 SDK. The file is located at the user home directory.
 
-Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the user who has
+Note: If you choose to create this file yourself, make sure to follow least privilege, allowing only the user who has
 created the file to have read/write permissions on it (`chmod 700 .netrc`).
 
 ```
