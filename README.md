@@ -119,7 +119,7 @@ ssl_verification_mode = SslVerificationMode.TRUST_STORE
 
 ConjurrcData is a data class containing all the non-credentials connection details.
 
-`connection_info = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)`
+`conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)`
 
 * conjur_url - url of conjur server
 * account - the account which we want to connect to
@@ -180,11 +180,11 @@ password 1234....
 
 #### Creating the client and use it
 
-Now that we have created `connection_info` and `credentials_provider`
+Now that we have created `conjurrc_data` and `credentials_provider`
 We can create our client
 
 ```
-client = Client(connection_info, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
+client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
 ```
 
 * ssl_verification_mode = `SslVerificationMode` enum that states what is the certificate verification technique we will
