@@ -191,7 +191,8 @@ client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_ve
 * ssl_verification_mode = `SslVerificationMode` enum that states which certificate verification technique to 
   use when making the API request.
 
-After you create the client, you can log in to Conjur and start using it. 
+After you create the client, you can start using it. 
+
 Example of usage:
 
 ```
