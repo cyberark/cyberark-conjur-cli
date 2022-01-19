@@ -14,7 +14,7 @@ accessing the Conjur API to manage Conjur resources.
 ![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
 The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will work securely
-with CyberArk Conjur Enterprise (previously known as DAP) as documented. In addition, CyberArk offers Enterprise-level
+with CyberArk Conjur Enterprise (previously known as Dynamic Access Provider). In addition, CyberArk offers Enterprise-level
 support for these features. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community)
 .
