@@ -196,7 +196,7 @@ After you create the client, you can start using it.
 Example of usage:
 
 ```
-client.list() # get list of all conjur resources that the user authorize to read`
+client.list() # get list of all Conjur resources that the user is authorized to read`
 ```
 
 ## Supported Client methods
