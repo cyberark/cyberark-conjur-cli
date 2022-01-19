@@ -104,7 +104,7 @@ from conjur.api.client import Client
 
 #### Define connection parameters
 
-In order to login to conjur you need to have 5 parameters known from advance.
+To log in to Conjur, you need the following information:
 
 ```
 conjur_url = "https://my_conjur.com"
