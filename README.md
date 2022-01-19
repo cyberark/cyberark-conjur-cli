@@ -35,7 +35,7 @@ Are you using this project with [Conjur Open Source](https://github.com/cyberark
 latest [Conjur OSS suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
 . Conjur maintainers perform additional testing on the Suite release versions to ensure compatibility. When possible,
 upgrade your Conjur Open Source version to match the
-[latest suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
+[latest Suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
 . When using integrations, choose the latest suite release that matches your Conjur Open Source version. For any
 questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/c/conjur/5).
 
