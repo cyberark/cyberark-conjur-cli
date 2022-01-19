@@ -152,7 +152,7 @@ del credentials
 
 Note: The password should be in the form of the api_key.
 
-##### In case connection already has been done
+##### Already connected:
 
 If a prior connection has been made by the SDK or the CLI with your username and account, then the credentials already
 stored in the credentials store. In that case, we only need to get the credentials store using `CredentialStoreFactory`
