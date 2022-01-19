@@ -138,7 +138,7 @@ written to a configuration file, `.netrc`, in plaintext.
 
 Example of usage:
 
-##### In case of first connection to conjur
+#####First connection to Conjur:
 
 ```
 credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
