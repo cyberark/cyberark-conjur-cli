@@ -128,7 +128,9 @@ credential store. If the detected credential store is not one we support or is n
 written to a configuration file, `.netrc`, in plaintext.
 
 Example of usage:
+
 ##### In case of first connection to conjur
+
 ```
 credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
 
@@ -138,13 +140,17 @@ credentials_provider.save(credentials)
 
 del credentials
 ```
+
 Note: The password should be in the form of the api_key.
 
 ##### In case connection already has been done
+
+If a prior connection has been made by the SDK or the CLI with your username and account, then the credentials already
+stored in the credentials store. In that case, we only need to get the credentials store using `CredentialStoreFactory`
+
 ```
 credentials_provider = CredentialStoreFactory.create_credential_store()
 ```
-Note: The credentials already store in the system key store or inside the `.netrc` file
 
 If written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the SDK. The
 file is located at the user home directory.
