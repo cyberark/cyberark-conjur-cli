@@ -203,7 +203,7 @@ client.list() # get list of all Conjur resources that the user is authorized to 
 
 #### `get(variable_id)`
 
-Gets a variable value based on its ID. Variable is binary data that should be decoded to your system's encoding. For
+Gets a variable value based on its ID. A variable is binary data that should be decoded to your system's encoding. For
 example:
 `get(variable_id).decode('utf-8')`.
 
