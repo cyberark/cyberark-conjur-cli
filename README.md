@@ -61,7 +61,7 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 #### Install the SDK
 
-The SDK can be installed via PyPI. Note that the SDK is a **Community** level project meaning that the SDK is subject to
+The SDK can be installed via PyPI. Note that the SDK is a **Community** level project, meaning that the SDK is subject to
 alterations that may result in breaking change.
 
 To avoid unanticipated breaking changes, make sure that you stay up-to-date on our latest releases and review the
