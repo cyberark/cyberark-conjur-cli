@@ -117,8 +117,9 @@ ssl_verification_mode = SslVerificationMode.TRUST_STORE
 #### Step 2. Define ConjurrcData
 
 ConjurrcData is a data class containing all the 'non-credential' connection details.
-
-`conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)`
+```
+conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = None)
+```
 
 * conjur_url - URL of the Conjur server
 * account - the organizational Conjur account name
