@@ -177,27 +177,7 @@ client = Client(connection_info, credentials_provider=credentials_provider, ssl_
 After creating the client we can login to conjur and start using it. Example of usage:
 
 ```
-client.login() # login to conjur and return the api_key`
-
 client.list() # get list of all conjur resources that the user authorize to read`
-```
-
-#### Defining the Conjur server endpoint
-
-A configuration file called `.conjurrc` is used to hold details required to communicate to the Conjur server. You can
-provide these details needed to open a connection to the Conjur endpoint in this file instead of passing them in (`url`
-, `account`, and `ca_bundle`)  
-during initialization of the Client.
-
-The `.conjurrc` file should be saved to your home directory and should contain `conjur_url`,
-`conjur_account`, and`cert_file`.
-
-```
-# .conjurrc
----
-cert_file: /Users/someuser/conjur-server.pem
-conjur_account: someaccount
-conjur_url: https://conjur-server
 ```
 
 ## Supported Client methods
