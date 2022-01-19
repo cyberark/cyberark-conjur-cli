@@ -1,6 +1,6 @@
 # conjur-api-python3
 
-This repository includes both the self-contained Conjur command-line tool (`conjur`) and the Python3-based SDK for
+This repository includes both the self-contained Conjur CLI (`conjur`) and the Python3-based SDK for
 accessing the Conjur API to manage Conjur resources.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
