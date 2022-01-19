@@ -128,17 +128,17 @@ ConjurrcData is a data class containing all the 'non-credential' connection deta
 #### Step 3. Storing credentials
 
 The client uses a credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
-approach allow to keep the credentials in a safe location and provide it to the client on demand.
+approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
 
-By default, the `CredentialStoreFactory` will favor saving credentials (login ID and password) to the system's
-credential store. If the detected credential store is not one we support or is not accessible, the credentials will be
+By default, the `CredentialStoreFactory` favors saving credentials (login ID and password) to the system's
+credential store. If we do not support the detected credential store, or the credential stoe is not accessible, the credentials are
 written to a configuration file, `.netrc`, in plaintext.
 
 Example of usage:
 
-##### In case of first connection to conjur
+#####First connection to Conjur:
 
 ```
 credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
@@ -152,7 +152,7 @@ del credentials
 
 Note: The password should be in the form of the api_key.
 
-##### In case connection already has been done
+##### Already connected:
 
 If a prior connection has been made by the SDK or the CLI with your username and account, then the credentials already
 stored in the credentials store. In that case, we only need to get the credentials store using `CredentialStoreFactory`
@@ -167,7 +167,7 @@ and should consist of 'machine', 'login', and 'password'.
 If credentials written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the
 SDK. The file is located at the user home directory.
 
-Note that if you choose to create this file yourself, ensure you follow least privilege, allowing only the user who has
+Note: If you choose to create this file yourself, make sure to follow least privilege, allowing only the user who has
 created the file to have read/write permissions on it (`chmod 600 .netrc`).
 
 ```
@@ -180,7 +180,7 @@ password 1234....
 #### Step 4. Creating the client and use it
 
 Now that we have created `conjurrc_data` and `credentials_provider`
-We can create our client
+you can create your client.
 
 ```
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
