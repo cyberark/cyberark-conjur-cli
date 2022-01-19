@@ -188,7 +188,7 @@ We can create our client
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
 ```
 
-* ssl_verification_mode = `SslVerificationMode` enum that states what is the certificate verification technique we will
+* ssl_verification_mode = `SslVerificationMode` enum that states which certificate verification technique to 
   use when making the api request
 
 After creating the client we can login to conjur and start using it. Example of usage:
