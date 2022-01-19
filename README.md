@@ -128,7 +128,7 @@ ConjurrcData is a data class containing all the 'non-credential' connection deta
 #### Step 3. Storing credentials
 
 The client uses credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
-approach allow to keep the credentials in a safe location and provide it to the client on demand.
+approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
 
