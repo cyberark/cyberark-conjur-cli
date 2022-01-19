@@ -132,7 +132,7 @@ approach enables storing the credentials in a safe location, and providing the c
 
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
 
-By default, the `CredentialStoreFactory` will favor saving credentials (login ID and password) to the system's
+By default, the `CredentialStoreFactory` favors saving credentials (login ID and password) to the system's
 credential store. If the detected credential store is not one we support or is not accessible, the credentials will be
 written to a configuration file, `.netrc`, in plaintext.
 
