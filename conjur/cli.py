@@ -134,7 +134,8 @@ class Cli:
     def _run_command_flow(self, args, resource):
         ssl_verification_meta_data = get_ssl_verification_meta_data_from_conjurrc(args.ssl_verify)
         client = Client(ssl_verification_mode=ssl_verification_meta_data.mode,
-                        connection_info=ConjurrcData.load_from_file(), debug=args.debug,
+                        connection_info=ConjurrcData.load_from_file().get_client_connection_info(),
+                        debug=args.debug,
                         credentials_provider=self.credential_provider,
                         async_mode=False)
 

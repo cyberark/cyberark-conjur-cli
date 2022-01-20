@@ -49,7 +49,7 @@ class LoginLogic:
             credentials_provider.save(CredentialsData(machine=conjurrc.conjur_url,
                                                       username=credential_data.username,
                                                       password=password))
-            client = Client(connection_info=conjurrc,
+            client = Client(connection_info=conjurrc.get_client_connection_info(),
                             ssl_verification_mode=ssl_verification_metadata.mode,
                             credentials_provider=credentials_provider,
                             async_mode=False)

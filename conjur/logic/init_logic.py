@@ -69,7 +69,7 @@ class InitLogic:
             'url': conjurrc_data.conjur_url
         }
         logging.debug("Attempting to fetch the account from the Conjur server...")
-        client = Client(connection_info=conjurrc_data,
+        client = Client(connection_info=conjurrc_data.get_client_connection_info(),
                         ssl_verification_mode=ssl_verification_metadata.mode,
                         credentials_provider=SimpleCredentialsProvider(),
                         async_mode=False)

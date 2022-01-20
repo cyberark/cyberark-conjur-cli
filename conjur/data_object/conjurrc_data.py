@@ -21,15 +21,15 @@ from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
 
 
-class ConjurrcData(ConjurConnectionInfo):
+class ConjurrcData:
     """
     Used for setting user input data
     """
 
-    # def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
-    #     self.conjur_url = conjur_url
-    #     self.conjur_account = account
-    #     self.cert_file = cert_file
+    def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
+        self.conjur_url = conjur_url
+        self.conjur_account = account
+        self.cert_file = cert_file
 
     # pylint: disable=unspecified-encoding
     @classmethod
@@ -57,3 +57,8 @@ class ConjurrcData(ConjurConnectionInfo):
             data = {key: val for key, val in self.__dict__.items() if val is not None}
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
+
+    def get_client_connection_info(self) -> ConjurConnectionInfo:
+        return ConjurConnectionInfo(conjur_url=self.conjur_url,
+                                    account=self.conjur_account,
+                                    cert_file=self.cert_file)
