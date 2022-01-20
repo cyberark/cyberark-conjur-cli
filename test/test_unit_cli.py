@@ -28,12 +28,7 @@ WHOAMI_RESPONSE = {
     "conjur_account": "myaccount"
 }
 
-
-class MockConjurrc:
-    conjur_url = 'https://someurl'
-    conjur_account = 'someacc'
-    cert_file = 'some/path/to/pem'
-
+MockConjurrc = ConjurrcData(conjur_url='https://someurl', account='someacc', cert_file='some/path/to/pem')
 
 class MockArgs(object):
     pass
@@ -41,8 +36,8 @@ class MockArgs(object):
 
 class CliTest(unittest.TestCase):
 
-    def __init__(self,testname):
-        ConjurrcData("https://someurl", "someacc",'some/path/to/pem').write_to_file(DEFAULT_CONFIG_FILE)
+    def __init__(self, testname):
+        ConjurrcData("https://someurl", "someacc", 'some/path/to/pem').write_to_file(DEFAULT_CONFIG_FILE)
         super(CliTest, self).__init__(testname)
 
     @cli_test()

@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 
 import conjur_api
-from conjur_api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode, ConjurConnectionInfo
 from conjur_api.errors.errors import HttpSslError
 from conjur.data_object import ConjurrcData
 from conjur.errors import CertificateVerificationException
@@ -16,10 +16,7 @@ class MockCredentialsData:
     password = 'somepass'
 
 
-class MockConjurrc:
-    conjur_url = 'https://someurl'
-    conjur_account = 'someacc'
-    cert_file = 'some/path/to/pem'
+MockConjurrc = ConjurrcData('https://someurl', 'someacc', 'some/path/to/pem')
 
 
 class MockConjurrcEmptyCertEntry:

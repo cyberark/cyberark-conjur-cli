@@ -12,10 +12,12 @@ import http
 import logging
 import sys
 
+# SDK
+from conjur_api.errors.errors import HttpError, HttpStatusError
+
 # Internals
 from conjur.errors import InvalidPasswordComplexityException, \
     OperationNotCompletedException
-from conjur_api.errors.errors import HttpError, HttpStatusError
 from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 from conjur.logic.user_logic import UserLogic
 from conjur.data_object.user_input_data import UserInputData

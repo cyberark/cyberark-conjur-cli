@@ -12,14 +12,13 @@ from typing import Tuple
 
 # SDK
 from conjur_api.interface import CredentialsProviderInterface
+from conjur_api.errors.errors import HttpError
+from conjur_api.models import CredentialsData
 
 # Internals
 from conjur.errors import OperationNotCompletedException
-from conjur_api.errors.errors import HttpError
-
 from conjur.resource import Resource
 from conjur.data_object import ConjurrcData
-from conjur_api.models import CredentialsData
 
 
 class UserLogic:

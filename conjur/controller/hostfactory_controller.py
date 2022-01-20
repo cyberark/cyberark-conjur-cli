@@ -10,10 +10,12 @@ import logging
 import sys
 import traceback
 
-# Internals
-from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException
+# SDK
 from conjur_api.errors.errors import HttpError, HttpStatusError
 from conjur_api.models import CreateTokenData, CreateHostData
+
+# Internals
+from conjur.errors import MissingRequiredParameterException, InvalidHostFactoryTokenException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 
 # pylint: disable=too-few-public-methods,logging-fstring-interpolation

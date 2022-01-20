@@ -58,7 +58,13 @@ class ConjurrcData:
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
 
+    def __repr__(self) -> str:
+        return f"{self.__dict__}"
+
     def get_client_connection_info(self) -> ConjurConnectionInfo:
+        """
+        Method return the SDK ConjurConnectionInfo with the ConjurrcData params
+        """
         return ConjurConnectionInfo(conjur_url=self.conjur_url,
                                     account=self.conjur_account,
                                     cert_file=self.cert_file)

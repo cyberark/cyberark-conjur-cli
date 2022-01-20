@@ -93,7 +93,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
     def test_remove_credentials_calls_delete_password_for_each_credential(self, mock_keyring_name,
                                                                           mock_delete_password):
         credential_provider = KeystoreCredentialsProvider()
-        credential_provider.remove_credentials(MockConjurrcData)
+        credential_provider.remove_credentials(MockConjurrcData.conjur_url)
         calls = [call(TEST_HOSTNAME, MACHINE),
                  call(TEST_HOSTNAME, USERNAME),
                  call(TEST_HOSTNAME, PASSWORD)]
@@ -106,14 +106,14 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
                                                                                                another_mock_keystore_wrapper):
         credential_provider = KeystoreCredentialsProvider()
         with self.assertRaises(Exception):
-            credential_provider.remove_credentials(MockConjurrcData)
+            credential_provider.remove_credentials(MockConjurrcData.conjur_url)
 
     @patch.object(KeystoreWrapper, "get_password", return_value="somepassword")
     @patch.object(KeystoreWrapper, "delete_password", return_value=None)
     @patch.object(KeystoreWrapper, "get_keyring_name", return_value=TEST_KEYRING)
     def test_cleanup_calls_delete_for_each_attribute(self, mock_keyring_name, mock_delete_password, mock_get_password):
         credential_provider = KeystoreCredentialsProvider()
-        credential_provider.remove_credentials(MockConjurrcData)
+        credential_provider.remove_credentials(MockConjurrcData.conjur_url)
         calls = [call(TEST_HOSTNAME, MACHINE),
                  call(TEST_HOSTNAME, USERNAME),
                  call(TEST_HOSTNAME, PASSWORD)]

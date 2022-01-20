@@ -10,15 +10,15 @@ import sys
 
 # SDK
 from conjur_api.interface import CredentialsProviderInterface
+from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData, ListPermittedRolesData, \
+    CredentialsData
 
 # Internal
 # pylint: disable=too-many-arguments
 from conjur.controller.hostfactory_controller import HostFactoryController
-from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData, ListPermittedRolesData, \
-    CredentialsData
+
 from conjur.errors import ConflictingParametersException, FileNotFoundException, InvalidFilePermissionsException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
-
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
     PolicyController, UserController, HostController
@@ -26,7 +26,6 @@ from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, Variable
     PolicyLogic, UserLogic
 from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
     PolicyData
-
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
 

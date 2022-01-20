@@ -26,7 +26,7 @@ class LogoutLogic:
         """
         Method to remove credentials during logout
         """
-        self.credentials_provider.remove_credentials(conjurrc)
+        self.credentials_provider.remove_credentials(conjurrc.conjur_url)
 
     def cleanup_credentials(self, conjurrc: ConjurrcData):
         """

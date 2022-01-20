@@ -65,9 +65,6 @@ class InitLogic:
         request to the /info endpoint. This endpoint only exists in the
         Conjur Enterprise server
         """
-        params = {
-            'url': conjurrc_data.conjur_url
-        }
         logging.debug("Attempting to fetch the account from the Conjur server...")
         client = Client(connection_info=conjurrc_data.get_client_connection_info(),
                         ssl_verification_mode=ssl_verification_metadata.mode,
@@ -76,9 +73,7 @@ class InitLogic:
         response = client.get_server_info()
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
-        # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Account '{conjurrc_data.conjur_account}' "
-                      "successfully fetched from the Conjur server")
+        logging.debug("Account '%s' successfully fetched from the Conjur server", conjurrc_data.conjur_account)
 
     @classmethod
     def write_certificate_to_file(cls, fetched_certificate: str, cert_file_path: str,

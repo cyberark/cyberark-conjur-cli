@@ -40,7 +40,7 @@ class LogoutController:
                 # their username or password manually.
                 self.logout_logic.cleanup_credentials(loaded_conjurrc)
                 raise NotLoggedInException("You are already logged out.")
-            self.logout_logic.remove_credentials(loaded_conjurrc)
+            self.logout_logic.remove_credentials(loaded_conjurrc.conjur_url)
         except Exception as error:
             # pylint: disable=raise-missing-from
             raise LoggedOutFailedException(f"Failed to log out. {error}")

@@ -12,11 +12,11 @@ import getpass
 
 # SDK
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import CredentialsData
 
 # Internals
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur_api.models import CredentialsData
 from conjur.errors import MissingRequiredParameterException
 
 

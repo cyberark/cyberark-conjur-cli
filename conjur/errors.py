@@ -7,7 +7,6 @@ This module holds Conjur CLI/SDK-specific errors for this project
 """
 from conjur.errors_messages import FETCH_CREDENTIALS_FAILURE_MESSAGE, \
     FETCH_CONFIGURATION_FAILURE_MESSAGE, CONFIGURATION_MISSING_FAILURE_MESSAGE
-from socket import gaierror
 
 
 class InvalidPasswordComplexityException(Exception):

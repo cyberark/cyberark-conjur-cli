@@ -15,10 +15,10 @@ from conjur_api import Client
 from conjur_api.models import SslVerificationMetadata, CredentialsData
 from conjur_api.interface import CredentialsProviderInterface
 from conjur_api.providers import SimpleCredentialsProvider
+from conjur_api.errors.errors import HttpSslError
 
 # Internals
 from conjur.errors import CertificateVerificationException
-from conjur_api.errors.errors import HttpSslError
 from conjur.data_object import ConjurrcData
 
 

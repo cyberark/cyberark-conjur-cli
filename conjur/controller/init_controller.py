@@ -11,6 +11,7 @@ required to successfully configure the conjurrc
 import http
 import logging
 import sys
+from typing import Optional
 
 # Third party
 from urllib.parse import urlparse
@@ -18,14 +19,12 @@ from urllib.parse import ParseResult
 
 # SDK
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.errors.errors import HttpStatusError, HttpSslError
 
 # Internals
-from typing import Optional
-
 from conjur.constants import DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE, VALID_CONFIRMATIONS
 from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, ConfirmationException, \
     MissingRequiredParameterException, OperationNotCompletedException
-from conjur_api.errors.errors import HttpStatusError, HttpSslError
 from conjur.util import util_functions
 from conjur.data_object import ConjurrcData
 from conjur.logic.init_logic import InitLogic

@@ -37,7 +37,7 @@ class LogoutControllerTest(unittest.TestCase):
             mock_factory.create_credential_store.is_exists = MagicMock(return_value=True)
             mock_logout_controller = LogoutController(mock_logout_logic, mock_factory)
             mock_logout_controller.remove_credentials()
-            mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc)
+            mock_logout_logic.remove_credentials.assert_called_once_with(MockConjurrc.conjur_url)
 
     @patch('os.path.exists', return_value=True)
     @patch('os.path.getsize', return_value=0)
