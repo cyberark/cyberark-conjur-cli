@@ -204,7 +204,7 @@ def delete_credentials():
         cred_store = create_cred_store()
         conjurrc = ConjurrcData.load_from_file()
         if cred_store.is_exists(conjurrc.conjur_url):
-            return cred_store.remove_credentials(conjurrc)
+            return cred_store.remove_credentials(conjurrc.conjur_url)
     except:
         # this is a util test not throwing for now. user should make sure conjurrc file exists
         pass

@@ -74,7 +74,14 @@ if [[ "$DEBUG" == "true" ]]; then
   docker-compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
-
-docker-compose exec \
+if [[ -n "$SDK_REPO_PATH" ]]; then
+  docker-compose exec \
+    test \
+    /bin/sh -c " /tests_executor.sh" $@
+  exit
+fi
+docker-compose run \
+  --rm \
+  --no-deps \
   test \
   /bin/sh -c " /tests_executor.sh" $@
