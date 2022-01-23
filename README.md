@@ -110,9 +110,22 @@ To log in to Conjur, define the following parameters, for example:
 conjur_url = "https://my_conjur.com"
 account = "my_account"
 username = "user1"
-api_key = "SomeStr@ngPassword!1"
+api_key = "a1s2d3f4gg55h432hhky4"
 ssl_verification_mode = SslVerificationMode.TRUST_STORE
 ```
+ssl_verification_mode is an enum that states which certificate verification technique to use when making the API 
+request. 
+
+Use one of the following:
+
+| Enum value | Explanation                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| `TRUST_STORE`             | The client is using the system's trusted CA as set by the machine admin |
+| `CA_BUNDLE`             | The client uses ca_bundle file to validate server certificate |
+| `SELF_SIGN`             | The client uses the self signed rootCA file to  |
+| `INSECURE`             | ( **NOT RECOMMENDED!** )The client does not validate the server certificate |
+* Note: for `CA_BUNDLE` and `SELF_SIGN` the path to the required file is provided in the `ConjurrcData`,`cert_file` 
+  argument 
 
 #### Step 2. Define ConjurrcData
 
@@ -131,45 +144,22 @@ conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = N
 The client retrieves credentials from a credential store called `CredentialStore` which inherits from `CredentialsStoreInterface`. This
 approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
+The SDK provide two implementations of `CredentialsStoreInterface`.
+1. `KeystoreCredentialsProvider` which saves credentials to the system's credential store (macOS keychain for example)
+2. `FileCredentialsProvider` which saves the credentials into `.netrc` file, in plaintext.
+
+
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
 
-By default, the `CredentialStoreFactory` favors creating a 'CredentialStore' that saves credentials (login ID and password) to the system's
-credential store over saving them to a file. If the SDK cannot access the operating system's credential store, the credentials are
-written to a configuration file, `.netrc`, in plaintext.
+By default, the `CredentialStoreFactory` favors creating a `KeystoreCredentialsProvider`. If the SDK cannot access the 
+operating system's credential store, then `CredentialStoreFactory` will create `FileCredentialsProvider` instead
 
-Example of usage:
-
-- First connection to Conjur:
-
-```
-credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
-
-credentials_provider = CredentialStoreFactory.create_credential_store()
-
-credentials_provider.save(credentials)
-
-del credentials
-```
-
-Note: The password is the api_key, for example ....(@mbenita-Cyberark  give a dummy example of an api key)
-
-- Already connected:
-
-If a prior connection has been made by the SDK or the CLI with your username and Conjur account, the credentials are already
-stored in the credential store. In this case, the SDK can retrieve the credentials using the `CredentialStore`
-
-```
-credentials_provider = CredentialStoreFactory.create_credential_store()
-```
+If credentials are written to the `.netrc`, we strongly recommend deleting those credentials when not using the
+SDK. The file is located in the user's home directory, for example: `/Users/my_username` in macOS 
+or `C:\Users\my_username` in Windows
 
 The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
 and should consist of 'machine', 'login', and 'password'.
-
-If credentials are written to the `.netrc`, we strongly recommend deleting those credentials when not using the
-SDK. The file is located at the user home directory.
-
-Note: If you choose to create this file yourself, make sure to follow least privilege, allowing only the user who has
-created the file to have read/write permissions on it (`chmod 600 .netrc`).
 
 ```
 # .netrc / _netrc
@@ -178,6 +168,26 @@ login admin
 password 1234....
 ```
 
+Note: If you choose to create this file yourself, make sure to follow least privilege rule, allowing only the user who has
+created the file to have read/write permissions on it (`chmod 600 .netrc`).
+
+
+Example of usage:
+
+- Create credential store:
+  ```
+  credentials_store = CredentialStoreFactory.create_credential_store()
+  ```
+
+- Store credentials inside the store
+  ```
+  credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
+  credentials_store.save(credentials)
+  del credentials # After being saved, it's consider best practice to delete credentials from memory after usage
+  ```
+  - Note: This step is needed only once! Credential stores provided by the SDK are meant to be persistent and can 
+    be used multiple time even if your app was crashed / started and stopped multiple times    
+    
 #### Step 4. Creating the client and use it
 
 Now that you have created `conjurrc_data` and `credentials_provider`
