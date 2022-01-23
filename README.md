@@ -13,7 +13,7 @@ accessing the Conjur API to manage Conjur resources.
 
 ![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
-The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it will work securely
+The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it works securely
 with CyberArk Conjur Enterprise (previously known as Dynamic Access Provider). In addition, CyberArk offers Enterprise-level
 support for these features. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
@@ -107,7 +107,7 @@ from conjur.api.client import Client
 To log in to Conjur, define the following parameters, for example:
 
 ```
-conjur_url = "https://my_conjur.com"
+conjur_url = "https://conjur-myorg.example.com"
 account = "my_account"
 username = "user1"
 api_key = "a1s2d3f4gg55h432hhky4"
@@ -145,8 +145,8 @@ The client retrieves credentials from a credential store called `CredentialStore
 approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
 The SDK provides the following implementations of `CredentialsStoreInterface`:
-1. `KeystoreCredentialsProvider` which saves credentials to the system's credential store (macOS keychain for example)
-2. `FileCredentialsProvider` which saves the credentials into `.netrc` file, in plaintext.
+-  `KeystoreCredentialsProvider` which saves credentials to the system's credential store (macOS keychain for example)
+-  `FileCredentialsProvider` which saves the credentials into `.netrc` file, in plaintext.
 
 
 We provide the`CredentialStoreFactory` which creates such credential stores.
@@ -158,12 +158,12 @@ If credentials are written to the `.netrc`, we strongly recommend deleting those
 SDK. The `.netrc` file is located in the user's home directory, for example: `/Users/my_username` in macOS 
 or `C:\Users\my_username` in Windows
 
-The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
+The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur server
 and should consist of 'machine', 'login', and 'password'.
 
 ```
 # .netrc / _netrc
-machine https://conjur.myorg.com
+machine https://conjur-myorg.example.com
 login admin
 password 1234....
 ```
