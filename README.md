@@ -122,9 +122,9 @@ Use one of the following:
 | ---------------- | ------------------------------------------------------------ |
 | `TRUST_STORE`             | The client is using the system's trusted CA as set by the machine admin |
 | `CA_BUNDLE`             | The client uses ca_bundle file to validate server certificate |
-| `SELF_SIGN`             | The client uses the self signed rootCA file to  |
-| `INSECURE`             | ( **NOT RECOMMENDED!** )The client does not validate the server certificate |
-* Note: for `CA_BUNDLE` and `SELF_SIGN` the path to the required file is provided in the `ConjurrcData`,`cert_file` 
+| `SELF_SIGN`             | The client uses the self signed rootCA file to validate server certificate|
+| `INSECURE`             | (**NOT RECOMMENDED!**) The client does not validate the server certificate |
+* Note: for `CA_BUNDLE` and `SELF_SIGN` modes, the path to the required file is provided in the `ConjurrcData`,`cert_file` 
   argument 
 
 #### Step 2. Define ConjurrcData
@@ -190,15 +190,12 @@ Example of usage:
     
 #### Step 4. Creating the client and use it
 
-Now that you have created `conjurrc_data` and `credentials_provider`
+Now that you have created `conjurrc_data` and `credentials_store` with stored credentials
 you can create your client.
 
 ```
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
 ```
-
-* ssl_verification_mode = `SslVerificationMode`. This is an enum that states which certificate verification technique to 
-  use when making the API request.
 
 After you create the client, you can start using it. 
 
