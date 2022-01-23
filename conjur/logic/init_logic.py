@@ -11,11 +11,11 @@ to the user's machine as well as fetching certificates from Conjur
 import logging
 import os.path
 
-from conjur.api.models import SslVerificationMetadata
-from conjur.api.ssl_utils.errors import TLSSocketConnectionException
-from conjur.api.endpoints import ConjurEndpoint
-from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
-from conjur.api.ssl_utils.ssl_client import SSLClient
+from conjur_api.models import SslVerificationMetadata
+from conjur_api import Client
+from conjur_api.providers import SimpleCredentialsProvider
+from conjur.util.ssl_utils.errors import TLSSocketConnectionException
+from conjur.util.ssl_utils import SSLClient
 from conjur.data_object import ConjurrcData
 from conjur.errors import ConnectionToConjurFailedException, RetrieveCertificateException
 
@@ -65,19 +65,15 @@ class InitLogic:
         request to the /info endpoint. This endpoint only exists in the
         Conjur Enterprise server
         """
-        params = {
-            'url': conjurrc_data.conjur_url
-        }
         logging.debug("Attempting to fetch the account from the Conjur server...")
-        response = invoke_endpoint(HttpVerb.GET,
-                                   ConjurEndpoint.INFO,
-                                   params,
-                                   ssl_verification_metadata=ssl_verification_metadata).json
+        client = Client(connection_info=conjurrc_data.get_client_connection_info(),
+                        ssl_verification_mode=ssl_verification_metadata.mode,
+                        credentials_provider=SimpleCredentialsProvider(),
+                        async_mode=False)
+        response = client.get_server_info()
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']
 
-        # pylint: disable=logging-fstring-interpolation
-        logging.debug(f"Account '{conjurrc_data.conjur_account}' "
-                      "successfully fetched from the Conjur server")
+        logging.debug("Account '%s' successfully fetched from the Conjur server", conjurrc_data.conjur_account)
 
     @classmethod
     def write_certificate_to_file(cls, fetched_certificate: str, cert_file_path: str,

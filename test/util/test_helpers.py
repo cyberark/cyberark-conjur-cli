@@ -7,8 +7,10 @@ from unittest.mock import patch
 # *************************************************
 # *********** INTEGRATION TESTS HELPERS ***********
 # *************************************************
+from conjur_api.models import CredentialsData
+
 from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_NETRC_FILE
-from conjur.data_object import ConjurrcData, CredentialsData
+from conjur.data_object import ConjurrcData
 from conjur.logic.credential_provider import CredentialStoreFactory
 
 
@@ -202,7 +204,7 @@ def delete_credentials():
         cred_store = create_cred_store()
         conjurrc = ConjurrcData.load_from_file()
         if cred_store.is_exists(conjurrc.conjur_url):
-            return cred_store.remove_credentials(conjurrc)
+            return cred_store.remove_credentials(conjurrc.conjur_url)
     except:
         # this is a util test not throwing for now. user should make sure conjurrc file exists
         pass

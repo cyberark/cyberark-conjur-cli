@@ -14,19 +14,22 @@ import os
 import sys
 import traceback
 
+# SDK
+from conjur_api.client import Client
+from conjur_api.errors.errors import HttpError, HttpStatusError
+from conjur_api.models.policy.policy_data import PolicyData
+
 # Internals
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
-from conjur.errors import CertificateVerificationException, HttpError, HttpStatusError
+from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
 from conjur.util.util_functions import determine_status_code_specific_error_messages, \
     file_is_missing_or_empty, get_ssl_verification_meta_data_from_conjurrc
 from conjur.wrapper import ArgparseWrapper
-from conjur.api.client import Client
 from conjur.constants import DEFAULT_CONFIG_FILE, LOGIN_IS_REQUIRED
 
 from conjur.data_object import ConjurrcData
-from conjur.data_object import PolicyData
 from conjur import cli_actions
 from conjur.version import __version__
 
@@ -133,8 +136,10 @@ class Cli:
     def _run_command_flow(self, args, resource):
         ssl_verification_meta_data = get_ssl_verification_meta_data_from_conjurrc(args.ssl_verify)
         client = Client(ssl_verification_mode=ssl_verification_meta_data.mode,
-                        conjurrc_data=ConjurrcData.load_from_file(), debug=args.debug,
-                        credentials_provider=self.credential_provider)
+                        connection_info=ConjurrcData.load_from_file().get_client_connection_info(),
+                        debug=args.debug,
+                        credentials_provider=self.credential_provider,
+                        async_mode=False)
 
         if resource == 'list':
             cli_actions.handle_list_logic(args, client)

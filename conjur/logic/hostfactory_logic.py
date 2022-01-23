@@ -10,8 +10,7 @@ returned data
 import json
 
 # Internals
-from conjur.data_object.create_token_data import CreateTokenData
-from conjur.data_object.create_host_data import CreateHostData
+from conjur_api.models import CreateTokenData,CreateHostData
 from conjur.errors import MissingRequiredParameterException
 
 

@@ -12,7 +12,7 @@ import string
 from unittest.mock import patch
 import uuid
 
-from conjur.data_object import CredentialsData
+from conjur_api.models import CredentialsData
 from conjur.logic.credential_provider import CredentialStoreFactory, KeystoreCredentialsProvider
 from conjur.util.os_types import OSTypes
 from conjur.util.util_functions import get_current_os
@@ -40,11 +40,11 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             pass
         utils.init_to_cli(self)
 
-    def validate_credentials(self, machine, login, password):
+    def validate_credentials(self, machine, username, password):
         creds = utils.get_credentials()
 
         assert creds.machine == machine
-        assert creds.login == login
+        assert creds.username == username
         assert creds.password == password
 
     # *************** LOGIN CREDENTIALS TESTS ***************

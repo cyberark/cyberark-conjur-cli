@@ -13,15 +13,17 @@ import netrc
 import os
 import stat
 
+# SDK
+from conjur_api.models import CredentialsData
+from conjur_api.interface import CredentialsProviderInterface
+
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, LOGIN
-from conjur.data_object import CredentialsData, ConjurrcData
+from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, USERNAME
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 
 
 # pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
-class FileCredentialsProvider(CredentialsStoreInterface):
+class FileCredentialsProvider(CredentialsProviderInterface):
     """
     FileCredentialsProvider
 
@@ -44,28 +46,28 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         if os.path.exists(self.netrc_path):
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
-            hosts[credential_data.machine] = (credential_data.login, None, credential_data.password)
+            hosts[credential_data.machine] = (credential_data.username, None, credential_data.password)
             self.build_netrc(netrc_obj)
         else:
             with open(self.netrc_path, "w+") as netrc_file:
                 netrc_file.write(f"machine {credential_data.machine}\n")
-                netrc_file.write(f"login {credential_data.login}\n")
+                netrc_file.write(f"login {credential_data.username}\n")
                 netrc_file.write(f"password {credential_data.password}\n")
 
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
         logging.debug(f"Credentials written to '{DEFAULT_NETRC_FILE}'")
 
-    def load(self, conjurrc_conjur_url: str) -> CredentialsData:
+    def load(self, conjur_url: str) -> CredentialsData:
         """
         Method that loads the netrc data.
         Triggered before each CLI action
         """
-        if not self.is_exists(conjurrc_conjur_url):
+        if not self.is_exists(conjur_url):
             raise CredentialRetrievalException
-        return self._get_credentials_from_file(conjurrc_conjur_url)
+        return self._get_credentials_from_file(conjur_url)
 
-    def is_exists(self, conjurrc_conjur_url: str) -> bool:
+    def is_exists(self, conjur_url: str) -> bool:
         if not os.path.exists(DEFAULT_NETRC_FILE) or os.path.getsize(DEFAULT_NETRC_FILE) == 0:
             return False
 
@@ -78,7 +80,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             return False
 
         for host in netrc_obj.hosts:
-            if conjurrc_conjur_url in host:
+            if conjur_url in host:
                 netrc_host_url = host
                 netrc_auth = netrc_obj.authenticators(netrc_host_url)
 
@@ -98,7 +100,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         hosts[credential_data.machine] = (user_to_update, None, new_api_key)
         self.build_netrc(netrc_obj)
 
-    def remove_credentials(self, conjurrc: ConjurrcData):
+    def remove_credentials(self, conjur_url: str):
         """
         Method that removes the described login entry from netrc
         """
@@ -107,7 +109,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
         if not os.path.exists(DEFAULT_NETRC_FILE):
             return
         elif os.path.getsize(DEFAULT_NETRC_FILE) != 0:
-            credential_data = self.load(conjurrc.conjur_url)
+            credential_data = self.load(conjur_url)
 
             netrc_obj = netrc.netrc(DEFAULT_NETRC_FILE)
             hosts = netrc_obj.hosts
@@ -149,7 +151,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
                             "after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
-    def _get_credentials_from_file(self, conjurrc_conjur_url: str) -> CredentialsData:  # pragma: no cover
+    def _get_credentials_from_file(self, conjur_url: str) -> CredentialsData:  # pragma: no cover
         try:
             loaded_credentials = {}
             netrc_auth = ""
@@ -157,7 +159,7 @@ class FileCredentialsProvider(CredentialsStoreInterface):
 
             logging.debug(f"Retrieving credentials from file '{self.netrc_path}'...")
             for host in netrc_obj.hosts:
-                if conjurrc_conjur_url in host:
+                if conjur_url in host:
                     netrc_host_url = host
                     netrc_auth = netrc_obj.authenticators(netrc_host_url)
                     break
@@ -165,14 +167,14 @@ class FileCredentialsProvider(CredentialsStoreInterface):
             login, _, password = netrc_auth
             loaded_credentials[MACHINE] = netrc_host_url
             loaded_credentials[PASSWORD] = password
-            loaded_credentials[LOGIN] = login
+            loaded_credentials[USERNAME] = login
             return CredentialsData.convert_dict_to_obj(loaded_credentials)
         except netrc.NetrcParseError as netrc_error:
             raise InvalidFormatException("Error: netrc is in an invalid format. "
-                            f"Reason: {netrc_error}") from netrc_error
+                                         f"Reason: {netrc_error}") from netrc_error
 
     # pylint: disable=unnecessary-pass
-    def cleanup_if_exists(self, conjurrc_conjur_url: str):
+    def cleanup_if_exists(self, conjur_url: str):
         """
         Not implemented for netrc for now.
         """

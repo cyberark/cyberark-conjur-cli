@@ -14,6 +14,8 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader as YamlLoader
 
+from conjur_api.models import ConjurConnectionInfo
+
 # Internals
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
@@ -46,10 +48,6 @@ class ConjurrcData:
         except FileNotFoundError as not_found_err:
             raise ConfigurationMissingException from not_found_err
 
-    # pylint: disable=line-too-long
-    def __repr__(self) -> str:
-        return f"{self.__dict__}"
-
     def write_to_file(self, dest: str):
         """
         Method for writing the conjurrc configuration
@@ -59,3 +57,14 @@ class ConjurrcData:
             data = {key: val for key, val in self.__dict__.items() if val is not None}
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
+
+    def __repr__(self) -> str:
+        return f"{self.__dict__}"
+
+    def get_client_connection_info(self) -> ConjurConnectionInfo:
+        """
+        Method return the SDK ConjurConnectionInfo with the ConjurrcData params
+        """
+        return ConjurConnectionInfo(conjur_url=self.conjur_url,
+                                    account=self.conjur_account,
+                                    cert_file=self.cert_file)

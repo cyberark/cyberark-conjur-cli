@@ -4,8 +4,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 
-from conjur import Client
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api import Client
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.controller import InitController
 from conjur.controller.host_controller import HostController
 from conjur.controller.hostfactory_controller import HostFactoryController
@@ -28,12 +28,7 @@ WHOAMI_RESPONSE = {
     "conjur_account": "myaccount"
 }
 
-
-class MockConjurrc:
-    conjur_url = 'https://someurl'
-    conjur_account = 'someacc'
-    cert_file = 'some/path/to/pem'
-
+MockConjurrc = ConjurrcData(conjur_url='https://someurl', account='someacc', cert_file='some/path/to/pem')
 
 class MockArgs(object):
     pass
@@ -41,8 +36,8 @@ class MockArgs(object):
 
 class CliTest(unittest.TestCase):
 
-    def __init__(self,testname):
-        ConjurrcData("https://someurl", "someacc",'some/path/to/pem').write_to_file(DEFAULT_CONFIG_FILE)
+    def __init__(self, testname):
+        ConjurrcData("https://someurl", "someacc", 'some/path/to/pem').write_to_file(DEFAULT_CONFIG_FILE)
         super(CliTest, self).__init__(testname)
 
     @cli_test()

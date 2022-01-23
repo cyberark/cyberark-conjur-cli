@@ -2,20 +2,21 @@ import netrc
 import unittest
 from unittest.mock import MagicMock, patch, mock_open
 
-from conjur.data_object import CredentialsData
+from conjur_api.models import CredentialsData
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from test.util import test_helpers as utils
 
+
 class MockCredentialsData:
     machine = 'https://someurl'
-    login = 'somelogin'
+    username = 'somelogin'
     password = 'somepass'
 
 
 class MockNetrc:
     hosts = {'https://someurl': ('somelogin', None, 'somepass')}
     machine = 'https://someurl'
-    login = 'somelogin'
+    username = 'somelogin'
     password = 'somepass'
 
 
@@ -31,6 +32,7 @@ EXPECTED_NETRC = \
 login somelogin
 password somepass
 '''
+
 
 class FileCredentialsProviderTest(unittest.TestCase):
     @patch('os.path.exists', return_value=True)
@@ -62,7 +64,8 @@ class FileCredentialsProviderTest(unittest.TestCase):
         netrc.netrc.return_value.authenticators = MagicMock(return_value=('somelogin', None, 'somepass'))
         with patch.object(FileCredentialsProvider, 'is_exists', return_value=True):
             credentials = FileCredentialsProvider()
-            self.assertEquals(credentials.load("https://someurl"), CredentialsData(machine='https://someurl', password='somepass', login='somelogin'))
+            self.assertEquals(credentials.load("https://someurl"),
+                              CredentialsData(machine='https://someurl', password='somepass', username='somelogin'))
 
     def test_credentials_netrc_exists_but_no_entry_is_found_raises_exception(self):
         with self.assertRaises(Exception):

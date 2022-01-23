@@ -6,14 +6,14 @@ from unittest.mock import patch, MagicMock
 import OpenSSL
 from OpenSSL import SSL
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import TEST_HOSTNAME
-from conjur.errors import CertificateHostnameMismatchException, InvalidURLFormatException, \
-    CertificateNotTrustedException, MissingRequiredParameterException, HttpSslError, HttpStatusError
+from conjur_api.errors.errors import CertificateHostnameMismatchException, HttpStatusError
+from conjur.errors import InvalidURLFormatException, CertificateNotTrustedException, MissingRequiredParameterException
 from conjur.logic.init_logic import InitLogic as InitLogic
 from conjur.controller.init_controller import InitController as InitController
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.api.ssl_utils.ssl_client import SSLClient
+from conjur.util.ssl_utils import SSLClient
 
 MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 

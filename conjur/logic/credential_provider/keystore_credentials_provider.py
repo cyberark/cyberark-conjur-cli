@@ -11,18 +11,19 @@ to the system's keyring when they login
 import logging
 import traceback
 
+# SDK
+from conjur_api.interface import CredentialsProviderInterface
+from conjur_api.models import CredentialsData
+
 # Internals
-from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, LOGIN, PASSWORD
-from conjur.data_object import CredentialsData
+from conjur.constants import KEYSTORE_ATTRIBUTES, MACHINE, USERNAME, PASSWORD
 from conjur.errors import OperationNotCompletedException, \
     CredentialRetrievalException, KeyringWrapperDeletionError
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
 from conjur.wrapper import KeystoreWrapper
-from conjur.data_object.conjurrc_data import ConjurrcData
 
 
 # pylint: disable=logging-fstring-interpolation
-class KeystoreCredentialsProvider(CredentialsStoreInterface):
+class KeystoreCredentialsProvider(CredentialsProviderInterface):
     """
     KeystoreCredentialsProvider
 
@@ -43,7 +44,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         credential_id = credential_data.machine
         try:
             KeystoreWrapper.set_password(credential_id, MACHINE, credential_data.machine)
-            KeystoreWrapper.set_password(credential_id, LOGIN, credential_data.login)
+            KeystoreWrapper.set_password(credential_id, USERNAME, credential_data.username)
             KeystoreWrapper.set_password(credential_id, PASSWORD, credential_data.password)
             logging.debug(
                 f"Credentials saved to the '{self.keyring_name}'"
@@ -51,22 +52,22 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
-    def load(self, conjurrc_conjur_url: str) -> CredentialsData:
+    def load(self, conjur_url: str) -> CredentialsData:
         """
         Method for fetching user credentials from the system's keyring
         """
         loaded_credentials = {}
-        if not self.is_exists(conjurrc_conjur_url):
+        if not self.is_exists(conjur_url):
             raise CredentialRetrievalException
 
         for attr in KEYSTORE_ATTRIBUTES:
-            loaded_credentials[attr] = KeystoreWrapper.get_password(conjurrc_conjur_url,
+            loaded_credentials[attr] = KeystoreWrapper.get_password(conjur_url,
                                                                     attr)
         return CredentialsData.convert_dict_to_obj(loaded_credentials)
 
-    def is_exists(self, conjurrc_conjur_url) -> bool:
+    def is_exists(self, conjur_url) -> bool:
         for attr in KEYSTORE_ATTRIBUTES:
-            if KeystoreWrapper.get_password(conjurrc_conjur_url, attr) is None:
+            if KeystoreWrapper.get_password(conjur_url, attr) is None:
                 return False
         return True
 
@@ -79,13 +80,13 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         try:
             KeystoreWrapper.set_password(credential_data.machine, MACHINE,
                                          credential_data.machine)
-            KeystoreWrapper.set_password(credential_data.machine, LOGIN, user_to_update)
+            KeystoreWrapper.set_password(credential_data.machine, USERNAME, user_to_update)
             KeystoreWrapper.set_password(credential_data.machine, PASSWORD, new_api_key)
         except Exception as incomplete_operation:
             raise OperationNotCompletedException(incomplete_operation) from incomplete_operation
 
     # pylint: disable=logging-fstring-interpolation,line-too-long
-    def remove_credentials(self, conjurrc: ConjurrcData):
+    def remove_credentials(self, conjur_url: str):
         """
         Method for removing user credentials in the system's keyring
         """
@@ -93,7 +94,7 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
                       f"the '{self.keyring_name}' credential store...")
         for attr in KEYSTORE_ATTRIBUTES:
             try:
-                KeystoreWrapper.delete_password(conjurrc.conjur_url, attr)
+                KeystoreWrapper.delete_password(conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
             except KeyringWrapperDeletionError:
@@ -105,15 +106,15 @@ class KeystoreCredentialsProvider(CredentialsStoreInterface):
         logging.debug("Successfully removed credentials from the "
                       f"'{self.keyring_name}' credential store")
 
-    def cleanup_if_exists(self, conjurrc_conjur_url: str):
+    def cleanup_if_exists(self, conjur_url: str):
         """
         For each credential attribute, check if exists for
-        the conjurrc_conjur_url identifier and delete if exists
+        the conjur_url identifier and delete if exists
         """
         for attr in KEYSTORE_ATTRIBUTES:
             try:
-                if KeystoreWrapper.get_password(conjurrc_conjur_url, attr) is not None:
-                    KeystoreWrapper.delete_password(conjurrc_conjur_url, attr)
+                if KeystoreWrapper.get_password(conjur_url, attr) is not None:
+                    KeystoreWrapper.delete_password(conjur_url, attr)
             # Catches when credentials do not exist in the keyring. If the key does not exist,
             # the user has already logged out. we still try to remove other leftovers
             except Exception:  # pylint: disable=broad-except
