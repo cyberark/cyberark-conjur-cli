@@ -89,7 +89,7 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 
 ### SDK
 
-To start using the SDK in your applications, create a Client instance and then invoke the API on it:
+To start using the SDK in your applications, create a Client instance and then invoke the API on it.
 
 #### Imports
 
@@ -118,7 +118,7 @@ request.
 
 Use one of the following:
 
-| Enum value | Explanation                                                  |
+| Enum value | Description                                                  |
 | ---------------- | ------------------------------------------------------------ |
 | `TRUST_STORE`             | The client is using the system's trusted CA as set by the machine admin |
 | `CA_BUNDLE`             | The client uses ca_bundle file to validate server certificate |
@@ -144,18 +144,18 @@ conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = N
 The client retrieves credentials from a credential store called `CredentialStore` which inherits from `CredentialsStoreInterface`. This
 approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
-The SDK provide two implementations of `CredentialsStoreInterface`.
+The SDK provides the following implementations of `CredentialsStoreInterface`:
 1. `KeystoreCredentialsProvider` which saves credentials to the system's credential store (macOS keychain for example)
 2. `FileCredentialsProvider` which saves the credentials into `.netrc` file, in plaintext.
 
 
-We provide the user with `CredentialStoreFactory` which create such Credential stores.
+We provide the`CredentialStoreFactory` which creates such credential stores.
 
 By default, the `CredentialStoreFactory` favors creating a `KeystoreCredentialsProvider`. If the SDK cannot access the 
-operating system's credential store, then `CredentialStoreFactory` will create `FileCredentialsProvider` instead
+operating system's credential store, then `CredentialStoreFactory` will create `FileCredentialsProvider` instead.
 
 If credentials are written to the `.netrc`, we strongly recommend deleting those credentials when not using the
-SDK. The file is located in the user's home directory, for example: `/Users/my_username` in macOS 
+SDK. The `.netrc` file is located in the user's home directory, for example: `/Users/my_username` in macOS 
 or `C:\Users\my_username` in Windows
 
 The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
@@ -186,11 +186,11 @@ Example of usage:
   del credentials # After being saved, it's consider best practice to delete credentials from memory after usage
   ```
   - Note: This step is needed only once! Credential stores provided by the SDK are meant to be persistent and can 
-    be used multiple time even if your app was crashed / started and stopped multiple times    
+    be used multiple times, even if your app crashed or started and stopped multiple times.
     
-#### Step 4. Creating the client and use it
+#### Step 4. Create the client and use it
 
-Now that you have created `conjurrc_data` and `credentials_store` with stored credentials
+Now that you have created `conjurrc_data` and `credentials_provider`,
 you can create your client.
 
 ```
