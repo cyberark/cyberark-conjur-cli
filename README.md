@@ -22,7 +22,7 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 
 ![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
 
-The Conjur Python SDK is a **Community** level project. It's a community contributed project that 
+The Conjur Python SDK is a **Community** level project. It's a community-contributed project that 
 **is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
@@ -30,7 +30,7 @@ see [our community guidelines](https://github.com/cyberark/community/blob/main/C
 
 Are you using this project with [Conjur Open Source](https://github.com/cyberark/conjur)? Then we
 **strongly** recommend choosing the version of this project to use from the
-latest [Conjur OSS suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
+latest [Conjur OSS Suite release](https://docs.conjur.org/Latest/en/Content/Overview/Conjur-OSS-Suite-Overview.html)
 . Conjur maintainers perform additional testing on the Suite release versions to ensure compatibility. When possible,
 upgrade your Conjur Open Source version to match the
 [latest Suite release](https://docs.conjur.org/Latest/en/Content/ReleaseNotes/ConjurOSS-suite-RN.htm)
@@ -60,7 +60,7 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 #### Install the SDK
 
 The SDK can be installed via PyPI. Note that the SDK is a **Community** level project, meaning that the SDK is subject to
-modifications that may result in breaking change.
+modifications that may result in breaking changes.
 
 To avoid unanticipated breaking changes, make sure that you stay up to date on our latest releases and always review the
 project's [CHANGELOG.md](CHANGELOG.md).
@@ -93,7 +93,7 @@ To start using the SDK in your applications, create a Client instance and then i
 
 #### Imports
 
-Import The relevant modules
+Import the relevant modules
 
 ```
 from conjur.api.models import SslVerificationMode
@@ -128,18 +128,18 @@ conjurrc_data = ConjurrcData(conjur_url=conjur_url,account=account,cert_file = N
 
 #### Step 3. Storing credentials
 
-The client uses a credentials provider called `CredentialStores` which inherit from `CredentialsStoreInterface`. This
+The client retrieves credentials from a credential store called `CredentialStore` which inherits from `CredentialsStoreInterface`. This
 approach enables storing the credentials in a safe location, and providing the credentials to the client on demand.
 
 We provide the user with `CredentialStoreFactory` which create such Credential stores.
 
-By default, the `CredentialStoreFactory` favors saving credentials (login ID and password) to the system's
-credential store. If we do not support the detected credential store, or the credential stoe is not accessible, the credentials are
+By default, the `CredentialStoreFactory` favors creating a 'CredentialStore' that saves credentials (login ID and password) to the system's
+credential store over saving them to a file. If the SDK cannot access the operating system's credential store, the credentials are
 written to a configuration file, `.netrc`, in plaintext.
 
 Example of usage:
 
-#####First connection to Conjur:
+- First connection to Conjur:
 
 ```
 credentials = CredentialsData(login=username, password=api_key, machine=conjur_url)
@@ -151,12 +151,12 @@ credentials_provider.save(credentials)
 del credentials
 ```
 
-Note: The password should be in the form of the api_key.
+Note: The password is the api_key, for example ....(@mbenita-Cyberark  give a dummy example of an api key)
 
-##### Already connected:
+- Already connected:
 
-If a prior connection has been made by the SDK or the CLI with your username and account, then the credentials already
-stored in the credentials store. In that case, we only need to get the credentials store using `CredentialStoreFactory`
+If a prior connection has been made by the SDK or the CLI with your username and Conjur account, the credentials are already
+stored in the credential store. In this case, the SDK can retrieve the credentials using the `CredentialStore`
 
 ```
 credentials_provider = CredentialStoreFactory.create_credential_store()
@@ -165,7 +165,7 @@ credentials_provider = CredentialStoreFactory.create_credential_store()
 The `.netrc` file or (`_netrc` for Windows environments) contains credentials needed to log in to the Conjur endpoint
 and should consist of 'machine', 'login', and 'password'.
 
-If credentials written to the `.netrc`, it is strongly recommended that you delete those credentials when not using the
+If credentials are written to the `.netrc`, we strongly recommend deleting those credentials when not using the
 SDK. The file is located at the user home directory.
 
 Note: If you choose to create this file yourself, make sure to follow least privilege, allowing only the user who has
@@ -180,14 +180,14 @@ password 1234....
 
 #### Step 4. Creating the client and use it
 
-Now that we have created `conjurrc_data` and `credentials_provider`
+Now that you have created `conjurrc_data` and `credentials_provider`
 you can create your client.
 
 ```
 client = Client(conjurrc_data, credentials_provider=credentials_provider, ssl_verification_mode=ssl_verification_mode)
 ```
 
-* ssl_verification_mode = `SslVerificationMode` enum that states which certificate verification technique to 
+* ssl_verification_mode = `SslVerificationMode`. This is an enum that states which certificate verification technique to 
   use when making the API request.
 
 After you create the client, you can start using it. 
@@ -198,7 +198,7 @@ Example of usage:
 client.list() # get list of all Conjur resources that the user is authorized to read`
 ```
 
-## Supported Client methods
+## Supported client methods
 
 #### `get(variable_id)`
 
