@@ -12,7 +12,7 @@ from unittest.mock import patch
 import string
 import uuid
 
-from conjur.data_object import CredentialsData
+from conjur_api.models import CredentialsData
 from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase

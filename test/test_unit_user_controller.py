@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur.errors import OperationNotCompletedException, InvalidPasswordComplexityException, \
-    HttpError, HttpStatusError
+from conjur_api.errors.errors import HttpError, HttpStatusError
+from conjur.errors import OperationNotCompletedException, InvalidPasswordComplexityException
 from conjur.controller.user_controller import UserController
 from conjur.logic.user_logic import UserLogic
 from conjur.data_object.user_input_data import UserInputData

@@ -7,8 +7,7 @@ It functionality will move into the init_action once we implement the cli action
 import os
 
 # Internals
-from conjur.api.models import SslVerificationMetadata
-from conjur.api.models import SslVerificationMode
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
 from conjur.errors import FileNotFoundException, InvalidFilePermissionsException, ConflictingParametersException
 

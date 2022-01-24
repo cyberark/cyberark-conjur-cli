@@ -7,11 +7,13 @@ This module represents the DTO that holds the params the user passes in.
 We use this DTO to build the variable request
 """
 
+
 # pylint: disable=too-few-public-methods
 class VariableData:
     """
     Used for organizing the params the user passed in to execute the variable command
     """
+
     def __init__(self, **arg_params):
         self.action = arg_params['action']
         self.variable_id = arg_params['id']

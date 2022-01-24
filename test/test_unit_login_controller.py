@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
-from conjur.errors import CertificateVerificationException, MissingRequiredParameterException, \
-    HttpError
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
+from conjur.errors import CertificateVerificationException, MissingRequiredParameterException
+from conjur_api.errors.errors import HttpError
 from conjur.util import util_functions
-from conjur.data_object.credentials_data import CredentialsData
+from conjur_api.models import CredentialsData
 from conjur.controller.login_controller import LoginController
 from conjur.logic.login_logic import LoginLogic
 

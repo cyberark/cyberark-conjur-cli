@@ -65,7 +65,7 @@ rm -rf $CURRENT_DIR/output/*
 
 if [[ -n "$SDK_REPO_PATH" ]]; then
   docker-compose cp "$SDK_REPO_PATH" test:/
-  docker-compose exec --privileged test /bin/sh -c " pip install /$SDK_REPO_PATH"
+  docker-compose exec test /bin/sh -c " pip install /$SDK_REPO_PATH"
 fi
 
 # Hint: '--privileged' is added here otherwise we will get operation
@@ -74,7 +74,12 @@ if [[ "$DEBUG" == "true" ]]; then
   docker-compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
-
+if [[ -n "$SDK_REPO_PATH" ]]; then
+  docker-compose exec \
+    test \
+    /bin/sh -c " /tests_executor.sh" $@
+  exit
+fi
 docker-compose run \
   --rm \
   --no-deps \

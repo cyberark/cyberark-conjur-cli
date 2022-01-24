@@ -10,6 +10,7 @@ import json
 import logging
 from conjur.data_object.policy_data import PolicyData
 
+
 # pylint: disable=too-few-public-methods
 class PolicyLogic:
     """
@@ -18,10 +19,11 @@ class PolicyLogic:
     This class holds the business logic for executing and manipulating
     returned data
     """
+
     def __init__(self, client):
         self.client = client
 
-    def run_action(self, policy_data:PolicyData) -> str:
+    def run_action(self, policy_data: PolicyData) -> str:
         """
         Method to determine which subcommand action to run {apply, replace, update}
         """

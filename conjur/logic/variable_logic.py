@@ -13,6 +13,7 @@ import logging
 # Internals
 from conjur.data_object.variable_data import VariableData
 
+
 # pylint: disable=too-few-public-methods
 class VariableLogic:
     """

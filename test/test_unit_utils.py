@@ -1,6 +1,6 @@
 import unittest
 
-from conjur.api.models import SslVerificationMode
+from conjur_api.models import SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
 from conjur.util import util_functions as utils
 from conjur.data_object import ConjurrcData

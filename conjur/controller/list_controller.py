@@ -10,10 +10,10 @@ required to successfully execute the LIST command
 import json
 import sys
 
-from conjur.data_object.list_members_of_data import ListMembersOfData
-from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur_api.models import ListMembersOfData, ListPermittedRolesData
 from conjur.logic.list_logic import ListLogic
 from conjur.data_object.list_data import ListData
+
 
 class ListController:
     """

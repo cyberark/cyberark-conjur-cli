@@ -10,10 +10,13 @@ required to successfully configure the Credentials
 # Builtins
 import getpass
 
-from conjur.api.models import SslVerificationMetadata, SslVerificationMode
+# SDK
+from conjur_api.models import SslVerificationMetadata, SslVerificationMode
+from conjur_api.models import CredentialsData
+
+# Internals
 from conjur.util import util_functions
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.data_object.credentials_data import CredentialsData
 from conjur.errors import MissingRequiredParameterException
 
 
@@ -56,10 +59,10 @@ class LoginController:
         """
         Method to fetch the username if the user did not provide one
         """
-        if self.credential_data.login is None:
+        if self.credential_data.username is None:
             # pylint: disable=logging-fstring-interpolation,line-too-long
-            self.credential_data.login = input("Enter your username: ").strip()
-            if self.credential_data.login == '':
+            self.credential_data.username = input("Enter your username: ").strip()
+            if self.credential_data.username == '':
                 # pylint: disable=raise-missing-from
                 raise MissingRequiredParameterException("Error: Login name is required")
 

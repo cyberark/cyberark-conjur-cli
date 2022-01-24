@@ -12,9 +12,12 @@ import http
 import logging
 import sys
 
+# SDK
+from conjur_api.errors.errors import HttpError, HttpStatusError
+
 # Internals
 from conjur.errors import InvalidPasswordComplexityException, \
-    OperationNotCompletedException, HttpError, HttpStatusError
+    OperationNotCompletedException
 from conjur.errors_messages import PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE
 from conjur.logic.user_logic import UserLogic
 from conjur.data_object.user_input_data import UserInputData
@@ -26,9 +29,10 @@ class UserController:
 
     This class represents the Presentation Layer for the User command.
     """
-    def __init__(self, user_logic: UserLogic, user_input_data:UserInputData):
-        self.user_logic=user_logic
-        self.user_input_data=user_input_data
+
+    def __init__(self, user_logic: UserLogic, user_input_data: UserInputData):
+        self.user_logic = user_logic
+        self.user_input_data = user_input_data
 
     def rotate_api_key(self):
         """
@@ -69,7 +73,8 @@ class UserController:
         """
         if self.user_input_data.new_password is None:
             # pylint: disable=line-too-long
-            self.user_input_data.new_password = getpass.getpass(prompt=f"Enter the new password {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
+            self.user_input_data.new_password = getpass.getpass(
+                prompt=f"Enter the new password {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
             self.check_password_validity()
 
     def check_password_validity(self):
@@ -78,4 +83,5 @@ class UserController:
         """
         # For the future, we can add client-side validations here
         while self.user_input_data.new_password == '':
-            self.user_input_data.new_password = getpass.getpass(prompt=f"Invalid format {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")
+            self.user_input_data.new_password = getpass.getpass(
+                prompt=f"Invalid format {PASSWORD_COMPLEXITY_CONSTRAINTS_MESSAGE}: ")

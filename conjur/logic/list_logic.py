@@ -8,8 +8,7 @@ This module is the business logic for executing the list command
 # pylint: disable=too-few-public-methods
 import logging
 
-from conjur.data_object.list_members_of_data import ListMembersOfData
-from conjur.data_object.list_permitted_roles_data import ListPermittedRolesData
+from conjur_api.models import ListMembersOfData, ListPermittedRolesData
 from conjur.resource import Resource
 
 

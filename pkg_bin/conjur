@@ -9,10 +9,11 @@ full use of the APIs through it.
 
 # Ensure that we can run this from both the repo and the egg
 import sys
+
 sys.path.append(".")
 sys.path.append("..")
 
-#pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
 from conjur.cli import Cli
 
 if __name__ == '__main__':

@@ -10,13 +10,16 @@ information to the user's machine
 # Builtins
 import logging
 
+# SDK
+from conjur_api import Client
+from conjur_api.models import SslVerificationMetadata, CredentialsData
+from conjur_api.interface import CredentialsProviderInterface
+from conjur_api.providers import SimpleCredentialsProvider
+from conjur_api.errors.errors import HttpSslError
+
 # Internals
-from conjur.api.endpoints import ConjurEndpoint
-from conjur.api.models import SslVerificationMetadata
-from conjur.errors import CertificateVerificationException, HttpSslError
-from conjur.interface.credentials_store_interface import CredentialsStoreInterface
-from conjur.wrapper.http_wrapper import invoke_endpoint, HttpVerb
-from conjur.data_object import CredentialsData, ConjurrcData
+from conjur.errors import CertificateVerificationException
+from conjur.data_object import ConjurrcData
 
 
 class LoginLogic:
@@ -27,32 +30,30 @@ class LoginLogic:
     netrc configuration details needed to login to Conjur
     """
 
-    def __init__(self, credentials_provider: CredentialsStoreInterface):
+    def __init__(self, credentials_provider: CredentialsProviderInterface):
         self.credentials_provider = credentials_provider
 
-    @classmethod
     # pylint: disable=logging-fstring-interpolation
-    def get_api_key(cls,
-                    ssl_verification_metadata: SslVerificationMetadata,
+    @staticmethod
+    def get_api_key(ssl_verification_metadata: SslVerificationMetadata,
                     credential_data: CredentialsData,
                     password: str,
                     conjurrc: ConjurrcData) -> str:
         """
         Method to fetch the user/host's API key from Conjur
         """
-        params = {
-            'url': conjurrc.conjur_url,
-            'account': conjurrc.conjur_account
-        }
-
         # pylint: disable=logging-fstring-interpolation,raise-missing-from
-        logging.debug(f"Attempting to fetch '{credential_data.login}' API key from Conjur...")
+        logging.debug(f"Attempting to fetch '{credential_data.username}' API key from Conjur...")
         try:
-            api_key = invoke_endpoint(HttpVerb.GET,
-                                      ConjurEndpoint.LOGIN,
-                                      params,
-                                      auth=(credential_data.login, password),
-                                      ssl_verification_metadata=ssl_verification_metadata).text
+            credentials_provider = SimpleCredentialsProvider()
+            credentials_provider.save(CredentialsData(machine=conjurrc.conjur_url,
+                                                      username=credential_data.username,
+                                                      password=password))
+            client = Client(connection_info=conjurrc.get_client_connection_info(),
+                            ssl_verification_mode=ssl_verification_metadata.mode,
+                            credentials_provider=credentials_provider,
+                            async_mode=False)
+            api_key = client.login()
         except HttpSslError:
             if not conjurrc.cert_file and not ssl_verification_metadata.is_insecure_mode:
                 raise CertificateVerificationException
