@@ -3,7 +3,7 @@
 This repository includes self-contained Conjur CLI (`conjur`) for
 accessing the Conjur API to manage Conjur resources.
 
-Note: Conjur python SDK was removed from this repo and is now maintained under 
+Note: The Conjur Python SDK was removed from this repo and is now maintained in the 
 https://github.com/cyberark/conjur-api-python repository
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/cyberark-conjur-cli/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/cyberark-conjur-cli/maintainability)
