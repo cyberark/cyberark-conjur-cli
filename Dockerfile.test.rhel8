@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8/ubi:8.3
 
-ENV INSTALL_DIR=/opt/conjur-api-python3
+ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 
 RUN yum --disableplugin=subscription-manager -y \
                                 install -y  bash \

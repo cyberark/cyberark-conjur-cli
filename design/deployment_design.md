@@ -12,7 +12,7 @@ machine if installing the CLI in this way. If installed via pip, the user can th
    The CLI is delivered as a standalone executable, packed with the required runtime and dependencies (excluding a few
    base linked libraries that are expected on the system). Therefore, there is no need for Python or other prerequisites
    to be installed on machine. The executable can be fetched by navigating to our
-   [Python CLI release page](https://github.com/cyberark/conjur-api-python3/releases/tag/v0.0.5).
+   [Python CLI release page](https://github.com/cyberark/cyberark-conjur-cli/releases/tag/v0.0.5).
    
    If installed in this manner the CLI can be invoked by, `./python-cli-executable-location variable get ...`
 
@@ -29,7 +29,7 @@ The infrastructure is already in-place so this would be at no additional effort.
 #### Standalone executable
 
 To install the executable, for Linux and macOS machines we will provide tar.gz files. For Windows machine we will
-provide a zip file that will be available on the [release page](https://github.com/cyberark/conjur-api-python3/releases)
+provide a zip file that will be available on the [release page](https://github.com/cyberark/cyberark-conjur-cli/releases)
 of our Github repository.
 
 tar.gz is a standard archieve format for macOS and other Linux systems and has been used to deliver software in

@@ -9,7 +9,7 @@
 FROM registry.access.redhat.com/ubi7/ubi
 
 # Set the install dir env param
-ENV INSTALL_DIR=/opt/conjur-api-python3
+ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 
 # Copy below repo files to yum repo dir to make rpms available
 COPY ./test/CentOS-SCLo-scl-rh.repo \

@@ -16,5 +16,5 @@ rm -rf $CURRENT_DIR/output/*
 docker run --rm \
            -t \
            -e TEST_ENV=true \
-           -v "$(pwd):/opt/conjur-api-python3" \
-           conjur-api-python3-test nose2 -v -X -A '!integration' --config unit_test.cfg --with-coverage $@
+           -v "$(pwd):/opt/cyberark-conjur-cli" \
+           cyberark-conjur-cli-test nose2 -v -X -A '!integration' --config unit_test.cfg --with-coverage $@

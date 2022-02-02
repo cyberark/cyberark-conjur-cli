@@ -8,7 +8,7 @@ function _build_test_integration_exec() {
   echo "Installing requirements for tests..."
   pip install -r requirements.txt
 
-  pyinstaller -F /opt/conjur-api-python3/test/util/test_runners/integrations_tests_runner.py
+  pyinstaller -F /opt/cyberark-conjur-cli/test/util/test_runners/integrations_tests_runner.py
   deactivate
 }
 

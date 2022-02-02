@@ -223,8 +223,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     This test should fail when running against a server with a CA-signed certificate configured.
     When a certificate can be validated against its own system's store, we don't actually use the 
     content of cert_file in the conjurrc when sending a request.
-    See issue opened for this here: https://github.com/cyberark/conjur-api-python3/issues/209
-    See flow description issue for more background info: https://github.com/cyberark/conjur-api-python3/issues/198
+    See issue opened for this here: https://github.com/cyberark/cyberark-conjur-cli/issues/209
+    See flow description issue for more background info: https://github.com/cyberark/cyberark-conjur-cli/issues/198
     """
 
     @integration_test(True)
@@ -248,8 +248,8 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     This test should fail when running against a server with a CA-signed certificate configured.
     When a certificate can be validated against its own system's store, we don't actually use the 
     content of cert_file in the conjurrc when sending a request.
-    See issue opened for this here: https://github.com/cyberark/conjur-api-python3/issues/209
-    See flow description issue for more background info: https://github.com/cyberark/conjur-api-python3/issues/198
+    See issue opened for this here: https://github.com/cyberark/cyberark-conjur-cli/issues/209
+    See flow description issue for more background info: https://github.com/cyberark/cyberark-conjur-cli/issues/198
     """
 
     @integration_test(True)

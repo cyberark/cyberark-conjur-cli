@@ -66,7 +66,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license="MIT",
-    url="https://github.com/conjurinc/conjur-api-python3",
+    url="https://github.com/cyberark/cyberark-conjur-cli",
     keywords=[
         "conjur",
         "cyberark",

@@ -1,9 +1,9 @@
-# conjur-api-python3
+# cyberark-conjur-cli
 
 This repository includes both the self-contained Conjur CLI (`conjur`) and the Python3-based SDK for
 accessing the Conjur API to manage Conjur resources.
 
-[![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/conjur-api-python3/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/conjur-api-python3/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/test_coverage)](https://codeclimate.com/github/cyberark/cyberark-conjur-cli/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/d90d69a3942120b36785/maintainability)](https://codeclimate.com/github/cyberark/cyberark-conjur-cli/maintainability)
 
 ---
 
@@ -26,7 +26,7 @@ The Conjur Python SDK is a **Community** level project. It's a community-contrib
 **is not reviewed or supported by CyberArk**. For more detailed information on our certification levels,
 see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
 
-### Using conjur-api-python3 with Conjur Open Source
+### Using cyberark-conjur-cli with Conjur Open Source
 
 Are you using this project with [Conjur Open Source](https://github.com/cyberark/conjur)? Then we
 **strongly** recommend choosing the version of this project to use from the
@@ -53,7 +53,7 @@ questions, please contact us on [Discourse](https://discuss.cyberarkcommons.org/
 #### Install the Conjur CLI
 
 To access the latest release of the Conjur CLI, go to
-our [release](https://github.com/cyberark/conjur-api-python3/releases)
+our [release](https://github.com/cyberark/cyberark-conjur-cli/releases)
 page. For instructions on how to set up and configure the CLI, see
 our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer/CLI/cli-lp.htm).
 

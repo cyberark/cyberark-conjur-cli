@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
 docker build -f Dockerfile.publish \
-             -t conjur-api-python3-publish \
+             -t cyberark-conjur-cli-publish \
              .

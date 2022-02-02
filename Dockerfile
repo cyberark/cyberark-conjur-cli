@@ -1,7 +1,7 @@
 # ========== BUILD CONTAINER ===========
 FROM ubuntu:21.10 as conjur-cli-builder
 
-ENV INSTALL_DIR=/opt/conjur-api-python3
+ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 ENV DEBIAN_FRONTEND noninteractive
 
 
@@ -41,5 +41,5 @@ FROM ubuntu:21.10 as conjur-python-cli
 
 ENTRYPOINT [ "/usr/local/bin/conjur" ]
 
-COPY --from=conjur-cli-builder "/opt/conjur-api-python3/dist/conjur" \
+COPY --from=conjur-cli-builder "/opt/cyberark-conjur-cli/dist/conjur" \
                                /usr/local/bin/conjur

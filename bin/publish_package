@@ -23,8 +23,8 @@ docker run --rm \
            -e TWINE_REPOSITORY_URL \
            -e TWINE_USERNAME \
            -e TWINE_PASSWORD \
-           -v "$(pwd):/opt/conjur-api-python3" \
-           conjur-api-python3-publish bash -exc "
+           -v "$(pwd):/opt/cyberark-conjur-cli" \
+           cyberark-conjur-cli-publish bash -exc "
                echo 'Installing new versions of pip and wheel...'
                /usr/bin/env pip3 install --upgrade pip wheel
 

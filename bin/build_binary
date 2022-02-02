@@ -10,10 +10,10 @@ if [[ "$1" = "--local" || "$1" = "-l" ]]; then
 fi
 
 docker build -f Dockerfile.test \
-             -t conjur-api-python3-test \
+             -t cyberark-conjur-cli-test \
              .
 
 docker run --rm -it \
-  -v $(pwd)/dist:/opt/conjur-api-python3/dist \
-  conjur-api-python3-test \
+  -v $(pwd)/dist:/opt/cyberark-conjur-cli/dist \
+  cyberark-conjur-cli-test \
     $BIN_BUILD_CMD
