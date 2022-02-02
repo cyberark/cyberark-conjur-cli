@@ -158,16 +158,16 @@ my-integration-test.someidentifier=True
 
 ```
 # For unit tests
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config unit_test.cfg -A '<unit-identifier>'
+root@123456:/opt/cyberark-conjur-cli# nose2 -v -X --config unit_test.cfg -A '<unit-identifier>'
 
 ## Example
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config unit_test.cfg -A 'someidentifier'
+root@123456:/opt/cyberark-conjur-cli# nose2 -v -X --config unit_test.cfg -A 'someidentifier'
 
 # For integration tests
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A '<integration-identifier>'
+root@123456:/opt/cyberark-conjur-cli# nose2 -v -X --config integration_test.cfg -A '<integration-identifier>'
 
 ## Example
-root@123456:/opt/conjur-api-python3# nose2 -v -X --config integration_test.cfg -A 'someidentifier'
+root@123456:/opt/cyberark-conjur-cli# nose2 -v -X --config integration_test.cfg -A 'someidentifier'
 ```
 
 4. You should see that only that specific test is run. Every change made locally can be seen in the container. 
@@ -228,7 +228,7 @@ See [here](docs/python-cli-ux-guidelines.md) for full UX guidelines to follow du
 2. Select an existing issue or open an issue to propose changes or fixes
 3. Add any relevant labels as you work on it
 4. Run tests as described in the
-    [testing section of this document](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#testing),
+    [testing section of this document](https://github.com/cyberark/cyberark-conjur-cli/blob/main/CONTRIBUTING.md#testing),
     ensuring they pass
 5. Submit a pull request, linking the issue in the description
 6. Adjust labels as-needed on the issue. Ask another contributor to review and merge your code if there are delays in
@@ -332,7 +332,7 @@ After the artifacts are signed, run basic CLI calls (`conjur -v`, `conjur list`)
 ### How to create release artifacts
 
 For all OS types perform the following:
-1. Clone the repo by running `git clone https://github.com/cyberark/conjur-api-python3.git`.
+1. Clone the repo by running `git clone https://github.com/cyberark/cyberark-conjur-cli.git`.
 1. Activate the development and install the requirements as described in the above [Development](#development) section.
 1. Run `pip3 install -r requirements.txt` to install all the project's dependencies.
 

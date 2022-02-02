@@ -1,4 +1,4 @@
-title = "conjur-api-python3 Gitleaks Configuration"
+title = "cyberark-conjur-cli Gitleaks Configuration"
 
 # This is a sample config file for gitleaks. You can configure gitleaks what to search for and what to whitelist.
 # The output you are seeing here is the default gitleaks config. If GITLEAKS_CONFIG environment variable

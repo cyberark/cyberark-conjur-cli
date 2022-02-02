@@ -78,7 +78,7 @@ services:
       - conjur
       - conjur-https
     volumes:
-      - ${PWD}:/opt/conjur-api-python3
+      - ${PWD}:/opt/cyberark-conjur-cli
 
   conjur-appliance:
     image: registry2.itci.conjur.net/conjur-appliance:5.0-stable
@@ -111,7 +111,7 @@ services:
     depends_on:
       - conjur-appliance
     volumes:
-      - ${PWD}:/opt/conjur-api-python3
+      - ${PWD}:/opt/cyberark-conjur-cli
 
   rhel7:
     privileged: true
@@ -132,4 +132,4 @@ services:
     depends_on:
       - conjur-appliance
     volumes:
-      - ${PWD}:/opt/conjur-api-python3
+      - ${PWD}:/opt/cyberark-conjur-cli

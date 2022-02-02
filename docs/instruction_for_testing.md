@@ -25,13 +25,13 @@ If macOS is not available, your local macOS machine should suffice.
 
 #### Create development environment and install requirements
 
-Once those machines are up, clone the repo (`git clone https://github.com/cyberark/conjur-api-python3.git`). You will 
+Once those machines are up, clone the repo (`git clone https://github.com/cyberark/cyberark-conjur-cli.git`). You will 
 need the repo to build the artifact needed for testing in the upcoming steps.
 
 After you have cloned the repository, you will need to drop into a development environment _and_ install the necessary dependencies
 to build the test artifact.
 
-To do both these tasks, follow the instructions outlined [here](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#development).
+To do both these tasks, follow the instructions outlined [here](https://github.com/cyberark/cyberark-conjur-cli/blob/main/CONTRIBUTING.md#development).
 
 ##### Summary:
 
@@ -100,7 +100,7 @@ Where `url`, `account`, `login`, `password` detail the Conjur server-specific in
 type Conjur server deployed impacts where certain tests will pass or fail. For example, if you have configured a Conjur 
 server with a verifiable CA-signed certificate, then `test_https_cli_fails_if_cert_is_bad` and 
 `test_https_cli_fails_if_cert_is_not_provided` should fail. "Why"? See the developer note above each test 
-or see the issue created [here](https://github.com/cyberark/conjur-api-python3/issues/209). For all other flows, these 
+or see the issue created [here](https://github.com/cyberark/cyberark-conjur-cli/issues/209). For all other flows, these 
 tests should pass.
 
 This executable should be 4 times, for each different supported platform.
@@ -123,7 +123,7 @@ To accomplish the first flow (a known, verifiable CA-signed certificate ), at a 
 #### Configure the certificate on Conjur server to be known and verifiable
 
 On your Conjur server, you will need to create and configure the certificate by following 
-[this](https://github.com/cyberark/conjur-api-python3/blob/main/docs/Setting_3rd_party_cert_environment.md) guide.
+[this](https://github.com/cyberark/cyberark-conjur-cli/blob/main/docs/Setting_3rd_party_cert_environment.md) guide.
 
 #### Add CA certificate to store
 
@@ -167,7 +167,7 @@ machines.
 To do so:
 
 1. On each platform, drop into a development environment and install dependencies as detailed 
-[here](https://github.com/cyberark/conjur-api-python3/blob/main/CONTRIBUTING.md#development).
+[here](https://github.com/cyberark/cyberark-conjur-cli/blob/main/CONTRIBUTING.md#development).
 1. Run `pyinstaller -F ./pkg_bin/conjur`. This will build the CLI into an executable.
 1. For Windows, sign executable and compress it as zip. For RHEL, just compress the executable as a zip.
 
