@@ -80,7 +80,6 @@ pipeline {
           }
         }
       }
-
       when {
         branch "main"
       }
