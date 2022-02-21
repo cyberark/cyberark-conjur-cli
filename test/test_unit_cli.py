@@ -4,16 +4,13 @@ import unittest
 from unittest.mock import patch, MagicMock
 import time
 
-from conjur_api import Client
-from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.controller import InitController
 from conjur.controller.host_controller import HostController
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
-from conjur.controller.user_controller import UserController
 from conjur.logic.credential_provider import FileCredentialsProvider
-from test.util.test_infrastructure import cli_test, cli_arg_test
+from test.util.test_infrastructure import cli_test
 from conjur.version import __version__
 from conjur.cli import Cli
 from conjur import cli_actions
@@ -188,42 +185,6 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_resource_listing_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('[\n    "some_id1",\n    "some_id2"\n]\n', output)
 
-    @cli_test(["user"])
-    def test_cli_user_retuns_main_help(self, cli_invocation, output, client):
-        self.assertIn("Usage:\n", output)
-
-    @cli_test(["user", "-h"])
-    def test_cli_user_short_help_returns_user_help(self, cli_invocation, output, client):
-        self.assertIn("Name:\n  user", output)
-
-    @cli_test(["user", "--help"])
-    def test_cli_user_long_help_returns_user_help(self, cli_invocation, output, client):
-        self.assertIn("Name:\n  user", output)
-
-    @cli_test(["user", "rotate-api-key", "-h"])
-    def test_cli_user_rotate_api_key_short_help_returns_rotate_api_key_help(
-            self, cli_invocation,
-            output, client):
-        self.assertIn("Name:\n  rotate-api-key", output)
-
-    @cli_test(["user", "rotate-api-key", "--help"])
-    def test_cli_user_rotate_api_key_long_help_returns_rotate_api_key_help(
-            self, cli_invocation,
-            output, client):
-        self.assertIn("Name:\n  rotate-api-key", output)
-
-    @cli_test(["user", "change-password", "-h"])
-    def test_cli_user_change_password_short_help_returns_change_password_help(
-            self, cli_invocation,
-            output, client):
-        self.assertIn("Name:\n  change-password", output)
-
-    @cli_test(["user", "change-password", "--help"])
-    def test_cli_user_change_password_long_help_returns_change_password_help(
-            self, cli_invocation,
-            output, client):
-        self.assertIn("Name:\n  change-password", output)
-
     @cli_test(["host", "-h"])
     def test_cli_host_short_help_returns_host_help(self, cli_invocation, output, client):
         self.assertIn("Name:\n  host", output)
@@ -277,26 +238,6 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_logout_functions_are_properly_called(self, mock_remove_creds):
         cli_actions.handle_logout_logic(credential_provider=FileCredentialsProvider)
         mock_remove_creds.assert_called_once()
-
-    @patch.object(UserController, 'rotate_api_key')
-    def test_cli_user_rotate_api_key_functions_are_properly_called(self, mock_rotate_api_key):
-        mock_obj = MockArgs()
-        mock_obj.action = 'rotate-api-key'
-        mock_obj.id = 'someid'
-
-        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider(), args=mock_obj,
-                                      client='someclient')
-        mock_rotate_api_key.assert_called_once()
-
-    @patch.object(UserController, 'change_personal_password')
-    def test_cli_user_change_password_functions_are_properly_called(self, mock_change_password):
-        mock_obj = MockArgs()
-        mock_obj.action = 'change-password'
-        mock_obj.password = 'somepass'
-
-        cli_actions.handle_user_logic(credential_provider=FileCredentialsProvider, args=mock_obj,
-                                      client='someclient')
-        mock_change_password.assert_called_once()
 
     @patch.object(HostController, 'rotate_api_key')
     def test_cli_host_logic_functions_are_properly_called(self, mock_rotate_api_key):
@@ -377,26 +318,6 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
 
             Cli().run_action('variable', mock_obj)
             mock_handle_login.assert_called_once()
-
-    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
-    @patch('conjur.cli_actions.handle_user_logic')
-    @patch('os.path.exists', side_effect=[True, True])
-    @patch('os.getenv', return_value=None)
-    @patch('os.path.getsize', return_value=1)
-    @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
-           return_value=MockConjurrc)
-    @patch('keyring.get_keyring')
-    def test_run_action_runs_user_logic(
-            self, mock_keyring, mock_conjurrc, mock_size, mock_getenv,
-            mock_path_exists, mock_handle_user, mock_is_exists):
-        with patch('conjur.cli.Client') as mock_client:
-            mock_client.return_value = MagicMock()
-            mock_obj = MockArgs()
-            mock_obj.ssl_verify = False
-            mock_obj.debug = 'somedebug'
-
-            Cli().run_action('user', mock_obj)
-            mock_handle_user.assert_called_once()
 
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
     @patch('conjur.cli_actions.handle_host_logic')

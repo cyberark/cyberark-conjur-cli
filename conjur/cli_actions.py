@@ -21,10 +21,10 @@ from conjur.errors import ConflictingParametersException, FileNotFoundException,
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
-    PolicyController, UserController, HostController
+    PolicyController, HostController
 from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, VariableLogic, \
-    PolicyLogic, UserLogic
-from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
+    PolicyLogic
+from conjur.data_object import ConjurrcData, HostResourceData, ListData, VariableData, \
     PolicyData
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
@@ -177,30 +177,6 @@ def handle_policy_logic(policy_data: PolicyData = None, client=None):
     policy_controller = PolicyController(policy_logic=policy_logic,
                                          policy_data=policy_data)
     policy_controller.load()
-
-
-def handle_user_logic(
-        credential_provider: CredentialsProviderInterface,
-        args=None, client=None):
-    """
-    Method wraps the user call logic
-    """
-    user_logic = UserLogic(ConjurrcData, credential_provider, client)
-    if args.action == 'rotate-api-key':
-        user_input_data = UserInputData(action=args.action,
-                                        id=args.id,
-                                        new_password=None)
-
-        user_controller = UserController(user_logic=user_logic,
-                                         user_input_data=user_input_data)
-        user_controller.rotate_api_key()
-    elif args.action == 'change-password':
-        user_input_data = UserInputData(action=args.action,
-                                        id=None,
-                                        new_password=args.password)
-        user_controller = UserController(user_logic=user_logic,
-                                         user_input_data=user_input_data)
-        user_controller.change_personal_password()
 
 
 def handle_host_logic(args, client):

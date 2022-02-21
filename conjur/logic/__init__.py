@@ -4,7 +4,6 @@ logic
 This package contains the logic classes
 """
 
-from conjur.logic.user_logic import UserLogic
 from conjur.logic.init_logic import InitLogic
 from conjur.logic.list_logic import ListLogic
 from conjur.logic.login_logic import LoginLogic

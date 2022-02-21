@@ -10,5 +10,4 @@ from conjur.controller.list_controller import ListController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
 from conjur.controller.policy_controller import PolicyController
-from conjur.controller.user_controller import UserController
 from conjur.controller.variable_controller import VariableController

@@ -62,7 +62,6 @@ class Cli:
             .add_list_parser() \
             .add_host_parser() \
             .add_policy_parser() \
-            .add_user_parser() \
             .add_variable_parser() \
             .add_whoami_parser() \
             .add_hostfactory_parser() \
@@ -154,9 +153,6 @@ class Cli:
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)
             cli_actions.handle_policy_logic(policy_data, client)
-
-        elif resource == 'user':
-            cli_actions.handle_user_logic(self.credential_provider, args, client)
 
         elif resource == 'host':
             cli_actions.handle_host_logic(args, client)

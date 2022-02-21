@@ -147,46 +147,46 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
                                  ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
         self.assertIn('Successfully logged in to Conjur', output)
 
-    '''
-    Validates a user can log in with a password, instead of their API key
-    To do this, we perform the following:
-    '''
-    @integration_test()
-    @patch('builtins.input', return_value='yes')
-    def test_https_credentials_user_can_login_successfully_when_another_user_is_already_logged_in(self, mock_input, keystore_disable_mock):
-        utils.setup_cli(self)
-        self.invoke_cli(self.cli_auth_params,
-                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
+#    '''
+#    Validates a user can log in with a password, instead of their API key
+#    To do this, we perform the following:
+#    '''
+#    @integration_test()
+#    @patch('builtins.input', return_value='yes')
+#    def test_https_credentials_user_can_login_successfully_when_another_user_is_already_logged_in(self, mock_input, keystore_disable_mock):
+#        utils.setup_cli(self)
+#        self.invoke_cli(self.cli_auth_params,
+#                        ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
 
         # Load in new user
-        self.invoke_cli(self.cli_auth_params,
-                        ['policy', 'replace', '-b', 'root', '-f',
-                         self.environment.path_provider.get_policy_path('conjur')])
+#        self.invoke_cli(self.cli_auth_params,
+#                        ['policy', 'replace', '-b', 'root', '-f',
+#                         self.environment.path_provider.get_policy_path('conjur')])
 
         # Rotate the new user's API key
-        user_api_key = self.invoke_cli(self.cli_auth_params,
-                                       ['user', 'rotate-api-key', '-i', 'someuser'])
-        extract_api_key_from_message = user_api_key.split(":")[1].strip()
+#        user_api_key = self.invoke_cli(self.cli_auth_params,
+#                                       ['user', 'rotate-api-key', '-i', 'someuser'])
+#        extract_api_key_from_message = user_api_key.split(":")[1].strip()
 
         # Login to change personal password
-        self.invoke_cli(self.cli_auth_params,
-                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
+#        self.invoke_cli(self.cli_auth_params,
+#                        ['login', '-i', 'someuser', '-p', extract_api_key_from_message])
 
         # Creates a password that meets Conjur password complexity standards
-        password = string.hexdigits + "$!@"
-        self.invoke_cli(self.cli_auth_params,
-                        ['user', 'change-password', '-p', password])
+#        password = string.hexdigits + "$!@"
+#        self.invoke_cli(self.cli_auth_params,
+#                        ['user', 'change-password', '-p', password])
 
-        self.invoke_cli(self.cli_auth_params,
-                        ['logout'])
+#        self.invoke_cli(self.cli_auth_params,
+#                        ['logout'])
 
         # Attempt to login with newly created password
-        output = self.invoke_cli(self.cli_auth_params,
-                                 ['login', '-i', 'someuser', '-p', password])
+#        output = self.invoke_cli(self.cli_auth_params,
+#                                 ['login', '-i', 'someuser', '-p', password])
 
-        self.assertIn("Successfully logged in to Conjur", output.strip())
-        utils.get_credentials()
-        self.validate_netrc(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
+#        self.assertIn("Successfully logged in to Conjur", output.strip())
+#        utils.get_credentials()
+#        self.validate_netrc(f"{self.client_params.hostname}", "someuser", extract_api_key_from_message)
 
     '''
     Validates interactively provided params create credentials

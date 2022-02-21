@@ -54,6 +54,9 @@ pipeline {
       steps {
         sh 'summon -e common ./bin/test_integration_rhel --rhel-version=7'
       }
+      when {
+        branch "main"
+      }
 
       post {
         always {
@@ -65,6 +68,9 @@ pipeline {
     stage('RHEL8 Integration tests') {
       steps {
         sh 'summon -e common ./bin/test_integration_rhel --rhel-version=8'
+      }
+      when {
+        branch "main"
       }
 
       post {
