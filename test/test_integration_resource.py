@@ -108,7 +108,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         # Verify that an unprivileged user cannot rotate an another's API key
         attempt_to_rotate_user_key = self.invoke_cli(self.cli_auth_params,
                                                      ['user', 'rotate-api-key', '-i', 'someuser'], exit_code=1)
-        self.assertIn("401 (Unauthorized) for url:", attempt_to_rotate_user_key)
+        self.assertIn("404 (Not Found) for url:", attempt_to_rotate_user_key)
 
         # Verify that a user cannot rotate an admin's API key
         attempt_to_rotate_admin_key = self.invoke_cli(self.cli_auth_params,
