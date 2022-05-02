@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Fixed
+- Corrected the `tar` command in the RHEL release steps.
+  [cyberark/cyberark-conjur-cli#406](https://github.com/cyberark/cyberark-conjur-cli/pull/406)
+
 ### Removed
 - `SDK` with all it contents was removed and is now maintained in the https://github.com/cyberark/conjur-api-python repository
 
