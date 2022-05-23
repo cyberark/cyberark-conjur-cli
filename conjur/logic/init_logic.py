@@ -13,7 +13,7 @@ import os.path
 
 from conjur_api.models import SslVerificationMetadata
 from conjur_api import Client
-from conjur_api.providers import SimpleCredentialsProvider
+from conjur_api.providers import SimpleCredentialsProvider, AuthnAuthenticationStrategy
 from conjur.util.ssl_utils.errors import TLSSocketConnectionException
 from conjur.util.ssl_utils import SSLClient
 from conjur.data_object import ConjurrcData
@@ -67,8 +67,8 @@ class InitLogic:
         """
         logging.debug("Attempting to fetch the account from the Conjur server...")
         client = Client(connection_info=conjurrc_data.get_client_connection_info(),
+                        authn_strategy=AuthnAuthenticationStrategy(SimpleCredentialsProvider()),
                         ssl_verification_mode=ssl_verification_metadata.mode,
-                        credentials_provider=SimpleCredentialsProvider(),
                         async_mode=False)
         response = client.get_server_info()
         conjurrc_data.conjur_account = response['configuration']['conjur']['account']

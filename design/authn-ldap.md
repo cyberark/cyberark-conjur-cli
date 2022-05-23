@@ -62,7 +62,7 @@ this design will occur in the API, which will move us closer to a pluggable auth
 
 ### User Experience
 
-The `conjur login` command should support LDAP authentication. It should be possible to specify the authentication type using the
+The `conjur init` command should support LDAP authentication. It should be possible to specify the authentication type using the
 `-t` or `--authn-type` option. The default value should be `authn` (same as current), and it should additionally support `ldap`.
 When using `ldap`, a `--ldap-service-id` option should be mandatory.
 If the `--ldap-service-id` option is specified, then `--authn-type` should default to `ldap`.
@@ -76,11 +76,11 @@ If the `--ldap-service-id` option is specified, then `--authn-type` should defau
 
 ##### In the CLI repository
 
-The CLI implementation should be straightforward. It needs to support the new CLI arguments in the `login` command,
+The CLI implementation should be straightforward. It needs to support the new CLI arguments in the `init` command,
 and it will need to pass them to the conjur-api-python library.
 Code changes will need to be made in the following files (may not be inclusive):
 
-- [conjur/argument_parser/_login_parser.py](../conjur/argument_parser/_login_parser.py)
+- [conjur/argument_parser/_init_parser.py](../conjur/argument_parser/_init_parser.py)
 - [conjur/cli.py](../conjur/cli.py)
 - [conjur/cli_actions.py](../conjur/cli_actions.py)
 
@@ -88,12 +88,12 @@ Code changes will need to be made in the following files (may not be inclusive):
 
 Create a new `AuthenticationStrategy` interface that will allow us to abstract the authentication flow. The interface should
 take a `CredentialProvider` and Conjur account as inputs, as well as any other arguments that are needed to authenticate,
-such as `service_id` for LDAP. The interface should have a `login` method which returns a Conjur auth token. All details of authentication
+such as `service_id` for LDAP. The interface should have an `authenticate` method which returns a Conjur auth token. All details of authentication (including `login` for authn and authn-ldap)
 should be handled by the `AuthenticationStrategy` interface.
 
 With the new interface, we no longer need to pass a `CredentialsProvider` instance to the `Client` class. Instead, we can pass an
 `AuthenticationStrategy` instance which will be used to authenticate and store the credentials in it's own `CredentialsProvider` instance.
-When calling the `login` method on the `Client`, we will invoke the `AuthenticationStrategy` and return the auth token.
+When calling the `authenticate` method on the `Client`, we will invoke the `AuthenticationStrategy` and return the auth token.
 
 #### Out of Scope
 

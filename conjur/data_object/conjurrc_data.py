@@ -17,6 +17,7 @@ except ImportError:  # pragma: no cover
 from conjur_api.models import ConjurConnectionInfo
 
 # Internals
+from conjur.data_object.authn_types import AuthnTypes
 from conjur.constants import DEFAULT_CONFIG_FILE
 from conjur.errors import InvalidConfigurationException, ConfigurationMissingException
 
@@ -26,10 +27,11 @@ class ConjurrcData:
     Used for setting user input data
     """
 
-    def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None):
+    def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None, authn_type: str = None):
         self.conjur_url = conjur_url
         self.conjur_account = account
         self.cert_file = cert_file
+        self.authn_type = ConjurrcData._parse_authn_type(authn_type)
 
     # pylint: disable=unspecified-encoding
     @classmethod
@@ -42,7 +44,8 @@ class ConjurrcData:
                 loaded_conjurrc = yaml_load(conjurrc, Loader=YamlLoader)
                 return ConjurrcData(loaded_conjurrc['conjur_url'],
                                     loaded_conjurrc['conjur_account'],
-                                    loaded_conjurrc['cert_file'])
+                                    loaded_conjurrc['cert_file'],
+                                    loaded_conjurrc.get('authn_type'))
         except KeyError as key_error:
             raise InvalidConfigurationException from key_error
         except FileNotFoundError as not_found_err:
@@ -54,7 +57,7 @@ class ConjurrcData:
         details needed to create a connection to Conjur
         """
         with open(dest, 'w') as config_fp:
-            data = {key: val for key, val in self.__dict__.items() if val is not None}
+            data = {key: str(val) for key, val in self.__dict__.items() if val is not None}
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
 
@@ -68,3 +71,21 @@ class ConjurrcData:
         return ConjurConnectionInfo(conjur_url=self.conjur_url,
                                     account=self.conjur_account,
                                     cert_file=self.cert_file)
+
+    @staticmethod
+    def _parse_authn_type(authn_type: str | AuthnTypes) -> AuthnTypes:
+        """
+        Method parses the authn_type string to the AuthnTypes enum
+        """
+
+        if isinstance(authn_type, AuthnTypes):
+            return authn_type
+
+        if authn_type == 'authn' or authn_type is None:
+            return AuthnTypes.AUTHN
+
+        # Future:
+        # elif authn_type_str == 'ldap':
+        #     return AuthnTypes.LDAP
+
+        raise InvalidConfigurationException(f"Invalid authn_type: {authn_type}")

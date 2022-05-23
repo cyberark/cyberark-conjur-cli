@@ -58,13 +58,14 @@ def setup_cli(self):
 
 # *************** INIT ***************
 
-def verify_conjurrc_contents(account, hostname, cert):
+def verify_conjurrc_contents(account, hostname, cert, authn_type='authn'):
     with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
         lines = conjurrc.readlines()
         assert "---" in lines[0]
-        assert f"cert_file: {cert}" in lines[1]
-        assert f"conjur_account: {account}" in lines[2]
-        assert f"conjur_url: {hostname}" in lines[3]
+        assert f"authn_type: {authn_type}" in lines[1], lines[1]
+        assert f"cert_file: {cert}" in lines[2], lines[2]
+        assert f"conjur_account: {account}" in lines[3], lines[3]
+        assert f"conjur_url: {hostname}" in lines[4], lines[4]
 
 
 # *************** VARIABLE ***************

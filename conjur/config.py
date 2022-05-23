@@ -34,6 +34,7 @@ class Config():
         ('conjur_account', 'account', True),
         ('conjur_url', 'url', True),
         ('cert_file', 'ca_bundle', True),
+        ('authn_type', 'authn_type', False),
     ]
 
     _config = {}
@@ -54,7 +55,7 @@ class Config():
         for config_field_name, attribute_name, mandatory in self.FIELDS:
             if mandatory and config_field_name not in config:
                 raise InvalidConfigurationException
-            setattr(self, attribute_name, config[config_field_name])
+            setattr(self, attribute_name, config.get(config_field_name))
             self._config[attribute_name] = getattr(self, attribute_name)
 
     def __repr__(self) -> Union[str,bytes]:

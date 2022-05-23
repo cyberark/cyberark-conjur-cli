@@ -48,6 +48,7 @@ class ConfigTest(unittest.TestCase):
             re.compile(
                 "^config:\n" +
                 "\s+account: accountname\n" +
+                "\s+authn_type: null\n" +
                 "\s+ca_bundle: /cert/file/location\n" +
                 "\s+url: https://someurl/somepath\n",
                 re.MULTILINE | re.DOTALL,
