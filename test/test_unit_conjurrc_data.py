@@ -9,7 +9,7 @@ class ConjurrcDataTest(unittest.TestCase):
     def test_conjurrc_object_representation(self):
         conjurrc_data = ConjurrcData("https://someurl", "someaccount", "/some/cert/path")
         rep_obj = conjurrc_data.__repr__()
-        expected_rep_obj = {'conjur_url': 'https://someurl', 'conjur_account': 'someaccount', 'cert_file': "/some/cert/path", 'authn_type': AuthnTypes.AUTHN}
+        expected_rep_obj = {'conjur_url': 'https://someurl', 'conjur_account': 'someaccount', 'cert_file': "/some/cert/path", 'authn_type': AuthnTypes.AUTHN, 'service_id': None}
         self.assertEquals(str(expected_rep_obj), rep_obj)
 
     input_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem'}
@@ -22,7 +22,7 @@ conjur_account: someacc
 conjur_url: https://someurl
 cert_file: /some/path/to/pem
 """
-        expected_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem', 'authn_type': AuthnTypes.AUTHN}
+        expected_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem', 'authn_type': AuthnTypes.AUTHN, 'service_id': None}
         with patch("builtins.open", mock_open(read_data=read_data)):
             mock_conjurrc_data = ConjurrcData.load_from_file()
             self.assertEquals(mock_conjurrc_data.__dict__, expected_dict)

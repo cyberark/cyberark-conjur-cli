@@ -54,6 +54,14 @@ class InitParser:
                                   help='Provide Conjur account name. '
                                        'Optional for Conjur Enterprise - overrides '
                                        'the value on the Conjur Enterprise server')
+        init_options.add_argument('-t', '--authn-type', metavar='VALUE',
+                                  action='store', dest='authn_type',
+                                  help='Provide authentication type. '
+                                       'Optional - use this option to override the default '
+                                       'authentication method. Supports "authn" (default) or "ldap"')
+        init_options.add_argument('--service-id', action='store',
+                                  dest='service_id', metavar='VALUE',
+                                  help='Provide LDAP service id. Required if `--authn-type=ldap`.')
         init_options.add_argument('-c', '--ca-cert', metavar='VALUE',
                                   action='store', dest='certificate',
                                   help='Optional- use this option to provide Conjur server RootCA '

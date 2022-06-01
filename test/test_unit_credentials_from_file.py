@@ -11,6 +11,7 @@ class MockCredentialsData:
     machine = 'https://someurl'
     username = 'somelogin'
     password = 'somepass'
+    api_key = 'somekey'
 
 
 class MockNetrc:
@@ -61,11 +62,11 @@ class FileCredentialsProviderTest(unittest.TestCase):
     def test_loaded_credentials_returns_proper_object(self):
         netrc.netrc = MagicMock(return_value=MockNetrc)
         netrc.netrc.hosts = MagicMock()
-        netrc.netrc.return_value.authenticators = MagicMock(return_value=('somelogin', None, 'somepass'))
+        netrc.netrc.return_value.authenticators = MagicMock(return_value=('somelogin', None, 'somekey'))
         with patch.object(FileCredentialsProvider, 'is_exists', return_value=True):
             credentials = FileCredentialsProvider()
             self.assertEquals(credentials.load("https://someurl"),
-                              CredentialsData(machine='https://someurl', password='somepass', username='somelogin'))
+                              CredentialsData(machine='https://someurl', api_key='somekey', username='somelogin', password=None))
 
     def test_credentials_netrc_exists_but_no_entry_is_found_raises_exception(self):
         with self.assertRaises(Exception):

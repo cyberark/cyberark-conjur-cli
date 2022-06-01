@@ -35,12 +35,19 @@ services:
       CONJUR_DATA_KEY: 'OyXV68Mip14xj33huGaQKewmmS+gKtDlp6ECZ2iATpU='
       DATABASE_URL: postgres://postgres@pg/postgres
       RAILS_ENV: development
+      CONJUR_AUTHENTICATORS: authn-ldap/test-service,authn
+      LDAP_URI: ldap://ldap-server:389
+      LDAP_BASE: dc=conjur,dc=net
+      LDAP_BINDDN: cn=admin,dc=conjur,dc=net
+      LDAP_BINDPW: ldapsecret
+      LDAP_FILTER: (uid=%s)
     ports:
       - 80
     volumes:
       - ${PWD}/test/test_config:/policy:ro
     depends_on:
       - pg
+      - ldap-server
 
   conjur-https:
     image: nginx:alpine
@@ -64,6 +71,25 @@ services:
       - conjur
       - conjur-https
 
+  ldap-server:
+    image: osixia/openldap
+    command: --copy-service --loglevel debug
+    hostname: ldap-server
+    environment:
+      LDAP_ORGANIZATION: CyberArk
+      LDAP_DOMAIN: conjur.net
+      LDAP_ADMIN_PASSWORD: ldapsecret
+      LDAP_TLS_CA_CRT_FILENAME: "ca-chain.cert.pem"
+      LDAP_TLS_CRT_FILENAME: "ldap-server.cert.pem"
+      LDAP_TLS_KEY_FILENAME: "ldap-server.key.pem"
+      LDAP_TLS_DH_PARAM_FILENAME: 'dhparam.pem'
+      LDAP_TLS_VERIFY_CLIENT: try
+    ports:
+      - "389:389"
+    volumes:
+      - ${PWD}/test/test_config/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom
+      - ${PWD}/test/test_config/ldap/certs:/container/service/slapd/assets/certs:ro
+
   test:
     privileged: true
     build:
@@ -82,6 +108,13 @@ services:
 
   conjur-appliance:
     image: registry2.itci.conjur.net/conjur-appliance:5.0-stable
+    environment:
+      CONJUR_AUTHENTICATORS: authn-ldap/test-service,authn
+      LDAP_URI: ldap://ldap-server:389
+      LDAP_BASE: dc=conjur,dc=net
+      LDAP_BINDDN: cn=admin,dc=conjur,dc=net
+      LDAP_BINDPW: ldapsecret
+      LDAP_FILTER: (uid=%s)
     ports:
       - "444:443"
     expose:
@@ -91,6 +124,8 @@ services:
       - "5432"
     security_opt:
         - "seccomp:unconfined"
+    depends_on:
+      - ldap-server
 
   rhel8:
     privileged: true

@@ -31,8 +31,8 @@ SUPPORTED_BACKENDS = ["macOS Keyring", "Windows WinVaultKeyring", "SecretService
 
 MACHINE = "machine"
 USERNAME = "username"
-PASSWORD = "password"
-KEYSTORE_ATTRIBUTES = [MACHINE, USERNAME, PASSWORD]
+API_KEY = "api_key"
+KEYSTORE_ATTRIBUTES = [MACHINE, USERNAME, API_KEY]
 
 # For testing purposes
 TEST_HOSTNAME = "https://conjur-https"

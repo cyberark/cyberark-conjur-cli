@@ -58,7 +58,7 @@ def setup_cli(self):
 
 # *************** INIT ***************
 
-def verify_conjurrc_contents(account, hostname, cert, authn_type='authn'):
+def verify_conjurrc_contents(account, hostname, cert, authn_type='authn', service_id=None):
     with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
         lines = conjurrc.readlines()
         assert "---" in lines[0]
@@ -66,6 +66,8 @@ def verify_conjurrc_contents(account, hostname, cert, authn_type='authn'):
         assert f"cert_file: {cert}" in lines[2], lines[2]
         assert f"conjur_account: {account}" in lines[3], lines[3]
         assert f"conjur_url: {hostname}" in lines[4], lines[4]
+        if service_id:
+            assert f"service_id: {service_id}" in lines[5], lines[5]
 
 
 # *************** VARIABLE ***************
@@ -173,6 +175,12 @@ def update_policy_from_string(self, policy):
     os.remove(file_name)
     return output
 
+def enable_authn_ldap(self):
+    self.invoke_cli(self.cli_auth_params,
+                    ['login', '-i', 'admin', '-p', self.client_params.env_api_key])
+
+    # Load in LDAP policy
+    update_policy(self, self.environment.path_provider.get_policy_path('ldap'))
 
 # *************** CREDENTIALS ***************
 

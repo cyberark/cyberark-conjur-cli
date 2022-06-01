@@ -10,6 +10,7 @@ import io
 import json
 from contextlib import redirect_stderr
 from unittest.mock import patch
+from conjur.constants import DEFAULT_CONFIG_FILE
 
 # Internals
 from conjur.data_object import ConjurrcData
@@ -65,7 +66,7 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
 
         credential_store = CredentialStoreFactory.create_credential_store()
         loaded_conjurrc = ConjurrcData.load_from_file()
-        old_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
+        old_api_key = credential_store.load(loaded_conjurrc.conjur_url).api_key
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
                                             ['user', 'rotate-api-key'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
@@ -73,14 +74,42 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
         assert old_api_key != extract_api_key_from_message, "the API keys are the same!"
 
         credential_store = CredentialStoreFactory.create_credential_store()
-        new_api_key = credential_store.load(loaded_conjurrc.conjur_url).password
+        new_api_key = credential_store.load(loaded_conjurrc.conjur_url).api_key
+
+        assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"
+
+    @integration_test()
+    def test_ldap_user_rotate_api_key_without_param_rotates_logged_in_user(self):
+        utils.enable_authn_ldap(self)
+
+        utils.delete_credentials()
+        utils.remove_file(DEFAULT_CONFIG_FILE)
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account, '--authn-type', 'ldap', '--service-id', 'test-service'])
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'login', '-i', 'ldapuser', '-p', 'ldapuser'])
+
+        credential_store = CredentialStoreFactory.create_credential_store()
+        loaded_conjurrc = ConjurrcData.load_from_file()
+        old_api_key = credential_store.load(loaded_conjurrc.conjur_url).api_key
+        some_user_api_key = self.invoke_cli(self.cli_auth_params,
+                                            ['--insecure', 'user', 'rotate-api-key'])
+        extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
+
+        assert old_api_key != extract_api_key_from_message, "the API keys are the same!"
+
+        credential_store = CredentialStoreFactory.create_credential_store()
+        new_api_key = credential_store.load(loaded_conjurrc.conjur_url).api_key
 
         assert new_api_key.strip() == extract_api_key_from_message, "the API keys are not the same!"
 
     @integration_test()
     def test_user_rotate_api_key_with_user_provided_rotates_user_api_key(self):
         some_user_api_key = self.invoke_cli(self.cli_auth_params,
-                                            ['user', 'rotate-api-key', '-i', 'someuser'])
+                                            ['--insecure', 'user', 'rotate-api-key', '-i', 'someuser'])
         extract_api_key_from_message = some_user_api_key.split(":")[1].strip()
 
         self.assertIn("Successfully rotated API key for 'someuser'", some_user_api_key)
@@ -142,6 +171,39 @@ class CliIntegrationResourceTest(IntegrationTestCaseBase):  # pragma: no cover
             output = self.invoke_cli(self.cli_auth_params,
                                      ['user', 'change-password'])
         self.assertIn("Successfully changed password for", output)
+
+    @integration_test()
+    def test_ldap_user_change_password_changes_authn_password(self):
+        # Login as LDAP user
+        utils.enable_authn_ldap(self)
+
+        utils.delete_credentials()
+        utils.remove_file(DEFAULT_CONFIG_FILE)
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account, '--authn-type', 'ldap', '--service-id', 'test-service'])
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'login', '-i', 'ldapuser', '-p', 'ldapuser'])
+
+        # Change password. This won't change the LDAP password, but will change the authn password.
+        with patch('getpass.getpass', side_effect=['Mypassw0rD2\!']):
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['--insecure', 'user', 'change-password'])
+
+        self.assertIn("Successfully changed password for", output)
+
+        # Logout and login again with authn
+        utils.delete_credentials()
+        utils.remove_file(DEFAULT_CONFIG_FILE)
+
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account, '--authn-type', 'authn'])
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['--insecure', 'login', '-i', 'ldapuser', '-p', 'Mypassw0rD2\!'])
+        self.assertIn("Successfully logged in to Conjur", output.strip())
 
     @integration_test()
     def test_user_insecure_interactive_change_password_does_not_provide_password_prompts_input(self):

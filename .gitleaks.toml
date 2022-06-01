@@ -180,8 +180,10 @@ tags = ["key", "twilio"]
 files = [
   "(.*?)(jpg|gif|doc|pdf|bin)$",
   "test/test_config/https/conjur.key",
-  ".gitleaks.toml"
+  ".gitleaks.toml",
+  "test/test_config/ldap/certs/ldap-server.key.pem",
 ]
+
 #regexes = [
 #  "AKIAIOSFODNN7EXAMPLE"
 #]

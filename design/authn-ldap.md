@@ -64,13 +64,13 @@ this design will occur in the API, which will move us closer to a pluggable auth
 
 The `conjur init` command should support LDAP authentication. It should be possible to specify the authentication type using the
 `-t` or `--authn-type` option. The default value should be `authn` (same as current), and it should additionally support `ldap`.
-When using `ldap`, a `--ldap-service-id` option should be mandatory.
-If the `--ldap-service-id` option is specified, then `--authn-type` should default to `ldap`.
+When using `ldap`, a `--service-id` option should be mandatory.
+If the `--service-id` option is specified, then `--authn-type` should default to `ldap`.
 
 | Option | Acceptable Values | Default | Description |
 | ------ | ----------------- | ------- | ----------- |
-| `--authn-type` / `-t` | `authn`, `ldap` | If `--ldap-service-id` is provided: `ldap`. Otherwise `authn` | The authentication method to use when connecting to Conjur |
-| `--ldap-service-id` | `<service_id>` | N/A | The service_id of the LDAP service to use |
+| `--authn-type` / `-t` | `authn`, `ldap` | If `--service-id` is provided: `ldap`. Otherwise `authn` | The authentication method to use when connecting to Conjur |
+| `--service-id` | `<service_id>` | N/A | The service_id of the LDAP service to use |
 
 #### Feature Details
 

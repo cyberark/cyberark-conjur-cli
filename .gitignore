@@ -15,6 +15,7 @@ coverage.xml
 *.key
 *.crt
 cleanup.log
+/integrations_tests_runner.spec
 
 # Build artifacts
 build/

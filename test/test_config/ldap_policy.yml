@@ -1,0 +1,22 @@
+- !user ldapuser
+
+- !policy
+  id: conjur/authn-ldap/test-service
+  body:
+  - !webservice
+
+  - !group users
+
+  - !permit
+    role: !group users
+    privilege: [ read, authenticate ]
+    resource: !webservice
+
+- !grant
+  role: !group conjur/authn-ldap/test-service/users
+  member: !user ldapuser
+
+- !permit
+  role: !user ldapuser
+  privileges: [ read ]
+  resource: !policy root

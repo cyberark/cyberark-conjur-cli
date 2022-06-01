@@ -14,7 +14,7 @@ import logging
 from conjur_api import Client
 from conjur_api.models import SslVerificationMetadata, CredentialsData
 from conjur_api.interface import CredentialsProviderInterface
-from conjur_api.providers import SimpleCredentialsProvider, AuthnAuthenticationStrategy
+from conjur_api.providers import SimpleCredentialsProvider
 from conjur_api.errors.errors import HttpSslError
 
 # Internals
@@ -44,13 +44,14 @@ class LoginLogic:
         """
         # pylint: disable=logging-fstring-interpolation,raise-missing-from
         logging.debug(f"Attempting to fetch '{credential_data.username}' API key from Conjur...")
+        api_key = None
         try:
             credentials_provider = SimpleCredentialsProvider()
             credentials_provider.save(CredentialsData(machine=conjurrc.conjur_url,
                                                       username=credential_data.username,
                                                       password=password))
             client = Client(connection_info=conjurrc.get_client_connection_info(),
-                            authn_strategy=AuthnAuthenticationStrategy(credentials_provider),
+                            authn_strategy=conjurrc.get_authn_strategy(credentials_provider),
                             ssl_verification_mode=ssl_verification_metadata.mode,
                             async_mode=False)
             api_key = client.login()
