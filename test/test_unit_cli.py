@@ -328,7 +328,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     a command will be run to completion. In this case, variable.
     '''
 
-    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
+    @patch.object(FileCredentialsProvider, 'is_exists', side_effect=[True, False])
     @patch('conjur.cli_actions.handle_init_logic')
     @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[False, True])
@@ -356,6 +356,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     a command will be run to completion. In this case, variable.
     '''
 
+    @patch.object(FileCredentialsProvider, 'is_exists', return_value=False)
     @patch('conjur.cli_actions.handle_login_logic')
     @patch('conjur.cli_actions.handle_variable_logic')
     @patch('os.path.exists', side_effect=[True, False])
@@ -367,7 +368,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_run_action_runs_login_if_netrc_not_found(
             self, mock_keyring, mock_conjurrc, mock_size,
             mock_getenv, mock_path_exists,
-            mock_variable_init, mock_handle_login):
+            mock_variable_init, mock_handle_login, mock_is_exists):
         with patch('conjur.cli.Client') as mock_client:
             mock_keyring.name.return_value = 'somekeyring'
             mock_client.return_value = MagicMock()
@@ -378,7 +379,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             Cli().run_action('variable', mock_obj)
             mock_handle_login.assert_called_once()
 
-    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
+    @patch.object(FileCredentialsProvider, 'is_exists', side_effect=[True, False])
     @patch('conjur.cli_actions.handle_user_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)
@@ -398,7 +399,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             Cli().run_action('user', mock_obj)
             mock_handle_user.assert_called_once()
 
-    @patch.object(FileCredentialsProvider, 'is_exists', return_value=True)
+    @patch.object(FileCredentialsProvider, 'is_exists', side_effect=[True, False])
     @patch('conjur.cli_actions.handle_host_logic')
     @patch('os.path.exists', side_effect=[True, True])
     @patch('os.getenv', return_value=None)

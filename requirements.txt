@@ -11,7 +11,8 @@ aiohttp>=3.8.1
 asynctest>=0.13.0
 setuptools>=57.0.0
 twine>=3.2.0
-conjur-api>=0.0.3
+# conjur-api>=8.0.0
+git+https://github.com/cyberark/conjur-api-python.git
 
 # https://nvd.nist.gov/vuln/detail/CVE-2020-26137
 urllib3>=1.25.9

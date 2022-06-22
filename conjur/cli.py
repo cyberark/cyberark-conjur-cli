@@ -16,11 +16,12 @@ import traceback
 
 # SDK
 from conjur_api.client import Client
+from conjur_api.providers import AuthnAuthenticationStrategy
 from conjur_api.errors.errors import HttpError, HttpStatusError
-from conjur_api.models.policy.policy_data import PolicyData
 
 # Internals
 from conjur.argument_parser.argparse_builder import ArgParseBuilder
+from conjur.data_object.policy_data import PolicyData
 from conjur.logic.credential_provider.credential_store_factory import CredentialStoreFactory
 from conjur.errors import CertificateVerificationException
 from conjur.errors_messages import INCONSISTENT_VERIFY_MODE_MESSAGE
@@ -137,8 +138,8 @@ class Cli:
         ssl_verification_meta_data = get_ssl_verification_meta_data_from_conjurrc(args.ssl_verify)
         client = Client(ssl_verification_mode=ssl_verification_meta_data.mode,
                         connection_info=ConjurrcData.load_from_file().get_client_connection_info(),
+                        authn_strategy=AuthnAuthenticationStrategy(self.credential_provider),
                         debug=args.debug,
-                        credentials_provider=self.credential_provider,
                         async_mode=False)
 
         if resource == 'list':

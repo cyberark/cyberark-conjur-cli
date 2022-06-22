@@ -14,6 +14,7 @@ coverage.xml
 .conjurrc
 *.key
 *.crt
+cleanup.log
 
 # Build artifacts
 build/

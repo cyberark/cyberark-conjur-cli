@@ -14,7 +14,7 @@ import logging
 from conjur_api import Client
 from conjur_api.models import SslVerificationMetadata, CredentialsData
 from conjur_api.interface import CredentialsProviderInterface
-from conjur_api.providers import SimpleCredentialsProvider
+from conjur_api.providers import SimpleCredentialsProvider, AuthnAuthenticationStrategy
 from conjur_api.errors.errors import HttpSslError
 
 # Internals
@@ -50,8 +50,8 @@ class LoginLogic:
                                                       username=credential_data.username,
                                                       password=password))
             client = Client(connection_info=conjurrc.get_client_connection_info(),
+                            authn_strategy=AuthnAuthenticationStrategy(credentials_provider),
                             ssl_verification_mode=ssl_verification_metadata.mode,
-                            credentials_provider=credentials_provider,
                             async_mode=False)
             api_key = client.login()
         except HttpSslError:
