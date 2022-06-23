@@ -4,14 +4,14 @@ from unittest.mock import patch, call
 # Third-Party
 import keyring
 # Internal
-from conjur.constants import TEST_HOSTNAME, PASSWORD, USERNAME, MACHINE, TEST_KEYRING
+from conjur.constants import API_KEY, TEST_HOSTNAME, USERNAME, MACHINE, TEST_KEYRING
 from conjur.data_object import ConjurrcData
 from conjur_api.models import CredentialsData
 from conjur.errors import OperationNotCompletedException, CredentialRetrievalException, KeyringWrapperGeneralError
 from conjur.logic.credential_provider import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreWrapper
 
-MockCredentials = CredentialsData(machine=TEST_HOSTNAME, username='somelogin', password='somepass')
+MockCredentials = CredentialsData(machine=TEST_HOSTNAME, username='somelogin', password='somepass', api_key='somekey')
 MockConjurrcData = ConjurrcData(conjur_url=TEST_HOSTNAME, account="admin")
 
 
@@ -24,7 +24,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         calls = [
             call(TEST_HOSTNAME, MACHINE, TEST_HOSTNAME),
             call(TEST_HOSTNAME, USERNAME, 'somelogin'),
-            call(TEST_HOSTNAME, PASSWORD, 'somepass')
+            call(TEST_HOSTNAME, API_KEY, 'somekey')
         ]
         mock_store_wrapper.assert_has_calls(calls)
 
@@ -49,12 +49,12 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         calls = [
             call(TEST_HOSTNAME, MACHINE),
             call(TEST_HOSTNAME, USERNAME),
-            call(TEST_HOSTNAME, PASSWORD)
+            call(TEST_HOSTNAME, API_KEY)
         ]
         mock_store_wrapper.assert_has_calls(calls)
         self.assertEquals(MockCredentials.machine, credentials_data.machine)
         self.assertEquals(MockCredentials.username, credentials_data.username)
-        self.assertEquals(MockCredentials.password, credentials_data.password)
+        self.assertEquals(MockCredentials.api_key, credentials_data.api_key)
 
     @patch.object(KeystoreWrapper, 'set_password')
     def test_update_api_key_calls_methods_properly(self, mock_store_wrapper):
@@ -63,7 +63,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         credential_provider.update_api_key_entry('someusertoupdate', MockCredentials, 'newapikey')
         calls = [call(TEST_HOSTNAME, MACHINE, TEST_HOSTNAME),
                  call(TEST_HOSTNAME, USERNAME, 'someusertoupdate'),
-                 call(TEST_HOSTNAME, PASSWORD, 'newapikey')]
+                 call(TEST_HOSTNAME, API_KEY, 'newapikey')]
         mock_store_wrapper.assert_has_calls(calls)
 
     @patch.object(KeystoreWrapper, 'set_password', side_effect=Exception)
@@ -96,7 +96,7 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         credential_provider.remove_credentials(MockConjurrcData.conjur_url)
         calls = [call(TEST_HOSTNAME, MACHINE),
                  call(TEST_HOSTNAME, USERNAME),
-                 call(TEST_HOSTNAME, PASSWORD)]
+                 call(TEST_HOSTNAME, API_KEY)]
         mock_delete_password.assert_has_calls(calls)
 
     @patch.object(KeystoreWrapper, "delete_password", side_effect=KeyringWrapperGeneralError)
@@ -116,5 +116,5 @@ class KeystoreCredentialsProviderTest(unittest.TestCase):
         credential_provider.remove_credentials(MockConjurrcData.conjur_url)
         calls = [call(TEST_HOSTNAME, MACHINE),
                  call(TEST_HOSTNAME, USERNAME),
-                 call(TEST_HOSTNAME, PASSWORD)]
+                 call(TEST_HOSTNAME, API_KEY)]
         mock_delete_password.assert_has_calls(calls)

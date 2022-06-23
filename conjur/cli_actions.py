@@ -17,7 +17,8 @@ from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData
 # pylint: disable=too-many-arguments
 from conjur.controller.hostfactory_controller import HostFactoryController
 
-from conjur.errors import ConflictingParametersException, FileNotFoundException, InvalidFilePermissionsException
+from conjur.errors import ConflictingParametersException, FileNotFoundException, \
+    InvalidFilePermissionsException, MissingRequiredParameterException
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
@@ -33,6 +34,7 @@ from conjur.util import init_utils, util_functions
 # pylint: disable=raise-missing-from
 def handle_init_logic(
         url: str = None, account: str = None,
+        authn_type: str = None, service_id: str = None,
         cert: str = None, force: bool = None,
         ssl_verify=None, is_self_signed: bool = False):
     """
@@ -52,12 +54,27 @@ def handle_init_logic(
     except InvalidFilePermissionsException:
         raise InvalidFilePermissionsException(f"No read access for: {cert}")
 
+    try:
+        init_utils.validate_init_action_authn_type_input(authn_type, service_id)
+    except MissingRequiredParameterException:
+        raise MissingRequiredParameterException("--service-id is required when --authn-type is ldap")
+
     ssl_verification_data = init_utils.get_ssl_verification_meta_data_from_cli_params(cert, is_self_signed, ssl_verify)
     ssl_service = SSLClient()
+
+    # If the user has provided a service id but not an authn_type, default to ldap.
+    # We must do this in the CLI instead of in the API, because the API can support a variety
+    # of authn methods that use a service id parameter, whereas the CLI only supports
+    # ldap and authn, so we can assume we're using ldap if a service id is provided.
+    if service_id and not authn_type:
+        authn_type = "ldap"
+
     # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
                                  account=account,
-                                 cert_file=cert)
+                                 cert_file=cert,
+                                 authn_type=authn_type,
+                                 service_id=service_id)
 
     init_logic = InitLogic(ssl_service)
     input_controller = InitController(conjurrc_data=conjurrc_data,

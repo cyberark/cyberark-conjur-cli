@@ -10,7 +10,7 @@ from conjur.data_object.conjurrc_data import ConjurrcData
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.user_logic import UserLogic
 
-MockCredentials = CredentialsData(username='someuser', password='someAPIKey')
+MockCredentials = CredentialsData(username='someuser', password="somePassword", api_key='someAPIKey')
 
 class MockConjurrc:
     conjur_url = 'someurl'

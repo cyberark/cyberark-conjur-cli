@@ -9,7 +9,8 @@ import os
 # Internals
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur.constants import DEFAULT_CERTIFICATE_FILE
-from conjur.errors import FileNotFoundException, InvalidFilePermissionsException, ConflictingParametersException
+from conjur.errors import FileNotFoundException, InvalidFilePermissionsException, \
+    ConflictingParametersException, MissingRequiredParameterException
 
 
 def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_verify):
@@ -34,6 +35,13 @@ def validate_init_action_ssl_verification_input(ca_path, is_self_signed, ssl_ver
         except Exception:
             # pylint: disable=raise-missing-from
             raise InvalidFilePermissionsException
+
+def validate_init_action_authn_type_input(authn_type, service_id):
+    """
+    Validate the input related to authn type for the init action
+    """
+    if authn_type == "ldap" and not service_id:
+        raise MissingRequiredParameterException
 
 
 def get_ssl_verification_meta_data_from_cli_params(ca_path,

@@ -133,6 +133,22 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
+    Validates that the conjurrc was created on the machine with ldap configuration
+    '''
+
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount', '--self-signed',
+                        '--authn-type', 'ldap', '--service-id', 'test-service'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path, 'ldap', 'test-service')
+        assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
+
+    '''
     Validates that the conjurrc was created on the machine when user provides Y instead of 'yes'
     '''
 
@@ -237,7 +253,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
                                           username="admin",
-                                          password=self.client_params.env_api_key)
+                                          api_key=self.client_params.env_api_key)
         cred_store.save(credential_data)
         self.setup_cli_params({})
 
@@ -261,7 +277,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         cred_store = utils.create_cred_store()
         credential_data = CredentialsData(machine=self.client_params.hostname,
                                           username="admin",
-                                          password=self.client_params.env_api_key)
+                                          api_key=self.client_params.env_api_key)
         cred_store.save(credential_data)
         self.setup_cli_params({})
 

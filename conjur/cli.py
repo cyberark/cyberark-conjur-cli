@@ -16,7 +16,6 @@ import traceback
 
 # SDK
 from conjur_api.client import Client
-from conjur_api.providers import AuthnAuthenticationStrategy
 from conjur_api.errors.errors import HttpError, HttpStatusError
 
 # Internals
@@ -115,7 +114,9 @@ class Cli:
             return
 
         if resource == 'init':
-            cli_actions.handle_init_logic(args.url, args.name, args.certificate, args.force,
+            cli_actions.handle_init_logic(args.url, args.name,
+                                          args.authn_type, args.service_id,
+                                          args.certificate, args.force,
                                           args.ssl_verify, args.is_self_signed)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
@@ -136,9 +137,10 @@ class Cli:
 
     def _run_command_flow(self, args, resource):
         ssl_verification_meta_data = get_ssl_verification_meta_data_from_conjurrc(args.ssl_verify)
+        conjurrc_data = ConjurrcData.load_from_file()
         client = Client(ssl_verification_mode=ssl_verification_meta_data.mode,
-                        connection_info=ConjurrcData.load_from_file().get_client_connection_info(),
-                        authn_strategy=AuthnAuthenticationStrategy(self.credential_provider),
+                        connection_info=conjurrc_data.get_client_connection_info(),
+                        authn_strategy=conjurrc_data.get_authn_strategy(self.credential_provider),
                         debug=args.debug,
                         async_mode=False)
 

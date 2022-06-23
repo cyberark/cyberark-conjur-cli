@@ -18,7 +18,7 @@ from conjur_api.models import CredentialsData
 from conjur_api.interface import CredentialsProviderInterface
 
 # Internals
-from conjur.constants import DEFAULT_NETRC_FILE, MACHINE, PASSWORD, USERNAME
+from conjur.constants import API_KEY, DEFAULT_NETRC_FILE, MACHINE, USERNAME
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
 
 
@@ -46,13 +46,13 @@ class FileCredentialsProvider(CredentialsProviderInterface):
         if os.path.exists(self.netrc_path):
             netrc_obj = netrc.netrc(self.netrc_path)
             hosts = netrc_obj.hosts
-            hosts[credential_data.machine] = (credential_data.username, None, credential_data.password)
+            hosts[credential_data.machine] = (credential_data.username, None, credential_data.api_key)
             self.build_netrc(netrc_obj)
         else:
             with open(self.netrc_path, "w+") as netrc_file:
                 netrc_file.write(f"machine {credential_data.machine}\n")
                 netrc_file.write(f"login {credential_data.username}\n")
-                netrc_file.write(f"password {credential_data.password}\n")
+                netrc_file.write(f"password {credential_data.api_key}\n")
 
         # Ensures that the netrc file is only available its owner
         os.chmod(self.netrc_path, stat.S_IRWXU)
@@ -166,7 +166,7 @@ class FileCredentialsProvider(CredentialsProviderInterface):
 
             login, _, password = netrc_auth
             loaded_credentials[MACHINE] = netrc_host_url
-            loaded_credentials[PASSWORD] = password
+            loaded_credentials[API_KEY] = password
             loaded_credentials[USERNAME] = login
             return CredentialsData.convert_dict_to_obj(loaded_credentials)
         except netrc.NetrcParseError as netrc_error:

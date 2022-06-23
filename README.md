@@ -12,14 +12,12 @@ https://github.com/cyberark/conjur-api-python repository
 
 ## Certificate level
 
-### Conjur CLI
+![](https://img.shields.io/badge/Certification%20Level-Community-28A745?link=https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md)
 
-![](https://img.shields.io/badge/Certification%20Level-Certified-6C757D?link=https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md)
-
-The Conjur CLI is a **Certified** level project. It's been reviewed by CyberArk to verify that it works securely
-with CyberArk Conjur Enterprise (previously known as Dynamic Access Provider). In addition, CyberArk offers Enterprise-level
-support for these features. For more detailed information on our certification levels,
-see [our community guidelines](https://github.com/cyberark/community/blob/main/Conjur/conventions/certification-levels.md#community).
+This repo is a **Community** level project. It's a community contributed project that **is not reviewed or supported by
+CyberArk**. For more detailed information on our certification levels,
+see [our community guidelines](https://github.com/cyberark/community/blob/master/Conjur/conventions/certification-levels.md#community)
+.
 
 ### Using cyberark-conjur-cli with Conjur Open Source
 

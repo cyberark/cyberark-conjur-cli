@@ -39,12 +39,12 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
         except OSError:
             pass
 
-    def validate_netrc(self, machine, login, password):
+    def validate_netrc(self, machine, login, api_key):
         with open(DEFAULT_NETRC_FILE, 'r') as netrc:
             lines = netrc.readlines()
             assert f"machine {machine}" in lines[0]
             assert f"login {login}" in lines[1]
-            assert f"password {password}" in lines[2]
+            assert f"password {api_key}" in lines[2]
 
     def write_to_netrc(self, machine, login, password):
         with open(f"{DEFAULT_NETRC_FILE}", "w") as netrc_test:
@@ -145,6 +145,24 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
 
         output = self.invoke_cli(self.cli_auth_params,
                                  ['--insecure', 'login', '-i', 'admin', '-p', self.client_params.env_api_key])
+        self.assertIn('Successfully logged in to Conjur', output)
+
+    '''
+    Validates that if a user configures the CLI in insecure mode and runs a command in 
+    insecure mode, then they will succeed
+    '''
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_cli_configured_in_insecure_mode_with_ldap_and_run_in_insecure_mode_passes_netrc(self, mock_input,
+                                                                                   keystore_disable_mock):
+        utils.setup_cli(self)
+        utils.enable_authn_ldap(self)
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account, '--authn-type', 'ldap', '--service-id', 'test-service'])
+
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['--insecure', 'login', '-i', 'ldapuser', '-p', 'ldapuser'])
         self.assertIn('Successfully logged in to Conjur', output)
 
     '''
@@ -287,7 +305,7 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     def test_https_netrc_is_created_with_host_netrc(self, keystore_disable_mock):
         utils.setup_cli(self)
         # Setup for fetching the API key of a host. To fetch we need to login
-        credentials = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
+        credentials = CredentialsData(self.client_params.hostname, "admin", api_key=self.client_params.env_api_key)
         utils.save_credentials(credentials)
 
         self.invoke_cli(self.cli_auth_params,

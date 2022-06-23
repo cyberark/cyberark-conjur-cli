@@ -40,12 +40,12 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
             pass
         utils.init_to_cli(self)
 
-    def validate_credentials(self, machine, username, password):
+    def validate_credentials(self, machine, username, api_key):
         creds = utils.get_credentials()
 
         assert creds.machine == machine
         assert creds.username == username
-        assert creds.password == password
+        assert creds.api_key == api_key
 
     # *************** LOGIN CREDENTIALS TESTS ***************
 
@@ -79,6 +79,25 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         self.assertFalse(utils.is_netrc_exists())
 
     '''
+    Validates that if a user configures the CLI in insecure mode with authn-ldap and runs a command in 
+    insecure mode, then they will succeed
+    '''
+
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_cli_configured_in_insecure_mode_with_ldap_and_run_in_insecure_mode_passes_keyring(self, mock_input):
+        utils.enable_authn_ldap(self)
+        utils.remove_file(DEFAULT_NETRC_FILE)
+        self.invoke_cli(self.cli_auth_params,
+                        ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
+                         self.client_params.account, '--authn-type', 'ldap', '--service-id', 'test-service'])
+
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['--insecure', 'login', '-i', 'ldapuser', '-p', 'ldapuser'])
+        self.assertIn('Successfully logged in to Conjur', output)
+        self.assertFalse(utils.is_netrc_exists())
+
+    '''
     Validates that if a user runs in insecure mode without supplying inputs, 
     we will ask for them and successfully initialize the client
     '''
@@ -90,6 +109,22 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
         with patch('builtins.input', side_effect=[self.client_params.hostname, self.client_params.account]):
             output = self.invoke_cli(self.cli_auth_params,
                                      ['--insecure', 'init'])
+
+        self.assertRegex(output, 'To start using the Conjur CLI')
+
+    '''
+    Validates that if a user runs in insecure mode with authn-ldap and without supplying inputs, 
+    we will ask for them and successfully initialize the client
+    '''
+
+    @integration_test(True)
+    def test_cli_configured_in_insecure_mode_with_params_and_ldap_passes_keyring(self):
+        utils.enable_authn_ldap(self)
+        utils.remove_file(DEFAULT_CONFIG_FILE)
+        utils.remove_file(DEFAULT_CERTIFICATE_FILE)
+        with patch('builtins.input', side_effect=[self.client_params.hostname, self.client_params.account]):
+            output = self.invoke_cli(self.cli_auth_params,
+                                     ['--insecure', 'init', '--authn-type', 'ldap', '--service-id', 'test-service'])
 
         self.assertRegex(output, 'To start using the Conjur CLI')
 
@@ -245,7 +280,7 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
     @integration_test()
     def test_https_credentials_is_created_with_host_keyring(self):
         # Setup for fetching the API key of a host. To fetch we need to login
-        credentials = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
+        credentials = CredentialsData(self.client_params.hostname, "admin", None, self.client_params.env_api_key)
         utils.save_credentials(credentials)
 
         self.invoke_cli(self.cli_auth_params,
@@ -273,10 +308,10 @@ class CliIntegrationTestCredentialsKeyring(IntegrationTestCaseBase):
 
     @integration_test(True)
     def test_https_credentials_does_not_remove_irrelevant_entry_keyring(self):
-        creds = CredentialsData(self.client_params.hostname, "admin", self.client_params.env_api_key)
+        creds = CredentialsData(self.client_params.hostname, "admin", "somepass", self.client_params.env_api_key)
         utils.save_credentials(creds)
 
-        creds = CredentialsData("somemachine", "somelogin", "somepass")
+        creds = CredentialsData("somemachine", "somelogin", "somepass", "someapikey")
         utils.save_credentials(creds)
 
         self.invoke_cli(self.cli_auth_params,

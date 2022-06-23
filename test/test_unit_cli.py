@@ -12,6 +12,7 @@ from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.controller.login_controller import LoginController
 from conjur.controller.logout_controller import LogoutController
 from conjur.controller.user_controller import UserController
+from conjur.errors import MissingRequiredParameterException
 from conjur.logic.credential_provider import FileCredentialsProvider
 from test.util.test_infrastructure import cli_test, cli_arg_test
 from conjur.version import __version__
@@ -266,6 +267,34 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
                                           cert=file_path, force=False, ssl_verify=True)
             mock_load.assert_called_once()
 
+    @patch.object(InitController, 'load')
+    def test_cli_init_fails_with_authn_ldap_without_service_id(self, mock_load):
+        with self.assertRaises(MissingRequiredParameterException) as context:
+            cli_actions.handle_init_logic(url="https://someurl", account="somename", authn_type="ldap")
+
+        mock_load.assert_not_called()
+        self.assertRegex(context.exception.message, "service-id is required")
+
+    @patch.object(InitController, 'load')
+    def test_cli_init_succeeds_with_authn_without_service_id(self, mock_load):
+        cli_actions.handle_init_logic(url="https://someurl", account="somename",
+                                      authn_type="authn")
+        mock_load.assert_called_once()
+
+    @patch.object(ConjurrcData, '__init__', return_value=None)
+    @patch.object(InitController, 'load')
+    def test_cli_init_defaults_to_ldap_with_service_id(self, mock_load, mock_conjurrc_init):
+        cli_actions.handle_init_logic(url="https://someurl", account="somename",
+                                      service_id="some-service-id")
+        mock_conjurrc_init.assert_called_once_with(
+            conjur_url="https://someurl",
+            account="somename",
+            cert_file=None,
+            authn_type="ldap",
+            service_id="some-service-id",
+        )
+        mock_load.assert_called_once()
+
     @patch.object(LoginController, 'load')
     def test_cli_login_functions_are_properly_called(self, mock_load):
         cli_actions.handle_login_logic(credential_provider=FileCredentialsProvider,
@@ -317,10 +346,12 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.force = 'force'
         mock_obj.debug = 'somedebug'
         mock_obj.is_self_signed = False
+        mock_obj.authn_type = 'authn'
+        mock_obj.service_id = 'service_id'
 
         Cli().run_action('init', mock_obj)
-        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'somecert', 'force',
-                                                 True, False)
+        mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'authn', 'service_id',
+                                                 'somecert', 'force', True, False)
 
     '''
     Verifies that if a user didn't run init, they are prompted to do so and that after they 

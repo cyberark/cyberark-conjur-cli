@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [7.2.0] - 2022-06-15
+
+### Added
+- Support authn-ldap
+  [cyberark/cyberark-conjur-cli#411](https://github.com/cyberark/cyberark-conjur-cli/pull/411)
+
 ### Fixed
 - Corrected the `tar` command in the RHEL release steps.
   [cyberark/cyberark-conjur-cli#406](https://github.com/cyberark/cyberark-conjur-cli/pull/406)
@@ -123,7 +129,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - The first tagged version.
 
-[Unreleased]: https://github.com/cyberark/cyberark-conjur-cli/compare/v7.1.0...HEAD
+[Unreleased]: https://github.com/cyberark/cyberark-conjur-cli/compare/v7.2.0...HEAD
+[7.1.0]: https://github.com/cyberark/cyberark-conjur-cli/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/cyberark/cyberark-conjur-cli/compare/v7.0.1...v7.1.0
 [7.0.1]: https://github.com/cyberark/cyberark-conjur-cli/compare/v0.1.1...v7.0.1
 [0.1.1]: https://github.com/cyberark/cyberark-conjur-cli/compare/v0.1.0...v0.1.1

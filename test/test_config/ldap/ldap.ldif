@@ -1,0 +1,12 @@
+dn: uid=ldapuser,dc=conjur,dc=net
+cn: Ldapuser
+sn: Smith
+uid: ldapuser
+givenName: ldapuser
+mail: ldapuser@conjur.net
+objectClass: person
+objectClass: uidObject
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: top
+userPassword: ldapuser
