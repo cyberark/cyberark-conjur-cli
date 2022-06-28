@@ -123,3 +123,15 @@ def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool,
     if cert_path and cert_path != DEFAULT_CERTIFICATE_FILE:
         return SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, cert_path)
     return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, cert_path)
+
+
+def get_file_keystore_from_conjurrc(conjur_data: ConjurrcData = None) -> bool:
+    """
+    Determine file_keystore from conjurrc file
+    """
+    if not conjur_data:
+        conjur_data = ConjurrcData.load_from_file()
+    if conjur_data.file_keystore == "True":
+        return True
+    return None
+    

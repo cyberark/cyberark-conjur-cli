@@ -14,6 +14,8 @@ from conjur.logic.credential_provider.file_credentials_provider import FileCrede
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreWrapper
+from conjur.util import util_functions
+
 
 
 # pylint: disable=too-few-public-methods
@@ -30,7 +32,9 @@ class CredentialStoreFactory:
         Factory method for determining which store to use
         """
         keyring_name = KeystoreWrapper.get_keyring_name()
-        if keyring_name in SUPPORTED_BACKENDS:
+        file_keystore = util_functions.get_file_keystore_from_conjurrc()
+
+        if keyring_name in SUPPORTED_BACKENDS and file_keystore is None:
             # If the keyring is unlocked then we will use it
             if KeystoreWrapper.is_keyring_accessible():
                 return KeystoreCredentialsProvider()

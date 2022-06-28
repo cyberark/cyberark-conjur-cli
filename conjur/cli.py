@@ -117,7 +117,8 @@ class Cli:
             cli_actions.handle_init_logic(args.url, args.name,
                                           args.authn_type, args.service_id,
                                           args.certificate, args.force,
-                                          args.ssl_verify, args.is_self_signed)
+                                          args.ssl_verify, args.is_self_signed,
+                                          args.file_keystore)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init

@@ -21,6 +21,8 @@ from conjur_api.interface import CredentialsProviderInterface
 from conjur.constants import API_KEY, DEFAULT_NETRC_FILE, MACHINE, USERNAME
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
 
+# Utils
+from conjur.util import util_functions
 
 # pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
 class FileCredentialsProvider(CredentialsProviderInterface):
@@ -144,11 +146,18 @@ class FileCredentialsProvider(CredentialsProviderInterface):
         Method logging an insecure credential provider (netrc) will be used.
         This will be displayed to the user as a warning on every CLI run
         """
+        file_keystore = util_functions.get_file_keystore_from_conjurrc()
+
         if cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
-            # pylint: disable=logging-fstring-interpolation
-            logging.warning("No supported keystore found! Saving credentials in "
-                            f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                            "after you have finished using the CLI")
+            if file_keystore is None:
+                # pylint: disable=logging-fstring-interpolation
+                logging.warning("No supported keystore found! Saving credentials in "
+                                f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
+                                "after you have finished using the CLI")
+            else:
+                logging.warning("You have chosen to run the CLI with a plaintext "
+                                f"keystore. Saving credentials in '{DEFAULT_NETRC_FILE}' "
+                                "Make sure to logoff after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
     def _get_credentials_from_file(self, conjur_url: str) -> CredentialsData:  # pragma: no cover

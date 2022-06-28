@@ -71,5 +71,8 @@ class InitParser:
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Optional- force overwrite of existing files')
+        init_options.add_argument('--file-keystore',
+                                  action='store_true',
+                                  dest='file_keystore', help='Optional- Use .netrc instead of system keystore')
         init_options.add_argument('-h', '--help', action='help',
                                   help='Display help screen and exit')

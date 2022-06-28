@@ -36,7 +36,9 @@ def handle_init_logic(
         url: str = None, account: str = None,
         authn_type: str = None, service_id: str = None,
         cert: str = None, force: bool = None,
-        ssl_verify=None, is_self_signed: bool = False):
+        ssl_verify=None, is_self_signed: bool = False,
+        file_keystore: bool = None):
+
     """
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
@@ -74,7 +76,8 @@ def handle_init_logic(
                                  account=account,
                                  cert_file=cert,
                                  authn_type=authn_type,
-                                 service_id=service_id)
+                                 service_id=service_id,
+                                 file_keystore=file_keystore)
 
     init_logic = InitLogic(ssl_service)
     input_controller = InitController(conjurrc_data=conjurrc_data,
