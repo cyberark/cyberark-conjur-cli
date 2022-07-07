@@ -13,6 +13,7 @@ import getpass
 # SDK
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 from conjur_api.models import CredentialsData
+from conjur.data_object.authn_types import AuthnTypes
 
 # Internals
 from conjur.util import util_functions
@@ -47,10 +48,11 @@ class LoginController:
         """
         Method that facilitates all method calls in this class
         """
-        self.get_username()
-        self.get_password()
-
         conjurrc = self.load_conjurrc_data()
+
+        self.get_username()
+        self.get_password(conjurrc)
+
         self.get_api_key(conjurrc)
 
         self.login_logic.save(self.credential_data)
@@ -66,16 +68,15 @@ class LoginController:
                 # pylint: disable=raise-missing-from
                 raise MissingRequiredParameterException("Error: Login name is required")
 
-    def get_password(self):
+    def get_password(self, conjurrc: ConjurrcData = None):
         """
         Method to fetch the password from the user attempting to login
         """
         if self.user_password is None:
             # pylint: disable=line-too-long
-            self.user_password = getpass.getpass(prompt="Enter your password or API key (this will not be echoed): ")
+            self.user_password = getpass.getpass(prompt=self._get_password_prompt(conjurrc))
             while self.user_password == '':
-                self.user_password = getpass.getpass(
-                    prompt="Invalid format. Enter your password or API key (this will not be echoed): ")
+                self.user_password = getpass.getpass(prompt="Invalid format. " + self._get_password_prompt(conjurrc))
 
     def load_conjurrc_data(self) -> ConjurrcData:
         """
@@ -96,3 +97,12 @@ class LoginController:
                                                                      self.credential_data,
                                                                      self.user_password,
                                                                      conjurrc)
+
+    def _get_password_prompt(self, conjurrc: ConjurrcData):
+        """
+        Method to get the password prompt based on the configured AuthnType
+        """
+        if conjurrc and conjurrc.authn_type == AuthnTypes.LDAP:
+            return "Enter your LDAP password (this will not be echoed): "
+
+        return "Enter your Conjur password or API key (this will not be echoed): "
