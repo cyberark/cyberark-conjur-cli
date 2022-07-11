@@ -12,9 +12,24 @@ class ConjurrcDataTest(unittest.TestCase):
         expected_rep_obj = {'conjur_url': 'https://someurl', 'conjur_account': 'someaccount', 'cert_file': "/some/cert/path", 'authn_type': AuthnTypes.AUTHN, 'service_id': None}
         self.assertEquals(str(expected_rep_obj), rep_obj)
 
-    input_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem'}
+    input_dict = {'appliance_url': 'https://someurl', 'account': 'someacc', 'cert_file': '/some/path/to/pem'}
     @patch('yaml.load', return_value=input_dict)
     def test_conjurrc_object_is_filled_correctly(self, mock_yaml_load):
+        read_data = \
+"""
+---
+account: someacc
+appliance_url: https://someurl
+cert_file: /some/path/to/pem
+"""
+        expected_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem', 'authn_type': AuthnTypes.AUTHN, 'service_id': None}
+        with patch("builtins.open", mock_open(read_data=read_data)):
+            mock_conjurrc_data = ConjurrcData.load_from_file()
+            self.assertEquals(mock_conjurrc_data.__dict__, expected_dict)
+
+    input_dict = {'conjur_url': 'https://someurl', 'conjur_account': 'someacc', 'cert_file': '/some/path/to/pem'}
+    @patch('yaml.load', return_value=input_dict)
+    def test_conjurrc_accepts_alternative_keynames(self, mock_yaml_load):
         read_data = \
 """
 ---
@@ -37,8 +52,8 @@ cert_file: /some/path/to/pem
         read_data = \
 """
 ---
-conjur_account: someacc
-conjur_url: https://someurl
+account: someacc
+appliance_url: https://someurl
 cert_file: /some/path/to/pem
 authn_type: abcd
 """

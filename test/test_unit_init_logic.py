@@ -18,8 +18,8 @@ MIIDOD...
 
 EXPECTED_CONFIG = \
     '''---
-    conjur_account: someaccount
-    conjur_url: https://someurl
+    account: someaccount
+    appliance_url: https://someurl
     cert_file: /path/to/conjur-someaccount.pem
     '''
 
@@ -88,7 +88,7 @@ class InitLogicTest(unittest.TestCase):
                 with open('path/to/conjurrc', 'r') as conjurrc:
                     lines = conjurrc.readlines()
                     self.assertEquals(lines[0].strip(), "---")
-                    self.assertEquals(lines[1].strip(), "conjur_account: someaccount")
+                    self.assertEquals(lines[1].strip(), "account: someaccount")
                     self.assertEquals(lines[3].strip(),
                                       "cert_file: /path/to/conjur-someaccount.pem")
 

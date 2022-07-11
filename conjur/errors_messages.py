@@ -23,8 +23,8 @@ FETCH_CREDENTIALS_FAILURE_MESSAGE = "Failed to fetch credentials. Log in again a
 
 FETCH_CONFIGURATION_FAILURE_MESSAGE = "The conjurrc configuration file is either invalid or missing parameters. "\
                                       "Reinitialize the client and make sure that the conjurrc contains "\
-                                      "'conjur_account', 'conjur_url', and 'cert_file'."
+                                      "'account', 'appliance_url', and 'cert_file'."
 
 CONFIGURATION_MISSING_FAILURE_MESSAGE = "The conjurrc configuration file content is empty. Reinitialize "\
                                         "the client and make sure that the conjurrc contains "\
-                                        "'conjur_account', 'conjur_url', and 'cert_file'."
+                                        "'account', 'appliance_url', and 'cert_file'."

@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## [7.2.0] - 2022-06-15
+## [7.2.0] - 2022-07-11
+
+### Changed
+- Revert conjurrc key names to match Ruby CLI.
+  [cyberark/cyberark-conjur-cli#413](https://github.com/cyberark/cyberark-conjur-cli/pull/413)
 
 ### Added
 - Support authn-ldap

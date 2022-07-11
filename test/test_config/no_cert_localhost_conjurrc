@@ -1,4 +1,4 @@
 ---
-conjur_account: dev
-conjur_url: https://localhost
+account: dev
+appliance_url: https://localhost
 cert_file: ''
