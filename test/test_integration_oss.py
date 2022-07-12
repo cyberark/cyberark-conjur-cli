@@ -55,5 +55,5 @@ class CliIntegrationTestOSS(IntegrationTestCaseBase):
             with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
                 lines = conjurrc.readlines()
                 assert "---" in lines[0]
-                assert "conjur_account: someotheraccount" in lines[3]
-                assert f"conjur_url: {self.client_params.hostname}" in lines[4]
+                assert "account: someotheraccount" in lines[1]
+                assert f"appliance_url: {self.client_params.hostname}" in lines[2]

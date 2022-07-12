@@ -49,8 +49,12 @@ class ConjurrcData:
         try:
             with open(conjurrc_path, 'r') as conjurrc:
                 loaded_conjurrc = yaml_load(conjurrc, Loader=YamlLoader)
-                return ConjurrcData(loaded_conjurrc['conjur_url'],
-                                    loaded_conjurrc['conjur_account'],
+                # For backwards compatibility with CLI 7.0-7.1, we accept the 'conjur_url' and 'conjur_account'
+                # keys as well as the 'appliance_url' and 'account' keys. When writing the config file, we write
+                # only the 'appliance_url' and 'account' keys which are used in CLI 6.x and 7.2+ as
+                # well as summon-conjur.
+                return ConjurrcData(loaded_conjurrc.get('appliance_url') or loaded_conjurrc['conjur_url'],
+                                    loaded_conjurrc.get('account') or loaded_conjurrc['conjur_account'],
                                     loaded_conjurrc['cert_file'],
                                     loaded_conjurrc.get('authn_type'),
                                     loaded_conjurrc.get('service_id'))
@@ -65,8 +69,13 @@ class ConjurrcData:
         details needed to create a connection to Conjur
         """
         with open(dest, 'w') as config_fp:
-            data = {key: str(val)
-                    for key, val in self.__dict__.items() if val is not None}
+            data = {
+                'appliance_url': self.conjur_url,
+                'account': self.conjur_account,
+                'cert_file': self.cert_file,
+                'authn_type': str(self.authn_type),
+                'service_id': self.service_id
+            }
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
 

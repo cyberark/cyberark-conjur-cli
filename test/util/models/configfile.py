@@ -10,8 +10,8 @@ class ConfigFile:
 
     def __str__(self):
         str = "---\n"
-        str += f"conjur_account: {self.account}\n"
-        str += f"conjur_url: {self.conjur_url}\n"
+        str += f"account: {self.account}\n"
+        str += f"appliance_url: {self.conjur_url}\n"
         str += f"cert_file: {self.cert_file}\n"
         return str
 
@@ -25,9 +25,9 @@ class ConfigFile:
         ret = ConfigFile()
         with open(file_path, 'r') as f:
             for line in f.readlines():
-                if line.strip().startswith('conjur_account'):
+                if line.strip().startswith('account'):
                     ret.account = "".join(line.split(":")[1:]).strip()
-                if line.strip().startswith('conjur_url'):
+                if line.strip().startswith('appliance_url'):
                     ret.conjur_url = "".join(line.split(":")[1:]).strip()
                 if line.strip().startswith('cert_file'):
                     ret.cert_file = "".join(line.split(":")[1:]).strip()

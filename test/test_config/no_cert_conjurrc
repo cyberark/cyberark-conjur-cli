@@ -1,4 +1,4 @@
 ---
-conjur_account: dev
-conjur_url: https://conjur-https
+account: dev
+appliance_url: https://conjur-https
 cert_file: ''
