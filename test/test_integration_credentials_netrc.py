@@ -21,7 +21,8 @@ from test.util import test_helpers as utils
 from conjur.constants import DEFAULT_NETRC_FILE, DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
 
 """
-All tests require that the Keyring on the system's environment is not accessible. 
+All tests require that the Keyring on the system's environment is not accessible.
+Alternatively the use_netrc flag can be set to True in the conjurrc file.
 This is required to validate that the CLI operates as expected under such conditions.
 """
 @patch('conjur.wrapper.keystore_wrapper.KeystoreWrapper.is_keyring_accessible', return_value=False)
@@ -59,9 +60,31 @@ class CliIntegrationTestCredentialsNetrc(IntegrationTestCaseBase):
     for these tests (netrc)
     '''
     @integration_test()
-    def test_provider_can_return_file_provider_netrc(self, keystore_disable_mock):
+    def test_provider_can_return_file_provider_netrc_with_inaccessible_keyring(self, keystore_disable_mock):
         utils.setup_cli(self)
         cred_store = utils.create_cred_store()
+        self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
+
+    '''
+    Validate the correct CredentialStore selected when use_netrc=True is
+    loaded from the conjurrc config file.
+    '''
+    @integration_test()
+    @patch('conjur.util.util_functions.get_netrc_flag_from_conjurrc', return_value=True)
+    def test_provider_can_return_file_provider_keyring_with_conjurrc_config(self, keystore_disable_mock, netrc_enable_mock):
+        # override the is_keychain_accessible mock for this test
+        keystore_disable_mock.return_value = True
+        cred_store = utils.create_cred_store()
+        self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
+
+    '''
+    Validate the correct CredentialStore selected when use_netrc is passed as a CLI argument.
+    '''
+    @integration_test()
+    def test_provider_can_return_file_provider_keyring_with_use_netrc_flag(self, keystore_disable_mock):
+        # override the is_keychain_accessible mock for this test
+        keystore_disable_mock.return_value = True
+        cred_store = utils.create_cred_store(use_netrc_flag=True)
         self.assertEquals(type(cred_store), type(FileCredentialsProvider()))
 
     '''

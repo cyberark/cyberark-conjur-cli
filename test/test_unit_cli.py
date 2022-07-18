@@ -292,6 +292,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             cert_file=None,
             authn_type="ldap",
             service_id="some-service-id",
+            use_netrc=None,
         )
         mock_load.assert_called_once()
 
@@ -348,10 +349,11 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.is_self_signed = False
         mock_obj.authn_type = 'authn'
         mock_obj.service_id = 'service_id'
+        mock_obj.use_netrc = None
 
         Cli().run_action('init', mock_obj)
         mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'authn', 'service_id',
-                                                 'somecert', 'force', True, False)
+                                                 'somecert', 'force', True, False, None)
 
     '''
     Verifies that if a user didn't run init, they are prompted to do so and that after they 
@@ -362,7 +364,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     @patch.object(FileCredentialsProvider, 'is_exists', side_effect=[True, False])
     @patch('conjur.cli_actions.handle_init_logic')
     @patch('conjur.cli_actions.handle_variable_logic')
-    @patch('os.path.exists', side_effect=[False, True])
+    @patch('os.path.exists', side_effect=[False, False, True])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 1])
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',
@@ -390,7 +392,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     @patch.object(FileCredentialsProvider, 'is_exists', return_value=False)
     @patch('conjur.cli_actions.handle_login_logic')
     @patch('conjur.cli_actions.handle_variable_logic')
-    @patch('os.path.exists', side_effect=[True, False])
+    @patch('os.path.exists', side_effect=[True, True, False])
     @patch('os.getenv', return_value=None)
     @patch('os.path.getsize', side_effect=[1, 0])
     @patch('conjur.data_object.conjurrc_data.ConjurrcData.load_from_file',

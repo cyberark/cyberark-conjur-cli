@@ -21,7 +21,6 @@ from conjur_api.interface import CredentialsProviderInterface
 from conjur.constants import API_KEY, DEFAULT_NETRC_FILE, MACHINE, USERNAME
 from conjur.errors import CredentialRetrievalException, NotLoggedInException, InvalidFormatException
 
-
 # pylint: disable=logging-fstring-interpolation, line-too-long, unspecified-encoding
 class FileCredentialsProvider(CredentialsProviderInterface):
     """
@@ -32,15 +31,16 @@ class FileCredentialsProvider(CredentialsProviderInterface):
 
     FIRST_TIME_LOG_INSECURE_STORE_WARNING = True  # Static
 
-    def __init__(self, netrc_path=DEFAULT_NETRC_FILE):
+    def __init__(self, use_netrc: bool = False, netrc_path=DEFAULT_NETRC_FILE):
         self.netrc_path = netrc_path
+        self.use_netrc = use_netrc
 
     def save(self, credential_data: CredentialsData):
         """
         Method that writes user data to a netrc file
         and updates permissions on the file
         """
-        self._log_netrc_warning()
+        self._log_netrc_warning(self.use_netrc)
         logging.debug(f"Attempting to write credentials to '{DEFAULT_NETRC_FILE}'...")
         # TDOO use private function
         if os.path.exists(self.netrc_path):
@@ -139,16 +139,23 @@ class FileCredentialsProvider(CredentialsProviderInterface):
             netrc_file.write(ret.replace('\t', ''))
 
     @classmethod
-    def _log_netrc_warning(cls):
+    def _log_netrc_warning(cls, use_netrc: bool):
         """
         Method logging an insecure credential provider (netrc) will be used.
         This will be displayed to the user as a warning on every CLI run
         """
+
         if cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
-            # pylint: disable=logging-fstring-interpolation
-            logging.warning("No supported keystore found! Saving credentials in "
-                            f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
-                            "after you have finished using the CLI")
+            if use_netrc is False:
+                # pylint: disable=logging-fstring-interpolation
+                logging.warning("No supported keystore found! Saving credentials in "
+                                f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
+                                "after you have finished using the CLI")
+            else:
+                # pylint: disable=logging-fstring-interpolation
+                logging.warning("You have chosen to run the CLI with a plaintext "
+                                f"keystore. Saving credentials in '{DEFAULT_NETRC_FILE}.' "
+                                "Make sure to logoff after you have finished using the CLI")
             cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING = False
 
     def _get_credentials_from_file(self, conjur_url: str) -> CredentialsData:  # pragma: no cover

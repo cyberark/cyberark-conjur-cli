@@ -17,11 +17,11 @@ from conjur_api.errors.errors import HttpError
 from conjur_api.models import SslVerificationMetadata, SslVerificationMode
 
 # Internals
-from conjur.errors import MissingRequiredParameterException
+from conjur.errors import MissingRequiredParameterException, InvalidConfigurationException
 from conjur.util.os_types import OSTypes
 from conjur.data_object.conjurrc_data import ConjurrcData
-from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME, \
-    MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, WINDOWS_KEYRING_NAME, DEFAULT_CERTIFICATE_FILE
+from conjur.constants import KEYRING_TYPE_ENV_VARIABLE_NAME,MAC_OS_KEYRING_NAME, LINUX_KEYRING_NAME, \
+    WINDOWS_KEYRING_NAME, DEFAULT_CERTIFICATE_FILE, DEFAULT_CONFIG_FILE
 
 
 def list_dictify(obj):
@@ -123,3 +123,19 @@ def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool,
     if cert_path and cert_path != DEFAULT_CERTIFICATE_FILE:
         return SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, cert_path)
     return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, cert_path)
+
+def get_netrc_flag_from_conjurrc(conjur_data: ConjurrcData = None) -> bool:
+    """
+    Determine use_netrc from conjurrc file (if it exists)
+    Ignore any conjurrc errors here since this gets called
+    before the CLI's main exception handling block
+    """
+    if conjur_data is None and os.path.exists(DEFAULT_CONFIG_FILE):
+        try:
+            conjur_data = ConjurrcData.load_from_file()
+        except InvalidConfigurationException:
+            pass
+
+    if hasattr(conjur_data, "use_netrc") and conjur_data.use_netrc is True:
+        return True
+    return False

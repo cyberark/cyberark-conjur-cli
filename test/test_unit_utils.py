@@ -29,3 +29,15 @@ class UserInputDataTest(unittest.TestCase):
                             cert_file="cert")
         res = utils.get_ssl_verification_meta_data_from_conjurrc(True, data)
         self.assertEquals(res.mode, SslVerificationMode.CA_BUNDLE)
+
+    def test_get_netrc_flag_from_conjurrc_none(self):
+        data = ConjurrcData(conjur_url="https://foo.com", account="some_account",
+                            cert_file="cert", use_netrc=None)
+        res = utils.get_netrc_flag_from_conjurrc(data)
+        self.assertEquals(res, False)
+
+    def test_get_netrc_flag_from_conjurrc_true(self):
+        data = ConjurrcData(conjur_url="https://foo.com", account="some_account",
+                            cert_file="cert", use_netrc=True)
+        res = utils.get_netrc_flag_from_conjurrc(data)
+        self.assertEquals(res, True)

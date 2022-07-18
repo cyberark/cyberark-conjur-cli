@@ -58,7 +58,7 @@ def setup_cli(self):
 
 # *************** INIT ***************
 
-def verify_conjurrc_contents(account, hostname, cert, authn_type='authn', service_id=None):
+def verify_conjurrc_contents(account, hostname, cert, authn_type='authn', service_id=None, use_netrc=None):
     with open(f"{DEFAULT_CONFIG_FILE}", 'r') as conjurrc:
         lines = conjurrc.readlines()
         assert "---" in lines[0]
@@ -68,6 +68,8 @@ def verify_conjurrc_contents(account, hostname, cert, authn_type='authn', servic
         assert f"cert_file: {cert}" in lines[4], lines[4]
         if service_id:
             assert f"service_id: {service_id}" in lines[5], lines[5]
+        if use_netrc:
+            assert f"use_netrc: {use_netrc}" in lines[6], lines[6]
 
 
 # *************** VARIABLE ***************
@@ -184,8 +186,8 @@ def enable_authn_ldap(self):
 
 # *************** CREDENTIALS ***************
 
-def create_cred_store():
-    cred_store = CredentialStoreFactory.create_credential_store()
+def create_cred_store(use_netrc_flag: bool = False):
+    cred_store = CredentialStoreFactory.create_credential_store(use_netrc_flag=use_netrc_flag)
     return cred_store
 
 

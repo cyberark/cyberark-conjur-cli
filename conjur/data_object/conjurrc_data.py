@@ -33,12 +33,13 @@ class ConjurrcData:
 
     # pylint: disable=too-many-arguments
     def __init__(self, conjur_url: str = None, account: str = None, cert_file: str = None,
-                 authn_type: str = None, service_id: str = None):
+                 authn_type: str = None, service_id: str = None, use_netrc: bool = None):
         self.conjur_url = conjur_url
         self.conjur_account = account
         self.cert_file = cert_file
         self.authn_type = ConjurrcData._parse_authn_type(authn_type)
         self.service_id = service_id
+        self.use_netrc = use_netrc
 
     # pylint: disable=unspecified-encoding
     @classmethod
@@ -57,7 +58,8 @@ class ConjurrcData:
                                     loaded_conjurrc.get('account') or loaded_conjurrc['conjur_account'],
                                     loaded_conjurrc['cert_file'],
                                     loaded_conjurrc.get('authn_type'),
-                                    loaded_conjurrc.get('service_id'))
+                                    loaded_conjurrc.get('service_id'),
+                                    loaded_conjurrc.get('use_netrc'))
         except KeyError as key_error:
             raise InvalidConfigurationException from key_error
         except FileNotFoundError as not_found_err:
@@ -74,7 +76,8 @@ class ConjurrcData:
                 'account': self.conjur_account,
                 'cert_file': self.cert_file,
                 'authn_type': str(self.authn_type),
-                'service_id': self.service_id
+                'service_id': self.service_id,
+                'use_netrc': self.use_netrc
             }
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
