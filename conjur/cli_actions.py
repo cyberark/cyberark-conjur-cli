@@ -29,6 +29,7 @@ from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, Li
     PolicyData
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
+from conjur.constants import DEFAULT_NETRC_FILE
 
 
 # pylint: disable=raise-missing-from
@@ -37,7 +38,7 @@ def handle_init_logic(
         authn_type: str = None, service_id: str = None,
         cert: str = None, force: bool = None,
         ssl_verify=None, is_self_signed: bool = False,
-        use_netrc: bool = None):
+        force_netrc: str = None):
     """
     Method that wraps the init call logic
     Initializes the client, creating the .conjurrc file
@@ -70,13 +71,15 @@ def handle_init_logic(
     if service_id and not authn_type:
         authn_type = "ldap"
 
+    netrc_path = DEFAULT_NETRC_FILE if force_netrc else None
+
     # TODO conjurrcData creation should move to controller
     conjurrc_data = ConjurrcData(conjur_url=url,
                                  account=account,
                                  cert_file=cert,
                                  authn_type=authn_type,
                                  service_id=service_id,
-                                 use_netrc=use_netrc)
+                                 netrc_path=netrc_path)
 
     init_logic = InitLogic(ssl_service)
     input_controller = InitController(conjurrc_data=conjurrc_data,

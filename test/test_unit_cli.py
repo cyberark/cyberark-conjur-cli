@@ -292,7 +292,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             cert_file=None,
             authn_type="ldap",
             service_id="some-service-id",
-            use_netrc=None,
+            netrc_path=None,
         )
         mock_load.assert_called_once()
 
@@ -349,7 +349,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
         mock_obj.is_self_signed = False
         mock_obj.authn_type = 'authn'
         mock_obj.service_id = 'service_id'
-        mock_obj.use_netrc = None
+        mock_obj.force_netrc = None
 
         Cli().run_action('init', mock_obj)
         mock_handle_init.assert_called_once_with('https://someurl', 'somename', 'authn', 'service_id',

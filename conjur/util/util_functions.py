@@ -124,9 +124,9 @@ def get_ssl_verification_meta_data_from_conjurrc(ssl_verify: bool,
         return SslVerificationMetadata(SslVerificationMode.CA_BUNDLE, cert_path)
     return SslVerificationMetadata(SslVerificationMode.SELF_SIGN, cert_path)
 
-def get_netrc_flag_from_conjurrc(conjur_data: ConjurrcData = None) -> bool:
+def get_netrc_path_from_conjurrc(conjur_data: ConjurrcData = None) -> str:
     """
-    Determine use_netrc from conjurrc file (if it exists)
+    Determine netrc_path from conjurrc file (if it exists)
     Ignore any conjurrc errors here since this gets called
     before the CLI's main exception handling block
     """
@@ -136,6 +136,6 @@ def get_netrc_flag_from_conjurrc(conjur_data: ConjurrcData = None) -> bool:
         except InvalidConfigurationException:
             pass
 
-    if hasattr(conjur_data, "use_netrc") and conjur_data.use_netrc is True:
-        return True
-    return False
+    if hasattr(conjur_data, "netrc_path") and conjur_data.netrc_path is not None:
+        return conjur_data.netrc_path
+    return None

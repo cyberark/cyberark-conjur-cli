@@ -76,9 +76,9 @@ class Cli:
 
         # There may be a better way to do this. Currently we have to
         # re-initialize the credential store once the CLI args become available
-        if 'use_netrc' not in args or args.use_netrc is False:
-            args.use_netrc = None
-        self.credential_provider = CredentialStoreFactory.create_credential_store(args.use_netrc)
+        if 'force_netrc' not in args or args.force_netrc is False:
+            args.force_netrc = None
+        self.credential_provider = CredentialStoreFactory.create_credential_store(args.force_netrc)
 
         # pylint: disable=broad-except
         try:
@@ -125,7 +125,7 @@ class Cli:
                                           args.authn_type, args.service_id,
                                           args.certificate, args.force,
                                           args.ssl_verify, args.is_self_signed,
-                                          args.use_netrc)
+                                          args.force_netrc)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init

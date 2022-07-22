@@ -146,7 +146,7 @@ class FileCredentialsProvider(CredentialsProviderInterface):
         """
 
         if cls.FIRST_TIME_LOG_INSECURE_STORE_WARNING:
-            if use_netrc is False:
+            if use_netrc is None:
                 # pylint: disable=logging-fstring-interpolation
                 logging.warning("No supported keystore found! Saving credentials in "
                                 f"plaintext in '{DEFAULT_NETRC_FILE}'. Make sure to logoff "
