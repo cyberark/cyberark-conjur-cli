@@ -68,6 +68,10 @@ class InitParser:
                                        'to the cli in case it is not already trusted by this machine')
         init_options.add_argument('-s', '--self-signed', action='store_true', dest='is_self_signed',
                                   help='Optional- state if you want to work with self-signed certificate')
+        init_options.add_argument('--force-netrc',
+                                  action='store_true', dest='force_netrc',
+                                  help='Optional- force the CLI to use a file-based credential storage in'
+                                       '$HOME/.netrc rather than OS-native keystore (for compatibility with Summon)')
         init_options.add_argument('--force',
                                   action='store_true',
                                   dest='force', help='Optional- force overwrite of existing files')

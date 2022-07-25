@@ -17,7 +17,7 @@ from test.util.test_infrastructure import integration_test
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util import test_helpers as utils
 
-from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE
+from conjur.constants import DEFAULT_CONFIG_FILE, DEFAULT_CERTIFICATE_FILE, DEFAULT_NETRC_FILE
 from test.util.models.configfile import ConfigFile
 
 
@@ -138,7 +138,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
     @integration_test(True)
     @patch('builtins.input', return_value='yes')
-    def test_https_conjurrc_is_created_with_all_parameters_given(self, mock_input):
+    def test_https_conjurrc_is_created_with_all_ldap_parameters_given(self, mock_input):
         self.setup_cli_params({})
         self.invoke_cli(self.cli_auth_params,
                         ['init', '--url', self.client_params.hostname, '--account', 'someaccount', '--self-signed',
@@ -146,6 +146,23 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
 
         utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
                                        self.environment.path_provider.certificate_path, 'ldap', 'test-service')
+        assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
+
+    '''
+    Validates that if a user adds the --force-netrc flag it is reflected in conjurrc
+    '''
+
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_is_created_with_force_netrc_parameter_given(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account', 'someaccount', '--self-signed', 
+                        '--force-netrc'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname,
+                                       self.environment.path_provider.certificate_path,
+                                       netrc_path=DEFAULT_NETRC_FILE)
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
@@ -202,8 +219,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
         assert os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
-    Validates that if user does not trust the certificate,
-    the conjurrc is not be created on the user's machine
+    Validates that if user does not trust the certificate, the conjurrc is not be created on the user's machine
     '''
 
     @integration_test(True)
@@ -217,8 +233,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
             assert not os.path.isfile(DEFAULT_CERTIFICATE_FILE)
 
     '''
-    Validates that when the user adds the force flag,
-    no confirmation is required
+    Validates that when the user adds the force flag, no confirmation is required
     '''
 
     @integration_test(True)

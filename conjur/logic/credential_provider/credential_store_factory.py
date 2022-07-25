@@ -14,6 +14,7 @@ from conjur.logic.credential_provider.file_credentials_provider import FileCrede
 from conjur.logic.credential_provider.keystore_credentials_provider \
     import KeystoreCredentialsProvider
 from conjur.wrapper import KeystoreWrapper
+from conjur.util import util_functions
 
 
 # pylint: disable=too-few-public-methods
@@ -25,14 +26,15 @@ class CredentialStoreFactory:
     """
 
     @classmethod
-    def create_credential_store(cls) -> CredentialsProviderInterface:
+    def create_credential_store(cls, force_netrc_flag: bool = None) -> CredentialsProviderInterface:
         """
         Factory method for determining which store to use
         """
         keyring_name = KeystoreWrapper.get_keyring_name()
-        if keyring_name in SUPPORTED_BACKENDS:
-            # If the keyring is unlocked then we will use it
+        use_netrc = force_netrc_flag or util_functions.get_netrc_path_from_conjurrc()
+
+        if keyring_name in SUPPORTED_BACKENDS and use_netrc is None:
             if KeystoreWrapper.is_keyring_accessible():
                 return KeystoreCredentialsProvider()
 
-        return FileCredentialsProvider()
+        return FileCredentialsProvider(use_netrc=use_netrc)

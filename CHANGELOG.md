@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Support authn-ldap
   [cyberark/cyberark-conjur-cli#411](https://github.com/cyberark/cyberark-conjur-cli/pull/411)
+- Add netrc credential storage mode as `init` option via `--force-netrc`
+  [cyberark/cyberark-conjur-cli#414](https://github.com/cyberark/cyberark-conjur-cli/pull/414)
 
 ### Fixed
 - Corrected the `tar` command in the RHEL release steps.

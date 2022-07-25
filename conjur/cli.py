@@ -45,6 +45,7 @@ class Cli:
         # TODO stop using testing_env
         self.is_testing_env = str(os.getenv('TEST_ENV')).lower() == 'true'
 
+        # Assume default credential store option until we get to parse the CLI args
         self.credential_provider = CredentialStoreFactory.create_credential_store()
 
     def run(self):
@@ -72,6 +73,12 @@ class Cli:
         resource, args = self._parse_args(parser)
 
         Client.configure_logger(debug=args.debug)
+
+        # There may be a better way to do this. Currently we have to
+        # re-initialize the credential store once the CLI args become available
+        if 'force_netrc' not in args or args.force_netrc is False:
+            args.force_netrc = None
+        self.credential_provider = CredentialStoreFactory.create_credential_store(args.force_netrc)
 
         # pylint: disable=broad-except
         try:
@@ -103,7 +110,7 @@ class Cli:
         if resource in ['logout', 'init', 'login']:
             self._run_auth_flow(args, resource)
             return
-        self._perofrm_auth_if_not_login(args)
+        self._perform_auth_if_not_login(args)
         self._run_command_flow(args, resource)
 
     def _run_auth_flow(self, args, resource):
@@ -117,7 +124,8 @@ class Cli:
             cli_actions.handle_init_logic(args.url, args.name,
                                           args.authn_type, args.service_id,
                                           args.certificate, args.force,
-                                          args.ssl_verify, args.is_self_signed)
+                                          args.ssl_verify, args.is_self_signed,
+                                          args.force_netrc)
             # A successful exit is required to prevent the initialization of
             # the Client because the init command does not require the Client
             # The below message when a user explicitly requested to init
@@ -172,7 +180,7 @@ class Cli:
             sys.stdout.write("The Conjur CLI needs to be initialized before you can use it\n")
             cli_actions.handle_init_logic()
 
-    def _perofrm_auth_if_not_login(self, args):
+    def _perform_auth_if_not_login(self, args):
         self._run_init_if_not_occur()
         # If the user runs a command without logging into the CLI,
         # we request they do so before executing their request
