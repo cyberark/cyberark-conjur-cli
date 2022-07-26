@@ -22,9 +22,9 @@ from conjur.errors import ConflictingParametersException, FileNotFoundException,
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
-    PolicyController, UserController, HostController
+    PolicyController, UserController, HostController, ResourceController
 from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, VariableLogic, \
-    PolicyLogic, UserLogic
+    PolicyLogic, UserLogic, ResourceLogic
 from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
     PolicyData
 from conjur.util.ssl_utils import SSLClient
@@ -232,3 +232,21 @@ def handle_host_logic(args, client):
     host_resource_data = HostResourceData(action=args.action, host_to_update=args.id)
     host_controller = HostController(client=client, host_resource_data=host_resource_data)
     host_controller.rotate_api_key()
+
+def handle_resource_logic(args: list = None, client=None):
+    """
+    Method wraps the resource call logic
+    """
+
+    resource_logic = ResourceLogic(client)
+    if args.action == 'exists':
+        resource_controller = ResourceController(resource_logic=resource_logic,
+                                                 kind=args.kind,
+                                                 resource_id=args.identifier)
+        resource_controller.get_resource_exists()
+    elif args.action == 'permitted_roles':
+        resource_controller = ResourceController(resource_logic=resource_logic,
+                                                 kind=args.kind,
+                                                 resource_id=args.identifier,
+                                                 privilege=args.privilege)
+        resource_controller.get_resource_permitted_roles()

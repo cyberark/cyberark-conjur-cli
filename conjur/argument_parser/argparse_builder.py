@@ -17,6 +17,7 @@ from conjur.argument_parser._user_parser import UserParser
 from conjur.argument_parser._variable_parser import VariableParser
 from conjur.argument_parser._whoami_parser import WhoamiParser
 from conjur.argument_parser._hostfactory_parser import HostFactoryParser
+from conjur.argument_parser._resource_parser import ResourceParser
 
 
 # pylint: disable=line-too-long
@@ -30,7 +31,8 @@ class ArgParseBuilder(InitParser,
                       VariableParser,
                       WhoamiParser,
                       HostFactoryParser,
-                      ScreenOptionsParser):
+                      ScreenOptionsParser,
+                      ResourceParser):
     """
     This class simplifies and encapsulates the way we build the help screens.
     It uses a fluent interface pattern where each function return

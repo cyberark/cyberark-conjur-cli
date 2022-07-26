@@ -67,6 +67,7 @@ class Cli:
             .add_variable_parser() \
             .add_whoami_parser() \
             .add_hostfactory_parser() \
+            .add_resource_parser() \
             .add_main_screen_options() \
             .build()
 
@@ -174,6 +175,9 @@ class Cli:
 
         elif resource == 'hostfactory':
             cli_actions.handle_hostfactory_logic(args, client)
+
+        elif resource == 'resource':
+            cli_actions.handle_resource_logic(args, client)
 
     def _run_init_if_not_occur(self):
         if not self.is_testing_env and file_is_missing_or_empty(DEFAULT_CONFIG_FILE):
