@@ -1,5 +1,5 @@
 # ========== BUILD CONTAINER ===========
-FROM ubuntu:21.10 as conjur-cli-builder
+FROM ubuntu:20.04 as conjur-cli-builder
 
 ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,7 +37,7 @@ RUN pyinstaller --onefile pkg_bin/conjur
 
 
 # ========== MAIN CONTAINER ===========
-FROM ubuntu:21.10 as conjur-python-cli
+FROM ubuntu:20.04 as conjur-python-cli
 
 ENTRYPOINT [ "/usr/local/bin/conjur" ]
 

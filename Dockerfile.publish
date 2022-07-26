@@ -1,4 +1,4 @@
-FROM ubuntu:21.10
+FROM ubuntu:20.04
 ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
