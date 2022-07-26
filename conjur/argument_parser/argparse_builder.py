@@ -12,6 +12,7 @@ from conjur.argument_parser._logout_parser import LogoutParser
 from conjur.argument_parser._policy_parser import PolicyParser
 from conjur.argument_parser._host_parser import HostParser
 from conjur.argument_parser._list_parser import ListParser
+from conjur.argument_parser._show_parser import ShowParser
 from conjur.argument_parser._screen_options_parser import ScreenOptionsParser
 from conjur.argument_parser._user_parser import UserParser
 from conjur.argument_parser._variable_parser import VariableParser
@@ -26,6 +27,7 @@ class ArgParseBuilder(InitParser,
                       PolicyParser,
                       HostParser,
                       ListParser,
+                      ShowParser,
                       UserParser,
                       VariableParser,
                       WhoamiParser,

@@ -25,7 +25,7 @@ def integration_test(should_run_as_process=False):
         return test_wrapper_func
     return function_decorator
 
-def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None,
+def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None, show_output=None,
              policy_change_output={}, whoami_output={}, rotate_api_key_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
     def test_cli_decorator(original_function):
@@ -37,6 +37,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=No
             client_instance_mock.get_many.return_value = get_many_output
             client_instance_mock.rotate_api_key.return_value = rotate_api_key_output
             client_instance_mock.list.return_value = list_output
+            client_instance_mock.get_resource.return_value = show_output
             client_instance_mock.load_policy_file.return_value = policy_change_output
             client_instance_mock.replace_policy_file.return_value = policy_change_output
             client_instance_mock.update_policy_file.return_value = policy_change_output

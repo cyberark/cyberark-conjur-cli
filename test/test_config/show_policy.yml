@@ -1,0 +1,6 @@
+- !layer somelayer
+- !group somegroup
+- !host anotherhost
+- !user someuser
+- !variable one/password
+- !webservice somewebservice
