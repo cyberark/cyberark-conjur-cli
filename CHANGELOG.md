@@ -8,15 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [7.2.0] - 2022-07-11
 
-### Changed
-- Revert conjurrc key names to match Ruby CLI.
-  [cyberark/cyberark-conjur-cli#413](https://github.com/cyberark/cyberark-conjur-cli/pull/413)
-
 ### Added
+- Add "show" command
+  [cyberark/cyberark-conjur-cli#416](https://github.com/cyberark/cyberark-conjur-cli/pull/416)
 - Support authn-ldap
   [cyberark/cyberark-conjur-cli#411](https://github.com/cyberark/cyberark-conjur-cli/pull/411)
 - Add netrc credential storage mode as `init` option via `--force-netrc`
   [cyberark/cyberark-conjur-cli#414](https://github.com/cyberark/cyberark-conjur-cli/pull/414)
+
+### Changed
+- Revert conjurrc key names to match Ruby CLI.
+  [cyberark/cyberark-conjur-cli#413](https://github.com/cyberark/cyberark-conjur-cli/pull/413)
 
 ### Fixed
 - Corrected the `tar` command in the RHEL release steps.

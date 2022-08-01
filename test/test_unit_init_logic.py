@@ -27,7 +27,6 @@ EXPECTED_CONFIG = \
 class InitLogicTest(unittest.TestCase):
     conjurrc_data = ConjurrcData("my_url", "myorg", None)
     ssl_service = SSLClient
-    capture_stream = io.StringIO()
     init_logic = InitLogic(ssl_service)
 
     '''

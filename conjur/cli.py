@@ -61,6 +61,7 @@ class Cli:
             .add_init_parser() \
             .add_logout_parser() \
             .add_list_parser() \
+            .add_show_parser() \
             .add_host_parser() \
             .add_policy_parser() \
             .add_user_parser() \
@@ -155,6 +156,9 @@ class Cli:
         if resource == 'list':
             cli_actions.handle_list_logic(args, client)
 
+        elif resource == 'show':
+            cli_actions.handle_show_logic(args, client)
+
         elif resource == 'whoami':
             result = client.whoami()
             print(json.dumps(result, indent=4))
@@ -201,7 +205,7 @@ class Cli:
             sys.exit(0)
 
         # Check whether we are running a command with required additional arguments/options
-        if args.resource not in ['list', 'whoami', 'init', 'login', 'logout']:
+        if args.resource not in ['list', 'show', 'whoami', 'init', 'login', 'logout']:
             if 'action' not in args or not args.action:
                 parser.print_help()
                 sys.exit(0)

@@ -8,9 +8,11 @@ This module holds the common logic across the codebase
 
 # Builtins
 import http
+import json
 import logging
 import platform
 import os
+import sys
 
 # SDK
 from conjur_api.errors.errors import HttpError
@@ -139,3 +141,9 @@ def get_netrc_path_from_conjurrc(conjur_data: ConjurrcData = None) -> str:
     if hasattr(conjur_data, "netrc_path") and conjur_data.netrc_path is not None:
         return conjur_data.netrc_path
     return None
+
+def print_json_result(result):
+    """
+    Method to print the JSON of the returned result
+    """
+    sys.stdout.write(f"{json.dumps(result, indent=4)}\n")
