@@ -106,6 +106,10 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
             output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
+    @cli_test(["role", "exists", "-i", "somekind:/path/to/role"])
+    def test_cli_invokes_role_exists_correctly(self, cli_invocation, output, client):
+        client.get_role.assert_called_once_with('somekind', '/path/to/role')
+
     @cli_test(["policy"])
     def test_cli_policy_parser_doesnt_break_without_action(self, cli_invocation, output, client):
         self.assertIn("Usage:", output)

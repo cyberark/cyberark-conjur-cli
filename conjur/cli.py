@@ -66,6 +66,7 @@ class Cli:
             .add_policy_parser() \
             .add_user_parser() \
             .add_variable_parser() \
+            .add_role_parser() \
             .add_whoami_parser() \
             .add_hostfactory_parser() \
             .add_main_screen_options() \
@@ -165,6 +166,9 @@ class Cli:
 
         elif resource == 'variable':
             cli_actions.handle_variable_logic(args, client)
+
+        elif resource == 'role':
+            cli_actions.handle_role_logic(args, client)
 
         elif resource == 'policy':
             policy_data = PolicyData(action=args.action, branch=args.branch, file=args.file)

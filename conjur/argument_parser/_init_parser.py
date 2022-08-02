@@ -70,7 +70,7 @@ class InitParser:
                                   help='Optional- state if you want to work with self-signed certificate')
         init_options.add_argument('--force-netrc',
                                   action='store_true', dest='force_netrc',
-                                  help='Optional- force the CLI to use a file-based credential storage in'
+                                  help='Optional- force the CLI to use a file-based credential storage in '
                                        '$HOME/.netrc rather than OS-native keystore (for compatibility with Summon)')
         init_options.add_argument('--force',
                                   action='store_true',

@@ -46,7 +46,7 @@ class ShowParser:
         show_options = show_subparser.add_argument_group(title=title_formatter("Options"))
 
         show_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
-                                          help='Provide variable identifier',
+                                          help='Provide object identifier',
                                           required=True)
 
         show_options.add_argument('-h', '--help', action='help',
