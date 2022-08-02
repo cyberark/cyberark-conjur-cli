@@ -49,28 +49,28 @@ class RoleParser:
 
     @staticmethod
     def _add_role_exists(role_subparser: ArgparseWrapper):
-        role_get_name = 'exists - Determines whether a role exists'
-        role_get_usage = 'conjur [global options] role exists [options] [args]'
+        role_exists_name = 'exists - Determines whether a role exists'
+        role_exists_usage = 'conjur [global options] role exists [options] [args]'
 
-        role_get_subcommand_parser = role_subparser \
+        role_exists_subcommand_parser = role_subparser \
             .add_parser(name="exists",
                         help='Determines whether a role exists',
                         description=command_description(
-                            role_get_name, role_get_usage),
+                            role_exists_name, role_exists_usage),
                         epilog=command_epilog(
                             'conjur role exists -i host:hosts/myhost\t\t\t'
                             'Returns true if the host role hosts/myhost exists\n'),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
-        role_get_options = role_get_subcommand_parser.add_argument_group(
+        role_exists_options = role_exists_subcommand_parser.add_argument_group(
             title=title_formatter("Options"))
-        role_get_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
+        role_exists_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
                                           help='Provide role identifier',
                                           required=True)
-        role_get_options.add_argument('--json', dest='json_response', action='store_true',
+        role_exists_options.add_argument('--json', dest='json_response', action='store_true',
                                           help='Output a JSON response with a single field, exists')
-        role_get_options.add_argument('-h', '--help', action='help',
+        role_exists_options.add_argument('-h', '--help', action='help',
                                           help='Display help screen and exit')
 
 

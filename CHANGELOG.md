@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Add "role" command and "exists" subcommand
   [cyberark/cyberark-conjur-cli#417](https://github.com/cyberark/cyberark-conjur-cli/pull/417)
+- Add "resource" command and "exists" subcommand
+  [cyberark/cyberark-conjur-cli#418](https://github.com/cyberark/cyberark-conjur-cli/pull/418)
 - Add "show" command
   [cyberark/cyberark-conjur-cli#416](https://github.com/cyberark/cyberark-conjur-cli/pull/416)
 - Support authn-ldap

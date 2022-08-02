@@ -9,6 +9,7 @@ import io
 import os
 import shutil
 from contextlib import redirect_stderr
+import sys
 
 from conjur.constants import DEFAULT_CONFIG_FILE
 from test.util.test_infrastructure import integration_test
@@ -44,13 +45,13 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test()
     def test_list_returns_resources(self):
         output = self.invoke_cli(self.cli_auth_params, ['list'])
-        self.assertIn(f'[\n    "{self.client_params.account}:policy:root",\n'
-                      f'    "{self.client_params.account}:user:someuser",\n'
-                      f'    "{self.client_params.account}:layer:somelayer",\n'
-                      f'    "{self.client_params.account}:group:somegroup",\n'
-                      f'    "{self.client_params.account}:host:anotherhost",\n'
-                      f'    "{self.client_params.account}:variable:one/password",\n'
-                      f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)
+        self.assertIn(f'"{self.client_params.account}:policy:root"', output)
+        self.assertIn(f'"{self.client_params.account}:user:someuser"', output)
+        self.assertIn(f'"{self.client_params.account}:layer:somelayer"', output)
+        self.assertIn(f'"{self.client_params.account}:group:somegroup"', output)
+        self.assertIn(f'"{self.client_params.account}:host:anotherhost"', output)
+        self.assertIn(f'"{self.client_params.account}:variable:one/password"', output)
+        self.assertIn(f'"{self.client_params.account}:webservice:somewebservice"', output)
 
     @integration_test(True)
     def test_list_help_returns_help_screen(self):

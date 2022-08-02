@@ -6,10 +6,10 @@ RoleController module
 This module is the controller that facilitates all list actions
 required to successfully execute the ROLE command
 """
-import json
 import sys
 from conjur.logic.role_logic import RoleLogic
 from conjur.role import Role
+from conjur.util import util_functions
 
 # pylint: disable=too-few-public-methods
 class RoleController:
@@ -30,6 +30,6 @@ class RoleController:
         result = self.role_logic.role_exists(role.kind, role.identifier)
 
         if json_response:
-            sys.stdout.write(f"{json.dumps({'exists' : result}, indent=4)}\n")
+            util_functions.print_json_result({'exists' : result})
         else:
             sys.stdout.write(str(result).lower()+'\n')

@@ -132,7 +132,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         with redirect_stderr(self.capture_stream):
             output = self.invoke_cli(self.cli_auth_params,
                            ['policy', 'load', '-b', 'wrong-branch', '-f',
-                           self.environment.path_provider.get_policy_path("resource")], exit_code=1)
+                           self.environment.path_provider.get_policy_path("user_host")], exit_code=1)
         self.assertIn("{\"error\":{\"code\":\"not_found\",\"message\":", output,
                         "Could not find detailed error in the output. "
                         "Expected to find:"

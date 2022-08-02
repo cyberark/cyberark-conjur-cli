@@ -62,6 +62,7 @@ class Cli:
             .add_logout_parser() \
             .add_list_parser() \
             .add_show_parser() \
+            .add_resource_parser() \
             .add_host_parser() \
             .add_policy_parser() \
             .add_user_parser() \
@@ -159,6 +160,9 @@ class Cli:
 
         elif resource == 'show':
             cli_actions.handle_show_logic(args, client)
+
+        elif resource == 'resource':
+            cli_actions.handle_resource_logic(args, client)
 
         elif resource == 'whoami':
             result = client.whoami()

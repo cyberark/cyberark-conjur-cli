@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch
 
 from conjur_api import Client
-from conjur.data_object import ConjurrcData
 from conjur.logic.credential_provider.file_credentials_provider import FileCredentialsProvider
 from conjur.logic.show_logic import ShowLogic
 

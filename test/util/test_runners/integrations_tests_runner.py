@@ -48,7 +48,10 @@ from test.test_integration_credentials_keyring import CliIntegrationTestCredenti
 from test.list_resources.test_integration_list import CliIntegrationTestList
 from test.test_integration_credentials_netrc import CliIntegrationTestCredentialsNetrc
 from test.test_integration_oss import CliIntegrationTestOSS
-from test.test_integration_resource import CliIntegrationResourceTest
+from test.test_integration_user_host import CliIntegrationUserHostTest
+from test.test_integration_role import CliIntegrationTestRole
+from test.test_integration_show import CliIntegrationTestShow
+from test.test_integration_resource import CliIntegrationTestResource
 from test.util.test_runners.integration_test_case import IntegrationTestCaseBase
 from test.util.test_runners.test_runner_args import TestRunnerArgs
 from test.util.test_runners.params import ClientParams, TestEnvironmentParams
@@ -66,10 +69,13 @@ def main():
         CliIntegrationTestCredentialsNetrc,
         CliIntegrationTestConfigurations,
         CliIntegrationTestVariable,
-        CliIntegrationResourceTest,
+        CliIntegrationUserHostTest,
         CliIntegrationTestList,
         CliIntegrationTestHostFactoryToken,
         CliIntegrationTestHostFactoryHost,
+        CliIntegrationTestRole,
+        CliIntegrationTestShow,
+        CliIntegrationTestResource,
         CliIntegrationPolicy
     ]
     if args.run_oss_tests:
