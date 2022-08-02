@@ -17,7 +17,7 @@ class Resource:
     @classmethod
     def from_full_id(cls, full_id: str):
         """
-        Factory method for
+        Factory method for creating a Resource object from a full ID.
         """
         id_parts = full_id.split(':', 2)
         if len(id_parts) == 3:

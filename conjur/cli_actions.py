@@ -23,9 +23,9 @@ from conjur.errors import ConflictingParametersException, FileNotFoundException,
 from conjur.logic.hostfactory_logic import HostFactoryLogic
 from conjur.controller import InitController, LoginController, \
     LogoutController, ListController, VariableController, \
-    PolicyController, UserController, HostController
+    PolicyController, UserController, HostController, RoleController
 from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, VariableLogic, \
-    PolicyLogic, UserLogic
+    PolicyLogic, UserLogic, RoleLogic
 from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
     PolicyData
 from conjur.logic.show_logic import ShowLogic
@@ -200,6 +200,25 @@ def handle_variable_logic(args: list = None, client=None):
         variable_controller = VariableController(variable_logic=variable_logic,
                                                  variable_data=variable_data)
         variable_controller.set_variable()
+
+
+def handle_role_logic(args: list = None, client=None):
+    """
+    Method wraps the role call logic
+    """
+    role_logic = RoleLogic(client)
+    role_controller = RoleController(role_logic=role_logic)
+
+    if args.action == 'exists':
+        role_controller.role_exists(identifier=args.identifier,
+                                    json_response=args.json_response)
+    elif args.action == 'members':
+        #TODO: implement
+        pass
+    elif args.action == 'memberships':
+        #TODO: implement
+        pass
+
 
 
 def handle_policy_logic(policy_data: PolicyData = None, client=None):
