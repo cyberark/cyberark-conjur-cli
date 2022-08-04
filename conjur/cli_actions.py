@@ -16,6 +16,7 @@ from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData
 # Internal
 # pylint: disable=too-many-arguments
 from conjur.controller.hostfactory_controller import HostFactoryController
+from conjur.controller.resource_controller import ResourceController
 from conjur.controller.show_controller import ShowController
 
 from conjur.errors import ConflictingParametersException, FileNotFoundException, \
@@ -28,6 +29,7 @@ from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, Variable
     PolicyLogic, UserLogic, RoleLogic
 from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
     PolicyData
+from conjur.logic.resource_logic import ResourceLogic
 from conjur.logic.show_logic import ShowLogic
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
@@ -154,6 +156,17 @@ def handle_show_logic(args: list = None, client=None):
     show_logic = ShowLogic(client)
     show_controller = ShowController(show_logic=show_logic)
     show_controller.load(args.identifier)
+
+def handle_resource_logic(args: list = None, client=None):
+    """
+    Method wraps the resource call logic
+    """
+    resource_logic = ResourceLogic(client)
+    resource_controller = ResourceController(resource_logic=resource_logic)
+
+    if args.action == 'exists':
+        resource_controller.exists(resource_id=args.identifier,
+                                   json_response=args.json_response)
 
 
 def handle_hostfactory_logic(args: list = None, client=None):

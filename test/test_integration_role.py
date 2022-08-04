@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-CLI Show Integration tests
+CLI Role Integration tests
 This test file handles the main test flows for the role command
 """
 from contextlib import redirect_stderr
@@ -17,11 +17,11 @@ from test.util import test_helpers as utils
 
 # Not coverage tested since integration tests don't run in
 # the same build step
-class CliIntegrationTestShow(IntegrationTestCaseBase):  # pragma: no cover
+class CliIntegrationTestRole(IntegrationTestCaseBase):  # pragma: no cover
     capture_stream = io.StringIO()
 
     def __init__(self, testname, client_params=None, environment_params=None):
-        super(CliIntegrationTestShow, self).__init__(testname, client_params, environment_params)
+        super(CliIntegrationTestRole, self).__init__(testname, client_params, environment_params)
 
     # *************** HELPERS ***************
 

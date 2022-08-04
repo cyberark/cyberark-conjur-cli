@@ -201,6 +201,10 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_show_outputs_formatted_json(self, cli_invocation, output, client):
         self.assertEquals('{\n    "foo": "A",\n    "bar": "B"\n}\n', output)
 
+    @cli_test(["resource", "exists", "-i", "kind:/path/to/var"])
+    def test_cli_invokes_resource_exists_correctly(self, cli_invocation, output, client):
+        client.resource_exists.assert_called_once_with('kind', '/path/to/var')
+
     @cli_test(["user"])
     def test_cli_user_retuns_main_help(self, cli_invocation, output, client):
         self.assertIn("Usage:\n", output)
