@@ -18,6 +18,7 @@ from conjur_api.models import CreateHostData, CreateTokenData, ListMembersOfData
 from conjur.controller.hostfactory_controller import HostFactoryController
 from conjur.controller.resource_controller import ResourceController
 from conjur.controller.show_controller import ShowController
+from conjur.controller.check_controller import CheckController
 
 from conjur.errors import ConflictingParametersException, FileNotFoundException, \
     InvalidFilePermissionsException, MissingRequiredParameterException
@@ -30,6 +31,7 @@ from conjur.logic import InitLogic, LoginLogic, LogoutLogic, ListLogic, Variable
 from conjur.data_object import ConjurrcData, UserInputData, HostResourceData, ListData, VariableData, \
     PolicyData
 from conjur.logic.resource_logic import ResourceLogic
+from conjur.logic.check_logic import CheckLogic
 from conjur.logic.show_logic import ShowLogic
 from conjur.util.ssl_utils import SSLClient
 from conjur.util import init_utils, util_functions
@@ -148,6 +150,13 @@ def handle_list_logic(args: list = None, client=None):
                              offset=args.offset, role=args.role)
         list_controller.load(list_data)
 
+def handle_check_logic(args: list = None, client=None):
+    """
+    Method wraps the check call logic
+    """
+    check_logic = CheckLogic(client)
+    check_controller = CheckController(check_logic=check_logic)
+    check_controller.check(args.identifier, args.privilege, args.role)
 
 def handle_show_logic(args: list = None, client=None):
     """

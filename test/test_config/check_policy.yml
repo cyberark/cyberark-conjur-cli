@@ -1,0 +1,42 @@
+# create roles
+- !user unprivileged_nonadmin_user
+- !user privileged_nonadmin_user
+
+- !user permitted_user
+- !host permitted_host
+- !layer permitted_layer
+
+- !user non_permitted_user
+- !host non_permitted_host
+- !layer non_permitted_layer
+
+- !group permitted_group
+- !group non_permitted_group
+
+# add permitted user, host, and layer to permitted_group
+- !grant
+  role: !group permitted_group
+  member:
+  - !user permitted_user
+  - !host permitted_host
+  - !layer permitted_layer
+  - !user privileged_nonadmin_user
+
+# add non permitted user, host, and layer to non permitted_group
+- !grant
+  role: !group non_permitted_group
+  member:
+  - !user non_permitted_user
+  - !host non_permitted_host
+  - !layer non_permitted_layer
+
+# add resources
+- !policy somepolicy
+- !variable somevariable
+- !webservice somewebservice
+
+# allow permitted_group read access on the resource
+- !permit
+  role: !group permitted_group
+  privileges: [ read ]
+  resource: !variable somevariable
