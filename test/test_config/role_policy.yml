@@ -1,0 +1,17 @@
+- !layer somelayer
+- !group somegroup
+- !group someothergroup
+- !host anotherhost
+- !user someuser
+- !variable one/password
+- !webservice somewebservice
+
+- !grant
+  role: !group somegroup
+  member:
+  - !user someuser
+
+- !grant
+  role: !group someothergroup
+  member:
+  - !group somegroup

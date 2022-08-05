@@ -30,9 +30,9 @@ class CliIntegrationTestRole(IntegrationTestCaseBase):  # pragma: no cover
         # Used to configure the CLI and login to run tests
         utils.setup_cli(self)
         return self.invoke_cli(self.cli_auth_params,
-                               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("list")])
+                               ['policy', 'replace', '-b', 'root', '-f', self.environment.path_provider.get_policy_path("role")])
 
-    # *************** TESTS ***************
+    # *************** EXISTS SUBCOMMAND TESTS ***************
 
     @integration_test()
     def test_role_exists_insecure_prints_warning_in_log(self):
@@ -128,6 +128,105 @@ class CliIntegrationTestRole(IntegrationTestCaseBase):  # pragma: no cover
                                  ['role', 'exists', '-i', 'policy:root'])
         self.assertIn('true', output)
 
+
+    # *************** MEMBERSHIPS SUBCOMMAND TESTS ***************
+
+    @integration_test()
+    def test_role_memberships_insecure_prints_warning_in_log(self):
+        with self.assertLogs('', level='DEBUG') as mock_log:
+            self.invoke_cli(self.cli_auth_params,
+                                     ['--insecure', 'role', 'memberships', '-i', 'user:someuser'])
+            self.assertIn("Warning: Running the command with '--insecure' makes your system vulnerable to security attacks",
+                          str(mock_log.output))
+
+    @integration_test(True)
+    def test_role_memberships_short_with_help_returns_role_memberships_help(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-h'])
+        self.assertIn("Name:\n  memberships", output)
+
+    @integration_test(True)
+    def test_role_memberships_long_with_help_returns_role_memberships_help(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '--help'])
+        self.assertIn("Name:\n  memberships", output)
+
+    @integration_test()
+    def test_role_memberships_without_id_returns_help(self):
+        with redirect_stderr(self.capture_stream):
+            self.invoke_cli(self.cli_auth_params,
+                            ['role', 'memberships'], exit_code=1)
+        self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
+
+    @integration_test()
+    def test_role_memberships_without_prefix_returns_help(self):
+        with redirect_stderr(self.capture_stream):
+            self.invoke_cli(self.cli_auth_params,
+                            ['role', 'memberships', '-i', 'someuser'], exit_code=1)
+        self.assertIn("Error the following arguments are required:", self.capture_stream.getvalue())
+
+    @integration_test(True)
+    def test_role_memberships_long_role_id_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '--id=user:someuser'])
+        self.assertIn('user:someuser', output)
+
+    @integration_test(True)
+    def test_role_memberships_short_options_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'user:someuser'])
+        self.assertIn('user:someuser', output)
+
+    @integration_test(True)
+    def test_role_memberships_host_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'host:anotherhost'])
+        self.assertIn('host:anotherhost', output)
+
+    @integration_test(True)
+    def test_role_memberships_layer_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'layer:somelayer'])
+        self.assertIn('layer:somelayer', output)
+
+    @integration_test(True)
+    def test_role_memberships_group_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'group:somegroup'])
+        self.assertIn('group:somegroup', output)
+
+    @integration_test(True)
+    def test_role_memberships_policy_returns_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'policy:root'])
+        self.assertIn('policy:root', output)
+
+    @integration_test(True)
+    def test_role_memberships_recursive_returns_correct_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'user:someuser'])
+        self.assertIn('group:somegroup', output)
+        self.assertIn('group:someothergroup', output)
+
+    @integration_test(True)
+    def test_role_memberships_direct_short_option_returns_correct_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'user:someuser', '-d'])
+        self.assertIn('group:somegroup', output)
+        self.assertNotIn('group:someothergroup', output)
+
+    @integration_test(True)
+    def test_role_memberships_direct_long_option_returns_correct_result(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'user:someuser', '--direct'])
+        self.assertIn('group:somegroup', output)
+        self.assertNotIn('group:someothergroup', output)
+
+    @integration_test(True)
+    def test_role_memberships_raises_not_found_error(self):
+        output = self.invoke_cli(self.cli_auth_params,
+                                 ['role', 'memberships', '-i', 'user:fakeuser'], exit_code=1)
+        self.assertIn("404 (Not Found) for url:", output)
 
     '''
     Validates that when the user isn't logged in and makes a request,

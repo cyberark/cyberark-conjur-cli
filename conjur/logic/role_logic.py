@@ -40,3 +40,12 @@ class RoleLogic:
             raise err
 
         return role_value is not None
+
+    # pylint: disable=logging-fstring-interpolation
+    def role_memberships(self, kind: str, role_id: str, direct: bool = False) -> bool:
+        """
+        Method to handle role memberships action
+        """
+        logging.debug(role_id)
+
+        return self.client.role_memberships(kind, role_id, direct)
