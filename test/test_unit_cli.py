@@ -108,7 +108,7 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
 
     @cli_test(["role", "exists", "-i", "somekind:/path/to/role"])
     def test_cli_invokes_role_exists_correctly(self, cli_invocation, output, client):
-        client.get_role.assert_called_once_with('somekind', '/path/to/role')
+        client.role_exists.assert_called_once_with('somekind', '/path/to/role')
 
     @cli_test(["role", "memberships", "-i", "somekind:/path/to/role", "-d"], memberships_output=['abc', 'def'])
     def test_cli_invokes_role_memberships_correctly(self, cli_invocation, output, client):

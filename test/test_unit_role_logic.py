@@ -6,8 +6,6 @@ from conjur_api import Client
 from conjur.logic.role_logic import RoleLogic
 from conjur_api.errors.errors import HttpStatusError
 
-MockRole = {'created_at': None, 'id': 'default:somekind:someapp', 'policy': 'default:policy:test', 
-            'members': []}
 MockMemberships = ['default:policy:test', 'default:group:somegroup']
 
 class RoleLogicTest(unittest.TestCase):
@@ -19,6 +17,12 @@ class RoleLogicTest(unittest.TestCase):
         role_logic = RoleLogic(mock_client)
         self.assertEquals(role_logic.client, mock_client)
 
+    
+    @patch('conjur_api.Client.role_exists')
+    def test_role_exists_calls_client(self, mock_role_exists):
+        self.role_logic.role_exists('some_kind', 'some_id')
+        mock_role_exists.assert_called_once_with('some_kind', 'some_id')
+
     '''
     Raises exception when the request is missing a required parameter
     '''
@@ -27,24 +31,17 @@ class RoleLogicTest(unittest.TestCase):
             self.role_logic.role_exists('somekind')
 
     '''
-    Returns true when the API returns an existing role
+    Returns true when the API returns true
     '''
     def test_role_exists_response(self):
-        self.client.get_role = MagicMock(return_value=MockRole)
+        self.client.role_exists = MagicMock(return_value=True)
         self.assertEqual(self.role_logic.role_exists('somekind', 'someapp'), True)
 
     '''
-    Returns false when the API returns a 404 not found error
-    '''
-    def test_role_exists_response_role_not_found(self):
-        self.role_logic.client.get_role = MagicMock(side_effect=HttpStatusError(status=404, message="Not Found"))
-        self.assertEqual(self.role_logic.role_exists('somekind', 'someapp'), False)
-
-    '''
-    Raises exception when another error besides 404 occurs
+    Raises exception when the API returns an error
     '''
     def test_role_exists_raises_exception_other_http_error(self):
-        self.role_logic.client.get_role = MagicMock(side_effect=HttpStatusError(status=500, message="Server Error"))
+        self.role_logic.client.role_exists = MagicMock(side_effect=HttpStatusError(status=500, message="Server Error"))
         with self.assertRaises(HttpStatusError):
             self.role_logic.role_exists('somekind', 'someapp')
 

@@ -9,8 +9,6 @@ This module is the business logic for executing the ROLE command
 # Builtins
 import logging
 
-from conjur_api.errors.errors import HttpStatusError
-
 # pylint: disable=too-few-public-methods
 class RoleLogic:
     """
@@ -30,16 +28,7 @@ class RoleLogic:
         """
         logging.debug(role_id)
 
-        role_value = None
-
-        try:
-            role_value = self.client.get_role(kind, role_id)
-        except HttpStatusError as err:
-            if '404' in str(err):
-                return False
-            raise err
-
-        return role_value is not None
+        return self.client.role_exists(kind, role_id)
 
     # pylint: disable=logging-fstring-interpolation
     def role_memberships(self, kind: str, role_id: str, direct: bool = False) -> bool:
