@@ -26,7 +26,7 @@ def integration_test(should_run_as_process=False):
     return function_decorator
 
 def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=None, list_output=None, show_output=None,
-             policy_change_output={}, whoami_output={}, rotate_api_key_output={}):
+             memberships_output=None, policy_change_output={}, whoami_output={}, rotate_api_key_output={}):
     cli_command = 'cli {}'.format(' '.join(cli_args))
     def test_cli_decorator(original_function):
         @wraps(original_function)
@@ -42,6 +42,7 @@ def cli_test(cli_args=[], integration=False, get_many_output=None, get_output=No
             client_instance_mock.replace_policy_file.return_value = policy_change_output
             client_instance_mock.update_policy_file.return_value = policy_change_output
             client_instance_mock.whoami.return_value = whoami_output
+            client_instance_mock.role_memberships.return_value = memberships_output
             with self.assertRaises(SystemExit) as sys_exit:
                 with redirect_stdout(capture_stream):
                     with patch.object(sys, 'argv', ["cli"] + cli_args), \

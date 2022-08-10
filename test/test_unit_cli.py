@@ -110,6 +110,10 @@ Copyright (c) {time.strftime("%Y")} CyberArk Software Ltd. All rights reserved.
     def test_cli_invokes_role_exists_correctly(self, cli_invocation, output, client):
         client.get_role.assert_called_once_with('somekind', '/path/to/role')
 
+    @cli_test(["role", "memberships", "-i", "somekind:/path/to/role", "-d"], memberships_output=['abc', 'def'])
+    def test_cli_invokes_role_memberships_correctly(self, cli_invocation, output, client):
+        client.role_memberships.assert_called_once_with('somekind', '/path/to/role', True)
+
     @cli_test(["policy"])
     def test_cli_policy_parser_doesnt_break_without_action(self, cli_invocation, output, client):
         self.assertIn("Usage:", output)

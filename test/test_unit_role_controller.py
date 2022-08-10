@@ -14,3 +14,11 @@ class RoleControllerTest(unittest.TestCase):
 
         with self.assertRaises(conjur.errors.MissingRequiredParameterException):
             mock_role_controller.role_exists("resource_id") # missing kind (kind:resource_id)
+
+    def test_role_memberships_resource_id_without_kind_raises_missing_required_parameter_exception(self):
+        client = Client
+        mock_role_logic = RoleLogic(client)
+        mock_role_controller = RoleController(mock_role_logic)
+
+        with self.assertRaises(conjur.errors.MissingRequiredParameterException):
+            mock_role_controller.role_memberships("resource_id") # missing kind (kind:resource_id)

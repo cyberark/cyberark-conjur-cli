@@ -225,13 +225,9 @@ def handle_role_logic(args: list = None, client=None):
     if args.action == 'exists':
         role_controller.role_exists(identifier=args.identifier,
                                     json_response=args.json_response)
-    elif args.action == 'members':
-        #TODO: implement
-        pass
     elif args.action == 'memberships':
-        #TODO: implement
-        pass
-
+        role_controller.role_memberships(identifier=args.identifier,
+                                         direct=args.direct)
 
 
 def handle_policy_logic(policy_data: PolicyData = None, client=None):

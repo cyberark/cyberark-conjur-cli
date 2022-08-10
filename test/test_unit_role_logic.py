@@ -8,6 +8,7 @@ from conjur_api.errors.errors import HttpStatusError
 
 MockRole = {'created_at': None, 'id': 'default:somekind:someapp', 'policy': 'default:policy:test', 
             'members': []}
+MockMemberships = ['default:policy:test', 'default:group:somegroup']
 
 class RoleLogicTest(unittest.TestCase):
     client = Client
@@ -21,7 +22,7 @@ class RoleLogicTest(unittest.TestCase):
     '''
     Raises exception when the request is missing a required parameter
     '''
-    def test_get_role_missing_parameter_raises_exception(self):
+    def test_role_exists_missing_parameter_raises_exception(self):
         with self.assertRaises(TypeError):
             self.role_logic.role_exists('somekind')
 
@@ -46,3 +47,25 @@ class RoleLogicTest(unittest.TestCase):
         self.role_logic.client.get_role = MagicMock(side_effect=HttpStatusError(status=500, message="Server Error"))
         with self.assertRaises(HttpStatusError):
             self.role_logic.role_exists('somekind', 'someapp')
+
+    '''
+    Raises exception when the request is missing a required parameter
+    '''
+    def test_role_memberships_missing_parameter_raises_exception(self):
+        with self.assertRaises(TypeError):
+            self.role_logic.role_memberships('somekind')
+
+    '''
+    Returns list of memberships from the API call
+    '''
+    def test_role_memberships_response(self):
+        self.client.role_memberships = MagicMock(return_value=MockMemberships)
+        self.assertEqual(self.role_logic.role_memberships('somekind', 'someuser'), MockMemberships)
+
+    '''
+    Raises exception when API error occurs
+    '''
+    def test_role_memberships_raises_exception_http_error(self):
+        self.role_logic.client.role_memberships = MagicMock(side_effect=HttpStatusError(status=404, message="Not found"))
+        with self.assertRaises(HttpStatusError):
+            self.role_logic.role_memberships('somekind', 'someapp')

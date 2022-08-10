@@ -24,6 +24,7 @@ class RoleParser:
         role_subparser = role_parser.add_subparsers(title="Subcommand", dest='action')
 
         self._add_role_exists(role_subparser)
+        self._add_role_memberships(role_subparser)
         self._add_role_options(role_parser)
 
         return self
@@ -41,7 +42,7 @@ class RoleParser:
                             'conjur role exists -i host:hosts/myhost\t\t\t'
                             'Returns true if the host role hosts/myhost exists\n',
                             command='role',
-                            subcommands=['exists']),
+                            subcommands=['exists', 'memberships']),
                         usage=argparse.SUPPRESS,
                         add_help=False,
                         formatter_class=formatter)
@@ -73,6 +74,32 @@ class RoleParser:
         role_exists_options.add_argument('-h', '--help', action='help',
                                           help='Display help screen and exit')
 
+    @staticmethod
+    def _add_role_memberships(role_subparser: ArgparseWrapper):
+        role_get_name = 'memberships - Lists role memberships. The role membership list is' \
+                        'recursively expanded by default'
+        role_get_usage = 'conjur [global options] role memberships [options] [args]'
+
+        role_get_subcommand_parser = role_subparser \
+            .add_parser(name="memberships",
+                        help='Lists role memberships. The role membership list is recursively expanded by default',
+                        description=command_description(
+                            role_get_name, role_get_usage),
+                        epilog=command_epilog(
+                            'conjur role memberships -i host:hosts/myhost\t\t\t'
+                            'Shows roles which hosts/myhost belongs to\n'),
+                        usage=argparse.SUPPRESS,
+                        add_help=False,
+                        formatter_class=formatter)
+        role_get_options = role_get_subcommand_parser.add_argument_group(
+            title=title_formatter("Options"))
+        role_get_options.add_argument('-i', '--id', dest='identifier', metavar='VALUE',
+                                          help='Provide role identifier',
+                                          required=True)
+        role_get_options.add_argument('-d', '--direct', dest='direct', action='store_true',
+                                          help='Whether to show direct memberships only')
+        role_get_options.add_argument('-h', '--help', action='help',
+                                          help='Display help screen and exit')
 
     @staticmethod
     def _add_role_options(role_parser: ArgparseWrapper):
