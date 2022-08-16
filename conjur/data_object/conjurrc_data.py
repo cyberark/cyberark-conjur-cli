@@ -71,19 +71,22 @@ class ConjurrcData:
         details needed to create a connection to Conjur
         """
         with open(dest, 'w') as config_fp:
-            data = {
-                'appliance_url': self.conjur_url,
-                'account': self.conjur_account,
-                'cert_file': self.cert_file,
-                'authn_type': str(self.authn_type),
-                'service_id': self.service_id,
-                'netrc_path': self.netrc_path
-            }
+            data = {key: str(val)
+                    for key, val in self.__getstate__().items() if val is not None}
             out = f"---\n{yaml_dump(data)}"
             config_fp.write(out)
 
     def __repr__(self) -> str:
         return f"{self.__dict__}"
+
+    def __getstate__(self) -> dict:
+        state = self.__dict__.copy()
+        state['appliance_url'] = state['conjur_url']
+        del state['conjur_url']
+        state['account'] = state['conjur_account']
+        del state['conjur_account']
+        state['authn_type'] = str(state['authn_type'])
+        return state
 
     def get_client_connection_info(self) -> ConjurConnectionInfo:
         """
