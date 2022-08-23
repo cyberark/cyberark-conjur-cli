@@ -45,7 +45,7 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
     # *************** INIT CONFIGURATION TESTS ***************
 
     '''
-    Validates that the conjurrc cert_file entry is blank when run in --insecure mode
+    Validates that the conjurrc cert_file entry is null when run in --insecure mode
     '''
 
     @integration_test(True)
@@ -56,7 +56,21 @@ class CliIntegrationTestConfigurations(IntegrationTestCaseBase):
                         ['--insecure', 'init', '--url', self.client_params.hostname, '--account',
                          'someaccount'])
 
-        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, '')
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, None)
+
+    '''
+    Validates that the conjurrc cert_file entry is null when no cert-related flag is provided
+    '''
+
+    @integration_test(True)
+    @patch('builtins.input', return_value='yes')
+    def test_https_conjurrc_no_cert_provided_leaves_cert_file_empty(self, mock_input):
+        self.setup_cli_params({})
+        self.invoke_cli(self.cli_auth_params,
+                        ['init', '--url', self.client_params.hostname, '--account',
+                         'someaccount'])
+
+        utils.verify_conjurrc_contents('someaccount', self.client_params.hostname, None)
 
     '''
     Validates that cli can't run with insecure + --ca-cert
