@@ -65,7 +65,10 @@ def verify_conjurrc_contents(account, hostname, cert, authn_type='authn', servic
         assert f"account: {account}" in lines[1], lines[1]
         assert f"appliance_url: {hostname}" in lines[2], lines[2]
         assert f"authn_type: {authn_type}" in lines[3], lines[3]
-        assert f"cert_file: {cert}" in lines[4], lines[4]
+        if cert:
+            assert f"cert_file: {cert}" in lines[4], lines[4]
+        else:
+            assert "cert_file: null"
         if netrc_path:
             assert f"netrc_path: {netrc_path}" in lines[5], lines[5]
         if service_id:

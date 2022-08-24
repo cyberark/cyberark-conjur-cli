@@ -79,7 +79,7 @@ class InitController:
             fetched_certificate = self._get_server_certificate(formatted_conjur_url)
             self._write_certificate(fetched_certificate)
         elif mode in [SslVerificationMode.INSECURE, SslVerificationMode.TRUST_STORE]:
-            self.conjurrc_data.cert_file = ""
+            self.conjurrc_data.cert_file = None
 
     def _prompt_for_conjur_url(self):
         """
