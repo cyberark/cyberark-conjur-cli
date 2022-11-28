@@ -33,8 +33,8 @@
 |------|:-------:|
 | [Conjur Docs: OIDC Authentication](https://docs.conjur.org/Latest/en/Content/OIDC/OIDC.htm) | No |
 | [Solution Design: Authn-LDAP Support in CLI](authn-ldap.md) | No |
-| [MFA for Conjur UI - Architecture](https://ca-il-confluence.il.cyber-ark.com/display/rndp/MFA+for+Conjur+UI+-+Architecture) | Yes |
-| [MFA Customer Documentation Changes](https://ca-il-confluence.il.cyber-ark.com/display/rndp/MFA+Customer+Documentation+Changes+-+Dev+Content) | Yes |
+| Confluence: MFA for Conjur UI - Architecture | Yes |
+| Confluence: MFA Customer Documentation Changes - Dev Content | Yes |
 
 ## Overview
 
@@ -198,16 +198,16 @@ Auditing will happen on the Conjur server. No changes are needed in the CLI or A
 
 | Description | Jira Story | Estimated<br />Story<br />Points<br /> | Completed |
 |-------------|------------|-----------|-----------|
-| Support `--authn-type oidc` in `conjur init` command | [ONYX-25481](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25481) | 1 | |
-| Set up Okta dev environment | [ONYX-25482](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25482) | 2 | |
-| Implement `OidcAuthenticationStrategy` in API | [ONYX-25484](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25484) | 5 | |
-| Support `OidcAuthenticationStrategy` in CLI | [ONYX-25485](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25485) | 3 | |
-| Security review + hardening: Ad-hoc HTTP server | [ONYX-25486](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25486) | 2 | |
-| Security review + hardening: JWT handling & validation | [ONYX-25487](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25487) | 3 | |
-| Integration tests for OIDC in CLI | [ONYX-25489](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25489) | 5 | |
-| [Spike] Support running CLI in Docker | [ONYX-25490](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25490) | 1 | |
-| Assist TW to update docs | [ONYX-25491](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25491) | 1 | |
-| Security review: Full implementation | [ONYX-25492](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-25492) | 1 | |
+| Support `--authn-type oidc` in `conjur init` command | ONYX-25481 | 1 | |
+| Set up Okta dev environment | ONYX-25482 | 2 | |
+| Implement `OidcAuthenticationStrategy` in API | ONYX-25484 | 5 | |
+| Support `OidcAuthenticationStrategy` in CLI | ONYX-25485 | 3 | |
+| Security review + hardening: Ad-hoc HTTP server | ONYX-25486 | 2 | |
+| Security review + hardening: JWT handling & validation | ONYX-25487 | 3 | |
+| Integration tests for OIDC in CLI | ONYX-25489 | 5 | |
+| [Spike] Support running CLI in Docker | ONYX-25490 | 1 | |
+| Assist TW to update docs | ONYX-25491 | 1 | |
+| Security review: Full implementation | ONYX-25492 | 1 | |
 
 ## Solution Review
 
