@@ -168,12 +168,12 @@ No changes to Conjur audit behavior are required for this feature.
 
 | Description | Jira Story | Estimated<br />Story<br />Points<br /> | Completed |
 |-------------|------------|-----------|-----------|
-| Abstract authentication flow into new interface |[ONYX-20429](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20429)|4||
-| API support for LDAP authentication |[ONYX-20430](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20430)|2||
-| CLI support for LDAP |[ONYX-20431](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20431)|3||
-| Security review for LDAP auth support |[ONYX-20432](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20432)|1||
-| Update API readme for new authentication flow |[ONYX-20433](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20433)|1||
-| Work with TW to update CLI docs for LDAP support |[ONYX-20434](https://ca-il-jira.il.cyber-ark.com:8443/browse/ONYX-20434)|2||
+| Abstract authentication flow into new interface |ONYX-20429|4||
+| API support for LDAP authentication |ONYX-20430|2||
+| CLI support for LDAP |ONYX-20431|3||
+| Security review for LDAP auth support |ONYX-20432|1||
+| Update API readme for new authentication flow |ONYX-20433|1||
+| Work with TW to update CLI docs for LDAP support |ONYX-20434|2||
 
 ## Solution Review
 

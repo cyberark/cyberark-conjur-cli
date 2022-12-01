@@ -86,4 +86,4 @@ class CliIntegrationTestHostFactoryHost(CliIntegrationTestHostFactory):  # pragm
                f'"created_at": ".*",\n    ' \
                f'"id": "{self.client_params.account}:host:{host}",\n    ' \
                f'"owner": "{FULLY_QUALIFIED_HOST_FACTORY_ID.format(self.client_params.account)}",\n    ' \
-               '"permissions": \[\],\n    "restricted_to": \[\]\n}\n'
+               '"permissions": \[\],\n    '

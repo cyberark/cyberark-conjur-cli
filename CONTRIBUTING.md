@@ -352,7 +352,7 @@ For all OS types perform the following:
 
 1. Run `pyinstaller -D ./pkg_bin/conjur`. Once this is run, a `dist` folder will be created with the executable in it.
   _(Note: If you installed Python with pyenv you may need to reinstall it with `env PYTHON_CONFIGURE_OPTS="--enable-framework" pyenv install 3.10.4` before running this command.)_
-1. Follow the [internal instructions](https://ca-il-confluence.il.cyber-ark.com/display/rndp/Signing+macOS+executables) on how to build the DMG and how to sign and notarize the CLI.
+1. Follow the internal instructions (Confluence - Signing macOS executables) on how to build the DMG and how to sign and notarize the CLI.
 1. Add the conjurcli.dmg as an asset in the release page.
 
 NOTE that the macOS executable is packed as a directory instead of a file for performance purposes.
