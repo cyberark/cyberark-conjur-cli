@@ -2,7 +2,7 @@
 nose2>=0.9.2
 nose2[coverage_plugin]>=0.6.5
 pylint>=2.6.0
-cryptography~=3.3.2
+cryptography~=38.0.3
 keyring>=23.0.0
 pyopenssl>=20.0.0
 PyInstaller>=4.0
