@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Removed
 - `SDK` with all it contents was removed and is now maintained in the https://github.com/cyberark/conjur-api-python repository
 
+### Security
+- Upgraded python cryptography module to v39.0.1 to resolve CVE-2023-0286 and CVE-2023-23931.
+  Upgraded pyopenssl to 23.0.0 at the same time. 
+  [cyberark/cyberark-conjur-cli#427](https://github.com/cyberark/cyberark-conjur-cli/pull/427)
+
 ## [7.1.0] - 2021-12-22
 
 ### Added
