@@ -7,9 +7,9 @@ the full text of the license associated with each component.
 
 
 Section 1: Apache-2.0
->>> github.com/pyca/cryptography - 3.3.2
+>>> github.com/pyca/cryptography - 39.0.1
 >>> github.com/psf/requests - 2.25.0
->>> github.com/pyca/pyopenssl - 20.0.0
+>>> github.com/pyca/pyopenssl - 23.0.0
 >>> github.com/pypa/twine - 3.2.0
 
 Section 2: BSD 3-Clause
@@ -36,7 +36,7 @@ APPENDIX: Standard License Files and Templates
 
 Apache-2.0 License is applicable to the following component(s).
 
->>> github.com/pyca/cryptography - 3.3.2
+>>> github.com/pyca/cryptography - 39.0.1
 
 Copyright 2013-2021 Individual Contributors
 
@@ -68,7 +68,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
->>> github.com/pyca/pyopenssl - 20.0.0
+>>> github.com/pyca/pyopenssl - 23.0.0
 
 Copyright 2001 The pyOpenSSL developers
 

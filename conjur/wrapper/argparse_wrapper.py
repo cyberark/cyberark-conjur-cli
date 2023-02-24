@@ -51,7 +51,7 @@ class ArgparseWrapper(argparse.ArgumentParser):
 
         resource = args.resource if args else None
         if arg_flags:
-            err_msg = (self.ARG_ERROR_FORMAT % ' '.join(arg_flags))
+            err_msg = self.ARG_ERROR_FORMAT % ' '.join(arg_flags)
             if not resource:
                 self.error(err_msg)
 
