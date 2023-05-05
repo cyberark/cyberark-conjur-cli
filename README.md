@@ -53,6 +53,15 @@ our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer
 For more information on how to set up, configure, and start using the Conjur CLI, see
 our [official documentation](https://docs.conjur.org/Latest/en/Content/Developer/CLI/cli-lp.htm).
 
+## Security
+
+When using this CLI on Windows machines, the keyring module used by the CLI will default to 
+Enterprise mode. This means that a CLI user who logs in via the CLI will remain logged in
+until they explicitly log out. **If using this CLI on Windows, CyberArk recommends that all
+users explicitly log out at the end of their session.** This behavior can be changed by 
+creating an environment variable called KEYRING_PROPERTY_PERSIST and setting that variable
+to 'session' (no quotes). When this variable is set as described, the CLI user should be
+logged out when the session expires. 
 
 ## Contributing
 
