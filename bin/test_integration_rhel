@@ -102,7 +102,7 @@ echo "Configure Conjur..."
 _configure_conjur
 
 echo "Starting test env..."
-docker-compose up -d "${CONTAINER_ID}"
+docker-compose up -d "${CONTAINER_ID}" --no-deps
 
 rm -rf "$CURRENT_DIR"/output/*
 
