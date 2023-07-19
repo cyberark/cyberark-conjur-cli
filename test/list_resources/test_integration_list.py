@@ -83,7 +83,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_list_kind_user_returns_users(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-k', 'user'])
-        self.assertIn(f'[\n    "{self.client_params.account}:user:someuser"\n]\n', output)
+        self.assertIn(f'[\n    "{self.client_params.account}:user:admin",\n    "{self.client_params.account}:user:someuser"\n]\n', output)
 
     @integration_test(True)
     def test_list_kind_nonexistent_returns_empty_list(self):
@@ -146,7 +146,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'    "{self.client_params.account}:host:anotherhost",\n'
                       f'    "{self.client_params.account}:layer:somelayer",\n'
                       f'    "{self.client_params.account}:policy:root",\n'
-                      f'    "{self.client_params.account}:user:someuser"\n]\n', output)
+                      f'    "{self.client_params.account}:user:admin"\n]\n', output)
 
     @integration_test()
     def test_list_limit_long_returns_same_number_of_resources(self):
@@ -155,7 +155,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                           f'    "{self.client_params.account}:host:anotherhost",\n'
                           f'    "{self.client_params.account}:layer:somelayer",\n'
                           f'    "{self.client_params.account}:policy:root",\n'
-                          f'    "{self.client_params.account}:user:someuser"\n]\n', output)
+                          f'    "{self.client_params.account}:user:admin"\n]\n', output)
 
     @integration_test(True)
     def test_list_limit_invalid_param_returns_empty_list(self):
@@ -187,6 +187,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '2'])
         self.assertIn(f'[\n    "{self.client_params.account}:layer:somelayer",\n'
                       f'    "{self.client_params.account}:policy:root",\n'
+                      f'    "{self.client_params.account}:user:admin",\n'
                       f'    "{self.client_params.account}:user:someuser",\n'
                       f'    "{self.client_params.account}:variable:one/password",\n'
                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)
@@ -196,6 +197,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
         output = self.invoke_cli(self.cli_auth_params, ['list', '--offset=2'])
         self.assertIn(f'[\n    "{self.client_params.account}:layer:somelayer",\n'
                       f'    "{self.client_params.account}:policy:root",\n'
+                      f'    "{self.client_params.account}:user:admin",\n'
                       f'    "{self.client_params.account}:user:someuser",\n'
                       f'    "{self.client_params.account}:variable:one/password",\n'
                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)
@@ -207,6 +209,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
                       f'    "{self.client_params.account}:host:anotherhost",\n'
                       f'    "{self.client_params.account}:layer:somelayer",\n'
                       f'    "{self.client_params.account}:policy:root",\n'
+                      f'    "{self.client_params.account}:user:admin",\n'
                       f'    "{self.client_params.account}:user:someuser",\n'
                       f'    "{self.client_params.account}:variable:one/password",\n'
                       f'    "{self.client_params.account}:webservice:somewebservice"\n]\n', output)

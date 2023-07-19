@@ -142,7 +142,7 @@ class CliIntegrationUserHostTest(IntegrationTestCaseBase):  # pragma: no cover
         # Verify that a user cannot rotate an admin's API key
         attempt_to_rotate_admin_key = self.invoke_cli(self.cli_auth_params,
                                                       ['user', 'rotate-api-key', '-i', 'admin'], exit_code=1)
-        self.assertIn("500 (Internal Server Error) for url:", attempt_to_rotate_admin_key)
+        self.assertIn("404 (Not Found) for url:", attempt_to_rotate_admin_key)
 
     @integration_test()
     def test_user_rotate_api_key_without_flag_returns_error(self):

@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi:8.3
+FROM registry.access.redhat.com/ubi8/ubi:8.8
 
 ENV INSTALL_DIR=/opt/cyberark-conjur-cli
 
@@ -25,10 +25,10 @@ RUN gpg --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS
 # Copy below repo file to enable installation of gnome-keyring and dbus-x11
 COPY ./test/CentOS-Linux-AppStream.repo \
      /etc/yum.repos.d/
-                   
+
 RUN yum --disableplugin=subscription-manager -y \
-                                install -y  dbus-x11 \  
-                                            gnome-keyring \                                        
+                                install -y  dbus-x11 \
+                                            gnome-keyring \
          && yum --disableplugin=subscription-manager clean all
 
 RUN mkdir -p $INSTALL_DIR
