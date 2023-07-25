@@ -59,7 +59,7 @@ DEBUG=$DEBUG
 ENV
 
 echo "Starting test env..."
-docker-compose up -d test
+docker-compose up -d test "$TEST_HOSTNAME" --no-deps
 
 rm -rf $CURRENT_DIR/output/*
 
