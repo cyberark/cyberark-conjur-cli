@@ -160,12 +160,12 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_list_limit_invalid_param_returns_empty_list(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-l', '0'], exit_code=1)
-        self.assertIn("422 (Unprocessable Entity) for url:", output)
+        self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
 
     @integration_test(True)
     def test_list_limit_string_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-l', 'somestring'], exit_code=1)
-        self.assertIn("422 (Unprocessable Entity) for url:", output)
+        self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
 
     '''
     Validates that an invalid input (a negative number) raises an error 
@@ -173,7 +173,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_list_limit_invalid_negative_param_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-l', '-5'], exit_code=1)
-        self.assertIn("422 (Unprocessable Entity) for url:", output)
+        self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
 
     @integration_test()
     def test_list_random_input_raises_error(self):
@@ -217,7 +217,7 @@ class CliIntegrationTestList(IntegrationTestCaseBase):  # pragma: no cover
     @integration_test(True)
     def test_list_offset_negative_raises_error(self):
         output = self.invoke_cli(self.cli_auth_params, ['list', '-o', '-1'], exit_code=1)
-        self.assertIn("422 (Unprocessable Entity) for url:", output)
+        self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
 
     # This tests is commented out because of a bug in server (https://github.com/cyberark/conjur/issues/1997)
     # where a string is considered valid input for offset. For example, when offset=somestring a list

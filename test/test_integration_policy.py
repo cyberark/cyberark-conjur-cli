@@ -111,8 +111,8 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         with self.assertLogs('', level='DEBUG') as mock_log:
             with redirect_stderr(self.capture_stream):
                 output = utils.load_policy_from_string(self, policy, exit_code=1)
-            self.assertIn("422 (Unprocessable Entity) for url:", output)
-        self.assertIn("422 Unprocessable Entity {\"error\":{\"code\":\"validation_failed\",\"message\":",
+            self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
+        self.assertIn("{\"error\":{\"code\":\"validation_failed\",\"message\":",
                   str(mock_log.output))
 
     @integration_test()
@@ -161,7 +161,7 @@ class CliIntegrationPolicy(IntegrationTestCaseBase):  # pragma: no cover
         policy = "- ! user bad syntax"
         output = utils.replace_policy_from_string(self, policy, exit_code=1)
 
-        self.assertIn("422 (Unprocessable Entity) for url:", output)
+        self.assertRegex(output, r".*422 \(Unprocessable (Entity|Content)\) for url:.*")
 
     @integration_test()
     def test_https_load_policy_doesnt_break_if_no_created_roles(self):

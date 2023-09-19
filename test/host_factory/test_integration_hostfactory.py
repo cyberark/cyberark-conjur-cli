@@ -20,7 +20,7 @@ INVALID_DURATION_ERROR_MSG = 'Failed to execute command. Reason: ' \
                              'Either \'duration-days\' / \'duration-hours\' / \'duration-minutes\' ' \
                              'are missing or not in the correct format. Solution: provide one of the required ' \
                              'parameters or make sure they are positive numbers'
-ERROR_PATTERN_422 = r"Failed to execute command. Reason: 422 \(Unprocessable Entity\) for url:.*"
+ERROR_PATTERN_422 = r"Failed to execute command. Reason: 422 \(Unprocessable (Entity|Content)\) for url:.*"
 ERROR_PATTERN_404 = r'Failed to execute command. Reason: 404 \(Not Found\) for url:.*'
 ERROR_PATTERN_401 = 'Failed to log in to Conjur. Unable to authenticate with Conjur. ' \
                     r'Reason: 401 \(Unauthorized\) for url:.*'
