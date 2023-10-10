@@ -4,6 +4,8 @@ For general contribution and community guidelines, please see the [community rep
 In particular, before contributing please review our [contributor licensing guide](https://github.com/cyberark/community/blob/main/CONTRIBUTING.md#when-the-repo-does-not-include-the-cla)
 to ensure your contribution is compliant with our contributor license agreements.
 
+Find more [OSS projects from CyberArk](https://github.com/cyberark).
+
 ## Table of Contents
 
 - [Building](#building)
