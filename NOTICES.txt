@@ -7,7 +7,7 @@ the full text of the license associated with each component.
 
 
 Section 1: Apache-2.0
->>> github.com/pyca/cryptography - 39.0.1
+>>> github.com/pyca/cryptography - 42.0.5
 >>> github.com/psf/requests - 2.25.0
 >>> github.com/pyca/pyopenssl - 23.0.0
 >>> github.com/pypa/twine - 3.2.0
@@ -36,7 +36,7 @@ APPENDIX: Standard License Files and Templates
 
 Apache-2.0 License is applicable to the following component(s).
 
->>> github.com/pyca/cryptography - 39.0.1
+>>> github.com/pyca/cryptography - 42.0.5
 
 Copyright 2013-2021 Individual Contributors
 
