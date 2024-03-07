@@ -25,7 +25,7 @@ with open('README.md', 'r') as readme_file:
 setup(
     name="conjur",
     version=VERSION_DATA['__version__'],
-    python_requires='>=3.10.1',
+    python_requires='>=3.11',
     packages=find_packages(exclude=("test")),
     zip_safe=True,
 
