@@ -46,7 +46,7 @@ setup(
         "pylint>=2.6.0",
         "cryptography~=42.0.5",
         "keyring>=23.0.0",
-        "pyopenssl>=23.0.0",
+        "pyopenssl>=24.0.0",
         "PyInstaller>=4.0",
         "PyYAML>=5.3.1",
         "aiohttp>=3.9.3",
