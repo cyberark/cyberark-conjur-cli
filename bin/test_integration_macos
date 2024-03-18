@@ -6,7 +6,7 @@
 cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
-  docker-compose rm --stop --force
+  docker compose rm --stop --force
 }
 
 DEBUG="false"
@@ -15,23 +15,23 @@ if [[ "$1" = "--debug" || "$1" = "-d" ]]; then
   shift
 fi
 
-trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'echo "ERROR: Test script encountered an error!"; docker compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
 echo "Generating certificate..."
-docker-compose up openssl
+docker compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur
-docker-compose up -d conjur-https
-docker-compose exec -T conjur conjurctl wait
+docker compose up -d conjur
+docker compose up -d conjur-https
+docker compose exec -T conjur conjurctl wait
 
 echo "Configuring Conjur..."
-admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
+admin_api_key=$(docker compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
 export CONJUR_AUTHN_API_KEY=$admin_api_key
 export DEBUG=$DEBUG
-conjur_host_port=$(docker-compose port conjur 80)
+conjur_host_port=$(docker compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
 export TEST_HOSTNAME=conjur-https
 export CONJURRC=no_cert_localhost_conjurrc

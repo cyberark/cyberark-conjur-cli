@@ -1,7 +1,7 @@
 # Dockerfile.test.rhel
 #
-# Dockerfile for running tests on RHEL 7. Python3.10.1 on RHEL 7
-# Python3.10.1 is installed using pyenv.
+# Dockerfile for running tests on RHEL 7. Python3.11 on RHEL 7
+# Python3.11 is installed using pyenv.
 # The Centos repo files enables access to RPMs required by pip and PyInstaller
 # that are not available on the RHEL7 built-in repos (e.g devtools7).
 
@@ -71,14 +71,14 @@ WORKDIR $INSTALL_DIR
 # Copy project's requirements file
 COPY ./requirements.txt $INSTALL_DIR/
 
-# Install Python 3.10.1 using pyenv, wheel and required libs
+# Install Python 3.11 using pyenv, wheel and required libs
 ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 RUN curl -L -s https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash \
     && eval "$(pyenv init --path)" \
-    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10.1 \
-    && pyenv global 3.10.1 \
+    && env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.11 \
+    && pyenv global 3.11 \
     && pip install wheel \
     && pip install -r requirements.txt
 

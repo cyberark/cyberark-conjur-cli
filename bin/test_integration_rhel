@@ -34,10 +34,10 @@ done
 cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
-  docker-compose rm --stop --force
+  docker compose rm --stop --force
 }
 
-trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'echo "ERROR: Test script encountered an error!"; docker compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
@@ -53,13 +53,13 @@ fi
 echo "Run integration tests on RHEL ${RHEL_VERSION}"
 
 echo "Building API container..."
-docker-compose build "${CONTAINER_ID}"
+docker compose build "${CONTAINER_ID}"
 
 echo "Generating certificate..."
-docker-compose up openssl
+docker compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur-appliance
+docker compose up -d conjur-appliance
 
 echo "Configuring Conjur..."
 export DEBUG=$DEBUG
@@ -93,7 +93,7 @@ function _configure_conjur() {
 
   echo "$_cmd"
 
-  docker-compose exec -T conjur-appliance \
+  docker compose exec -T conjur-appliance \
     bash -c "$_cmd"
   set -x
 }
@@ -102,18 +102,18 @@ echo "Configure Conjur..."
 _configure_conjur
 
 echo "Starting test env..."
-docker-compose up -d "${CONTAINER_ID}" --no-deps
+docker compose up -d "${CONTAINER_ID}" --no-deps
 
 rm -rf "$CURRENT_DIR"/output/*
 
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged "${CONTAINER_ID}" /bin/sh -c " /tests_executor.sh" "$@"
+  docker compose exec --privileged "${CONTAINER_ID}" /bin/sh -c " /tests_executor.sh" "$@"
   exit
 fi
 
-docker-compose run \
+docker compose run \
   --rm \
   --no-deps \
   "${CONTAINER_ID}" \

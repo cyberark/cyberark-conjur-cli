@@ -3,7 +3,7 @@
 cleanup() {
   echo "Cleaning up..."
   echo "Cleaning up... logs in cleanup.log"
-  docker-compose rm --stop --force
+  docker compose rm --stop --force
 }
 
 DEBUG="false"
@@ -29,25 +29,25 @@ function get_parameters() {
 }
 get_parameters $@
 
-trap 'echo "ERROR: Test script encountered an error!"; docker-compose logs &> cleanup.log; cleanup' ERR
+trap 'echo "ERROR: Test script encountered an error!"; docker compose logs &> cleanup.log; cleanup' ERR
 trap 'cleanup' EXIT
 cleanup
 
 echo "Building API container..."
-docker-compose build test
+docker compose build test
 
 echo "Generating certificate..."
-docker-compose up openssl
+docker compose up openssl
 
 echo "Starting Conjur..."
-docker-compose up -d conjur
-docker-compose exec -T conjur conjurctl wait
+docker compose up -d conjur
+docker compose exec -T conjur conjurctl wait
 
 echo "Configuring Conjur..."
-admin_api_key=$(docker-compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
+admin_api_key=$(docker compose exec -T conjur conjurctl role retrieve-key dev:user:admin | tr -d '\r')
 export CONJUR_AUTHN_API_KEY=$admin_api_key
 export DEBUG=$DEBUG
-conjur_host_port=$(docker-compose port conjur 80)
+conjur_host_port=$(docker compose port conjur 80)
 conjur_port="${conjur_host_port##*:}"
 export TEST_HOSTNAME=conjur-https
 
@@ -59,28 +59,28 @@ DEBUG=$DEBUG
 ENV
 
 echo "Starting test env..."
-docker-compose up -d test "$TEST_HOSTNAME" --no-deps
+docker compose up -d test "$TEST_HOSTNAME" --no-deps
 
 rm -rf $CURRENT_DIR/output/*
 
 if [[ -n "$SDK_REPO_PATH" ]]; then
-  docker-compose cp "$SDK_REPO_PATH" test:/
-  docker-compose exec test /bin/sh -c " pip install /$SDK_REPO_PATH"
+  docker compose cp "$SDK_REPO_PATH" test:/
+  docker compose exec test /bin/sh -c " pip install /$SDK_REPO_PATH"
 fi
 
 # Hint: '--privileged' is added here otherwise we will get operation
 # not permitted when attempting to do anything related to dbus
 if [[ "$DEBUG" == "true" ]]; then
-  docker-compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
+  docker compose exec --privileged test /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
 if [[ -n "$SDK_REPO_PATH" ]]; then
-  docker-compose exec \
+  docker compose exec \
     test \
     /bin/sh -c " /tests_executor.sh" $@
   exit
 fi
-docker-compose run \
+docker compose run \
   --rm \
   --no-deps \
   test \
