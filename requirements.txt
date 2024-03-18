@@ -12,8 +12,8 @@ asynctest>=0.13.0
 async-timeout>=4.0.3
 setuptools>=57.0.0
 twine>=3.2.0
-# conjur-api>=8.0.0
-git+https://github.com/cyberark/conjur-api-python.git
+conjur-api>=0.1.1
+# git+https://github.com/cyberark/conjur-api-python.git
 
 # https://nvd.nist.gov/vuln/detail/CVE-2020-26137
 urllib3>=1.25.9
