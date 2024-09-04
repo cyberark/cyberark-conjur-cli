@@ -1,3 +1,7 @@
+# DEPRECATED
+
+As of September 4, 2024 this project is deprecated and will no longer be maintained. Please use [cyberark/conjur-cli-go](https://github.com/cyberark/conjur-cli-go) instead.
+
 # cyberark-conjur-cli
 
 This repository includes self-contained Conjur CLI (`conjur`) for
